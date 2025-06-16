@@ -37,11 +37,18 @@
 - **表示**: アイコンのみ（テキストラベル禁止）
 - **アイコン**: `lucide-react` の `Copy` / `Check`
 - **状態**: 通常時 = Copy、成功時 = Check（緑色）
+- **UI参照**: 必ず現在の `src/components/common/CopyColorButton.tsx` の実装を基準とする
 
 ### バリアント
 1. **minimal**: アイコンのみ、丸ボタン
 2. **compact**: アイコンのみ、角丸ボタン  
 3. **full**: アイコンのみ、大きめボタン
+
+### 実装ルール
+- **コンポーネント参照**: 新規作成時は `CopyColorButton` の現在の状態を必ず参照
+- **アイコンサイズ**: `w-4 h-4`（16px）統一
+- **インラインスタイル**: SimpleTest等では `<Copy size={16} />` 形式
+- **統一性**: 全プロジェクトで同じ見た目・動作を保つ
 
 ### 可視性
 - **表示**: `opacity-80 hover:opacity-100`（常時表示）
@@ -102,6 +109,7 @@
 3. **group-hover隠し**: `opacity-0 group-hover:opacity-100`
 4. **日本語配色技法名**: 「補色配色」「三角配色」等
 5. **Canvas強制**: 表示されない場合はdivに切り替え
+6. **コピーアイコンの独自実装**: 必ず `CopyColorButton.tsx` の現在のUIを参照・統一
 
 ### CSS変数依存回避
 - Tailwindのカスタム変数が効かない場合は **インラインスタイル** を優先
