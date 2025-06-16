@@ -41,17 +41,61 @@ export const extractColorsFromImage = async (
         // カラーパレットを取得
         const palette = colorThief.getPalette(img, maxColors, 10) || [];
         
+        // 実際のピクセル分析による使用度計算
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const pixels = imageData.data;
+        const totalPixels = canvas.width * canvas.height;
+        
+        // 各色の使用度を計算
+        const colorCounts = new Map<string, number>();
+        const tolerance = 30; // 色の許容差
+        
+        for (let i = 0; i < pixels.length; i += 4) {
+          const r = pixels[i];
+          const g = pixels[i + 1];
+          const b = pixels[i + 2];
+          const pixelColor = chroma.rgb(r, g, b);
+          
+          // パレット内の最も近い色を見つける
+          let closestColor = '';
+          let minDistance = Infinity;
+          
+          for (const paletteRgb of palette) {
+            const paletteColor = chroma.rgb(paletteRgb[0], paletteRgb[1], paletteRgb[2]);
+            const distance = chroma.deltaE(pixelColor, paletteColor);
+            
+            if (distance < minDistance && distance < tolerance) {
+              minDistance = distance;
+              closestColor = paletteColor.hex();
+            }
+          }
+          
+          if (closestColor) {
+            colorCounts.set(closestColor, (colorCounts.get(closestColor) || 0) + 1);
+          }
+        }
+        
         // ExtractedColor形式に変換
-        const colors: ExtractedColor[] = palette.map((rgb: [number, number, number], index: number) => ({
-          hex: chroma.rgb(rgb[0], rgb[1], rgb[2]).hex(),
-          rgb,
-          usage: 1 - (index / palette.length), // 最初の色ほど使用度が高い
-        }));
+        const colors: ExtractedColor[] = palette.map((rgb: [number, number, number]) => {
+          const hex = chroma.rgb(rgb[0], rgb[1], rgb[2]).hex();
+          const count = colorCounts.get(hex) || 0;
+          const usage = count / totalPixels;
+          
+          return {
+            hex,
+            rgb,
+            usage,
+          };
+        }).sort((a, b) => b.usage - a.usage); // 使用度の高い順にソート
 
+        // ドミナントカラーの実際の使用度を設定
+        const dominantHex = chroma.rgb(dominantRgb[0], dominantRgb[1], dominantRgb[2]).hex();
+        const dominantUsage = colorCounts.get(dominantHex) || 0;
+        
         const dominantColor: ExtractedColor = {
-          hex: chroma.rgb(dominantRgb[0], dominantRgb[1], dominantRgb[2]).hex(),
+          hex: dominantHex,
           rgb: dominantRgb,
-          usage: 1,
+          usage: dominantUsage / totalPixels,
         };
 
         // ドミナントカラーが結果に含まれていない場合は先頭に追加

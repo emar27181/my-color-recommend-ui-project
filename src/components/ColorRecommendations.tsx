@@ -74,12 +74,12 @@ export const ColorRecommendations = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-3 xs:grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 2xl:grid-cols-16 gap-2 sm:gap-3">
+          <div className="grid grid-cols-8 sm:grid-cols-10 md:grid-cols-12 lg:grid-cols-16 xl:grid-cols-20 gap-2">
             {recommendedColors.map((color, index) => (
-              <div key={index} className="space-y-2 group">
+              <div key={index} className="space-y-1 group">
                 <div className="relative">
                   <div
-                    className="w-full aspect-square rounded-lg border-2 border-border hover:border-primary transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-lg cursor-pointer min-h-[48px] sm:min-h-[56px]"
+                    className="w-10 h-10 rounded-md border-2 border-border hover:border-primary transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-lg cursor-pointer"
                     style={{ backgroundColor: color }}
                     onClick={() => handleGenerateTones(color)}
                     title={`色: ${color} (クリックでトーン生成)`}
@@ -97,7 +97,7 @@ export const ColorRecommendations = () => {
                   </button>
                 </div>
                 <div className="text-center">
-                  <p className="text-xs font-mono text-muted-foreground bg-muted/50 px-1.5 py-1 rounded-md truncate leading-relaxed">{color}</p>
+                  <p className="text-xs font-mono text-muted-foreground bg-muted/50 px-1 py-0.5 rounded text-center truncate">{color}</p>
                 </div>
               </div>
             ))}
@@ -158,14 +158,14 @@ export const ToneRecommendations = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-3 xs:grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 2xl:grid-cols-16 gap-2 sm:gap-3">
+          <div className="grid grid-cols-8 sm:grid-cols-10 md:grid-cols-12 lg:grid-cols-16 xl:grid-cols-20 gap-2">
             {recommendedTones.map((tone, index) => {
               const adjustment = TONE_ADJUSTMENTS[index];
               return (
-                <div key={index} className="space-y-2 group">
+                <div key={index} className="space-y-1 group">
                   <div className="relative">
                     <div
-                      className="w-full aspect-square rounded-lg border-2 border-border hover:border-primary transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-lg cursor-pointer min-h-[48px] sm:min-h-[56px]"
+                      className="w-10 h-10 rounded-md border-2 border-border hover:border-primary transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-lg cursor-pointer"
                       style={{ backgroundColor: tone }}
                       title={`${adjustment?.name || ''}: ${tone}`}
                       onClick={(e) => handleCopyTone(tone, e)}
@@ -183,7 +183,7 @@ export const ToneRecommendations = () => {
                     </button>
                   </div>
                   <div className="text-center space-y-1">
-                    <p className="text-xs font-mono text-muted-foreground bg-muted/50 px-1.5 py-1 rounded-md truncate leading-relaxed">{tone}</p>
+                    <p className="text-xs font-mono text-muted-foreground bg-muted/50 px-1 py-0.5 rounded text-center truncate">{tone}</p>
                     {adjustment && (
                       <p className="text-xs text-muted-foreground font-medium">{adjustment.name}</p>
                     )}

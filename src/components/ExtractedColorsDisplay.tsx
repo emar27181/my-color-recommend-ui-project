@@ -56,7 +56,7 @@ export const ExtractedColorsDisplay = () => {
               <div className="flex items-center gap-3">
                 <div className="relative group">
                   <div
-                    className="w-12 h-12 rounded-lg border-2 border-primary shadow-sm cursor-pointer hover:scale-105 transition-transform"
+                    className="w-10 h-10 rounded-md border-2 border-primary shadow-sm cursor-pointer hover:scale-105 transition-transform"
                     style={{ backgroundColor: dominantColor.hex }}
                     onClick={() => handleColorSelect(dominantColor.hex)}
                     title={`ドミナントカラー: ${dominantColor.hex} (クリックで選択)`}
@@ -91,14 +91,14 @@ export const ExtractedColorsDisplay = () => {
           {/* その他の抽出色 */}
           <div>
             <h3 className="text-sm font-medium mb-2">その他の抽出色</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+            <div className="grid grid-cols-8 sm:grid-cols-10 md:grid-cols-12 lg:grid-cols-16 xl:grid-cols-20 gap-2">
               {extractedColors
                 .filter(color => color.hex !== dominantColor?.hex)
                 .map((color, index) => (
-                  <div key={index} className="space-y-2 group">
+                  <div key={index} className="space-y-1 group">
                     <div className="relative">
                       <div
-                        className="w-full aspect-square rounded-lg border border-border cursor-pointer hover:border-primary hover:scale-105 transition-all duration-200 shadow-sm"
+                        className="w-10 h-10 rounded-md border border-border cursor-pointer hover:border-primary hover:scale-105 transition-all duration-200 shadow-sm"
                         style={{ backgroundColor: color.hex }}
                         onClick={() => handleColorSelect(color.hex)}
                         title={`${color.hex} (クリックで選択)`}
@@ -119,10 +119,10 @@ export const ExtractedColorsDisplay = () => {
                       </button>
                     </div>
                     <div className="text-center">
-                      <p className="text-xs font-mono text-muted-foreground truncate">
+                      <p className="text-xs font-mono text-muted-foreground bg-muted/50 px-1 py-0.5 rounded text-center truncate">
                         {color.hex}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-muted-foreground font-medium">
                         {Math.round(color.usage * 100)}%
                       </p>
                     </div>
