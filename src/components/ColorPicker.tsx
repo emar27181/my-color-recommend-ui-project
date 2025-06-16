@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useColorStore } from '@/store/colorStore';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { CopyColorButton } from '@/components/common/CopyColorButton';
+import { Palette } from 'lucide-react';
+import { TYPOGRAPHY, COLOR_BLOCK_SPEC } from '@/constants/ui';
 
 export const ColorPicker = () => {
   const { selectedColor, setSelectedColor } = useColorStore();
@@ -33,28 +35,50 @@ export const ColorPicker = () => {
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>カラーピッカー</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className="w-full max-w-md p-6 rounded-xl border" style={{ 
+      backgroundColor: 'var(--card)', 
+      borderColor: 'var(--border)',
+      color: 'var(--foreground)',
+      minHeight: '300px'
+    }}>
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold" style={{ color: 'var(--foreground)' }}>カラーピッカー</h2>
+      </div>
+      <div className="space-y-4">
         {/* HTML5 Color Input */}
         <div className="space-y-2">
-          <label htmlFor="color-picker" className="text-sm font-medium">
+          <label htmlFor="color-picker" className="text-sm font-medium text-foreground">
             色を選択
           </label>
-          <input
-            id="color-picker"
-            type="color"
-            value={selectedColor}
-            onChange={handleColorChange}
-            className="w-full h-12 rounded-md border cursor-pointer"
-          />
+          <div className="flex justify-center">
+            <div className="relative cursor-pointer">
+              <div 
+                className="border-2 border-gray-300 rounded cursor-pointer hover:scale-110 transition-transform"
+                style={{ 
+                  backgroundColor: selectedColor,
+                  width: `${COLOR_BLOCK_SPEC.width}px`,
+                  height: `${COLOR_BLOCK_SPEC.height}px`
+                }}
+                title="クリックで色を選択"
+              />
+              <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1 border border-gray-300 pointer-events-none">
+                <Palette size={16} className="text-gray-600" />
+              </div>
+              <input
+                id="color-picker-input"
+                type="color"
+                value={selectedColor}
+                onChange={handleColorChange}
+                className="absolute opacity-0 w-full h-full cursor-pointer"
+                style={{ top: 0, left: 0 }}
+              />
+            </div>
+          </div>
         </div>
 
         {/* Text Input for Color Code */}
         <div className="space-y-2">
-          <label htmlFor="color-input" className="text-sm font-medium">
+          <label htmlFor="color-input" className="text-sm font-medium text-foreground">
             カラーコード
           </label>
           <div className="flex gap-2">
@@ -75,16 +99,40 @@ export const ColorPicker = () => {
 
         {/* Selected Color Preview */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">選択された色</label>
-          <div
-            className="w-full h-16 rounded-md border-2 border-border"
-            style={{ backgroundColor: selectedColor }}
-          />
-          <p className="text-sm text-muted-foreground text-center">
-            {selectedColor}
-          </p>
+          <label className={TYPOGRAPHY.subtitle}>選択された色</label>
+          <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
+            <div className="flex items-center gap-6">
+              <div className="relative cursor-pointer">
+                <div 
+                  className="border-2 border-gray-300 rounded cursor-pointer hover:scale-110 transition-transform"
+                  style={{ 
+                    backgroundColor: selectedColor,
+                    width: `${COLOR_BLOCK_SPEC.width}px`,
+                    height: `${COLOR_BLOCK_SPEC.height}px`
+                  }}
+                  title="クリックで色を選択"
+                />
+                <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1 border border-gray-300 pointer-events-none">
+                  <Palette size={16} className="text-gray-600" />
+                </div>
+                <input
+                  type="color"
+                  value={selectedColor}
+                  onChange={handleColorChange}
+                  className="absolute opacity-0 w-full h-full cursor-pointer"
+                  style={{ top: 0, left: 0 }}
+                />
+              </div>
+              <div className="flex-1">
+                <p className={`${TYPOGRAPHY.colorCode} bg-muted px-3 py-1 rounded-full`}>
+                  {selectedColor}
+                </p>
+              </div>
+              <CopyColorButton color={selectedColor} variant="compact" className="opacity-100" />
+            </div>
+          </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
