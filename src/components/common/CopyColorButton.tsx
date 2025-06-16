@@ -44,7 +44,7 @@ export const CopyColorButton = ({
         className={`p-2 rounded-full bg-background/80 backdrop-blur-sm border border-border/50 
                    hover:bg-background hover:border-border hover:scale-105 
                    transition-all duration-200 shadow-sm hover:shadow-md 
-                   opacity-0 group-hover:opacity-100 ${className}`}
+                   ${className.includes('opacity') ? className : `opacity-80 hover:opacity-100 ${className}`}`}
         title={`${color} をコピー`}
       >
         {isCopied ? (
@@ -64,7 +64,7 @@ export const CopyColorButton = ({
         className={`px-3 py-2 rounded-lg bg-background/80 backdrop-blur-sm border border-border/50 
                    hover:bg-background hover:border-border hover:scale-105 
                    transition-all duration-200 shadow-sm hover:shadow-md 
-                   flex items-center gap-2 opacity-0 group-hover:opacity-100 ${className}`}
+                   flex items-center gap-2 ${className.includes('opacity') ? className : `opacity-80 hover:opacity-100 ${className}`}`}
         title={`${color} をコピー`}
       >
         {isCopied ? (

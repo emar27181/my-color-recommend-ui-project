@@ -99,7 +99,7 @@ export const ColorPicker = () => {
                   {selectedColor}
                 </p>
               </div>
-              <CopyColorButton color={selectedColor} variant="compact" />
+              <CopyColorButton color={selectedColor} variant="compact" className="opacity-100" />
             </div>
           </div>
         </div>

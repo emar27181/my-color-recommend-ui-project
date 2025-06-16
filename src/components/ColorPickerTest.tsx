@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useColorStore } from '@/store/colorStore';
+import { CopyColorButton } from '@/components/common/CopyColorButton';
 
 export const ColorPickerTest = () => {
   const { selectedColor, setSelectedColor } = useColorStore();
@@ -45,8 +46,9 @@ export const ColorPickerTest = () => {
               className="hidden"
             />
           </div>
-          <div className="text-center">
+          <div className="flex items-center justify-center gap-2">
             <span className="text-sm text-gray-600">{selectedColor}</span>
+            <CopyColorButton color={selectedColor} variant="minimal" className="opacity-100" />
           </div>
         </div>
       </div>
@@ -69,8 +71,9 @@ export const ColorPickerTest = () => {
               className="hidden"
             />
           </div>
-          <div className="text-center">
+          <div className="flex items-center justify-center gap-2">
             <span className="text-sm font-mono bg-gray-200 px-2 py-1 rounded">{selectedColor}</span>
+            <CopyColorButton color={selectedColor} variant="minimal" className="opacity-100" />
           </div>
         </div>
       </div>
@@ -93,8 +96,9 @@ export const ColorPickerTest = () => {
               className="hidden"
             />
           </div>
-          <div className="text-center">
+          <div className="flex items-center justify-center gap-2">
             <span className="text-lg font-bold text-blue-800">{selectedColor}</span>
+            <CopyColorButton color={selectedColor} variant="minimal" className="opacity-100" />
           </div>
         </div>
       </div>
@@ -119,8 +123,9 @@ export const ColorPickerTest = () => {
               className="hidden"
             />
           </div>
-          <div className="text-center">
+          <div className="flex items-center justify-center gap-2">
             <span className="text-sm text-green-700 bg-green-100 px-3 py-1 rounded-full">{selectedColor}</span>
+            <CopyColorButton color={selectedColor} variant="minimal" className="opacity-100" />
           </div>
         </div>
       </div>
@@ -143,8 +148,9 @@ export const ColorPickerTest = () => {
               className="hidden"
             />
           </div>
-          <div className="text-center">
+          <div className="flex items-center justify-center gap-2">
             <span className="text-sm text-purple-700 font-semibold">{selectedColor}</span>
+            <CopyColorButton color={selectedColor} variant="minimal" className="opacity-100" />
           </div>
         </div>
       </div>
@@ -172,8 +178,9 @@ export const ColorPickerTest = () => {
               className="hidden"
             />
           </div>
-          <div className="text-center">
+          <div className="flex items-center justify-center gap-2">
             <span className="text-sm text-yellow-700 bg-yellow-200 px-2 py-1 rounded font-mono">{selectedColor}</span>
+            <CopyColorButton color={selectedColor} variant="minimal" className="opacity-100" />
           </div>
         </div>
       </div>

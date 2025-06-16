@@ -74,6 +74,7 @@ export const ColorRecommendations = () => {
                   <CopyColorButton 
                     color={color} 
                     variant="minimal"
+                    className="opacity-100"
                   />
                 </div>
               </div>
@@ -134,6 +135,7 @@ export const ToneRecommendations = () => {
                   <CopyColorButton 
                     color={tone} 
                     variant="minimal"
+                    className="opacity-100"
                   />
                 </div>
               </div>

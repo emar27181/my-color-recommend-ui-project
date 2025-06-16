@@ -83,6 +83,7 @@ export const ExtractedColorsDisplay = () => {
                       <CopyColorButton 
                         color={color.hex} 
                         variant="minimal"
+                        className="opacity-100"
                       />
                     </div>
                   </div>
