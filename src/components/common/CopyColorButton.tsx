@@ -68,15 +68,9 @@ export const CopyColorButton = ({
         title={`${color} をコピー`}
       >
         {isCopied ? (
-          <>
-            <Check className="w-4 h-4 text-emerald-500" />
-            <span className="text-xs font-medium text-emerald-500">Done!</span>
-          </>
+          <Check className="w-4 h-4 text-emerald-500" />
         ) : (
-          <>
-            <Copy className="w-4 h-4 text-muted-foreground" />
-            <span className="text-xs font-medium text-muted-foreground">Copy</span>
-          </>
+          <Copy className="w-4 h-4 text-muted-foreground" />
         )}
       </button>
     );
@@ -101,15 +95,9 @@ export const CopyColorButton = ({
       
       <div className="flex items-center gap-2">
         {isCopied ? (
-          <>
-            <Check className="w-4 h-4 text-emerald-500" />
-            <span className="text-sm font-medium text-emerald-500">Copied!</span>
-          </>
+          <Check className="w-4 h-4 text-emerald-500" />
         ) : (
-          <>
-            <Copy className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm font-medium text-muted-foreground">Copy Code</span>
-          </>
+          <Copy className="w-4 h-4 text-muted-foreground" />
         )}
       </div>
     </button>

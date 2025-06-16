@@ -1,3 +1,5 @@
+import { Copy } from 'lucide-react';
+
 export const SimpleTest = () => {
   return (
     <div style={{ 
@@ -35,13 +37,16 @@ export const SimpleTest = () => {
             }} />
             <span style={{ fontSize: '16px', fontFamily: 'monospace' }}>#3b82f6</span>
             <button style={{
-              padding: '8px 16px',
+              padding: '8px',
               backgroundColor: '#e5e7eb',
               border: '1px solid #ccc',
               borderRadius: '4px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}>
-              コピー
+              <Copy size={16} color="#374151" />
             </button>
           </div>
         </div>
@@ -65,13 +70,16 @@ export const SimpleTest = () => {
             }} />
             <span style={{ fontSize: '16px', fontFamily: 'monospace' }}>#f97316</span>
             <button style={{
-              padding: '8px 16px',
+              padding: '8px',
               backgroundColor: '#fed7aa',
               border: '1px solid #f97316',
               borderRadius: '4px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}>
-              コピー
+              <Copy size={16} color="#f97316" />
             </button>
           </div>
         </div>
@@ -95,13 +103,16 @@ export const SimpleTest = () => {
             }} />
             <span style={{ fontSize: '16px', fontFamily: 'monospace' }}>#22c55e</span>
             <button style={{
-              padding: '8px 16px',
+              padding: '8px',
               backgroundColor: '#bbf7d0',
               border: '1px solid #22c55e',
               borderRadius: '4px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}>
-              コピー
+              <Copy size={16} color="#22c55e" />
             </button>
           </div>
         </div>
