@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ColorBlock } from '@/components/common/ColorBlock';
+import { CopyColorButton } from '@/components/common/CopyColorButton';
 import { TYPOGRAPHY } from '@/constants/ui';
 
 export const ColorPicker = () => {
@@ -86,13 +87,14 @@ export const ColorPicker = () => {
         <div className="space-y-2">
           <label className={TYPOGRAPHY.subtitle}>選択された色</label>
           <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
-            <div className="flex flex-col items-center gap-3">
+            <div className="flex items-center gap-4">
               <ColorBlock color={selectedColor} />
-              <div className="text-center">
+              <div className="flex-1">
                 <p className={`${TYPOGRAPHY.colorCode} bg-muted px-3 py-1 rounded-full`}>
                   {selectedColor}
                 </p>
               </div>
+              <CopyColorButton color={selectedColor} variant="compact" />
             </div>
           </div>
         </div>

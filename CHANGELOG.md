@@ -159,6 +159,42 @@
 - `src/components/ExtractedColorsDisplay.tsx`: モバイルファーストUI + 統一仕様
 - `src/components/ColorRecommendations.tsx`: シンプルボタン + モバイルUI
 
+#### 11. 横並びレイアウトへの変更
+**変更内容**:
+- **縦長問題解決**: 縦並びカード → 横並びコンパクトレイアウト
+- **ColorPicker**: 色ブロック + カラーコードを横並びに配置
+- **ExtractedColorsDisplay**: 最頻出色とその他の色を横並びレイアウトに変更
+- **ColorRecommendations**: 推薦色とトーン表示を横並びに変更
+- **空間効率化**: `flex items-center gap-3/4`でコンパクトな表示を実現
+
+**変更ファイル**:
+- `src/components/ColorPicker.tsx`: 横並びレイアウト適用
+- `src/components/ExtractedColorsDisplay.tsx`: 横並びレイアウト適用
+- `src/components/ColorRecommendations.tsx`: 横並びレイアウト適用
+
+#### 12. おしゃれなCopyColorButtonとナイトモード実装
+**変更内容**:
+- **統一CopyColorButtonコンポーネント**: 3種類のバリアントを持つおしゃれなコピーボタン
+  - `minimal`: アイコンのみのシンプルボタン
+  - `compact`: アイコン + 小さいラベル
+  - `full`: フルサイズグラデーションボタン
+- **ナイトモードデフォルト**: App.tsxに`dark`クラスを追加
+- **おしゃれフォント設定**: 
+  - Inter: メインフォント
+  - JetBrains Mono: コード用フォント
+- **グラスモーフィズム効果**: backdrop-blurと半透明背景
+- **カスタムスクロールバー**: ダークモード対応の美しいスクロールバー
+- **アニメーション効果**: fadeIn、scaleIn等のスムーズアニメーション
+
+**変更ファイル**:
+- `src/components/common/CopyColorButton.tsx`: 新規作成（統一コピーボタン）
+- `src/App.tsx`: ナイトモードデフォルト化
+- `tailwind.config.js`: ダークモードとフォント設定
+- `src/index.css`: Inter/JetBrains Monoフォント、スタイル効果追加
+- `src/components/ColorPicker.tsx`: CopyColorButton適用
+- `src/components/ExtractedColorsDisplay.tsx`: CopyColorButton適用
+- `src/components/ColorRecommendations.tsx`: CopyColorButton適用
+
 ### 技術的改善のサマリー
 
 1. **色抽出精度**: 近似計算 → 実際のピクセル分析（deltaE色差使用）

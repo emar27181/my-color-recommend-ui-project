@@ -8,7 +8,7 @@ import { ToastContainer } from '@/components/ToastContainer';
 function App() {
   return (
     <ToastProvider>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background dark">
         <header className="border-b">
           <div className="container mx-auto px-4 py-6">
             <h1 className="text-3xl font-bold text-center">色推薦アプリ</h1>
