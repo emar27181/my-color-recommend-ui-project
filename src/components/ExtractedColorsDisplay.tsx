@@ -91,7 +91,7 @@ export const ExtractedColorsDisplay = () => {
           {/* その他の抽出色 */}
           <div>
             <h3 className="text-sm font-medium mb-2">その他の抽出色</h3>
-            <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 xl:grid-cols-14 gap-3">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3">
               {extractedColors
                 .filter(color => color.hex !== dominantColor?.hex)
                 .map((color, index) => (

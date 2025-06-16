@@ -74,7 +74,7 @@ export const ColorRecommendations = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 xl:grid-cols-14 gap-3">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3">
             {recommendedColors.map((color, index) => (
               <div key={index} className="space-y-1 group">
                 <div className="relative">
@@ -158,7 +158,7 @@ export const ToneRecommendations = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 xl:grid-cols-14 gap-3">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3">
             {recommendedTones.map((tone, index) => {
               const adjustment = TONE_ADJUSTMENTS[index];
               return (
