@@ -1,39 +1,19 @@
-import { useState } from 'react';
 import { useColorStore } from '@/store/colorStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { useToastContext } from '@/contexts/ToastContext';
-import { copyToClipboard } from '@/lib/clipboard';
-import { Copy, Check, Palette, MousePointer } from 'lucide-react';
+import { Palette } from 'lucide-react';
 import { ColorBlock } from '@/components/common/ColorBlock';
 import { CopyColorButton } from '@/components/common/CopyColorButton';
 import { RESPONSIVE_GRID, TYPOGRAPHY } from '@/constants/ui';
 
 export const ExtractedColorsDisplay = () => {
   const { extractedColors, dominantColor, setColorFromExtracted } = useColorStore();
-  const { showToast } = useToastContext();
-  const [copiedColor, setCopiedColor] = useState<string | null>(null);
 
   if (extractedColors.length === 0) {
     return null;
   }
 
-  const handleCopyColor = async (color: string, event: React.MouseEvent) => {
-    event.stopPropagation();
-    const result = await copyToClipboard(color);
-    
-    if (result.success) {
-      setCopiedColor(color);
-      showToast(`カラーコード ${color} をコピーしました`, 'success');
-      setTimeout(() => setCopiedColor(null), 2000);
-    } else {
-      showToast('コピーに失敗しました', 'error');
-    }
-  };
-
   const handleColorSelect = (color: string) => {
     setColorFromExtracted(color);
-    showToast(`${color} を選択色として設定しました`, 'success');
   };
 
   return (

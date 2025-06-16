@@ -1,33 +1,14 @@
-import { useColorStore, COLOR_SCHEMES, TONE_ADJUSTMENTS } from '@/store/colorStore';
+import { useColorStore, COLOR_SCHEMES } from '@/store/colorStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useToastContext } from '@/contexts/ToastContext';
-import { copyToClipboard } from '@/lib/clipboard';
-import { Copy, Check } from 'lucide-react';
-import { useState } from 'react';
 import { ColorBlock } from '@/components/common/ColorBlock';
 import { CopyColorButton } from '@/components/common/CopyColorButton';
 import { RESPONSIVE_GRID, TYPOGRAPHY } from '@/constants/ui';
 
 export const ColorRecommendations = () => {
   const { recommendedColors, selectedScheme, setSelectedScheme, generateRecommendedTones } = useColorStore();
-  const { showToast } = useToastContext();
-  const [copiedColor, setCopiedColor] = useState<string | null>(null);
 
   const handleGenerateTones = (color: string) => {
     generateRecommendedTones(color);
-  };
-
-  const handleCopyColor = async (color: string, event: React.MouseEvent) => {
-    event.stopPropagation();
-    const result = await copyToClipboard(color);
-    
-    if (result.success) {
-      setCopiedColor(color);
-      showToast(`カラーコード ${color} をコピーしました`, 'success');
-      setTimeout(() => setCopiedColor(null), 2000);
-    } else {
-      showToast('コピーに失敗しました', 'error');
-    }
   };
 
   const currentScheme = COLOR_SCHEMES.find(scheme => scheme.id === selectedScheme);
@@ -106,21 +87,6 @@ export const ColorRecommendations = () => {
 
 export const ToneRecommendations = () => {
   const { recommendedTones, toneBaseColor } = useColorStore();
-  const { showToast } = useToastContext();
-  const [copiedTone, setCopiedTone] = useState<string | null>(null);
-
-  const handleCopyTone = async (color: string, event: React.MouseEvent) => {
-    event.stopPropagation();
-    const result = await copyToClipboard(color);
-    
-    if (result.success) {
-      setCopiedTone(color);
-      showToast(`カラーコード ${color} をコピーしました`, 'success');
-      setTimeout(() => setCopiedTone(null), 2000);
-    } else {
-      showToast('コピーに失敗しました', 'error');
-    }
-  };
 
   return (
     <Card className="w-full">
@@ -156,8 +122,7 @@ export const ToneRecommendations = () => {
         ) : (
           <div className={`${RESPONSIVE_GRID.colors} ${RESPONSIVE_GRID.gap}`}>
             {recommendedTones.map((tone, index) => (
-              <div key={index} className="bg-card border border-border rounded-xl p-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
-                   onClick={(e) => handleCopyTone(tone, e)}>
+              <div key={index} className="bg-card border border-border rounded-xl p-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group">
                 <div className="flex items-center gap-3">
                   <ColorBlock 
                     color={tone}
