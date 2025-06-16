@@ -44,13 +44,15 @@ export const ColorPicker = () => {
             色を選択
           </label>
           <div className="flex justify-start">
-            <input
-              id="color-picker"
-              type="color"
-              value={selectedColor}
-              onChange={handleColorChange}
-              className="w-8 h-8 rounded border-2 border-border cursor-pointer"
-            />
+            <div className="relative">
+              <input
+                id="color-picker"
+                type="color"
+                value={selectedColor}
+                onChange={handleColorChange}
+                className="w-20 h-12 rounded-lg border-2 border-border cursor-pointer shadow-sm hover:shadow-md transition-shadow"
+              />
+            </div>
           </div>
         </div>
 
@@ -79,15 +81,18 @@ export const ColorPicker = () => {
         <div className="space-y-2">
           <label className="text-sm font-medium">選択された色</label>
           <div className="flex justify-start">
-            <div className="space-y-1">
-              <div
-                className="w-8 h-8 rounded border-2 border-border"
-                style={{ backgroundColor: selectedColor }}
-              />
-              <div className="text-center">
-                <p className="text-xs font-mono text-muted-foreground bg-muted/50 px-1 py-0.5 rounded truncate">
-                  {selectedColor}
-                </p>
+            <div className="bg-card border border-border rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-12 h-12 rounded-lg border-2 border-border shadow-sm"
+                  style={{ backgroundColor: selectedColor }}
+                />
+                <div className="flex flex-col">
+                  <p className="text-sm font-medium text-foreground">選択色</p>
+                  <p className="text-xs font-mono text-muted-foreground bg-muted px-2 py-1 rounded">
+                    {selectedColor}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
