@@ -25,6 +25,10 @@ function App() {
 
         <main className="container mx-auto px-4 py-8">
           <div className="space-y-8">
+            {/* カラーピッカーテストセクション */}
+            <section>
+              <ColorPickerTest />
+            </section>
             {/* Phase 1: Color Selection */}
             <section>
               <h2 className="text-2xl font-semibold mb-4 text-foreground">Step 1: 色を選択</h2>
