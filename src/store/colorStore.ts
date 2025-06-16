@@ -22,37 +22,37 @@ export interface ToneAdjustment {
 export const COLOR_SCHEMES: ColorScheme[] = [
   {
     id: 'dominant',
-    name: 'ドミナント配色',
+    name: 'Dominant',
     description: '同系色の微細なバリエーション',
     angles: [0, 15, -15, 30, -30],
   },
   {
     id: 'analogous',
-    name: '類似色配色',
+    name: 'Analogous',
     description: '隣接する色相の組み合わせ',
     angles: [0, 30, -30, 60, -60],
   },
   {
     id: 'complementary',
-    name: '補色配色',
+    name: 'Dyad',
     description: '対照的な色相の組み合わせ',
     angles: [0, 180],
   },
   {
     id: 'triadic',
-    name: '三角配色',
+    name: 'Triad',
     description: '色相環を3等分した配色',
     angles: [0, 120, 240],
   },
   {
     id: 'tetradic',
-    name: '四角配色',
+    name: 'Tetrad',
     description: '色相環を4等分した配色',
     angles: [0, 90, 180, 270],
   },
   {
     id: 'split_complementary',
-    name: '分割補色配色',
+    name: 'Split',
     description: '補色の両隣を使った配色',
     angles: [0, 150, 210],
   },
@@ -60,14 +60,14 @@ export const COLOR_SCHEMES: ColorScheme[] = [
 
 // トーン調整値の定義
 export const TONE_ADJUSTMENTS: ToneAdjustment[] = [
-  { id: 'darker', name: '暗く', lightnessOffset: -0.2 },
-  { id: 'lighter', name: '明るく', lightnessOffset: 0.2 },
-  { id: 'much_darker', name: 'とても暗く', lightnessOffset: -0.4 },
-  { id: 'much_lighter', name: 'とても明るく', lightnessOffset: 0.4 },
-  { id: 'desaturated', name: '彩度を下げて', lightnessOffset: 0, saturationMultiplier: 0.5 },
-  { id: 'saturated', name: '彩度を上げて', lightnessOffset: 0, saturationMultiplier: 1.5 },
-  { id: 'muted', name: 'くすませて', lightnessOffset: -0.1, saturationMultiplier: 0.7 },
-  { id: 'vivid', name: '鮮やかに', lightnessOffset: 0.1, saturationMultiplier: 1.3 },
+  { id: 'darker', name: '', lightnessOffset: -0.2 },
+  { id: 'lighter', name: '', lightnessOffset: 0.2 },
+  { id: 'much_darker', name: '', lightnessOffset: -0.4 },
+  { id: 'much_lighter', name: '', lightnessOffset: 0.4 },
+  { id: 'desaturated', name: '', lightnessOffset: 0, saturationMultiplier: 0.5 },
+  { id: 'saturated', name: '', lightnessOffset: 0, saturationMultiplier: 1.5 },
+  { id: 'muted', name: '', lightnessOffset: -0.1, saturationMultiplier: 0.7 },
+  { id: 'vivid', name: '', lightnessOffset: 0.1, saturationMultiplier: 1.3 },
 ];
 
 export interface ColorState {

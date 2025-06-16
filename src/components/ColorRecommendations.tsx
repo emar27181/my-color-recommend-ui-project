@@ -1,10 +1,11 @@
 import { useColorStore, COLOR_SCHEMES, TONE_ADJUSTMENTS } from '@/store/colorStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { useToastContext } from '@/contexts/ToastContext';
 import { copyToClipboard } from '@/lib/clipboard';
 import { Copy, Check } from 'lucide-react';
 import { useState } from 'react';
+import { ColorBlock } from '@/components/common/ColorBlock';
+import { RESPONSIVE_GRID, TYPOGRAPHY } from '@/constants/ui';
 
 export const ColorRecommendations = () => {
   const { recommendedColors, selectedScheme, setSelectedScheme, generateRecommendedTones } = useColorStore();
@@ -40,18 +41,20 @@ export const ColorRecommendations = () => {
         
         {/* 配色技法選択UI */}
         <div className="mt-4">
-          <h3 className="text-sm font-medium mb-3">配色技法を選択:</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+          <h3 className={`${TYPOGRAPHY.subtitle} mb-3`}>配色技法:</h3>
+          <div className={`${RESPONSIVE_GRID.schemes} ${RESPONSIVE_GRID.gap}`}>
             {COLOR_SCHEMES.map((scheme) => (
-              <Button
+              <button
                 key={scheme.id}
-                variant={selectedScheme === scheme.id ? "default" : "outline"}
-                size="sm"
                 onClick={() => setSelectedScheme(scheme.id)}
-                className="text-xs h-8 px-2 whitespace-nowrap overflow-hidden text-ellipsis"
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                  selectedScheme === scheme.id 
+                    ? 'bg-primary text-primary-foreground shadow-sm' 
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                }`}
               >
                 {scheme.name}
-              </Button>
+              </button>
             ))}
           </div>
           {currentScheme && (
@@ -74,33 +77,29 @@ export const ColorRecommendations = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+          <div className={`${RESPONSIVE_GRID.colors} ${RESPONSIVE_GRID.gap}`}>
             {recommendedColors.map((color, index) => (
-              <div key={index} className="bg-card border border-border rounded-lg p-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
+              <div key={index} className="bg-card border border-border rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
                    onClick={() => handleGenerateTones(color)}>
-                <div className="flex items-center gap-3">
-                  <button
-                    className="w-12 h-12 rounded border-2 border-border cursor-pointer hover:scale-110 transition-transform"
-                    style={{ backgroundColor: color }}
-                    title={`色: ${color} (クリックでトーン生成)`}
+                <div className="flex flex-col items-center gap-3">
+                  <ColorBlock 
+                    color={color}
+                    title={`色: ${color} (タップでトーン生成)`}
                   />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-mono text-sm text-foreground truncate">{color}</p>
-                    <p className="text-xs text-muted-foreground">トーン生成</p>
+                  <div className="text-center">
+                    <p className={`${TYPOGRAPHY.colorCode} truncate`}>{color}</p>
                   </div>
-                  <div className="flex flex-col gap-1">
-                    <button
-                      onClick={(e) => handleCopyColor(color, e)}
-                      className="p-2 rounded-md bg-muted hover:bg-muted/80 transition-colors"
-                      title="カラーコードをコピー"
-                    >
-                      {copiedColor === color ? (
-                        <Check className="w-4 h-4 text-green-600" />
-                      ) : (
-                        <Copy className="w-4 h-4 text-muted-foreground" />
-                      )}
-                    </button>
-                  </div>
+                  <button
+                    onClick={(e) => handleCopyColor(color, e)}
+                    className="p-2 rounded-full bg-muted hover:bg-muted/80 transition-colors opacity-0 group-hover:opacity-100"
+                    title="コピー"
+                  >
+                    {copiedColor === color ? (
+                      <Check className="w-4 h-4 text-green-600" />
+                    ) : (
+                      <Copy className="w-4 h-4 text-muted-foreground" />
+                    )}
+                  </button>
                 </div>
               </div>
             ))}
@@ -161,41 +160,32 @@ export const ToneRecommendations = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-            {recommendedTones.map((tone, index) => {
-              const adjustment = TONE_ADJUSTMENTS[index];
-              return (
-                <div key={index} className="bg-card border border-border rounded-lg p-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
-                     onClick={(e) => handleCopyTone(tone, e)}>
-                  <div className="flex items-center gap-3">
-                    <button
-                      className="w-12 h-12 rounded border-2 border-border cursor-pointer hover:scale-110 transition-transform"
-                      style={{ backgroundColor: tone }}
-                      title={`${adjustment?.name || ''}: ${tone}`}
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-mono text-sm text-foreground truncate">{tone}</p>
-                      {adjustment && (
-                        <p className="text-xs text-muted-foreground">{adjustment.name}</p>
-                      )}
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <button
-                        onClick={(e) => handleCopyTone(tone, e)}
-                        className="p-2 rounded-md bg-muted hover:bg-muted/80 transition-colors"
-                        title="カラーコードをコピー"
-                      >
-                        {copiedTone === tone ? (
-                          <Check className="w-4 h-4 text-green-600" />
-                        ) : (
-                          <Copy className="w-4 h-4 text-muted-foreground" />
-                        )}
-                      </button>
-                    </div>
+          <div className={`${RESPONSIVE_GRID.colors} ${RESPONSIVE_GRID.gap}`}>
+            {recommendedTones.map((tone, index) => (
+              <div key={index} className="bg-card border border-border rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
+                   onClick={(e) => handleCopyTone(tone, e)}>
+                <div className="flex flex-col items-center gap-3">
+                  <ColorBlock 
+                    color={tone}
+                    title={tone}
+                  />
+                  <div className="text-center">
+                    <p className={`${TYPOGRAPHY.colorCode} truncate`}>{tone}</p>
                   </div>
+                  <button
+                    onClick={(e) => handleCopyTone(tone, e)}
+                    className="p-2 rounded-full bg-muted hover:bg-muted/80 transition-colors opacity-0 group-hover:opacity-100"
+                    title="コピー"
+                  >
+                    {copiedTone === tone ? (
+                      <Check className="w-4 h-4 text-green-600" />
+                    ) : (
+                      <Copy className="w-4 h-4 text-muted-foreground" />
+                    )}
+                  </button>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         )}
       </CardContent>

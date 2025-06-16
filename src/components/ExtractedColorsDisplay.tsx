@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { useToastContext } from '@/contexts/ToastContext';
 import { copyToClipboard } from '@/lib/clipboard';
 import { Copy, Check, Palette, MousePointer } from 'lucide-react';
+import { ColorBlock } from '@/components/common/ColorBlock';
+import { RESPONSIVE_GRID, TYPOGRAPHY } from '@/constants/ui';
 
 export const ExtractedColorsDisplay = () => {
   const { extractedColors, dominantColor, setColorFromExtracted } = useColorStore();
@@ -53,39 +55,33 @@ export const ExtractedColorsDisplay = () => {
                 <span>最頻出色</span>
                 <span className="text-xs text-muted-foreground">(自動選択済み)</span>
               </h3>
-              <div className="bg-card border-2 border-primary rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer group"
+              <div className="bg-card border-2 border-primary rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer group"
                    onClick={() => handleColorSelect(dominantColor.hex)}>
-                <div className="flex items-center gap-4">
-                  <button
-                    className="w-12 h-12 rounded border-2 border-border cursor-pointer hover:scale-110 transition-transform"
-                    style={{ backgroundColor: dominantColor.hex }}
-                    title={`ドミナントカラー: ${dominantColor.hex} (クリックで選択)`}
+                <div className="flex flex-col items-center gap-4">
+                  <ColorBlock 
+                    color={dominantColor.hex}
+                    title={`ドミナントカラー: ${dominantColor.hex} (タップで選択)`}
                   />
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-sm text-foreground mb-1">最頻出色</h4>
-                    <p className="font-mono text-sm text-foreground mb-2">{dominantColor.hex}</p>
-                    <p className="text-xs text-muted-foreground">
-                      使用度: {Math.round(dominantColor.usage * 100)}%
+                  <div className="text-center">
+                    <h4 className={`${TYPOGRAPHY.title} mb-2`}>最頻出色</h4>
+                    <p className={`${TYPOGRAPHY.colorCode} mb-1`}>{dominantColor.hex}</p>
+                    <p className={TYPOGRAPHY.usage}>
+                      {Math.round(dominantColor.usage * 100)}%
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={(e) => handleCopyColor(dominantColor.hex, e)}
-                      className="flex items-center gap-1"
-                    >
-                      {copiedColor === dominantColor.hex ? (
-                        <Check className="w-3 h-3 text-green-600" />
-                      ) : (
-                        <Copy className="w-3 h-3" />
-                      )}
-                      コピー
-                    </Button>
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                      <MousePointer className="w-5 h-5 text-primary" />
-                    </div>
-                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={(e) => handleCopyColor(dominantColor.hex, e)}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    {copiedColor === dominantColor.hex ? (
+                      <Check className="w-4 h-4 text-green-600" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
+                    コピー
+                  </Button>
                 </div>
               </div>
             </div>
@@ -94,37 +90,34 @@ export const ExtractedColorsDisplay = () => {
           {/* その他の抽出色 */}
           <div>
             <h3 className="text-sm font-medium mb-3">その他の抽出色</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            <div className={`${RESPONSIVE_GRID.colors} ${RESPONSIVE_GRID.gap}`}>
               {extractedColors
                 .filter(color => color.hex !== dominantColor?.hex)
                 .map((color, index) => (
-                  <div key={index} className="bg-card border border-border rounded-lg p-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
+                  <div key={index} className="bg-card border border-border rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
                        onClick={() => handleColorSelect(color.hex)}>
-                    <div className="flex items-center gap-3">
-                      <button
-                        className="w-12 h-12 rounded border-2 border-border cursor-pointer hover:scale-110 transition-transform"
-                        style={{ backgroundColor: color.hex }}
-                        title={`${color.hex} (クリックで選択)`}
+                    <div className="flex flex-col items-center gap-3">
+                      <ColorBlock 
+                        color={color.hex}
+                        title={`${color.hex} (タップで選択)`}
                       />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-mono text-sm text-foreground truncate">{color.hex}</p>
-                        <p className="text-xs text-muted-foreground">
+                      <div className="text-center">
+                        <p className={`${TYPOGRAPHY.colorCode} truncate`}>{color.hex}</p>
+                        <p className={TYPOGRAPHY.usage}>
                           {Math.round(color.usage * 100)}%
                         </p>
                       </div>
-                      <div className="flex flex-col gap-1">
-                        <button
-                          onClick={(e) => handleCopyColor(color.hex, e)}
-                          className="p-2 rounded-md bg-muted hover:bg-muted/80 transition-colors"
-                          title="カラーコードをコピー"
-                        >
-                          {copiedColor === color.hex ? (
-                            <Check className="w-4 h-4 text-green-600" />
-                          ) : (
-                            <Copy className="w-4 h-4 text-muted-foreground" />
-                          )}
-                        </button>
-                      </div>
+                      <button
+                        onClick={(e) => handleCopyColor(color.hex, e)}
+                        className="p-2 rounded-full bg-muted hover:bg-muted/80 transition-colors opacity-0 group-hover:opacity-100"
+                        title="コピー"
+                      >
+                        {copiedColor === color.hex ? (
+                          <Check className="w-4 h-4 text-green-600" />
+                        ) : (
+                          <Copy className="w-4 h-4 text-muted-foreground" />
+                        )}
+                      </button>
                     </div>
                   </div>
                 ))}

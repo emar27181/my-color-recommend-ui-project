@@ -3,6 +3,8 @@ import { useColorStore } from '@/store/colorStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { ColorBlock } from '@/components/common/ColorBlock';
+import { TYPOGRAPHY } from '@/constants/ui';
 
 export const ColorPicker = () => {
   const { selectedColor, setSelectedColor } = useColorStore();
@@ -43,11 +45,11 @@ export const ColorPicker = () => {
           <label htmlFor="color-picker" className="text-sm font-medium">
             色を選択
           </label>
-          <div className="flex justify-start">
-            <button
-              className="w-12 h-12 rounded border-2 border-border cursor-pointer hover:scale-110 transition-transform"
-              style={{ backgroundColor: selectedColor }}
+          <div className="flex justify-center">
+            <ColorBlock 
+              color={selectedColor}
               onClick={() => document.getElementById('color-picker-input')?.click()}
+              title="クリックで色を選択"
             />
             <input
               id="color-picker-input"
@@ -82,16 +84,12 @@ export const ColorPicker = () => {
 
         {/* Selected Color Preview */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">選択された色</label>
-          <div className="bg-card border border-border rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center gap-3">
-              <button
-                className="w-12 h-12 rounded border-2 border-border cursor-pointer hover:scale-110 transition-transform"
-                style={{ backgroundColor: selectedColor }}
-              />
-              <div className="flex flex-col">
-                <p className="text-sm font-medium text-foreground">選択色</p>
-                <p className="text-xs font-mono text-muted-foreground bg-muted px-2 py-1 rounded">
+          <label className={TYPOGRAPHY.subtitle}>選択された色</label>
+          <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
+            <div className="flex flex-col items-center gap-3">
+              <ColorBlock color={selectedColor} />
+              <div className="text-center">
+                <p className={`${TYPOGRAPHY.colorCode} bg-muted px-3 py-1 rounded-full`}>
                   {selectedColor}
                 </p>
               </div>
