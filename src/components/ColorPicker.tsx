@@ -43,13 +43,15 @@ export const ColorPicker = () => {
           <label htmlFor="color-picker" className="text-sm font-medium">
             色を選択
           </label>
-          <input
-            id="color-picker"
-            type="color"
-            value={selectedColor}
-            onChange={handleColorChange}
-            className="w-full aspect-square rounded border-2 border-border cursor-pointer"
-          />
+          <div className="grid grid-cols-6 gap-2">
+            <input
+              id="color-picker"
+              type="color"
+              value={selectedColor}
+              onChange={handleColorChange}
+              className="w-full aspect-square rounded border-2 border-border cursor-pointer"
+            />
+          </div>
         </div>
 
         {/* Text Input for Color Code */}
@@ -76,13 +78,19 @@ export const ColorPicker = () => {
         {/* Selected Color Preview */}
         <div className="space-y-2">
           <label className="text-sm font-medium">選択された色</label>
-          <div
-            className="w-full aspect-square rounded border-2 border-border"
-            style={{ backgroundColor: selectedColor }}
-          />
-          <p className="text-sm text-muted-foreground text-center">
-            {selectedColor}
-          </p>
+          <div className="grid grid-cols-6 gap-2">
+            <div className="space-y-1">
+              <div
+                className="w-full aspect-square rounded border-2 border-border"
+                style={{ backgroundColor: selectedColor }}
+              />
+              <div className="text-center">
+                <p className="text-xs font-mono text-muted-foreground bg-muted/50 px-1 py-0.5 rounded truncate">
+                  {selectedColor}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>
