@@ -56,21 +56,11 @@ export const ExtractedColorsDisplay = () => {
               <div className="bg-card border-2 border-primary rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer group"
                    onClick={() => handleColorSelect(dominantColor.hex)}>
                 <div className="flex items-center gap-4">
-                  <div className="relative w-16 h-16 rounded-lg shadow-sm group-hover:scale-105 transition-transform flex-shrink-0 overflow-hidden">
-                    <div 
-                      className="absolute inset-0 border-8"
-                      style={{ 
-                        borderColor: dominantColor.hex,
-                        background: `radial-gradient(circle, ${dominantColor.hex} 20%, ${dominantColor.hex}80 60%, ${dominantColor.hex} 100%)`,
-                        boxShadow: `inset 0 0 20px ${dominantColor.hex}60, 0 0 15px ${dominantColor.hex}40`
-                      }}
-                      title={`ドミナントカラー: ${dominantColor.hex} (クリックで選択)`}
-                    />
-                    <div 
-                      className="absolute top-1 right-1 w-3 h-3 rounded-full border-2 border-white"
-                      style={{ backgroundColor: dominantColor.hex }}
-                    />
-                  </div>
+                  <button
+                    className="w-12 h-12 rounded border-2 border-border cursor-pointer hover:scale-110 transition-transform"
+                    style={{ backgroundColor: dominantColor.hex }}
+                    title={`ドミナントカラー: ${dominantColor.hex} (クリックで選択)`}
+                  />
                   <div className="flex-1">
                     <h4 className="font-semibold text-sm text-foreground mb-1">最頻出色</h4>
                     <p className="font-mono text-sm text-foreground mb-2">{dominantColor.hex}</p>
@@ -111,32 +101,15 @@ export const ExtractedColorsDisplay = () => {
                   <div key={index} className="bg-card border border-border rounded-lg p-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
                        onClick={() => handleColorSelect(color.hex)}>
                     <div className="flex items-center gap-3">
-                      <div className="relative w-12 h-12 rounded-lg shadow-sm group-hover:scale-105 transition-transform flex-shrink-0 overflow-hidden border-2 border-border">
-                        <div 
-                          className="absolute inset-0"
-                          style={{ 
-                            background: `conic-gradient(${color.hex} 0deg, ${color.hex}90 90deg, ${color.hex} 180deg, ${color.hex}90 270deg, ${color.hex} 360deg)`,
-                            boxShadow: `0 0 20px ${color.hex}50`
-                          }}
-                          title={`${color.hex} (クリックで選択)`}
-                        />
-                        <div 
-                          className="absolute inset-2 rounded border-2"
-                          style={{ 
-                            borderColor: color.hex,
-                            backgroundColor: `${color.hex}20`
-                          }}
-                        />
-                        <div 
-                          className="absolute bottom-1 left-1 w-2 h-2 rounded-full"
-                          style={{ backgroundColor: color.hex }}
-                        />
-                      </div>
+                      <button
+                        className="w-12 h-12 rounded border-2 border-border cursor-pointer hover:scale-110 transition-transform"
+                        style={{ backgroundColor: color.hex }}
+                        title={`${color.hex} (クリックで選択)`}
+                      />
                       <div className="flex-1 min-w-0">
-                        <p className="font-mono text-sm font-bold truncate" style={{ color: color.hex }}>{color.hex}</p>
-                        <p className="text-xs" style={{ color: `${color.hex}CC` }}>
-                          {Math.round(color.usage * 100)}% • 
-                          <span className="inline-block w-2 h-2 rounded-full ml-1" style={{ backgroundColor: color.hex }}></span>
+                        <p className="font-mono text-sm text-foreground truncate">{color.hex}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {Math.round(color.usage * 100)}%
                         </p>
                       </div>
                       <div className="flex flex-col gap-1">

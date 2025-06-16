@@ -44,15 +44,18 @@ export const ColorPicker = () => {
             色を選択
           </label>
           <div className="flex justify-start">
-            <div className="relative">
-              <input
-                id="color-picker"
-                type="color"
-                value={selectedColor}
-                onChange={handleColorChange}
-                className="w-20 h-12 rounded-lg border-2 border-border cursor-pointer shadow-sm hover:shadow-md transition-shadow"
-              />
-            </div>
+            <button
+              className="w-12 h-12 rounded border-2 border-border cursor-pointer hover:scale-110 transition-transform"
+              style={{ backgroundColor: selectedColor }}
+              onClick={() => document.getElementById('color-picker-input')?.click()}
+            />
+            <input
+              id="color-picker-input"
+              type="color"
+              value={selectedColor}
+              onChange={handleColorChange}
+              className="hidden"
+            />
           </div>
         </div>
 
@@ -80,37 +83,17 @@ export const ColorPicker = () => {
         {/* Selected Color Preview */}
         <div className="space-y-2">
           <label className="text-sm font-medium">選択された色</label>
-          <div className="flex justify-start">
-            <div className="bg-card border border-border rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-3">
-                <div className="relative w-12 h-12 rounded-lg border-2 border-border shadow-sm overflow-hidden">
-                  <div 
-                    className="absolute inset-0"
-                    style={{ 
-                      background: `linear-gradient(45deg, ${selectedColor} 0%, ${selectedColor} 100%)`,
-                      boxShadow: `inset 0 0 20px ${selectedColor}40, 0 0 10px ${selectedColor}20`
-                    }}
-                  />
-                  <div 
-                    className="absolute inset-1 rounded border-4"
-                    style={{ borderColor: selectedColor }}
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <p className="text-sm font-medium text-foreground">選択色</p>
-                  <div className="flex items-center gap-2">
-                    <div 
-                      className="w-4 h-4 rounded border"
-                      style={{ 
-                        background: selectedColor,
-                        boxShadow: `0 0 8px ${selectedColor}60`
-                      }}
-                    />
-                    <p className="text-xs font-mono text-muted-foreground bg-muted px-2 py-1 rounded">
-                      {selectedColor}
-                    </p>
-                  </div>
-                </div>
+          <div className="bg-card border border-border rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-3">
+              <button
+                className="w-12 h-12 rounded border-2 border-border cursor-pointer hover:scale-110 transition-transform"
+                style={{ backgroundColor: selectedColor }}
+              />
+              <div className="flex flex-col">
+                <p className="text-sm font-medium text-foreground">選択色</p>
+                <p className="text-xs font-mono text-muted-foreground bg-muted px-2 py-1 rounded">
+                  {selectedColor}
+                </p>
               </div>
             </div>
           </div>

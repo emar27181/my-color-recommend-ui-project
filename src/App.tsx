@@ -2,8 +2,6 @@ import { ColorPicker } from '@/components/ColorPicker';
 import { ColorRecommendations, ToneRecommendations } from '@/components/ColorRecommendations';
 import { ImageUpload } from '@/components/ImageUpload';
 import { ExtractedColorsDisplay } from '@/components/ExtractedColorsDisplay';
-import { PalettePatterns } from '@/components/PalettePatterns';
-import { SingleColorBlockTest } from '@/components/SingleColorBlockTest';
 import { ToastProvider } from '@/contexts/ToastContext';
 import { ToastContainer } from '@/components/ToastContainer';
 
@@ -22,18 +20,6 @@ function App() {
 
         <main className="container mx-auto px-4 py-8">
           <div className="space-y-8">
-            {/* Single Color Block Test */}
-            <section>
-              <h2 className="text-2xl font-semibold mb-4">単一色ブロック表示テスト</h2>
-              <SingleColorBlockTest />
-            </section>
-
-            {/* Palette Patterns Test */}
-            <section>
-              <h2 className="text-2xl font-semibold mb-4">パレット表示パターンテスト</h2>
-              <PalettePatterns />
-            </section>
-
             {/* Phase 1: Color Selection */}
             <section>
               <h2 className="text-2xl font-semibold mb-4">Step 1: 色を選択</h2>
