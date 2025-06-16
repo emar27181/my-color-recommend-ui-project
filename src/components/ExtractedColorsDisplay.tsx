@@ -56,7 +56,7 @@ export const ExtractedColorsDisplay = () => {
               <div className="flex items-center gap-3">
                 <div className="relative group">
                   <div
-                    className="w-16 h-16 rounded border-2 border-primary shadow-sm cursor-pointer hover:scale-105 transition-transform"
+                    className="w-8 h-8 rounded border-2 border-primary shadow-sm cursor-pointer hover:scale-105 transition-transform"
                     style={{ backgroundColor: dominantColor.hex }}
                     onClick={() => handleColorSelect(dominantColor.hex)}
                     title={`ドミナントカラー: ${dominantColor.hex} (クリックで選択)`}
@@ -91,14 +91,14 @@ export const ExtractedColorsDisplay = () => {
           {/* その他の抽出色 */}
           <div>
             <h3 className="text-sm font-medium mb-2">その他の抽出色</h3>
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3">
+            <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 xl:grid-cols-16 gap-2">
               {extractedColors
                 .filter(color => color.hex !== dominantColor?.hex)
                 .map((color, index) => (
                   <div key={index} className="space-y-1 group">
                     <div className="relative">
                       <div
-                        className="w-16 h-16 rounded border border-border cursor-pointer hover:border-primary hover:scale-105 transition-all duration-200 shadow-sm"
+                        className="w-8 h-8 rounded border border-border cursor-pointer hover:border-primary hover:scale-105 transition-all duration-200 shadow-sm"
                         style={{ backgroundColor: color.hex }}
                         onClick={() => handleColorSelect(color.hex)}
                         title={`${color.hex} (クリックで選択)`}
@@ -108,13 +108,13 @@ export const ExtractedColorsDisplay = () => {
                       </div>
                       <button
                         onClick={(e) => handleCopyColor(color.hex, e)}
-                        className="absolute top-1 right-1 p-1.5 rounded bg-white/90 hover:bg-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm"
+                        className="absolute top-0.5 right-0.5 p-1 rounded bg-white/90 hover:bg-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm"
                         title="カラーコードをコピー"
                       >
                         {copiedColor === color.hex ? (
-                          <Check className="w-4 h-4 text-green-600" />
+                          <Check className="w-3 h-3 text-green-600" />
                         ) : (
-                          <Copy className="w-4 h-4 text-gray-600" />
+                          <Copy className="w-3 h-3 text-gray-600" />
                         )}
                       </button>
                     </div>

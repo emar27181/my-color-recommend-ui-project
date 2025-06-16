@@ -74,25 +74,25 @@ export const ColorRecommendations = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3">
+          <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 xl:grid-cols-16 gap-2">
             {recommendedColors.map((color, index) => (
               <div key={index} className="space-y-1 group">
                 <div className="relative">
                   <div
-                    className="w-16 h-16 rounded border-2 border-border hover:border-primary transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-lg cursor-pointer"
+                    className="w-8 h-8 rounded border-2 border-border hover:border-primary transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-lg cursor-pointer"
                     style={{ backgroundColor: color }}
                     onClick={() => handleGenerateTones(color)}
                     title={`色: ${color} (クリックでトーン生成)`}
                   />
                   <button
                     onClick={(e) => handleCopyColor(color, e)}
-                    className="absolute top-1 right-1 p-1.5 rounded bg-white/90 hover:bg-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm"
+                    className="absolute top-0.5 right-0.5 p-1 rounded bg-white/90 hover:bg-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm"
                     title="カラーコードをコピー"
                   >
                     {copiedColor === color ? (
-                      <Check className="w-4 h-4 text-green-600" />
+                      <Check className="w-3 h-3 text-green-600" />
                     ) : (
-                      <Copy className="w-4 h-4 text-gray-600" />
+                      <Copy className="w-3 h-3 text-gray-600" />
                     )}
                   </button>
                 </div>
@@ -158,27 +158,27 @@ export const ToneRecommendations = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3">
+          <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 xl:grid-cols-16 gap-2">
             {recommendedTones.map((tone, index) => {
               const adjustment = TONE_ADJUSTMENTS[index];
               return (
                 <div key={index} className="space-y-1 group">
                   <div className="relative">
                     <div
-                      className="w-16 h-16 rounded border-2 border-border hover:border-primary transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-lg cursor-pointer"
+                      className="w-8 h-8 rounded border-2 border-border hover:border-primary transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-lg cursor-pointer"
                       style={{ backgroundColor: tone }}
                       title={`${adjustment?.name || ''}: ${tone}`}
                       onClick={(e) => handleCopyTone(tone, e)}
                     />
                     <button
                       onClick={(e) => handleCopyTone(tone, e)}
-                      className="absolute top-1 right-1 p-1.5 rounded bg-white/90 hover:bg-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm"
+                      className="absolute top-0.5 right-0.5 p-1 rounded bg-white/90 hover:bg-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm"
                       title="カラーコードをコピー"
                     >
                       {copiedTone === tone ? (
-                        <Check className="w-4 h-4 text-green-600" />
+                        <Check className="w-3 h-3 text-green-600" />
                       ) : (
-                        <Copy className="w-4 h-4 text-gray-600" />
+                        <Copy className="w-3 h-3 text-gray-600" />
                       )}
                     </button>
                   </div>

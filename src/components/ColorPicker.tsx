@@ -49,7 +49,7 @@ export const ColorPicker = () => {
               type="color"
               value={selectedColor}
               onChange={handleColorChange}
-              className="w-16 h-16 rounded border-2 border-border cursor-pointer"
+              className="w-8 h-8 rounded border-2 border-border cursor-pointer"
             />
           </div>
         </div>
@@ -81,7 +81,7 @@ export const ColorPicker = () => {
           <div className="flex justify-start">
             <div className="space-y-1">
               <div
-                className="w-16 h-16 rounded border-2 border-border"
+                className="w-8 h-8 rounded border-2 border-border"
                 style={{ backgroundColor: selectedColor }}
               />
               <div className="text-center">
