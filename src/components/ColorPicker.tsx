@@ -36,11 +36,16 @@ export const ColorPicker = () => {
   };
 
   return (
-    <Card className="w-full max-w-md bg-card border border-border">
-      <CardHeader>
-        <CardTitle className="text-foreground">カラーピッカー</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className="w-full max-w-md p-6 rounded-xl border" style={{ 
+      backgroundColor: 'var(--card)', 
+      borderColor: 'var(--border)',
+      color: 'var(--foreground)',
+      minHeight: '300px'
+    }}>
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold" style={{ color: 'var(--foreground)' }}>カラーピッカー</h2>
+      </div>
+      <div className="space-y-4">
         {/* HTML5 Color Input */}
         <div className="space-y-2">
           <label htmlFor="color-picker" className="text-sm font-medium text-foreground">
@@ -98,7 +103,7 @@ export const ColorPicker = () => {
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
