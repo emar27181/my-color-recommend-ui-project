@@ -48,7 +48,7 @@ export const ColorPicker = () => {
             type="color"
             value={selectedColor}
             onChange={handleColorChange}
-            className="w-full h-12 rounded-md border cursor-pointer"
+            className="w-full aspect-square rounded border-2 border-border cursor-pointer"
           />
         </div>
 
@@ -77,7 +77,7 @@ export const ColorPicker = () => {
         <div className="space-y-2">
           <label className="text-sm font-medium">選択された色</label>
           <div
-            className="w-full h-16 rounded-md border-2 border-border"
+            className="w-full aspect-square rounded border-2 border-border"
             style={{ backgroundColor: selectedColor }}
           />
           <p className="text-sm text-muted-foreground text-center">
