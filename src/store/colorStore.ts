@@ -71,3 +71,10 @@ export const useColorStore = create<ColorState>((set, get) => ({
     }
   },
 }));
+
+// 初期状態で推薦色を生成
+setTimeout(() => {
+  console.log('Generating initial recommended colors...');
+  useColorStore.getState().generateRecommendedColors();
+  console.log('Recommended colors:', useColorStore.getState().recommendedColors);
+}, 0);
