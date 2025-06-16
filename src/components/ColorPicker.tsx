@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useColorStore } from '@/store/colorStore';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { ColorBlock } from '@/components/common/ColorBlock';
 import { CopyColorButton } from '@/components/common/CopyColorButton';
 import { Palette } from 'lucide-react';
 import { TYPOGRAPHY, COLOR_BLOCK_SPEC } from '@/constants/ui';
