@@ -36,14 +36,14 @@ export const ColorPicker = () => {
   };
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full max-w-md bg-card border border-border">
       <CardHeader>
-        <CardTitle>カラーピッカー</CardTitle>
+        <CardTitle className="text-foreground">カラーピッカー</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* HTML5 Color Input */}
         <div className="space-y-2">
-          <label htmlFor="color-picker" className="text-sm font-medium">
+          <label htmlFor="color-picker" className="text-sm font-medium text-foreground">
             色を選択
           </label>
           <div className="flex justify-center">
@@ -64,7 +64,7 @@ export const ColorPicker = () => {
 
         {/* Text Input for Color Code */}
         <div className="space-y-2">
-          <label htmlFor="color-input" className="text-sm font-medium">
+          <label htmlFor="color-input" className="text-sm font-medium text-foreground">
             カラーコード
           </label>
           <div className="flex gap-2">

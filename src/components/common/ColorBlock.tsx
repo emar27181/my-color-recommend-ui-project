@@ -17,11 +17,13 @@ export const ColorBlock = ({
   className = ''
 }: ColorBlockProps) => {
   return (
-    <canvas 
-      width={COLOR_BLOCK_SPEC.width} 
-      height={COLOR_BLOCK_SPEC.height}
+    <div 
       className={`${COLOR_BLOCK_SPEC.className} ${className}`}
-      style={{ backgroundColor: color }}
+      style={{ 
+        width: `${COLOR_BLOCK_SPEC.width}px`,
+        height: `${COLOR_BLOCK_SPEC.height}px`,
+        backgroundColor: color 
+      }}
       onClick={onClick}
       title={title}
     />
