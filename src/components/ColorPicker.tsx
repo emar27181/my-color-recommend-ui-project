@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useColorStore } from '@/store/colorStore';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ColorBlock } from '@/components/common/ColorBlock';

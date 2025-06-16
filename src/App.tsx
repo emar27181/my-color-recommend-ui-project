@@ -9,15 +9,15 @@ import { ToastContainer } from '@/components/ToastContainer';
 function App() {
   return (
     <ToastProvider>
-      <div className="min-h-screen bg-background">
-        <header className="border-b border-border bg-background">
+      <div className="min-h-screen" style={{ backgroundColor: 'white', color: 'black' }}>
+        <header className="border-b" style={{ borderColor: '#e5e7eb', backgroundColor: 'white' }}>
           <div className="container mx-auto px-4 py-6">
             <div className="flex justify-between items-center mb-4">
               <div></div>
               <ThemeToggle />
             </div>
-            <h1 className="text-3xl font-bold text-center text-foreground">色推薦アプリ</h1>
-            <p className="text-center text-muted-foreground mt-2">
+            <h1 className="text-3xl font-bold text-center" style={{ color: 'black' }}>色推薦アプリ</h1>
+            <p className="text-center mt-2" style={{ color: '#6b7280' }}>
               色彩理論に基づいた相性の良い色とトーンを推薦します
             </p>
           </div>
@@ -27,7 +27,9 @@ function App() {
           <div className="space-y-8">
             {/* カラーピッカーテストセクション */}
             <section>
-              <ColorPickerTest />
+              <div style={{ padding: '24px', backgroundColor: 'white', color: 'black' }}>
+                <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '16px' }}>テストセクション</h2>
+              </div>
             </section>
             {/* Phase 1: Color Selection */}
             <section>
