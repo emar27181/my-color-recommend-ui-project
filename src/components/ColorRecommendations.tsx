@@ -1,13 +1,34 @@
-import { useColorStore } from '@/store/colorStore';
+import { useColorStore, COLOR_SCHEMES, TONE_ADJUSTMENTS } from '@/store/colorStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useToastContext } from '@/contexts/ToastContext';
+import { copyToClipboard } from '@/lib/clipboard';
+import { Copy, Check } from 'lucide-react';
+import { useState } from 'react';
 
 export const ColorRecommendations = () => {
-  const { recommendedColors, generateRecommendedTones } = useColorStore();
+  const { recommendedColors, selectedScheme, setSelectedScheme, generateRecommendedTones } = useColorStore();
+  const { showToast } = useToastContext();
+  const [copiedColor, setCopiedColor] = useState<string | null>(null);
 
   const handleGenerateTones = (color: string) => {
     generateRecommendedTones(color);
   };
+
+  const handleCopyColor = async (color: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    const result = await copyToClipboard(color);
+    
+    if (result.success) {
+      setCopiedColor(color);
+      showToast(`カラーコード ${color} をコピーしました`, 'success');
+      setTimeout(() => setCopiedColor(null), 2000);
+    } else {
+      showToast('コピーに失敗しました', 'error');
+    }
+  };
+
+  const currentScheme = COLOR_SCHEMES.find(scheme => scheme.id === selectedScheme);
 
   return (
     <Card className="w-full">
@@ -16,6 +37,29 @@ export const ColorRecommendations = () => {
         <p className="text-sm text-muted-foreground">
           選択した色に基づいて、色彩理論に従った相性の良い色を推薦します
         </p>
+        
+        {/* 配色技法選択UI */}
+        <div className="mt-4">
+          <h3 className="text-sm font-medium mb-2">配色技法を選択:</h3>
+          <div className="flex flex-wrap gap-2">
+            {COLOR_SCHEMES.map((scheme) => (
+              <Button
+                key={scheme.id}
+                variant={selectedScheme === scheme.id ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedScheme(scheme.id)}
+                className="text-xs"
+              >
+                {scheme.name}
+              </Button>
+            ))}
+          </div>
+          {currentScheme && (
+            <p className="text-xs text-muted-foreground mt-2">
+              {currentScheme.description}
+            </p>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         {recommendedColors.length === 0 ? (
@@ -32,13 +76,26 @@ export const ColorRecommendations = () => {
         ) : (
           <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 xl:grid-cols-16 gap-1 sm:gap-2">
             {recommendedColors.map((color, index) => (
-              <div key={index} className="space-y-1">
-                <div
-                  className="w-full aspect-square rounded border-2 border-border hover:border-primary transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-lg cursor-pointer"
-                  style={{ backgroundColor: color }}
-                  onClick={() => handleGenerateTones(color)}
-                  title={`色: ${color}`}
-                />
+              <div key={index} className="space-y-1 group">
+                <div className="relative">
+                  <div
+                    className="w-full aspect-square rounded border-2 border-border hover:border-primary transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-lg cursor-pointer"
+                    style={{ backgroundColor: color }}
+                    onClick={() => handleGenerateTones(color)}
+                    title={`色: ${color} (クリックでトーン生成)`}
+                  />
+                  <button
+                    onClick={(e) => handleCopyColor(color, e)}
+                    className="absolute top-1 right-1 p-1 rounded bg-white/80 hover:bg-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                    title="カラーコードをコピー"
+                  >
+                    {copiedColor === color ? (
+                      <Check className="w-3 h-3 text-green-600" />
+                    ) : (
+                      <Copy className="w-3 h-3 text-gray-600" />
+                    )}
+                  </button>
+                </div>
                 <div className="text-center">
                   <p className="text-xs font-mono text-muted-foreground bg-muted/50 px-1 py-0.5 rounded truncate">{color}</p>
                 </div>
@@ -52,7 +109,22 @@ export const ColorRecommendations = () => {
 };
 
 export const ToneRecommendations = () => {
-  const { recommendedTones } = useColorStore();
+  const { recommendedTones, toneBaseColor } = useColorStore();
+  const { showToast } = useToastContext();
+  const [copiedTone, setCopiedTone] = useState<string | null>(null);
+
+  const handleCopyTone = async (color: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    const result = await copyToClipboard(color);
+    
+    if (result.success) {
+      setCopiedTone(color);
+      showToast(`カラーコード ${color} をコピーしました`, 'success');
+      setTimeout(() => setCopiedTone(null), 2000);
+    } else {
+      showToast('コピーに失敗しました', 'error');
+    }
+  };
 
   return (
     <Card className="w-full">
@@ -61,6 +133,17 @@ export const ToneRecommendations = () => {
         <p className="text-sm text-muted-foreground">
           選択した色の明度・彩度を変化させたトーンバリエーション
         </p>
+        {toneBaseColor && (
+          <div className="mt-2 flex items-center gap-2">
+            <div 
+              className="w-4 h-4 rounded border"
+              style={{ backgroundColor: toneBaseColor }}
+            />
+            <span className="text-xs text-muted-foreground">
+              ベース色: {toneBaseColor}
+            </span>
+          </div>
+        )}
       </CardHeader>
       <CardContent>
         {recommendedTones.length === 0 ? (
@@ -76,18 +159,38 @@ export const ToneRecommendations = () => {
           </div>
         ) : (
           <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 xl:grid-cols-16 gap-1 sm:gap-2">
-            {recommendedTones.map((tone, index) => (
-              <div key={index} className="space-y-1">
-                <div
-                  className="w-full aspect-square rounded border-2 border-border hover:border-primary transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-lg cursor-pointer"
-                  style={{ backgroundColor: tone }}
-                  title={`色: ${tone}`}
-                />
-                <div className="text-center">
-                  <p className="text-xs font-mono text-muted-foreground bg-muted/50 px-1 py-0.5 rounded truncate">{tone}</p>
+            {recommendedTones.map((tone, index) => {
+              const adjustment = TONE_ADJUSTMENTS[index];
+              return (
+                <div key={index} className="space-y-1 group">
+                  <div className="relative">
+                    <div
+                      className="w-full aspect-square rounded border-2 border-border hover:border-primary transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-lg cursor-pointer"
+                      style={{ backgroundColor: tone }}
+                      title={`${adjustment?.name || ''}: ${tone}`}
+                      onClick={(e) => handleCopyTone(tone, e)}
+                    />
+                    <button
+                      onClick={(e) => handleCopyTone(tone, e)}
+                      className="absolute top-1 right-1 p-1 rounded bg-white/80 hover:bg-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                      title="カラーコードをコピー"
+                    >
+                      {copiedTone === tone ? (
+                        <Check className="w-3 h-3 text-green-600" />
+                      ) : (
+                        <Copy className="w-3 h-3 text-gray-600" />
+                      )}
+                    </button>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-xs font-mono text-muted-foreground bg-muted/50 px-1 py-0.5 rounded truncate">{tone}</p>
+                    {adjustment && (
+                      <p className="text-xs text-muted-foreground">{adjustment.name}</p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </CardContent>
