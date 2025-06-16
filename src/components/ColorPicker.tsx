@@ -83,15 +83,33 @@ export const ColorPicker = () => {
           <div className="flex justify-start">
             <div className="bg-card border border-border rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-center gap-3">
-                <div
-                  className="w-12 h-12 rounded-lg border-2 border-border shadow-sm"
-                  style={{ backgroundColor: selectedColor }}
-                />
+                <div className="relative w-12 h-12 rounded-lg border-2 border-border shadow-sm overflow-hidden">
+                  <div 
+                    className="absolute inset-0"
+                    style={{ 
+                      background: `linear-gradient(45deg, ${selectedColor} 0%, ${selectedColor} 100%)`,
+                      boxShadow: `inset 0 0 20px ${selectedColor}40, 0 0 10px ${selectedColor}20`
+                    }}
+                  />
+                  <div 
+                    className="absolute inset-1 rounded border-4"
+                    style={{ borderColor: selectedColor }}
+                  />
+                </div>
                 <div className="flex flex-col">
                   <p className="text-sm font-medium text-foreground">選択色</p>
-                  <p className="text-xs font-mono text-muted-foreground bg-muted px-2 py-1 rounded">
-                    {selectedColor}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <div 
+                      className="w-4 h-4 rounded border"
+                      style={{ 
+                        background: selectedColor,
+                        boxShadow: `0 0 8px ${selectedColor}60`
+                      }}
+                    />
+                    <p className="text-xs font-mono text-muted-foreground bg-muted px-2 py-1 rounded">
+                      {selectedColor}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>

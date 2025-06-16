@@ -79,14 +79,30 @@ export const ColorRecommendations = () => {
               <div key={index} className="bg-card border border-border rounded-lg p-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
                    onClick={() => handleGenerateTones(color)}>
                 <div className="flex items-center gap-3">
-                  <div
-                    className="w-12 h-12 rounded-lg shadow-sm group-hover:scale-105 transition-transform flex-shrink-0"
-                    style={{ backgroundColor: color }}
-                    title={`色: ${color} (クリックでトーン生成)`}
-                  />
+                  <div className="relative w-12 h-12 rounded-lg shadow-sm group-hover:scale-105 transition-transform flex-shrink-0 border-2 border-border overflow-hidden">
+                    <div 
+                      className="absolute inset-0"
+                      style={{ 
+                        background: `linear-gradient(135deg, ${color} 0%, ${color}CC 50%, ${color} 100%)`,
+                        boxShadow: `inset 0 0 10px ${color}40`
+                      }}
+                      title={`色: ${color} (クリックでトーン生成)`}
+                    />
+                    <div 
+                      className="absolute inset-1 rounded-md border"
+                      style={{ borderColor: color }}
+                    />
+                    <div 
+                      className="absolute top-0 left-0 w-full h-1"
+                      style={{ backgroundColor: color }}
+                    />
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-mono text-sm text-foreground truncate">{color}</p>
-                    <p className="text-xs text-muted-foreground">トーン生成</p>
+                    <p className="font-mono text-sm font-bold truncate" style={{ color: color }}>{color}</p>
+                    <p className="text-xs flex items-center gap-1" style={{ color: `${color}CC` }}>
+                      トーン生成 
+                      <span className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: color }}></span>
+                    </p>
                   </div>
                   <div className="flex flex-col gap-1">
                     <button
@@ -168,15 +184,31 @@ export const ToneRecommendations = () => {
                 <div key={index} className="bg-card border border-border rounded-lg p-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
                      onClick={(e) => handleCopyTone(tone, e)}>
                   <div className="flex items-center gap-3">
-                    <div
-                      className="w-12 h-12 rounded-lg shadow-sm group-hover:scale-105 transition-transform flex-shrink-0"
-                      style={{ backgroundColor: tone }}
-                      title={`${adjustment?.name || ''}: ${tone}`}
-                    />
+                    <div className="relative w-12 h-12 rounded-lg shadow-sm group-hover:scale-105 transition-transform flex-shrink-0 border-2 border-border overflow-hidden">
+                      <div 
+                        className="absolute inset-0"
+                        style={{ 
+                          background: `repeating-linear-gradient(45deg, ${tone} 0px, ${tone} 10px, ${tone}80 10px, ${tone}80 20px)`,
+                          boxShadow: `0 0 15px ${tone}60`
+                        }}
+                        title={`${adjustment?.name || ''}: ${tone}`}
+                      />
+                      <div 
+                        className="absolute bottom-0 left-0 w-full h-2"
+                        style={{ backgroundColor: tone }}
+                      />
+                      <div 
+                        className="absolute top-1 right-1 w-2 h-2 rounded-full border border-white"
+                        style={{ backgroundColor: tone }}
+                      />
+                    </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-mono text-sm text-foreground truncate">{tone}</p>
+                      <p className="font-mono text-sm font-bold truncate" style={{ color: tone }}>{tone}</p>
                       {adjustment && (
-                        <p className="text-xs text-muted-foreground">{adjustment.name}</p>
+                        <p className="text-xs flex items-center gap-1" style={{ color: `${tone}CC` }}>
+                          {adjustment.name}
+                          <span className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: tone }}></span>
+                        </p>
                       )}
                     </div>
                     <div className="flex flex-col gap-1">
