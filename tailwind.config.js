@@ -11,8 +11,8 @@ export default {
         '2xl': '1536px',
       },
       gridTemplateColumns: {
+        '14': 'repeat(14, minmax(0, 1fr))',
         '16': 'repeat(16, minmax(0, 1fr))',
-        '20': 'repeat(20, minmax(0, 1fr))',
       }
     },
   },

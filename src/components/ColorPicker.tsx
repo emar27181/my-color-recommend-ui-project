@@ -43,13 +43,13 @@ export const ColorPicker = () => {
           <label htmlFor="color-picker" className="text-sm font-medium">
             色を選択
           </label>
-          <div className="grid grid-cols-6 gap-2">
+          <div className="flex justify-start">
             <input
               id="color-picker"
               type="color"
               value={selectedColor}
               onChange={handleColorChange}
-              className="w-full aspect-square rounded border-2 border-border cursor-pointer"
+              className="w-16 h-16 rounded border-2 border-border cursor-pointer"
             />
           </div>
         </div>
@@ -78,10 +78,10 @@ export const ColorPicker = () => {
         {/* Selected Color Preview */}
         <div className="space-y-2">
           <label className="text-sm font-medium">選択された色</label>
-          <div className="grid grid-cols-6 gap-2">
+          <div className="flex justify-start">
             <div className="space-y-1">
               <div
-                className="w-full aspect-square rounded border-2 border-border"
+                className="w-16 h-16 rounded border-2 border-border"
                 style={{ backgroundColor: selectedColor }}
               />
               <div className="text-center">
