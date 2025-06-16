@@ -5,7 +5,15 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      screens: {
+        'xs': '475px',
+        '2xl': '1536px',
+      },
+      gridTemplateColumns: {
+        '16': 'repeat(16, minmax(0, 1fr))',
+      }
+    },
   },
   plugins: [],
 }

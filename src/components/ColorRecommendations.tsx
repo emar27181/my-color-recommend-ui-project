@@ -40,15 +40,15 @@ export const ColorRecommendations = () => {
         
         {/* 配色技法選択UI */}
         <div className="mt-4">
-          <h3 className="text-sm font-medium mb-2">配色技法を選択:</h3>
-          <div className="flex flex-wrap gap-2">
+          <h3 className="text-sm font-medium mb-3">配色技法を選択:</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
             {COLOR_SCHEMES.map((scheme) => (
               <Button
                 key={scheme.id}
                 variant={selectedScheme === scheme.id ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedScheme(scheme.id)}
-                className="text-xs"
+                className="text-xs h-8 px-2 whitespace-nowrap overflow-hidden text-ellipsis"
               >
                 {scheme.name}
               </Button>
@@ -74,19 +74,19 @@ export const ColorRecommendations = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 xl:grid-cols-16 gap-1 sm:gap-2">
+          <div className="grid grid-cols-3 xs:grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 2xl:grid-cols-16 gap-2 sm:gap-3">
             {recommendedColors.map((color, index) => (
-              <div key={index} className="space-y-1 group">
+              <div key={index} className="space-y-2 group">
                 <div className="relative">
                   <div
-                    className="w-full aspect-square rounded border-2 border-border hover:border-primary transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-lg cursor-pointer"
+                    className="w-full aspect-square rounded-lg border-2 border-border hover:border-primary transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-lg cursor-pointer min-h-[48px] sm:min-h-[56px]"
                     style={{ backgroundColor: color }}
                     onClick={() => handleGenerateTones(color)}
                     title={`色: ${color} (クリックでトーン生成)`}
                   />
                   <button
                     onClick={(e) => handleCopyColor(color, e)}
-                    className="absolute top-1 right-1 p-1 rounded bg-white/80 hover:bg-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-1 right-1 p-1 rounded bg-white/90 hover:bg-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm"
                     title="カラーコードをコピー"
                   >
                     {copiedColor === color ? (
@@ -97,7 +97,7 @@ export const ColorRecommendations = () => {
                   </button>
                 </div>
                 <div className="text-center">
-                  <p className="text-xs font-mono text-muted-foreground bg-muted/50 px-1 py-0.5 rounded truncate">{color}</p>
+                  <p className="text-xs font-mono text-muted-foreground bg-muted/50 px-1.5 py-1 rounded-md truncate leading-relaxed">{color}</p>
                 </div>
               </div>
             ))}
@@ -158,21 +158,21 @@ export const ToneRecommendations = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 xl:grid-cols-16 gap-1 sm:gap-2">
+          <div className="grid grid-cols-3 xs:grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 2xl:grid-cols-16 gap-2 sm:gap-3">
             {recommendedTones.map((tone, index) => {
               const adjustment = TONE_ADJUSTMENTS[index];
               return (
-                <div key={index} className="space-y-1 group">
+                <div key={index} className="space-y-2 group">
                   <div className="relative">
                     <div
-                      className="w-full aspect-square rounded border-2 border-border hover:border-primary transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-lg cursor-pointer"
+                      className="w-full aspect-square rounded-lg border-2 border-border hover:border-primary transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-lg cursor-pointer min-h-[48px] sm:min-h-[56px]"
                       style={{ backgroundColor: tone }}
                       title={`${adjustment?.name || ''}: ${tone}`}
                       onClick={(e) => handleCopyTone(tone, e)}
                     />
                     <button
                       onClick={(e) => handleCopyTone(tone, e)}
-                      className="absolute top-1 right-1 p-1 rounded bg-white/80 hover:bg-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-1 right-1 p-1 rounded bg-white/90 hover:bg-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm"
                       title="カラーコードをコピー"
                     >
                       {copiedTone === tone ? (
@@ -182,10 +182,10 @@ export const ToneRecommendations = () => {
                       )}
                     </button>
                   </div>
-                  <div className="text-center">
-                    <p className="text-xs font-mono text-muted-foreground bg-muted/50 px-1 py-0.5 rounded truncate">{tone}</p>
+                  <div className="text-center space-y-1">
+                    <p className="text-xs font-mono text-muted-foreground bg-muted/50 px-1.5 py-1 rounded-md truncate leading-relaxed">{tone}</p>
                     {adjustment && (
-                      <p className="text-xs text-muted-foreground">{adjustment.name}</p>
+                      <p className="text-xs text-muted-foreground font-medium">{adjustment.name}</p>
                     )}
                   </div>
                 </div>
