@@ -5,7 +5,6 @@ import { ExtractedColorsDisplay } from '@/components/ExtractedColorsDisplay';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { ToastProvider } from '@/contexts/ToastContext';
 import { ToastContainer } from '@/components/ToastContainer';
-import { HorizontalColorTest } from '@/components/HorizontalColorTest';
 
 function App() {
   return (
@@ -49,7 +48,6 @@ function App() {
               <ToneRecommendations />
             </section>
 
-            <HorizontalColorTest />
           </div>
 
           {/* Desktop: Horizontal Layout */}
@@ -78,7 +76,6 @@ function App() {
               </section>
             </div>
 
-            <HorizontalColorTest />
           </div>
         </main>
 
