@@ -26,82 +26,59 @@ function App() {
 
         <main className="container mx-auto px-4 py-8">
           {/* Mobile/Tablet: Vertical Layout */}
-          <div className="block xl:hidden space-y-6">
-            {/* Phase 1: Color Selection */}
-            <section>
-              <h2 className="text-xl font-semibold mb-4 text-foreground">Step 1: 色を選択</h2>
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-base font-medium mb-3 text-foreground">手動で色を選択</h3>
-                  <ColorPicker />
-                </div>
-                <div>
-                  <h3 className="text-base font-medium mb-3 text-foreground">画像から色を抽出</h3>
-                  <ImageUpload />
-                </div>
+          <div className="block xl:hidden space-y-4">
+            {/* Step 1 */}
+            <section className="space-y-3">
+              <h2 className="text-lg font-medium text-foreground">1. 色選択</h2>
+              <div className="grid grid-cols-1 gap-3">
+                <ColorPicker />
+                <ImageUpload />
               </div>
+              <ExtractedColorsDisplay />
             </section>
 
-            {/* Extracted Colors Display */}
-            <ExtractedColorsDisplay />
-
-            {/* Phase 2: Color Recommendations */}
+            {/* Step 2 */}
             <section>
-              <h2 className="text-xl font-semibold mb-4 text-foreground">Step 2: 推薦色相</h2>
+              <h2 className="text-lg font-medium mb-3 text-foreground">2. 推薦色</h2>
               <ColorRecommendations />
             </section>
 
-            {/* Phase 3: Tone Recommendations */}
+            {/* Step 3 */}
             <section>
-              <h2 className="text-xl font-semibold mb-4 text-foreground">Step 3: 推薦トーン</h2>
+              <h2 className="text-lg font-medium mb-3 text-foreground">3. トーン</h2>
               <ToneRecommendations />
             </section>
 
-            {/* Horizontal Color Test */}
-            <section>
-              <HorizontalColorTest />
-            </section>
+            <HorizontalColorTest />
           </div>
 
           {/* Desktop: Horizontal Layout */}
-          <div className="hidden xl:block">
-            {/* Header Section */}
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-6 text-foreground">Step 1: 色を選択</h2>
-              <div className="grid grid-cols-2 gap-8">
-                <div>
-                  <h3 className="text-lg font-medium mb-4 text-foreground">手動で色を選択</h3>
-                  <ColorPicker />
-                </div>
-                <div>
-                  <h3 className="text-lg font-medium mb-4 text-foreground">画像から色を抽出</h3>
-                  <ImageUpload />
-                </div>
+          <div className="hidden xl:block space-y-6">
+            {/* Step 1 */}
+            <section>
+              <h2 className="text-xl font-medium mb-4 text-foreground">1. 色選択</h2>
+              <div className="grid grid-cols-2 gap-6">
+                <ColorPicker />
+                <ImageUpload />
+              </div>
+              <div className="mt-4">
+                <ExtractedColorsDisplay />
               </div>
             </section>
 
-            {/* Extracted Colors Display */}
-            <ExtractedColorsDisplay />
-
-            {/* Main Content Area: Side by Side */}
-            <div className="grid grid-cols-2 gap-8 mt-8">
-              {/* Phase 2: Color Recommendations */}
+            {/* Steps 2 & 3 */}
+            <div className="grid grid-cols-2 gap-6">
               <section>
-                <h2 className="text-2xl font-semibold mb-4 text-foreground">Step 2: 推薦色相</h2>
+                <h2 className="text-xl font-medium mb-4 text-foreground">2. 推薦色</h2>
                 <ColorRecommendations />
               </section>
-
-              {/* Phase 3: Tone Recommendations */}
               <section>
-                <h2 className="text-2xl font-semibold mb-4 text-foreground">Step 3: 推薦トーン</h2>
+                <h2 className="text-xl font-medium mb-4 text-foreground">3. トーン</h2>
                 <ToneRecommendations />
               </section>
             </div>
 
-            {/* Horizontal Color Test - Full Width */}
-            <section className="mt-8">
-              <HorizontalColorTest />
-            </section>
+            <HorizontalColorTest />
           </div>
         </main>
         
