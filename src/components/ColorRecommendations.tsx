@@ -62,27 +62,60 @@ export const ColorRecommendations = () => {
             </p>
           </div>
         ) : (
-          <div className={`${RESPONSIVE_GRID.colors} ${RESPONSIVE_GRID.gap}`}>
-            {recommendedColors.map((color, index) => (
-              <div key={index} className="bg-card border border-border rounded-xl p-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
-                onClick={() => handleGenerateTones(color)}>
-                <div className="flex items-center gap-3">
-                  <ColorBlock
-                    color={color}
-                    title={`色: ${color} (タップでトーン生成)`}
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className={`${TYPOGRAPHY.colorCode} truncate`}>{color}</p>
+          <>
+            {/* Desktop/Tablet Layout */}
+            <div className={`hidden md:block ${RESPONSIVE_GRID.colors} ${RESPONSIVE_GRID.gap}`}>
+              {recommendedColors.map((color, index) => (
+                <div key={index} className="bg-card border border-border rounded-sm p-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
+                  onClick={() => handleGenerateTones(color)}>
+                  <div className="flex items-center gap-3">
+                    <ColorBlock
+                      color={color}
+                      title={`色: ${color} (タップでトーン生成)`}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className={`${TYPOGRAPHY.colorCode} truncate`}>{color}</p>
+                    </div>
+                    <CopyColorButton
+                      color={color}
+                      variant="minimal"
+                      className="opacity-100"
+                    />
                   </div>
-                  <CopyColorButton
-                    color={color}
-                    variant="minimal"
-                    className="opacity-100"
-                  />
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+            
+            {/* Mobile 2-Column Layout */}
+            <div className="block md:hidden space-y-3">
+              {Array.from({ length: Math.ceil(recommendedColors.length / 2) }).map((_, rowIndex) => (
+                <div key={rowIndex} className="flex gap-3">
+                  {recommendedColors.slice(rowIndex * 2, (rowIndex + 1) * 2).map((color, index) => (
+                    <div key={index} className="flex items-center gap-3 bg-card border border-border rounded-sm p-3 shadow-sm flex-1 cursor-pointer hover:shadow-md transition-all duration-200"
+                      onClick={() => handleGenerateTones(color)}>
+                      <div 
+                        className="border-2 border-gray-300 rounded-sm cursor-pointer hover:scale-110 transition-transform flex-shrink-0"
+                        style={{ 
+                          backgroundColor: color,
+                          width: '40px',
+                          height: '40px'
+                        }}
+                        title={color}
+                      />
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <CopyColorButton
+                          color={color}
+                          variant="minimal"
+                          className="opacity-100 flex-shrink-0"
+                        />
+                      </div>
+                      <span className="text-xs font-mono text-muted-foreground truncate">{color}</span>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </CardContent>
     </Card>
@@ -122,26 +155,56 @@ export const ToneRecommendations = () => {
             </p>
           </div>
         ) : (
-          <div className={`${RESPONSIVE_GRID.colors} ${RESPONSIVE_GRID.gap}`}>
-            {recommendedTones.map((tone, index) => (
-              <div key={index} className="bg-card border border-border rounded-xl p-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group">
-                <div className="flex items-center gap-3">
-                  <ColorBlock
-                    color={tone}
-                    title={tone}
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className={`${TYPOGRAPHY.colorCode} truncate`}>{tone}</p>
+          <>
+            {/* Desktop/Tablet Layout */}
+            <div className={`hidden md:block ${RESPONSIVE_GRID.colors} ${RESPONSIVE_GRID.gap}`}>
+              {recommendedTones.map((tone, index) => (
+                <div key={index} className="bg-card border border-border rounded-sm p-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group">
+                  <div className="flex items-center gap-3">
+                    <ColorBlock
+                      color={tone}
+                      title={tone}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className={`${TYPOGRAPHY.colorCode} truncate`}>{tone}</p>
+                    </div>
+                    <CopyColorButton
+                      color={tone}
+                      variant="minimal"
+                      className="opacity-100"
+                    />
                   </div>
-                  <CopyColorButton
-                    color={tone}
-                    variant="minimal"
-                    className="opacity-100"
-                  />
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+            
+            {/* Mobile 2-Column Layout */}
+            <div className="block md:hidden space-y-3">
+              {Array.from({ length: Math.ceil(recommendedTones.length / 2) }).map((_, rowIndex) => (
+                <div key={rowIndex} className="flex gap-3">
+                  {recommendedTones.slice(rowIndex * 2, (rowIndex + 1) * 2).map((tone, index) => (
+                    <div key={index} className="flex items-center gap-3 bg-card border border-border rounded-sm p-3 shadow-sm flex-1">
+                      <div 
+                        className="border-2 border-gray-300 rounded-sm cursor-pointer hover:scale-110 transition-transform flex-shrink-0"
+                        style={{ 
+                          backgroundColor: tone,
+                          width: '40px',
+                          height: '40px'
+                        }}
+                        title={tone}
+                      />
+                      <CopyColorButton
+                        color={tone}
+                        variant="minimal"
+                        className="opacity-100 flex-shrink-0"
+                      />
+                      <span className="text-xs font-mono text-muted-foreground truncate">{tone}</span>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </CardContent>
     </Card>
