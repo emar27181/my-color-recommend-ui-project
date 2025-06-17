@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToastContext } from '@/contexts/ToastContext';
 import { useColorStore } from '@/store/colorStore';
 import { extractColorsFromImage, validateImageFile } from '@/lib/colorExtractor';
+import { ProgressBar } from '@/components/common/ProgressBar';
 import { Upload, Image as ImageIcon, Loader2 } from 'lucide-react';
 import type { ExtractedColor } from '@/lib/colorExtractor';
 
@@ -12,6 +13,7 @@ interface ImageUploadProps {
 
 export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { showToast } = useToastContext();
@@ -25,6 +27,7 @@ export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
     }
 
     setIsLoading(true);
+    setProgress(0);
     
     try {
       // プレビュー画像を設定
@@ -34,8 +37,10 @@ export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
       };
       reader.readAsDataURL(file);
 
-      // 色を抽出
-      const result = await extractColorsFromImage(file, 8);
+      // 色を抽出（プログレスコールバック付き）
+      const result = await extractColorsFromImage(file, 8, (progressValue) => {
+        setProgress(progressValue);
+      });
       
       // ストアに保存
       setExtractedColors(result.colors, result.dominantColor);
@@ -47,8 +52,11 @@ export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
     } catch (error) {
       console.error('Color extraction failed:', error);
       showToast('色の抽出に失敗しました', 'error');
+      setProgress(0);
     } finally {
       setIsLoading(false);
+      // プログレス完了後、少し待ってから非表示
+      setTimeout(() => setProgress(0), 1500);
     }
   };
 
@@ -96,9 +104,19 @@ export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
           />
           
           {isLoading ? (
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-col items-center gap-4">
               <Loader2 className="w-8 h-8 text-primary animate-spin" />
-              <p className="text-muted-foreground">色を抽出中...</p>
+              <div className="w-full max-w-xs">
+                <ProgressBar 
+                  value={progress} 
+                  size="md" 
+                  variant="default"
+                  className="mb-2"
+                />
+                <p className="text-sm text-muted-foreground text-center">
+                  色を抽出中... ({Math.round(progress)}%)
+                </p>
+              </div>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-2">
