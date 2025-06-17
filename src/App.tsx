@@ -12,14 +12,11 @@ function App() {
       <div className="min-h-screen bg-background text-foreground">
         <header className="border-b border-border bg-background">
           <div className="container mx-auto px-4 py-6">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center">
               <div></div>
+              <h2 className="text-3xl font-bold text-center text-foreground flex-1">色相・トーン推薦アプリ</h2>
               <ThemeToggle />
             </div>
-            <h1 className="text-3xl font-bold text-center text-foreground">色推薦アプリ</h1>
-            <p className="text-center mt-2 text-muted-foreground">
-              色彩理論に基づいた相性の良い色とトーンを推薦します
-            </p>
           </div>
         </header>
 
@@ -51,10 +48,10 @@ function App() {
           </div>
 
           {/* Desktop: Horizontal Layout */}
-          <div className="hidden xl:block space-y-6">
+          <div className="hidden xl:block space-y-2">
             {/* Step 1 */}
             <section>
-              <h2 className="text-xl font-medium mb-4 text-foreground">1. ベース色選択</h2>
+              <h2 className="text-xl font-medium mb-0 text-foreground">1. ベース色選択</h2>
               <div className="grid grid-cols-2 gap-6">
                 <ColorPicker />
                 <ImageUpload />
@@ -67,11 +64,11 @@ function App() {
             {/* Steps 2 & 3 */}
             <div className="grid grid-cols-2 gap-6">
               <section>
-                <h2 className="text-xl font-medium mb-4 text-foreground">2.色相推薦</h2>
+                <h2 className="text-xl font-medium mb-0 text-foreground">2.色相推薦</h2>
                 <ColorRecommendations />
               </section>
               <section>
-                <h2 className="text-xl font-medium mb-4 text-foreground">3.トーン推薦</h2>
+                <h2 className="text-xl font-medium mb-0 text-foreground">3.トーン推薦</h2>
                 <ToneRecommendations />
               </section>
             </div>

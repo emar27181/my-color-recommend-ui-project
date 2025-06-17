@@ -140,7 +140,7 @@ export const useColorStore = create<ColorState>((set, get) => ({
   selectedColor: '#3b82f6', // デフォルトは青色
   recommendedColors: [],
   recommendedTones: [],
-  selectedScheme: 'analogous', // デフォルトは類似色配色
+  selectedScheme: 'complementary', // デフォルトはダイアード配色
   toneBaseColor: null,
   extractedColors: [],
   dominantColor: null,
@@ -148,6 +148,8 @@ export const useColorStore = create<ColorState>((set, get) => ({
   setSelectedColor: (color: string) => {
     set({ selectedColor: color });
     get().generateRecommendedColors();
+    // デフォルトでトーン推薦も生成
+    get().generateRecommendedTones(color);
   },
 
   setSelectedScheme: (schemeId: string) => {
@@ -224,6 +226,11 @@ export const useColorStore = create<ColorState>((set, get) => ({
     }
   },
 }));
+
+// 初期化時にデフォルトの推薦色とトーンを生成
+const initialState = useColorStore.getState();
+initialState.generateRecommendedColors();
+initialState.generateRecommendedTones(initialState.selectedColor);
 
 // カラーソート関数: 明るい→暗いでソート
 const sortColorsByLightness = (colors: string[]): string[] => {

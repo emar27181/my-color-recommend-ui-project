@@ -20,76 +20,69 @@ export const ExtractedColorsDisplay = () => {
     <section>
       <Card className="w-full">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Palette className="w-5 h-5" />
-            抽出された色
-          </CardTitle>
-          <p className="text-sm text-muted-foreground">
-            画像から抽出された色をクリックして推薦の起点として使用できます
-          </p>
         </CardHeader>
-        <CardContent className="space-y-6">
-          {/* ドミナントカラー */}
-          {dominantColor && (
-            <div>
-              <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
-                <span>最頻出色</span>
-                <span className="text-xs text-muted-foreground">(自動選択済み)</span>
-              </h3>
-              <div className="bg-card border-2 border-primary rounded-xl p-4 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer group"
-                   onClick={() => handleColorSelect(dominantColor.hex)}>
-                <div className="flex items-center gap-5">
-                  <ColorBlock 
-                    color={dominantColor.hex}
-                    title={`ドミナントカラー: ${dominantColor.hex} (タップで選択)`}
-                  />
-                  <div className="flex-1">
-                    <h4 className={`${TYPOGRAPHY.title} mb-2`}>最頻出色</h4>
-                    <p className={`${TYPOGRAPHY.colorCode} mb-2`}>{dominantColor.hex}</p>
-                    <p className={TYPOGRAPHY.usage}>
-                      {Math.round(dominantColor.usage * 100)}%
-                    </p>
+        <CardContent>
+          {/* 抽出色一覧 */}
+          <>
+            {/* Desktop/Tablet Layout */}
+            <div className={`hidden md:block ${RESPONSIVE_GRID.colors} ${RESPONSIVE_GRID.gap}`}>
+              {extractedColors.map((color, index) => (
+                <div key={index} className="bg-card border border-border rounded-sm p-4 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
+                  onClick={() => handleColorSelect(color.hex)}>
+                  <div className="flex items-center gap-4">
+                    <ColorBlock
+                      color={color.hex}
+                      title={`${color.hex} (タップで選択)`}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className={`${TYPOGRAPHY.colorCode} truncate`}>{color.hex}</p>
+                      <p className={TYPOGRAPHY.usage}>
+                        {Math.round(color.usage * 100)}%
+                      </p>
+                    </div>
+                    <CopyColorButton
+                      color={color.hex}
+                      variant="minimal"
+                      className="opacity-100"
+                    />
                   </div>
-                  <CopyColorButton 
-                    color={dominantColor.hex} 
-                    variant="compact"
-                    className="opacity-100"
-                  />
                 </div>
-              </div>
+              ))}
             </div>
-          )}
 
-          {/* その他の抽出色 */}
-          <div>
-            <h3 className="text-sm font-medium mb-3">その他の抽出色</h3>
-            <div className={`${RESPONSIVE_GRID.colors} ${RESPONSIVE_GRID.gap}`}>
-              {extractedColors
-                .filter(color => color.hex !== dominantColor?.hex)
-                .map((color, index) => (
-                  <div key={index} className="bg-card border border-border rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
-                       onClick={() => handleColorSelect(color.hex)}>
-                    <div className="flex items-center gap-4">
-                      <ColorBlock 
-                        color={color.hex}
+            {/* Mobile 2-Column Layout */}
+            <div className="block md:hidden space-y-3">
+              {Array.from({ length: Math.ceil(extractedColors.length / 2) }).map((_, rowIndex) => (
+                <div key={rowIndex} className="flex gap-3">
+                  {extractedColors.slice(rowIndex * 2, (rowIndex + 1) * 2).map((color, index) => (
+                    <div key={index} className="flex items-center gap-4 bg-card border border-border rounded-sm p-4 shadow-sm flex-1 cursor-pointer hover:shadow-md transition-all duration-200"
+                      onClick={() => handleColorSelect(color.hex)}>
+                      <div
+                        className="border-2 border-gray-300 rounded-sm cursor-pointer hover:scale-110 transition-transform flex-shrink-0"
+                        style={{
+                          backgroundColor: color.hex,
+                          width: '40px',
+                          height: '40px'
+                        }}
                         title={`${color.hex} (タップで選択)`}
                       />
-                      <div className="flex-1 min-w-0">
-                        <p className={`${TYPOGRAPHY.colorCode} truncate`}>{color.hex}</p>
-                        <p className={TYPOGRAPHY.usage}>
-                          {Math.round(color.usage * 100)}%
-                        </p>
-                      </div>
-                      <CopyColorButton 
-                        color={color.hex} 
+                      <CopyColorButton
+                        color={color.hex}
                         variant="minimal"
-                        className="opacity-100"
+                        className="opacity-100 flex-shrink-0"
                       />
+                      <div className="flex-1 min-w-0">
+                        <span className="text-xs font-mono text-muted-foreground truncate block">{color.hex}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {Math.round(color.usage * 100)}%
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              ))}
             </div>
-          </div>
+          </>
         </CardContent>
       </Card>
     </section>

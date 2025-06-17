@@ -1,3 +1,4 @@
+import React from 'react';
 import { useColorStore, COLOR_SCHEMES } from '@/store/colorStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ColorBlock } from '@/components/common/ColorBlock';
@@ -123,7 +124,14 @@ export const ColorRecommendations = () => {
 };
 
 export const ToneRecommendations = () => {
-  const { recommendedTones, toneBaseColor } = useColorStore();
+  const { recommendedTones, toneBaseColor, selectedColor, generateRecommendedTones } = useColorStore();
+
+  // トーンが生成されていない場合、選択色から生成
+  React.useEffect(() => {
+    if (recommendedTones.length === 0 && selectedColor) {
+      generateRecommendedTones(selectedColor);
+    }
+  }, [selectedColor, recommendedTones.length, generateRecommendedTones]);
 
   return (
     <Card className="w-full">

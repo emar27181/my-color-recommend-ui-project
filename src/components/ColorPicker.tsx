@@ -55,8 +55,8 @@ export const ColorPicker = () => {
                 }}
                 title="クリックで色を選択"
               />
-              <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1 border border-gray-300 pointer-events-none">
-                <Palette size={16} className="text-gray-600" />
+              <div className="absolute inset-0 flex items-center justify-center bg-transparent border-transparent pointer-events-none">
+                <Palette size={20} className="text-white drop-shadow-md" />
               </div>
               <input
                 id="color-picker-input"
@@ -113,8 +113,8 @@ export const ColorPicker = () => {
                   }}
                   title="クリックで色を選択"
                 />
-                <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1 border border-gray-300 pointer-events-none">
-                  <Palette size={16} className="text-gray-600" />
+                <div className="absolute inset-0 flex items-center justify-center bg-transparent border-transparent pointer-events-none">
+                  <Palette size={20} className="text-white drop-shadow-md" />
                 </div>
                 <input
                   id="color-picker-desktop"
