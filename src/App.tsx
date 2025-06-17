@@ -5,6 +5,7 @@ import { ExtractedColorsDisplay } from '@/components/ExtractedColorsDisplay';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { ToastProvider } from '@/contexts/ToastContext';
 import { ToastContainer } from '@/components/ToastContainer';
+import { HorizontalColorTest } from '@/components/HorizontalColorTest';
 
 function App() {
   return (
@@ -24,19 +25,18 @@ function App() {
         </header>
 
         <main className="container mx-auto px-4 py-8">
-          <div className="space-y-8">
+          {/* Mobile/Tablet: Vertical Layout */}
+          <div className="block xl:hidden space-y-6">
             {/* Phase 1: Color Selection */}
             <section>
-              <h2 className="text-2xl font-semibold mb-4 text-foreground">Step 1: 色を選択</h2>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <h2 className="text-xl font-semibold mb-4 text-foreground">Step 1: 色を選択</h2>
+              <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-medium mb-3 text-foreground">手動で色を選択</h3>
-                  <div className="flex justify-center">
-                    <ColorPicker />
-                  </div>
+                  <h3 className="text-base font-medium mb-3 text-foreground">手動で色を選択</h3>
+                  <ColorPicker />
                 </div>
                 <div>
-                  <h3 className="text-lg font-medium mb-3 text-foreground">画像から色を抽出</h3>
+                  <h3 className="text-base font-medium mb-3 text-foreground">画像から色を抽出</h3>
                   <ImageUpload />
                 </div>
               </div>
@@ -47,14 +47,60 @@ function App() {
 
             {/* Phase 2: Color Recommendations */}
             <section>
-              <h2 className="text-2xl font-semibold mb-4 text-foreground">Step 2: 推薦色相</h2>
+              <h2 className="text-xl font-semibold mb-4 text-foreground">Step 2: 推薦色相</h2>
               <ColorRecommendations />
             </section>
 
             {/* Phase 3: Tone Recommendations */}
             <section>
-              <h2 className="text-2xl font-semibold mb-4 text-foreground">Step 3: 推薦トーン</h2>
+              <h2 className="text-xl font-semibold mb-4 text-foreground">Step 3: 推薦トーン</h2>
               <ToneRecommendations />
+            </section>
+
+            {/* Horizontal Color Test */}
+            <section>
+              <HorizontalColorTest />
+            </section>
+          </div>
+
+          {/* Desktop: Horizontal Layout */}
+          <div className="hidden xl:block">
+            {/* Header Section */}
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-6 text-foreground">Step 1: 色を選択</h2>
+              <div className="grid grid-cols-2 gap-8">
+                <div>
+                  <h3 className="text-lg font-medium mb-4 text-foreground">手動で色を選択</h3>
+                  <ColorPicker />
+                </div>
+                <div>
+                  <h3 className="text-lg font-medium mb-4 text-foreground">画像から色を抽出</h3>
+                  <ImageUpload />
+                </div>
+              </div>
+            </section>
+
+            {/* Extracted Colors Display */}
+            <ExtractedColorsDisplay />
+
+            {/* Main Content Area: Side by Side */}
+            <div className="grid grid-cols-2 gap-8 mt-8">
+              {/* Phase 2: Color Recommendations */}
+              <section>
+                <h2 className="text-2xl font-semibold mb-4 text-foreground">Step 2: 推薦色相</h2>
+                <ColorRecommendations />
+              </section>
+
+              {/* Phase 3: Tone Recommendations */}
+              <section>
+                <h2 className="text-2xl font-semibold mb-4 text-foreground">Step 3: 推薦トーン</h2>
+                <ToneRecommendations />
+              </section>
+            </div>
+
+            {/* Horizontal Color Test - Full Width */}
+            <section className="mt-8">
+              <HorizontalColorTest />
             </section>
           </div>
         </main>
