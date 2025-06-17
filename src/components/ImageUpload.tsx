@@ -124,7 +124,6 @@ export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
         {/* プレビュー画像 */}
         {previewImage && (
           <div className="mt-4">
-            <h3 className="text-sm font-medium mb-2">アップロードした画像:</h3>
             <div className="relative max-w-md mx-auto">
               <img
                 src={previewImage}
