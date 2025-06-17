@@ -41,9 +41,9 @@ export const CopyColorButton = ({
     return (
       <button
         onClick={handleCopy}
-        className={`p-2 rounded-full bg-background/80 backdrop-blur-sm border border-border/50 
-                   hover:bg-background hover:border-border hover:scale-105 
-                   transition-all duration-200 shadow-sm hover:shadow-md 
+        className={`p-1.5 rounded-md bg-transparent border-transparent 
+                   hover:bg-background/10 hover:scale-105 
+                   transition-all duration-200 
                    ${className.includes('opacity') ? className : `opacity-80 hover:opacity-100 ${className}`}`}
         title={`${color} をコピー`}
       >
@@ -61,9 +61,9 @@ export const CopyColorButton = ({
     return (
       <button
         onClick={handleCopy}
-        className={`px-3 py-2 rounded-lg bg-background/80 backdrop-blur-sm border border-border/50 
-                   hover:bg-background hover:border-border hover:scale-105 
-                   transition-all duration-200 shadow-sm hover:shadow-md 
+        className={`px-2 py-1.5 rounded-md bg-transparent border-transparent 
+                   hover:bg-background/10 hover:scale-105 
+                   transition-all duration-200 
                    flex items-center gap-2 ${className.includes('opacity') ? className : `opacity-80 hover:opacity-100 ${className}`}`}
         title={`${color} をコピー`}
       >
@@ -80,10 +80,10 @@ export const CopyColorButton = ({
   return (
     <button
       onClick={handleCopy}
-      className={`px-4 py-2 rounded-xl bg-gradient-to-r from-background/90 to-background/80 
-                 backdrop-blur-sm border border-border/50 hover:border-border 
-                 hover:scale-105 transition-all duration-200 shadow-sm hover:shadow-md 
-                 flex items-center gap-3 ${className}`}
+      className={`px-3 py-1.5 rounded-lg bg-transparent border-transparent 
+                 hover:bg-background/10 hover:scale-105 
+                 transition-all duration-200 
+                 flex items-center gap-2 ${className}`}
       title={`${color} をコピー`}
     >
       <div className="flex items-center gap-2">
