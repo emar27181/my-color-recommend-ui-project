@@ -28,7 +28,7 @@ export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
 
     setIsLoading(true);
     setProgress(0);
-    
+
     try {
       // プレビュー画像を設定
       const reader = new FileReader();
@@ -41,13 +41,13 @@ export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
       const result = await extractColorsFromImage(file, 8, (progressValue) => {
         setProgress(progressValue);
       });
-      
+
       // ストアに保存
       setExtractedColors(result.colors, result.dominantColor);
-      
+
       // 親コンポーネントに結果を通知
       onColorsExtracted?.(result.colors, result.dominantColor);
-      
+
       showToast(`${result.colors.length}色を抽出しました`, 'success');
     } catch (error) {
       console.error('Color extraction failed:', error);
@@ -81,11 +81,7 @@ export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <ImageIcon className="w-5 h-5" />
-          画像から色を抽出
         </CardTitle>
-        <p className="text-sm text-muted-foreground">
-          画像をアップロードして、使用されている色を抽出します
-        </p>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* アップロードエリア */}
@@ -102,14 +98,14 @@ export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
             onChange={handleFileInputChange}
             className="hidden"
           />
-          
+
           {isLoading ? (
             <div className="flex flex-col items-center gap-4">
               <Loader2 className="w-8 h-8 text-primary animate-spin" />
               <div className="w-full max-w-xs">
-                <ProgressBar 
-                  value={progress} 
-                  size="md" 
+                <ProgressBar
+                  value={progress}
+                  size="md"
                   variant="default"
                   className="mb-2"
                 />
@@ -121,12 +117,6 @@ export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
           ) : (
             <div className="flex flex-col items-center gap-2">
               <Upload className="w-8 h-8 text-muted-foreground" />
-              <p className="text-muted-foreground">
-                画像をドラッグ&ドロップするか、クリックして選択
-              </p>
-              <p className="text-xs text-muted-foreground">
-                JPEG、PNG、GIF、WebP（最大10MB）
-              </p>
             </div>
           )}
         </div>

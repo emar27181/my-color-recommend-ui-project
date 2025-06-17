@@ -29,7 +29,7 @@ function App() {
           <div className="block xl:hidden space-y-4">
             {/* Step 1 */}
             <section className="space-y-3">
-              <h2 className="text-lg font-medium text-foreground">1. 色選択</h2>
+              <h2 className="text-lg font-medium text-foreground">1. ベース色選択</h2>
               <div className="grid grid-cols-1 gap-3">
                 <ColorPicker />
                 <ImageUpload />
@@ -39,13 +39,13 @@ function App() {
 
             {/* Step 2 */}
             <section>
-              <h2 className="text-lg font-medium mb-3 text-foreground">2. 推薦色</h2>
+              <h2 className="text-lg font-medium mb-3 text-foreground">2. 色相推薦</h2>
               <ColorRecommendations />
             </section>
 
             {/* Step 3 */}
             <section>
-              <h2 className="text-lg font-medium mb-3 text-foreground">3. トーン</h2>
+              <h2 className="text-lg font-medium mb-3 text-foreground">3. トーン推薦</h2>
               <ToneRecommendations />
             </section>
 
@@ -56,7 +56,7 @@ function App() {
           <div className="hidden xl:block space-y-6">
             {/* Step 1 */}
             <section>
-              <h2 className="text-xl font-medium mb-4 text-foreground">1. 色選択</h2>
+              <h2 className="text-xl font-medium mb-4 text-foreground">1. ベース色選択</h2>
               <div className="grid grid-cols-2 gap-6">
                 <ColorPicker />
                 <ImageUpload />
@@ -69,11 +69,11 @@ function App() {
             {/* Steps 2 & 3 */}
             <div className="grid grid-cols-2 gap-6">
               <section>
-                <h2 className="text-xl font-medium mb-4 text-foreground">2. 推薦色</h2>
+                <h2 className="text-xl font-medium mb-4 text-foreground">2.色相推薦</h2>
                 <ColorRecommendations />
               </section>
               <section>
-                <h2 className="text-xl font-medium mb-4 text-foreground">3. トーン</h2>
+                <h2 className="text-xl font-medium mb-4 text-foreground">3.トーン推薦</h2>
                 <ToneRecommendations />
               </section>
             </div>
@@ -81,7 +81,7 @@ function App() {
             <HorizontalColorTest />
           </div>
         </main>
-        
+
         <ToastContainer />
       </div>
     </ToastProvider>

@@ -35,26 +35,20 @@ export const ColorPicker = () => {
   };
 
   return (
-    <div className="w-full border rounded-xl bg-card" style={{ 
+    <div className="w-full border rounded-xl bg-card" style={{
       borderColor: 'var(--border)',
       color: 'var(--foreground)'
     }}>
       {/* Mobile/Tablet: Vertical Layout */}
       <div className="block lg:hidden p-4 space-y-4">
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold text-foreground">カラーピッカー</h2>
-        </div>
-        
+
         {/* Color Picker */}
         <div className="space-y-2">
-          <label htmlFor="color-picker" className="text-sm font-medium text-foreground">
-            色を選択
-          </label>
           <div className="flex justify-center">
             <div className="relative cursor-pointer">
-              <div 
+              <div
                 className="border-2 border-gray-300 rounded cursor-pointer hover:scale-110 transition-transform"
-                style={{ 
+                style={{
                   backgroundColor: selectedColor,
                   width: `${COLOR_BLOCK_SPEC.width}px`,
                   height: `${COLOR_BLOCK_SPEC.height}px`
@@ -78,9 +72,6 @@ export const ColorPicker = () => {
 
         {/* Text Input */}
         <div className="space-y-2">
-          <label htmlFor="color-input" className="text-sm font-medium text-foreground">
-            カラーコード
-          </label>
           <div className="flex gap-2">
             <Input
               id="color-input"
@@ -97,41 +88,6 @@ export const ColorPicker = () => {
           </div>
         </div>
 
-        {/* Selected Color Preview */}
-        <div className="space-y-2">
-          <label className={TYPOGRAPHY.subtitle}>選択された色</label>
-          <div className="bg-card border border-border rounded-xl p-3 shadow-sm">
-            <div className="flex items-center gap-3">
-              <div className="relative cursor-pointer">
-                <div 
-                  className="border-2 border-gray-300 rounded cursor-pointer hover:scale-110 transition-transform"
-                  style={{ 
-                    backgroundColor: selectedColor,
-                    width: `${COLOR_BLOCK_SPEC.width}px`,
-                    height: `${COLOR_BLOCK_SPEC.height}px`
-                  }}
-                  title="クリックで色を選択"
-                />
-                <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1 border border-gray-300 pointer-events-none">
-                  <Palette size={16} className="text-gray-600" />
-                </div>
-                <input
-                  type="color"
-                  value={selectedColor}
-                  onChange={handleColorChange}
-                  className="absolute opacity-0 w-full h-full cursor-pointer"
-                  style={{ top: 0, left: 0 }}
-                />
-              </div>
-              <div className="flex-1">
-                <p className={`${TYPOGRAPHY.colorCode} bg-muted px-3 py-1 rounded-full`}>
-                  {selectedColor}
-                </p>
-              </div>
-              <CopyColorButton color={selectedColor} variant="compact" className="opacity-100" />
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Desktop: Horizontal Layout */}
@@ -139,7 +95,7 @@ export const ColorPicker = () => {
         <div className="mb-4">
           <h2 className="text-lg font-semibold text-foreground">カラーピッカー</h2>
         </div>
-        
+
         <div className="grid grid-cols-3 gap-6 items-start">
           {/* Color Picker */}
           <div className="space-y-2">
@@ -148,9 +104,9 @@ export const ColorPicker = () => {
             </label>
             <div className="flex justify-center">
               <div className="relative cursor-pointer">
-                <div 
+                <div
                   className="border-2 border-gray-300 rounded cursor-pointer hover:scale-110 transition-transform"
-                  style={{ 
+                  style={{
                     backgroundColor: selectedColor,
                     width: `${COLOR_BLOCK_SPEC.width}px`,
                     height: `${COLOR_BLOCK_SPEC.height}px`
@@ -174,9 +130,6 @@ export const ColorPicker = () => {
 
           {/* Text Input */}
           <div className="space-y-2">
-            <label htmlFor="color-input-desktop" className="text-sm font-medium text-foreground">
-              カラーコード
-            </label>
             <div className="flex gap-2">
               <Input
                 id="color-input-desktop"
@@ -193,41 +146,7 @@ export const ColorPicker = () => {
             </div>
           </div>
 
-          {/* Selected Color Preview */}
-          <div className="space-y-2">
-            <label className={TYPOGRAPHY.subtitle}>選択された色</label>
-            <div className="bg-card border border-border rounded-xl p-3 shadow-sm">
-              <div className="flex items-center gap-3">
-                <div className="relative cursor-pointer">
-                  <div 
-                    className="border-2 border-gray-300 rounded cursor-pointer hover:scale-110 transition-transform"
-                    style={{ 
-                      backgroundColor: selectedColor,
-                      width: `${COLOR_BLOCK_SPEC.width}px`,
-                      height: `${COLOR_BLOCK_SPEC.height}px`
-                    }}
-                    title="クリックで色を選択"
-                  />
-                  <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1 border border-gray-300 pointer-events-none">
-                    <Palette size={16} className="text-gray-600" />
-                  </div>
-                  <input
-                    type="color"
-                    value={selectedColor}
-                    onChange={handleColorChange}
-                    className="absolute opacity-0 w-full h-full cursor-pointer"
-                    style={{ top: 0, left: 0 }}
-                  />
-                </div>
-                <div className="flex-1">
-                  <p className={`${TYPOGRAPHY.colorCode} bg-muted px-3 py-1 rounded-full`}>
-                    {selectedColor}
-                  </p>
-                </div>
-                <CopyColorButton color={selectedColor} variant="compact" className="opacity-100" />
-              </div>
-            </div>
-          </div>
+
         </div>
       </div>
     </div>

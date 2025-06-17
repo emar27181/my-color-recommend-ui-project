@@ -16,34 +16,37 @@ export const ColorRecommendations = () => {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>推薦色相</CardTitle>
+        {/*
         <p className="text-sm text-muted-foreground">
           選択した色に基づいて、色彩理論に従った相性の良い色を推薦します
         </p>
-        
+         */}
+
         {/* 配色技法選択UI */}
         <div className="mt-4">
-          <h3 className={`${TYPOGRAPHY.subtitle} mb-3`}>配色技法:</h3>
           <div className={`${RESPONSIVE_GRID.schemes} ${RESPONSIVE_GRID.gap}`}>
             {COLOR_SCHEMES.map((scheme) => (
               <button
                 key={scheme.id}
                 onClick={() => setSelectedScheme(scheme.id)}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                  selectedScheme === scheme.id 
-                    ? 'bg-primary text-primary-foreground shadow-sm' 
-                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                }`}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${selectedScheme === scheme.id
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  }`}
               >
                 {scheme.name}
               </button>
             ))}
           </div>
+
+          {/*
           {currentScheme && (
             <p className="text-xs text-muted-foreground mt-2">
               {currentScheme.description}
             </p>
           )}
+          */}
+
         </div>
       </CardHeader>
       <CardContent>
@@ -62,17 +65,17 @@ export const ColorRecommendations = () => {
           <div className={`${RESPONSIVE_GRID.colors} ${RESPONSIVE_GRID.gap}`}>
             {recommendedColors.map((color, index) => (
               <div key={index} className="bg-card border border-border rounded-xl p-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
-                   onClick={() => handleGenerateTones(color)}>
+                onClick={() => handleGenerateTones(color)}>
                 <div className="flex items-center gap-3">
-                  <ColorBlock 
+                  <ColorBlock
                     color={color}
                     title={`色: ${color} (タップでトーン生成)`}
                   />
                   <div className="flex-1 min-w-0">
                     <p className={`${TYPOGRAPHY.colorCode} truncate`}>{color}</p>
                   </div>
-                  <CopyColorButton 
-                    color={color} 
+                  <CopyColorButton
+                    color={color}
                     variant="minimal"
                     className="opacity-100"
                   />
@@ -92,19 +95,17 @@ export const ToneRecommendations = () => {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>推薦トーン</CardTitle>
+        {/*
         <p className="text-sm text-muted-foreground">
           選択した色の明度・彩度を変化させたトーンバリエーション
         </p>
+        */}
         {toneBaseColor && (
           <div className="mt-2 flex items-center gap-2">
-            <div 
+            <div
               className="w-4 h-4 rounded border"
               style={{ backgroundColor: toneBaseColor }}
             />
-            <span className="text-xs text-muted-foreground">
-              ベース色: {toneBaseColor}
-            </span>
           </div>
         )}
       </CardHeader>
@@ -117,7 +118,7 @@ export const ToneRecommendations = () => {
               </svg>
             </div>
             <p className="text-center text-muted-foreground text-sm max-w-md">
-              推薦色をクリックするか「トーン生成」ボタンを押すとトーンが表示されます
+              推薦色をクリックするとトーンが表示されます
             </p>
           </div>
         ) : (
@@ -125,15 +126,15 @@ export const ToneRecommendations = () => {
             {recommendedTones.map((tone, index) => (
               <div key={index} className="bg-card border border-border rounded-xl p-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group">
                 <div className="flex items-center gap-3">
-                  <ColorBlock 
+                  <ColorBlock
                     color={tone}
                     title={tone}
                   />
                   <div className="flex-1 min-w-0">
                     <p className={`${TYPOGRAPHY.colorCode} truncate`}>{tone}</p>
                   </div>
-                  <CopyColorButton 
-                    color={tone} 
+                  <CopyColorButton
+                    color={tone}
                     variant="minimal"
                     className="opacity-100"
                   />
