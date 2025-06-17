@@ -96,9 +96,9 @@ export const ColorPicker = () => {
           <h2 className="text-lg font-semibold text-foreground">カラーピッカー</h2>
         </div>
 
-        <div className="grid grid-cols-3 gap-6 items-start">
+        <div className="grid grid-cols-2 gap-8 items-start">
           {/* Color Picker */}
-          <div className="space-y-2">
+          <div className="space-y-3">
             <label htmlFor="color-picker-desktop" className="text-sm font-medium text-foreground">
               色を選択
             </label>
@@ -129,8 +129,11 @@ export const ColorPicker = () => {
           </div>
 
           {/* Text Input */}
-          <div className="space-y-2">
-            <div className="flex gap-2">
+          <div className="space-y-3">
+            <label className="text-sm font-medium text-foreground">
+              カラーコード入力
+            </label>
+            <div className="flex gap-3">
               <Input
                 id="color-input-desktop"
                 type="text"

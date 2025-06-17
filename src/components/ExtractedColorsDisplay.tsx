@@ -38,14 +38,14 @@ export const ExtractedColorsDisplay = () => {
               </h3>
               <div className="bg-card border-2 border-primary rounded-xl p-4 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer group"
                    onClick={() => handleColorSelect(dominantColor.hex)}>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-5">
                   <ColorBlock 
                     color={dominantColor.hex}
                     title={`ドミナントカラー: ${dominantColor.hex} (タップで選択)`}
                   />
                   <div className="flex-1">
-                    <h4 className={`${TYPOGRAPHY.title} mb-1`}>最頻出色</h4>
-                    <p className={`${TYPOGRAPHY.colorCode} mb-1`}>{dominantColor.hex}</p>
+                    <h4 className={`${TYPOGRAPHY.title} mb-2`}>最頻出色</h4>
+                    <p className={`${TYPOGRAPHY.colorCode} mb-2`}>{dominantColor.hex}</p>
                     <p className={TYPOGRAPHY.usage}>
                       {Math.round(dominantColor.usage * 100)}%
                     </p>
@@ -67,9 +67,9 @@ export const ExtractedColorsDisplay = () => {
               {extractedColors
                 .filter(color => color.hex !== dominantColor?.hex)
                 .map((color, index) => (
-                  <div key={index} className="bg-card border border-border rounded-xl p-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
+                  <div key={index} className="bg-card border border-border rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
                        onClick={() => handleColorSelect(color.hex)}>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-4">
                       <ColorBlock 
                         color={color.hex}
                         title={`${color.hex} (タップで選択)`}

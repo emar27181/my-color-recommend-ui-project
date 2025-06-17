@@ -91,7 +91,7 @@ export const ColorRecommendations = () => {
               {Array.from({ length: Math.ceil(recommendedColors.length / 2) }).map((_, rowIndex) => (
                 <div key={rowIndex} className="flex gap-3">
                   {recommendedColors.slice(rowIndex * 2, (rowIndex + 1) * 2).map((color, index) => (
-                    <div key={index} className="flex items-center gap-3 bg-card border border-border rounded-sm p-3 shadow-sm flex-1 cursor-pointer hover:shadow-md transition-all duration-200"
+                    <div key={index} className="flex items-center gap-4 bg-card border border-border rounded-sm p-4 shadow-sm flex-1 cursor-pointer hover:shadow-md transition-all duration-200"
                       onClick={() => handleGenerateTones(color)}>
                       <div 
                         className="border-2 border-gray-300 rounded-sm cursor-pointer hover:scale-110 transition-transform flex-shrink-0"
@@ -159,8 +159,8 @@ export const ToneRecommendations = () => {
             {/* Desktop/Tablet Layout */}
             <div className={`hidden md:block ${RESPONSIVE_GRID.colors} ${RESPONSIVE_GRID.gap}`}>
               {recommendedTones.map((tone, index) => (
-                <div key={index} className="bg-card border border-border rounded-sm p-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group">
-                  <div className="flex items-center gap-3">
+                <div key={index} className="bg-card border border-border rounded-sm p-4 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group">
+                  <div className="flex items-center gap-4">
                     <ColorBlock
                       color={tone}
                       title={tone}
@@ -183,7 +183,7 @@ export const ToneRecommendations = () => {
               {Array.from({ length: Math.ceil(recommendedTones.length / 2) }).map((_, rowIndex) => (
                 <div key={rowIndex} className="flex gap-3">
                   {recommendedTones.slice(rowIndex * 2, (rowIndex + 1) * 2).map((tone, index) => (
-                    <div key={index} className="flex items-center gap-3 bg-card border border-border rounded-sm p-3 shadow-sm flex-1">
+                    <div key={index} className="flex items-center gap-4 bg-card border border-border rounded-sm p-4 shadow-sm flex-1">
                       <div 
                         className="border-2 border-gray-300 rounded-sm cursor-pointer hover:scale-110 transition-transform flex-shrink-0"
                         style={{ 

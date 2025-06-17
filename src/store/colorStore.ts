@@ -18,45 +18,95 @@ export interface ToneAdjustment {
   saturationMultiplier?: number;
 }
 
-// 配色技法のデータ定義
+// 配色技法のデータ定義（anglesの数で昇順ソート済み）
 export const COLOR_SCHEMES: ColorScheme[] = [
   {
-    id: 'dominant',
-    name: 'Dominant',
-    description: '同系色の微細なバリエーション',
-    angles: [0, 15, -15, 30, -30],
+    id: 'identity',
+    name: 'アイデンティティ',
+    description: '単一色のみの配色',
+    angles: [0],
   },
   {
-    id: 'analogous',
-    name: 'Analogous',
-    description: '隣接する色相の組み合わせ',
-    angles: [0, 30, -30, 60, -60],
+    id: 'analogous_1',
+    name: 'アナロジー1',
+    description: '基準色から時計回りのアナロジー配色',
+    angles: [0, 30],
+  },
+  {
+    id: 'analogous_2',
+    name: 'アナロジー2',
+    description: '基準色から反時計回りのアナロジー配色',
+    angles: [0, -30],
   },
   {
     id: 'complementary',
-    name: 'Dyad',
+    name: 'ダイアード',
     description: '対照的な色相の組み合わせ',
     angles: [0, 180],
   },
   {
+    id: 'intermediate_1',
+    name: 'インターミディエート1',
+    description: '基準色から時計回りの60度配色',
+    angles: [0, 60],
+  },
+  {
+    id: 'intermediate_2',
+    name: 'インターミディエート2',
+    description: '基準色から反時計回りの60度配色',
+    angles: [0, -60],
+  },
+  {
+    id: 'opponent',
+    name: 'オポーネント',
+    description: '心理的補色に基づいた配色',
+    angles: [0, 180],
+  },
+  {
+    id: 'dominant_1',
+    name: 'ドミナント1',
+    description: '同系色の微細なバリエーション',
+    angles: [0, 15, -15],
+  },
+  {
+    id: 'dominant_2',
+    name: 'ドミナント2',
+    description: '同系色の微細なバリエーション',
+    angles: [0, 30, -30],
+  },
+  {
     id: 'triadic',
-    name: 'Triad',
+    name: 'トライアド',
     description: '色相環を3等分した配色',
     angles: [0, 120, 240],
   },
   {
+    id: 'split_complementary',
+    name: 'スプリット',
+    description: '補色の両隣を使った配色',
+    angles: [0, 150, 210],
+  },
+  {
     id: 'tetradic',
-    name: 'Tetrad',
+    name: 'テトラード',
     description: '色相環を4等分した配色',
     angles: [0, 90, 180, 270],
   },
   {
-    id: 'split_complementary',
-    name: 'Split',
-    description: '補色の両隣を使った配色',
-    angles: [0, 150, 210],
+    id: 'pentad',
+    name: 'ペンタード',
+    description: '色相環を5等分した配色',
+    angles: [0, 72, 144, 216, 288],
+  },
+  {
+    id: 'hexad',
+    name: 'ヘクサード',
+    description: '色相環を6等分した配色',
+    angles: [0, 60, 120, 180, 240, 300],
   },
 ];
+
+
 
 // トーン調整値の定義
 export const TONE_ADJUSTMENTS: ToneAdjustment[] = [
@@ -94,27 +144,27 @@ export const useColorStore = create<ColorState>((set, get) => ({
   toneBaseColor: null,
   extractedColors: [],
   dominantColor: null,
-  
+
   setSelectedColor: (color: string) => {
     set({ selectedColor: color });
     get().generateRecommendedColors();
   },
-  
+
   setSelectedScheme: (schemeId: string) => {
     set({ selectedScheme: schemeId });
     get().generateRecommendedColors();
   },
-  
+
   setExtractedColors: (colors: ExtractedColor[], dominantColor: ExtractedColor) => {
     set({ extractedColors: colors, dominantColor });
     // ドミナントカラーを自動的に選択色として設定
     get().setSelectedColor(dominantColor.hex);
   },
-  
+
   setColorFromExtracted: (color: string) => {
     get().setSelectedColor(color);
   },
-  
+
   generateRecommendedColors: () => {
     const { selectedColor, selectedScheme } = get();
     try {
@@ -122,7 +172,7 @@ export const useColorStore = create<ColorState>((set, get) => ({
       const hue = baseColor.get('hsl.h') || 0;
       const saturation = baseColor.get('hsl.s');
       const lightness = baseColor.get('hsl.l');
-      
+
       // 選択された配色技法を取得
       const scheme = COLOR_SCHEMES.find(s => s.id === selectedScheme);
       if (!scheme) {
@@ -130,43 +180,43 @@ export const useColorStore = create<ColorState>((set, get) => ({
         set({ recommendedColors: [] });
         return;
       }
-      
+
       // 配色技法に基づく推薦色を生成
       const recommendations = scheme.angles.map(angle => {
         const newHue = (hue + angle) % 360;
         return chroma.hsl(newHue, saturation, lightness).hex();
       });
-      
+
       // 明るい→暗い順でソート
       const sortedRecommendations = sortColorsByLightness(recommendations);
-      
+
       set({ recommendedColors: sortedRecommendations });
     } catch (error) {
       console.error('Failed to generate recommended colors:', error);
       set({ recommendedColors: [] });
     }
   },
-  
+
   generateRecommendedTones: (baseColor: string) => {
     try {
       const color = chroma(baseColor);
       const hue = color.get('hsl.h') || 0;
       const saturation = color.get('hsl.s');
       const lightness = color.get('hsl.l');
-      
+
       // TONE_ADJUSTMENTSに基づいてトーンを生成
       const tones = TONE_ADJUSTMENTS.map(adjustment => {
         const newLightness = Math.max(0, Math.min(1, lightness + adjustment.lightnessOffset));
-        const newSaturation = adjustment.saturationMultiplier 
+        const newSaturation = adjustment.saturationMultiplier
           ? Math.max(0, Math.min(1, saturation * adjustment.saturationMultiplier))
           : saturation;
-        
+
         return chroma.hsl(hue, newSaturation, newLightness).hex();
       });
-      
+
       // 明るい→暗い順でソート
       const sortedTones = sortColorsByLightness(tones);
-      
+
       set({ recommendedTones: sortedTones, toneBaseColor: baseColor });
     } catch (error) {
       console.error('Failed to generate recommended tones:', error);
