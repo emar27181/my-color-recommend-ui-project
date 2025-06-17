@@ -3,6 +3,7 @@ import { ColorRecommendations, ToneRecommendations } from '@/components/ColorRec
 import { ImageUpload } from '@/components/ImageUpload';
 import { ExtractedColorsDisplay } from '@/components/ExtractedColorsDisplay';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { NavigationMenu } from '@/components/NavigationMenu';
 import { ToastProvider } from '@/contexts/ToastContext';
 import { ToastContainer } from '@/components/ToastContainer';
 
@@ -13,7 +14,7 @@ function App() {
         <header className="border-b border-border bg-background">
           <div className="container mx-auto px-4 py-6">
             <div className="flex justify-between items-center">
-              <div></div>
+              <NavigationMenu />
               <h2 className="text-3xl font-bold text-center text-foreground flex-1">色相・トーン推薦アプリ</h2>
               <ThemeToggle />
             </div>
