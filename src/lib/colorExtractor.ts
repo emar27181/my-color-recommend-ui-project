@@ -14,7 +14,8 @@ export interface ColorExtractionResult {
 
 export const extractColorsFromImage = async (
   file: File, 
-  maxColors: number = 5
+  maxColors: number = 5,
+  onProgress?: (progress: number) => void
 ): Promise<ColorExtractionResult> => {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -28,85 +29,112 @@ export const extractColorsFromImage = async (
 
     img.onload = () => {
       try {
-        // キャンバスに画像を描画
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx.drawImage(img, 0, 0);
+        onProgress?.(10); // 画像読み込み完了
+        
+        // 高速化: 大きな画像は縮小して処理
+        const maxDimension = 800;
+        let { width, height } = img;
+        
+        if (width > maxDimension || height > maxDimension) {
+          const ratio = Math.min(maxDimension / width, maxDimension / height);
+          width = Math.floor(width * ratio);
+          height = Math.floor(height * ratio);
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        onProgress?.(30); // 画像描画完了
 
         const colorThief = new ColorThief();
         
-        // ドミナントカラーを取得
-        const dominantRgb = colorThief.getColor(img, 10);
+        // 高速化: 品質パラメータを調整（10 → 20）
+        const dominantRgb = colorThief.getColor(img, 20);
+        onProgress?.(50); // ドミナントカラー取得完了
         
-        // カラーパレットを取得
-        const palette = colorThief.getPalette(img, maxColors, 10) || [];
+        const palette = colorThief.getPalette(img, maxColors, 20) || [];
+        onProgress?.(70); // パレット取得完了
         
-        // 実際のピクセル分析による使用度計算
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        // 高速化: サンプリング間隔を増やしてピクセル数を減らす
+        const sampleRate = Math.max(1, Math.floor(Math.sqrt(width * height) / 100));
+        const imageData = ctx.getImageData(0, 0, width, height);
         const pixels = imageData.data;
-        const totalPixels = canvas.width * canvas.height;
+        const totalSamples = Math.floor((width * height) / (sampleRate * sampleRate));
         
-        // 各色の使用度を計算
         const colorCounts = new Map<string, number>();
-        const tolerance = 30; // 色の許容差
+        const tolerance = 35; // 許容差を少し広げて処理を軽く
         
-        for (let i = 0; i < pixels.length; i += 4) {
-          const r = pixels[i];
-          const g = pixels[i + 1];
-          const b = pixels[i + 2];
-          const pixelColor = chroma.rgb(r, g, b);
-          
-          // パレット内の最も近い色を見つける
-          let closestColor = '';
-          let minDistance = Infinity;
-          
-          for (const paletteRgb of palette) {
-            const paletteColor = chroma.rgb(paletteRgb[0], paletteRgb[1], paletteRgb[2]);
-            const distance = chroma.deltaE(pixelColor, paletteColor);
+        let processedSamples = 0;
+        
+        for (let y = 0; y < height; y += sampleRate) {
+          for (let x = 0; x < width; x += sampleRate) {
+            const i = (y * width + x) * 4;
+            const r = pixels[i];
+            const g = pixels[i + 1];
+            const b = pixels[i + 2];
+            const pixelColor = chroma.rgb(r, g, b);
             
-            if (distance < minDistance && distance < tolerance) {
-              minDistance = distance;
-              closestColor = paletteColor.hex();
+            let closestColor = '';
+            let minDistance = Infinity;
+            
+            for (const paletteRgb of palette) {
+              const paletteColor = chroma.rgb(paletteRgb[0], paletteRgb[1], paletteRgb[2]);
+              const distance = chroma.deltaE(pixelColor, paletteColor);
+              
+              if (distance < minDistance && distance < tolerance) {
+                minDistance = distance;
+                closestColor = paletteColor.hex();
+              }
+            }
+            
+            if (closestColor) {
+              colorCounts.set(closestColor, (colorCounts.get(closestColor) || 0) + 1);
+            }
+            
+            processedSamples++;
+            
+            // プログレス更新（70-90%の範囲）
+            if (processedSamples % Math.floor(totalSamples / 10) === 0) {
+              const progress = 70 + Math.floor((processedSamples / totalSamples) * 20);
+              onProgress?.(progress);
             }
           }
-          
-          if (closestColor) {
-            colorCounts.set(closestColor, (colorCounts.get(closestColor) || 0) + 1);
-          }
         }
+        
+        onProgress?.(90); // ピクセル分析完了
         
         // ExtractedColor形式に変換
         const colors: ExtractedColor[] = palette.map((rgb: [number, number, number]) => {
           const hex = chroma.rgb(rgb[0], rgb[1], rgb[2]).hex();
           const count = colorCounts.get(hex) || 0;
-          const usage = count / totalPixels;
+          const usage = count / totalSamples;
           
           return {
             hex,
             rgb,
             usage,
           };
-        }).sort((a, b) => b.usage - a.usage); // 使用度の高い順にソート
+        }).sort((a, b) => b.usage - a.usage);
 
-        // ドミナントカラーの実際の使用度を設定
         const dominantHex = chroma.rgb(dominantRgb[0], dominantRgb[1], dominantRgb[2]).hex();
         const dominantUsage = colorCounts.get(dominantHex) || 0;
         
         const dominantColor: ExtractedColor = {
           hex: dominantHex,
           rgb: dominantRgb,
-          usage: dominantUsage / totalPixels,
+          usage: dominantUsage / totalSamples,
         };
 
-        // ドミナントカラーが結果に含まれていない場合は先頭に追加
         const isDominantIncluded = colors.some(color => color.hex === dominantColor.hex);
         if (!isDominantIncluded) {
           colors.unshift(dominantColor);
-          // 配列のサイズを調整
           if (colors.length > maxColors) {
             colors.pop();
           }
         }
+        
+        onProgress?.(100); // 完了
 
         resolve({
           colors,
