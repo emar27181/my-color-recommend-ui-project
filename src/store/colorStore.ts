@@ -137,7 +137,10 @@ export const useColorStore = create<ColorState>((set, get) => ({
         return chroma.hsl(newHue, saturation, lightness).hex();
       });
       
-      set({ recommendedColors: recommendations });
+      // 明るい→暗い順でソート
+      const sortedRecommendations = sortColorsByLightness(recommendations);
+      
+      set({ recommendedColors: sortedRecommendations });
     } catch (error) {
       console.error('Failed to generate recommended colors:', error);
       set({ recommendedColors: [] });
@@ -161,13 +164,30 @@ export const useColorStore = create<ColorState>((set, get) => ({
         return chroma.hsl(hue, newSaturation, newLightness).hex();
       });
       
-      set({ recommendedTones: tones, toneBaseColor: baseColor });
+      // 明るい→暗い順でソート
+      const sortedTones = sortColorsByLightness(tones);
+      
+      set({ recommendedTones: sortedTones, toneBaseColor: baseColor });
     } catch (error) {
       console.error('Failed to generate recommended tones:', error);
       set({ recommendedTones: [], toneBaseColor: null });
     }
   },
 }));
+
+// カラーソート関数: 明るい→暗いでソート
+const sortColorsByLightness = (colors: string[]): string[] => {
+  return colors.sort((a, b) => {
+    try {
+      const lightnessA = chroma(a).get('hsl.l');
+      const lightnessB = chroma(b).get('hsl.l');
+      return lightnessB - lightnessA; // 明るい→暗い（降順）
+    } catch (error) {
+      console.error('Error sorting colors:', error);
+      return 0;
+    }
+  });
+};
 
 // 初期状態で推薦色を生成
 setTimeout(() => {
