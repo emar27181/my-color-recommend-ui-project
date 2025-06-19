@@ -2,9 +2,8 @@ import { useState } from 'react';
 import { useColorStore } from '@/store/colorStore';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { CopyColorButton } from '@/components/common/CopyColorButton';
 import { Palette } from 'lucide-react';
-import { TYPOGRAPHY, COLOR_BLOCK_SPEC } from '@/constants/ui';
+import { COLOR_BLOCK_SPEC } from '@/constants/ui';
 
 export const ColorPicker = () => {
   const { selectedColor, setSelectedColor } = useColorStore();

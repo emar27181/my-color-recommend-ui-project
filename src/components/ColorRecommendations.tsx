@@ -1,6 +1,6 @@
 import React from 'react';
 import { useColorStore, COLOR_SCHEMES } from '@/store/colorStore';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ColorBlock } from '@/components/common/ColorBlock';
 import { CopyColorButton } from '@/components/common/CopyColorButton';
 import { RESPONSIVE_GRID, TYPOGRAPHY } from '@/constants/ui';
@@ -12,7 +12,7 @@ export const ColorRecommendations = () => {
     generateRecommendedTones(color);
   };
 
-  const currentScheme = COLOR_SCHEMES.find(scheme => scheme.id === selectedScheme);
+
 
   return (
     <Card className="w-full">
@@ -86,7 +86,7 @@ export const ColorRecommendations = () => {
                 </div>
               ))}
             </div>
-            
+
             {/* Mobile 2-Column Layout */}
             <div className="block md:hidden space-y-3">
               {Array.from({ length: Math.ceil(recommendedColors.length / 2) }).map((_, rowIndex) => (
@@ -94,9 +94,9 @@ export const ColorRecommendations = () => {
                   {recommendedColors.slice(rowIndex * 2, (rowIndex + 1) * 2).map((color, index) => (
                     <div key={index} className="flex items-center gap-4 bg-card border border-border rounded-sm p-4 shadow-sm flex-1 cursor-pointer hover:shadow-md transition-all duration-200"
                       onClick={() => handleGenerateTones(color)}>
-                      <div 
+                      <div
                         className="border-2 border-gray-300 rounded-sm cursor-pointer hover:scale-110 transition-transform flex-shrink-0"
-                        style={{ 
+                        style={{
                           backgroundColor: color,
                           width: '40px',
                           height: '40px'
@@ -185,16 +185,16 @@ export const ToneRecommendations = () => {
                 </div>
               ))}
             </div>
-            
+
             {/* Mobile 2-Column Layout */}
             <div className="block md:hidden space-y-3">
               {Array.from({ length: Math.ceil(recommendedTones.length / 2) }).map((_, rowIndex) => (
                 <div key={rowIndex} className="flex gap-3">
                   {recommendedTones.slice(rowIndex * 2, (rowIndex + 1) * 2).map((tone, index) => (
                     <div key={index} className="flex items-center gap-4 bg-card border border-border rounded-sm p-4 shadow-sm flex-1">
-                      <div 
+                      <div
                         className="border-2 border-gray-300 rounded-sm cursor-pointer hover:scale-110 transition-transform flex-shrink-0"
-                        style={{ 
+                        style={{
                           backgroundColor: tone,
                           width: '40px',
                           height: '40px'

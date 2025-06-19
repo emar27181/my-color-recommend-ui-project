@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 
 interface NavigationMenuProps {
@@ -38,11 +38,11 @@ export const NavigationMenu = ({ className = '' }: NavigationMenuProps) => {
       {isOpen && (
         <>
           {/* Backdrop */}
-          <div 
+          <div
             className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm"
             onClick={toggleMenu}
           />
-          
+
           {/* Menu Content */}
           <div className="absolute top-12 left-0 z-50 min-w-48 bg-background border border-border rounded-lg shadow-lg overflow-hidden">
             <nav className="py-2">
@@ -50,11 +50,10 @@ export const NavigationMenu = ({ className = '' }: NavigationMenuProps) => {
                 <a
                   key={index}
                   href={item.href}
-                  className={`block px-4 py-3 text-sm transition-colors hover:bg-muted ${
-                    item.isActive 
-                      ? 'text-primary font-medium bg-primary/10' 
+                  className={`block px-4 py-3 text-sm transition-colors hover:bg-muted ${item.isActive
+                      ? 'text-primary font-medium bg-primary/10'
                       : 'text-foreground'
-                  }`}
+                    }`}
                   onClick={toggleMenu}
                 >
                   {item.label}

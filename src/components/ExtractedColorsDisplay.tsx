@@ -1,12 +1,11 @@
 import { useColorStore } from '@/store/colorStore';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Palette } from 'lucide-react';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ColorBlock } from '@/components/common/ColorBlock';
 import { CopyColorButton } from '@/components/common/CopyColorButton';
 import { RESPONSIVE_GRID, TYPOGRAPHY } from '@/constants/ui';
 
 export const ExtractedColorsDisplay = () => {
-  const { extractedColors, dominantColor, setColorFromExtracted } = useColorStore();
+  const { extractedColors, setColorFromExtracted } = useColorStore();
 
   if (extractedColors.length === 0) {
     return null;
