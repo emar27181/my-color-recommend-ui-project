@@ -6,27 +6,21 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { ToastProvider } from '@/contexts/ToastContext';
 import { ToastContainer } from '@/components/ToastContainer';
-import { useScrollVisibility } from '@/hooks/useScrollVisibility';
-
 function App() {
-  const isHeaderVisible = useScrollVisibility(50);
 
   return (
     <ToastProvider>
       <div className="min-h-screen bg-background text-foreground">
-        <header className={`fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/95 backdrop-blur-sm transition-transform duration-300 ${
-          isHeaderVisible ? 'translate-y-0' : '-translate-y-full'
-        }`}>
-          <div className="container mx-auto px-4 py-3">
+        <header className="border-b border-border bg-background">
+          <div className="container mx-auto px-4 py-2">
             <div className="flex justify-between items-center">
               <NavigationMenu />
-              <h2 className="text-2xl font-bold text-center text-foreground flex-1">色相・トーン推薦アプリ</h2>
               <ThemeToggle />
             </div>
           </div>
         </header>
 
-        <main className="container mx-auto px-4 py-4 pt-0">
+        <main className="container mx-auto px-4 py-4">
           {/* Mobile/Tablet: Vertical Layout */}
           <div className="block xl:hidden space-y-3">
             {/* Step 1 */}

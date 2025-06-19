@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 
-export const useScrollVisibility = (threshold: number = 50) => {
+export const useScrollVisibility = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY || document.documentElement.scrollTop;
-      setIsVisible(scrollTop <= threshold);
+      // ページトップ（スクロール位置が0）の時のみ表示
+      setIsVisible(scrollTop === 0);
     };
 
     // 初期状態を設定（ページ読み込み時は非表示）
@@ -24,7 +25,7 @@ export const useScrollVisibility = (threshold: number = 50) => {
       window.removeEventListener('scroll', handleScroll);
       clearTimeout(timeoutId);
     };
-  }, [threshold]);
+  }, []);
 
   return isVisible;
 };
