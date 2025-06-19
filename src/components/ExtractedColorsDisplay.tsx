@@ -18,15 +18,15 @@ export const ExtractedColorsDisplay = () => {
   return (
     <section>
       <Card className="w-full">
-        <CardHeader>
+        <CardHeader className="pb-2">
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-2">
           {/* 抽出色一覧 */}
           <>
             {/* Desktop/Tablet Layout */}
             <div className={`hidden md:block ${RESPONSIVE_GRID.colors} ${RESPONSIVE_GRID.gap}`}>
               {extractedColors.map((color, index) => (
-                <div key={index} className="bg-card border border-border rounded-sm p-4 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
+                <div key={index} className="bg-card border border-border rounded-sm p-2 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
                   onClick={() => handleColorSelect(color.hex)}>
                   <div className="flex items-center gap-4">
                     <ColorBlock
@@ -50,11 +50,11 @@ export const ExtractedColorsDisplay = () => {
             </div>
 
             {/* Mobile 2-Column Layout */}
-            <div className="block md:hidden space-y-3">
+            <div className="block md:hidden space-y-2">
               {Array.from({ length: Math.ceil(extractedColors.length / 2) }).map((_, rowIndex) => (
-                <div key={rowIndex} className="flex gap-3">
+                <div key={rowIndex} className="flex gap-2">
                   {extractedColors.slice(rowIndex * 2, (rowIndex + 1) * 2).map((color, index) => (
-                    <div key={index} className="flex items-center gap-4 bg-card border border-border rounded-sm p-4 shadow-sm flex-1 cursor-pointer hover:shadow-md transition-all duration-200"
+                    <div key={index} className="flex items-center gap-2 bg-card border border-border rounded-sm p-2 shadow-sm flex-1 cursor-pointer hover:shadow-md transition-all duration-200"
                       onClick={() => handleColorSelect(color.hex)}>
                       <div
                         className="border-2 border-gray-300 rounded-sm cursor-pointer hover:scale-110 transition-transform flex-shrink-0"

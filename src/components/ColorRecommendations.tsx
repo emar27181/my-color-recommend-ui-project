@@ -16,15 +16,9 @@ export const ColorRecommendations = () => {
 
   return (
     <Card className="w-full">
-      <CardHeader>
-        {/*
-        <p className="text-sm text-muted-foreground">
-          選択した色に基づいて、色彩理論に従った相性の良い色を推薦します
-        </p>
-         */}
-
+      <CardHeader className="pb-3">
         {/* 配色技法選択UI */}
-        <div className="mt-4">
+        <div className="mt-0">
           <div className={`${RESPONSIVE_GRID.schemes} ${RESPONSIVE_GRID.gap}`}>
             {COLOR_SCHEMES.map((scheme) => (
               <button
@@ -50,9 +44,9 @@ export const ColorRecommendations = () => {
 
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-3">
         {recommendedColors.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 px-4">
+          <div className="flex flex-col items-center justify-center py-8 px-4">
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
               <svg className="w-8 h-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a4 4 0 004-4V5z" />
@@ -67,7 +61,7 @@ export const ColorRecommendations = () => {
             {/* Desktop/Tablet Layout */}
             <div className={`hidden md:block ${RESPONSIVE_GRID.colors} ${RESPONSIVE_GRID.gap}`}>
               {recommendedColors.map((color, index) => (
-                <div key={index} className="bg-card border border-border rounded-sm p-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
+                <div key={index} className="bg-card border border-border rounded-sm p-2 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
                   onClick={() => handleGenerateTones(color)}>
                   <div className="flex items-center gap-3">
                     <ColorBlock
@@ -88,11 +82,11 @@ export const ColorRecommendations = () => {
             </div>
 
             {/* Mobile 2-Column Layout */}
-            <div className="block md:hidden space-y-3">
+            <div className="block md:hidden space-y-2">
               {Array.from({ length: Math.ceil(recommendedColors.length / 2) }).map((_, rowIndex) => (
-                <div key={rowIndex} className="flex gap-3">
+                <div key={rowIndex} className="flex gap-2">
                   {recommendedColors.slice(rowIndex * 2, (rowIndex + 1) * 2).map((color, index) => (
-                    <div key={index} className="flex items-center gap-4 bg-card border border-border rounded-sm p-4 shadow-sm flex-1 cursor-pointer hover:shadow-md transition-all duration-200"
+                    <div key={index} className="flex items-center gap-2 bg-card border border-border rounded-sm p-2 shadow-sm flex-1 cursor-pointer hover:shadow-md transition-all duration-200"
                       onClick={() => handleGenerateTones(color)}>
                       <div
                         className="border-2 border-gray-300 rounded-sm cursor-pointer hover:scale-110 transition-transform flex-shrink-0"
@@ -135,14 +129,9 @@ export const ToneRecommendations = () => {
 
   return (
     <Card className="w-full">
-      <CardHeader>
-        {/*
-        <p className="text-sm text-muted-foreground">
-          選択した色の明度・彩度を変化させたトーンバリエーション
-        </p>
-        */}
+      <CardHeader className="pb-3">
         {toneBaseColor && (
-          <div className="mt-2 flex items-center gap-2">
+          <div className="mt-0 flex items-center gap-2">
             <div
               className="w-4 h-4 rounded border"
               style={{ backgroundColor: toneBaseColor }}
@@ -150,9 +139,9 @@ export const ToneRecommendations = () => {
           </div>
         )}
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-3">
         {recommendedTones.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 px-4">
+          <div className="flex flex-col items-center justify-center py-8 px-4">
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
               <svg className="w-8 h-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -167,7 +156,7 @@ export const ToneRecommendations = () => {
             {/* Desktop/Tablet Layout */}
             <div className={`hidden md:block ${RESPONSIVE_GRID.colors} ${RESPONSIVE_GRID.gap}`}>
               {recommendedTones.map((tone, index) => (
-                <div key={index} className="bg-card border border-border rounded-sm p-4 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group">
+                <div key={index} className="bg-card border border-border rounded-sm p-2 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group">
                   <div className="flex items-center gap-4">
                     <ColorBlock
                       color={tone}
@@ -187,11 +176,11 @@ export const ToneRecommendations = () => {
             </div>
 
             {/* Mobile 2-Column Layout */}
-            <div className="block md:hidden space-y-3">
+            <div className="block md:hidden space-y-2">
               {Array.from({ length: Math.ceil(recommendedTones.length / 2) }).map((_, rowIndex) => (
-                <div key={rowIndex} className="flex gap-3">
+                <div key={rowIndex} className="flex gap-2">
                   {recommendedTones.slice(rowIndex * 2, (rowIndex + 1) * 2).map((tone, index) => (
-                    <div key={index} className="flex items-center gap-4 bg-card border border-border rounded-sm p-4 shadow-sm flex-1">
+                    <div key={index} className="flex items-center gap-2 bg-card border border-border rounded-sm p-2 shadow-sm flex-1">
                       <div
                         className="border-2 border-gray-300 rounded-sm cursor-pointer hover:scale-110 transition-transform flex-shrink-0"
                         style={{
