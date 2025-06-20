@@ -53,22 +53,18 @@ function App() {
               <ExtractedColorsDisplay />
             </section>
 
-            {/* Steps 2 & 3: 色相推薦・トーン推薦 - 1画面内収納 */}
-            <div className="flex-1 grid grid-cols-1 gap-1 min-h-0">
+            {/* Steps 2 & 3: 色相推薦・トーン推薦 - 動的サイズ */}
+            <div className="space-y-1">
               {/* Step 2 */}
-              <section className="flex flex-col">
-                <h3 className="text-xs font-medium mb-0 text-foreground leading-tight flex-shrink-0">2. 色相(配色技法)推薦</h3>
-                <div className="flex-1">
-                  <ColorRecommendations />
-                </div>
+              <section>
+                <h3 className="text-xs font-medium mb-0 text-foreground leading-tight">2. 色相(配色技法)推薦</h3>
+                <ColorRecommendations />
               </section>
 
               {/* Step 3 */}
-              <section className="flex flex-col mb-0">
-                <h3 className="text-xs font-medium mb-0 text-foreground leading-tight flex-shrink-0">3. トーン(明度・彩度)推薦</h3>
-                <div className="flex-1">
-                  <ToneRecommendations />
-                </div>
+              <section>
+                <h3 className="text-xs font-medium mb-0 text-foreground leading-tight">3. トーン(明度・彩度)推薦</h3>
+                <ToneRecommendations />
               </section>
             </div>
           </div>
