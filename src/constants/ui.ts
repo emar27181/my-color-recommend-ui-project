@@ -9,7 +9,7 @@ export const COLOR_BLOCK_SPEC = {
   height: 48,
   
   // CSSクラス
-  className: 'border-2 border-gray-300 rounded cursor-pointer hover:scale-110 transition-transform',
+  className: 'border-2 border-border rounded cursor-pointer hover:scale-110 transition-all duration-200',
   
   // アニメーション
   hoverScale: 1.1,

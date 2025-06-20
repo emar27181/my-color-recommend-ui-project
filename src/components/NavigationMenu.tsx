@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Menu, X, HelpCircle } from 'lucide-react';
 
 interface NavigationMenuProps {
   className?: string;
@@ -17,6 +18,7 @@ export const NavigationMenu = ({ className = '' }: NavigationMenuProps) => {
     { label: 'ダミーページ1', href: '/page1' },
     { label: 'ダミーページ2', href: '/page2' },
     { label: 'ダミーページ3', href: '/page3' },
+    { label: 'ヘルプ', href: '/help' },
   ];
 
   return (
@@ -47,9 +49,9 @@ export const NavigationMenu = ({ className = '' }: NavigationMenuProps) => {
           <div className="absolute top-12 left-0 z-50 min-w-48 bg-background border border-border rounded-lg shadow-lg overflow-hidden">
             <nav className="py-2">
               {menuItems.map((item, index) => (
-                <a
+                <Link
                   key={index}
-                  href={item.href}
+                  to={item.href}
                   className={`block px-4 py-3 text-sm transition-colors hover:bg-muted ${item.isActive
                       ? 'text-primary font-medium bg-primary/10'
                       : 'text-foreground'
@@ -57,7 +59,7 @@ export const NavigationMenu = ({ className = '' }: NavigationMenuProps) => {
                   onClick={toggleMenu}
                 >
                   {item.label}
-                </a>
+                </Link>
               ))}
             </nav>
           </div>

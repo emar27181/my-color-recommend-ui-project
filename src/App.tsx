@@ -7,6 +7,8 @@ import { NavigationMenu } from '@/components/NavigationMenu';
 import { ToastProvider } from '@/contexts/ToastContext';
 import { ToastContainer } from '@/components/ToastContainer';
 import { useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
+import { HelpCircle } from 'lucide-react';
 
 function App() {
   const mainRef = useRef<HTMLElement>(null);
@@ -24,7 +26,16 @@ function App() {
           <div className="container mx-auto px-4 py-3">
             <div className="flex justify-between items-center">
               <NavigationMenu />
-              <ThemeToggle />
+              <div className="flex items-center gap-2">
+                <Link
+                  to="/help"
+                  className="p-2 rounded-lg bg-background/50 border-none hover:bg-muted/50 transition-colors backdrop-blur-sm"
+                  title="ヘルプページ"
+                >
+                  <HelpCircle className="w-5 h-5 text-foreground" />
+                </Link>
+                <ThemeToggle />
+              </div>
             </div>
           </div>
         </header>

@@ -77,7 +77,7 @@ export const ColorRecommendations = () => {
                     <div key={index} className="flex items-center gap-1 bg-card border border-border rounded-sm p-1 shadow-sm flex-1 cursor-pointer hover:shadow-md transition-all duration-200"
                       onClick={() => handleGenerateTones(color)}>
                       <div
-                        className="border-2 border-gray-300 rounded-sm cursor-pointer hover:scale-110 transition-transform flex-shrink-0"
+                        className="border-2 border-border rounded-sm cursor-pointer hover:scale-110 transition-all duration-200 flex-shrink-0"
                         style={{
                           backgroundColor: color,
                           width: '32px',
@@ -169,7 +169,7 @@ export const ToneRecommendations = () => {
                   {recommendedTones.slice(rowIndex * 2, (rowIndex + 1) * 2).map((tone, index) => (
                     <div key={index} className="flex items-center gap-1 bg-card border border-border rounded-sm p-1 shadow-sm flex-1">
                       <div
-                        className="border-2 border-gray-300 rounded-sm cursor-pointer hover:scale-110 transition-transform flex-shrink-0"
+                        className="border-2 border-border rounded-sm cursor-pointer hover:scale-110 transition-all duration-200 flex-shrink-0"
                         style={{
                           backgroundColor: tone,
                           width: '32px',
