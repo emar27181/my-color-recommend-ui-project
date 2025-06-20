@@ -117,14 +117,6 @@ export const ToneRecommendations = () => {
   return (
     <Card className="w-full flex flex-col pb-0">
       <CardHeader className="pb-1 pt-2 flex-shrink-0">
-        {toneBaseColor && (
-          <div className="mt-0 flex items-center gap-2">
-            <div
-              className="w-4 h-4 rounded border"
-              style={{ backgroundColor: toneBaseColor }}
-            />
-          </div>
-        )}
       </CardHeader>
       <CardContent className="pt-0 flex-1 overflow-auto pb-0 min-h-0">
         {recommendedTones.length === 0 ? (
