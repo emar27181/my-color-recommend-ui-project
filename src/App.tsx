@@ -12,33 +12,29 @@ function App() {
   const mainRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    // 初期表示時にメインコンテンツにフォーカス
-    if (mainRef.current) {
-      mainRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    // 初期表示時にページの最上端を表示
+    window.scrollTo(0, 0);
   }, []);
 
   return (
     <ToastProvider>
-      <div className="bg-background text-foreground">
-        {/* ヘッダーを画面上部に薄く表示（初期フォーカスは下のメインコンテンツ） */}
-        <header className="border-b border-border bg-background/80 backdrop-blur-sm fixed top-0 left-0 right-0 z-50 h-12">
-          <div className="container mx-auto px-4 py-1">
-            <div className="flex justify-between items-center h-full">
+      <div className="bg-background text-foreground h-screen flex flex-col">
+        {/* ヘッダーを画面上部に表示 */}
+        <header className="border-b border-border bg-background flex-shrink-0">
+          <div className="container mx-auto px-4 py-3">
+            <div className="flex justify-between items-center">
               <NavigationMenu />
               <ThemeToggle />
             </div>
           </div>
         </header>
 
-        {/* メインコンテンツを1画面内に収める */}
+        {/* メインコンテンツ */}
         <main
-          ref={mainRef}
-          className="h-screen overflow-auto px-4 py-2 pt-14"
-          style={{ scrollMarginTop: '48px' }}
+          className="flex-1 overflow-auto px-4 pb-2"
         >
           {/* Mobile/Tablet: Single Screen Layout */}
-          <div className="block xl:hidden h-full flex flex-col">
+          <div className="block xl:hidden flex flex-col">
             {/* Step 1: ベース色選択 - コンパクト化 */}
             <section className="flex-shrink-0 mb-1">
               <h3 className="text-xs font-medium text-foreground leading-tight mb-0">1. ベースカラー(推薦元)選択</h3>
