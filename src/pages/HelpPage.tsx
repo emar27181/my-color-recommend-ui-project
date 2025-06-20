@@ -30,14 +30,10 @@ export const HelpPage = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="text-center space-y-6">
-              <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                <Clock className="w-5 h-5" />
-                <p className="text-lg">このページは現在準備中です</p>
-              </div>
-              
+
               <div className="bg-muted/20 p-6 rounded-lg">
                 <p className="text-muted-foreground mb-4">
-                  ヘルプページを鋭意作成中です。<br />
+                  ヘルプページは現在作成中です。<br />
                   詳細な使い方ガイドやよくある質問など、<br />
                   お役立ち情報を準備しております。
                 </p>
