@@ -20,7 +20,7 @@ function App() {
 
   return (
     <ToastProvider>
-      <div className="bg-background text-foreground h-screen flex flex-col">
+      <div className="bg-background text-foreground min-h-screen flex flex-col">
         {/* ヘッダーを画面上部に表示 */}
         <header className="border-b border-border bg-background flex-shrink-0">
           <div className="container mx-auto px-4 py-3">
@@ -42,7 +42,7 @@ function App() {
 
         {/* メインコンテンツ */}
         <main
-          className="flex-1 overflow-auto px-4 pb-2"
+          className="flex-1 px-4 pb-2 overflow-y-auto"
         >
           {/* Mobile/Tablet: Single Screen Layout */}
           <div className="block xl:hidden flex flex-col">

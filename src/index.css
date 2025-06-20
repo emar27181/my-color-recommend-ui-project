@@ -133,6 +133,19 @@
   * {
     scrollbar-width: none;
   }
+  
+  /* モバイル向けスクロール最適化 */
+  html, body {
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* iOS Safari向けのスクロール問題対策 */
+  @supports (-webkit-touch-callout: none) {
+    body {
+      -webkit-overflow-scrolling: touch;
+    }
+  }
 }
 
 @layer components {
