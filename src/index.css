@@ -124,21 +124,14 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
   
-  /* おしゃれなスクロールバー */
+  /* スクロールバーを非表示 */
   ::-webkit-scrollbar {
-    width: 8px;
+    display: none;
   }
   
-  ::-webkit-scrollbar-track {
-    @apply bg-muted;
-  }
-  
-  ::-webkit-scrollbar-thumb {
-    @apply bg-muted-foreground/30 rounded-full;
-  }
-  
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted-foreground/50;
+  /* Firefox用 */
+  * {
+    scrollbar-width: none;
   }
 }
 
