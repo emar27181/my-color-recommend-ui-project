@@ -77,16 +77,11 @@ export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
 
 
   return (
-    <Card className="w-full">
-      <CardHeader className="pb-1 pt-2">
-        <CardTitle className="flex items-center gap-2">
-          <ImageIcon className="w-4 h-4" />
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-1 pt-1">
+    <Card className="w-full h-full flex flex-col">
+      <CardContent className="space-y-1 pt-1 flex-1 flex flex-col">
         {/* アップロードエリア */}
         <div
-          className="border-2 border-dashed border-border rounded-lg p-3 text-center hover:border-primary transition-colors cursor-pointer"
+          className="border-2 border-dashed border-border rounded-lg p-3 text-center hover:border-primary transition-colors cursor-pointer flex-1 flex items-center justify-center"
           onDrop={handleDrop}
           onDragOver={(e) => e.preventDefault()}
           onClick={() => fileInputRef.current?.click()}
@@ -116,7 +111,7 @@ export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
             </div>
           ) : (
             <div className="flex flex-col items-center gap-0">
-              <Upload className="w-8 h-8 text-muted-foreground" />
+              <Upload className="w-12 h-12 text-muted-foreground" />
             </div>
           )}
         </div>
