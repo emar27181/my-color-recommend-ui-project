@@ -115,7 +115,7 @@ export const ToneRecommendations = () => {
   }, [selectedColor, recommendedTones.length, generateRecommendedTones]);
 
   return (
-    <Card className="w-full">
+    <Card className="w-full mb-0">
       <CardHeader className="pb-1 pt-2">
         {toneBaseColor && (
           <div className="mt-0 flex items-center gap-2">

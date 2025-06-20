@@ -20,7 +20,7 @@ function App() {
           </div>
         </header>
 
-        <main className="container mx-auto px-4 py-1">
+        <main className="container mx-auto px-4 pt-1 pb-0">
           {/* Mobile/Tablet: Vertical Layout */}
           <div className="block xl:hidden space-y-1">
             {/* Step 1 */}
@@ -40,7 +40,7 @@ function App() {
             </section>
 
             {/* Step 3 */}
-            <section>
+            <section className="mb-0">
               <h3 className="text-xs font-medium mb-0 text-foreground leading-tight">3. トーン推薦</h3>
               <ToneRecommendations />
             </section>
