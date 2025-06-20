@@ -60,8 +60,8 @@ export const ExtractedColorsDisplay = () => {
                         className="border-2 border-gray-300 rounded-sm cursor-pointer hover:scale-110 transition-transform flex-shrink-0"
                         style={{
                           backgroundColor: color.hex,
-                          width: '40px',
-                          height: '40px'
+                          width: '32px',
+                          height: '32px'
                         }}
                         title={`${color.hex} (タップで選択)`}
                       />
