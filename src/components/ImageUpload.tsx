@@ -78,15 +78,15 @@ export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
 
   return (
     <Card className="w-full">
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-1 pt-2">
         <CardTitle className="flex items-center gap-2">
           <ImageIcon className="w-4 h-4" />
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-2 pt-2">
+      <CardContent className="space-y-1 pt-1">
         {/* アップロードエリア */}
         <div
-          className="border-2 border-dashed border-border rounded-lg p-4 text-center hover:border-primary transition-colors cursor-pointer"
+          className="border-2 border-dashed border-border rounded-lg p-3 text-center hover:border-primary transition-colors cursor-pointer"
           onDrop={handleDrop}
           onDragOver={(e) => e.preventDefault()}
           onClick={() => fileInputRef.current?.click()}

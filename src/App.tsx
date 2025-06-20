@@ -20,13 +20,13 @@ function App() {
           </div>
         </header>
 
-        <main className="container mx-auto px-4 py-2">
+        <main className="container mx-auto px-4 py-1">
           {/* Mobile/Tablet: Vertical Layout */}
-          <div className="block xl:hidden space-y-2">
+          <div className="block xl:hidden space-y-1">
             {/* Step 1 */}
-            <section className="space-y-1">
-              <h2 className="text-sm font-medium text-foreground">1. ベース色選択</h2>
-              <div className="grid grid-cols-1 gap-1">
+            <section className="space-y-0">
+              <h3 className="text-xs font-medium text-foreground leading-tight mb-1">1. ベース色選択</h3>
+              <div className="grid grid-cols-1 gap-0">
                 <ColorPicker />
                 <ImageUpload />
               </div>
@@ -35,13 +35,13 @@ function App() {
 
             {/* Step 2 */}
             <section>
-              <h2 className="text-sm font-medium mb-1 text-foreground">2. 色相推薦</h2>
+              <h3 className="text-xs font-medium mb-0 text-foreground leading-tight">2. 色相推薦</h3>
               <ColorRecommendations />
             </section>
 
             {/* Step 3 */}
             <section>
-              <h2 className="text-sm font-medium mb-1 text-foreground">3. トーン推薦</h2>
+              <h3 className="text-xs font-medium mb-0 text-foreground leading-tight">3. トーン推薦</h3>
               <ToneRecommendations />
             </section>
 

@@ -18,9 +18,9 @@ export const ExtractedColorsDisplay = () => {
   return (
     <section>
       <Card className="w-full">
-        <CardHeader className="pb-1">
+        <CardHeader className="pb-0 pt-1">
         </CardHeader>
-        <CardContent className="pt-1">
+        <CardContent className="pt-0">
           {/* 抽出色一覧 */}
           <>
             {/* Desktop/Tablet Layout */}

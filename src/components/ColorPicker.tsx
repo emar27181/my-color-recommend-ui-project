@@ -39,7 +39,7 @@ export const ColorPicker = () => {
       color: 'var(--foreground)'
     }}>
       {/* Mobile/Tablet: Vertical Layout */}
-      <div className="block lg:hidden p-2 space-y-2">
+      <div className="block lg:hidden p-1 space-y-1">
 
         {/* Color Picker */}
         <div className="space-y-0">
@@ -71,7 +71,7 @@ export const ColorPicker = () => {
 
         {/* Text Input */}
         <div className="space-y-0">
-          <div className="flex gap-2">
+          <div className="flex gap-1">
             <Input
               id="color-input"
               type="text"
