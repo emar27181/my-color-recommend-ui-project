@@ -78,15 +78,15 @@ export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
 
   return (
     <Card className="w-full">
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2">
-          <ImageIcon className="w-5 h-5" />
+          <ImageIcon className="w-4 h-4" />
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3 pt-3">
+      <CardContent className="space-y-2 pt-2">
         {/* アップロードエリア */}
         <div
-          className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer"
+          className="border-2 border-dashed border-border rounded-lg p-4 text-center hover:border-primary transition-colors cursor-pointer"
           onDrop={handleDrop}
           onDragOver={(e) => e.preventDefault()}
           onClick={() => fileInputRef.current?.click()}
@@ -100,7 +100,7 @@ export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
           />
 
           {isLoading ? (
-            <div className="flex flex-col items-center gap-3">
+            <div className="flex flex-col items-center gap-2">
               <Loader2 className="w-8 h-8 text-primary animate-spin" />
               <div className="w-full max-w-xs">
                 <ProgressBar
@@ -115,7 +115,7 @@ export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
               </div>
             </div>
           ) : (
-            <div className="flex flex-col items-center gap-1">
+            <div className="flex flex-col items-center gap-0">
               <Upload className="w-8 h-8 text-muted-foreground" />
             </div>
           )}
