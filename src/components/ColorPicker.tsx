@@ -2,7 +2,6 @@ import { useColorStore } from '@/store/colorStore';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ColorBlock } from '@/components/common/ColorBlock';
 import { CopyColorButton } from '@/components/common/CopyColorButton';
-import { Palette } from 'lucide-react';
 import { TYPOGRAPHY } from '@/constants/ui';
 
 export const ColorPicker = () => {
@@ -27,9 +26,6 @@ export const ColorPicker = () => {
                   color={selectedColor}
                   title="クリックで色を選択"
                 />
-                <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1 border border-gray-300">
-                  <Palette size={16} className="text-gray-600" />
-                </div>
                 <input
                   type="color"
                   value={selectedColor}
@@ -63,9 +59,6 @@ export const ColorPicker = () => {
                 }}
                 title="クリックで色を選択"
               />
-              <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 border border-gray-300">
-                <Palette size={12} className="text-gray-600" />
-              </div>
               <input
                 type="color"
                 value={selectedColor}
