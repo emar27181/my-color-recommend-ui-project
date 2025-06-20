@@ -24,7 +24,7 @@ export const NavigationMenu = ({ className = '' }: NavigationMenuProps) => {
       {/* Hamburger Menu Button */}
       <button
         onClick={toggleMenu}
-        className="p-2 rounded-lg bg-transparent border-transparent hover:bg-muted transition-colors"
+        className="p-2 rounded-lg bg-transparent border-none hover:bg-muted/50 transition-colors"
         aria-label="メニューを開く"
       >
         {isOpen ? (
