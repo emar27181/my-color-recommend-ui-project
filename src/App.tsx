@@ -41,7 +41,7 @@ function App() {
           <div className="block xl:hidden h-full flex flex-col">
             {/* Step 1: ベース色選択 - コンパクト化 */}
             <section className="flex-shrink-0 mb-1">
-              <h3 className="text-xs font-medium text-foreground leading-tight mb-0">1. ベース色(推薦元)選択</h3>
+              <h3 className="text-xs font-medium text-foreground leading-tight mb-0">1. ベースカラー(推薦元)選択</h3>
               <div className="flex gap-1">
                 <div className="flex-1">
                   <ColorPicker />
