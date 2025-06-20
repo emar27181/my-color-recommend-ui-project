@@ -51,7 +51,7 @@ export const ColorPicker = () => {
           <div className="bg-card border border-border rounded-sm p-1 shadow-sm flex items-center gap-1">
             <div className="relative cursor-pointer">
               <div
-                className="border-2 border-gray-300 rounded-sm cursor-pointer hover:scale-110 transition-transform flex-shrink-0"
+                className="border-2 border-border rounded-sm cursor-pointer hover:scale-110 transition-all duration-200 flex-shrink-0"
                 style={{
                   backgroundColor: selectedColor,
                   width: '32px',
