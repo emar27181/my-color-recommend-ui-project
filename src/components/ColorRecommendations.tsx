@@ -13,8 +13,8 @@ export const ColorRecommendations = () => {
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader className="pb-1 pt-2">
+    <Card className="w-full h-full flex flex-col">
+      <CardHeader className="pb-1 pt-2 flex-shrink-0">
         <div className="mt-0">
           <div className={`${RESPONSIVE_GRID.schemes} ${RESPONSIVE_GRID.gap}`}>
             {COLOR_SCHEMES.map((scheme) => (
@@ -32,11 +32,11 @@ export const ColorRecommendations = () => {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pt-1">
+      <CardContent className="pt-0 flex-1 overflow-auto pb-0">
         {recommendedColors.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-2 px-2">
-            <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-2">
-              <svg className="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex flex-col items-center justify-center py-0 px-2">
+            <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mb-1">
+              <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a4 4 0 004-4V5z" />
               </svg>
             </div>
@@ -70,18 +70,18 @@ export const ColorRecommendations = () => {
             </div>
 
             {/* Mobile 2-Column Layout */}
-            <div className="block md:hidden space-y-2">
+            <div className="block md:hidden space-y-0">
               {Array.from({ length: Math.ceil(recommendedColors.length / 2) }).map((_, rowIndex) => (
-                <div key={rowIndex} className="flex gap-2">
+                <div key={rowIndex} className="flex gap-1">
                   {recommendedColors.slice(rowIndex * 2, (rowIndex + 1) * 2).map((color, index) => (
-                    <div key={index} className="flex items-center gap-2 bg-card border border-border rounded-sm p-1 shadow-sm flex-1 cursor-pointer hover:shadow-md transition-all duration-200"
+                    <div key={index} className="flex items-center gap-1 bg-card border border-border rounded-sm p-1 shadow-sm flex-1 cursor-pointer hover:shadow-md transition-all duration-200"
                       onClick={() => handleGenerateTones(color)}>
                       <div
                         className="border-2 border-gray-300 rounded-sm cursor-pointer hover:scale-110 transition-transform flex-shrink-0"
                         style={{
                           backgroundColor: color,
-                          width: '40px',
-                          height: '40px'
+                          width: '32px',
+                          height: '32px'
                         }}
                         title={color}
                       />
@@ -115,8 +115,8 @@ export const ToneRecommendations = () => {
   }, [selectedColor, recommendedTones.length, generateRecommendedTones]);
 
   return (
-    <Card className="w-full mb-0">
-      <CardHeader className="pb-1 pt-2">
+    <Card className="w-full h-full flex flex-col">
+      <CardHeader className="pb-1 pt-2 flex-shrink-0">
         {toneBaseColor && (
           <div className="mt-0 flex items-center gap-2">
             <div
@@ -126,12 +126,12 @@ export const ToneRecommendations = () => {
           </div>
         )}
       </CardHeader>
-      <CardContent className="pt-1">
+      <CardContent className="pt-0 flex-1 overflow-auto pb-0">
         {recommendedTones.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-2 px-2">
-            <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-2">
-              <svg className="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          <div className="flex flex-col items-center justify-center py-0 px-2">
+            <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mb-1">
+              <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
             <p className="text-center text-muted-foreground text-xs max-w-md">
@@ -163,17 +163,17 @@ export const ToneRecommendations = () => {
             </div>
 
             {/* Mobile 2-Column Layout */}
-            <div className="block md:hidden space-y-2">
+            <div className="block md:hidden space-y-0">
               {Array.from({ length: Math.ceil(recommendedTones.length / 2) }).map((_, rowIndex) => (
-                <div key={rowIndex} className="flex gap-2">
+                <div key={rowIndex} className="flex gap-1">
                   {recommendedTones.slice(rowIndex * 2, (rowIndex + 1) * 2).map((tone, index) => (
-                    <div key={index} className="flex items-center gap-2 bg-card border border-border rounded-sm p-1 shadow-sm flex-1">
+                    <div key={index} className="flex items-center gap-1 bg-card border border-border rounded-sm p-1 shadow-sm flex-1">
                       <div
                         className="border-2 border-gray-300 rounded-sm cursor-pointer hover:scale-110 transition-transform flex-shrink-0"
                         style={{
                           backgroundColor: tone,
-                          width: '40px',
-                          height: '40px'
+                          width: '32px',
+                          height: '32px'
                         }}
                         title={tone}
                       />

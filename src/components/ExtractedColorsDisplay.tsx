@@ -17,10 +17,10 @@ export const ExtractedColorsDisplay = () => {
 
   return (
     <section>
-      <Card className="w-full">
-        <CardHeader className="pb-0 pt-1">
+      <Card className="w-full h-full flex flex-col">
+        <CardHeader className="pb-0 pt-1 flex-shrink-0">
         </CardHeader>
-        <CardContent className="pt-0">
+        <CardContent className="pt-0 flex-1 overflow-auto pb-0">
           {/* 抽出色一覧 */}
           <>
             {/* Desktop/Tablet Layout */}
@@ -50,7 +50,7 @@ export const ExtractedColorsDisplay = () => {
             </div>
 
             {/* Mobile 2-Column Layout */}
-            <div className="block md:hidden space-y-2">
+            <div className="block md:hidden space-y-1">
               {Array.from({ length: Math.ceil(extractedColors.length / 2) }).map((_, rowIndex) => (
                 <div key={rowIndex} className="flex gap-2">
                   {extractedColors.slice(rowIndex * 2, (rowIndex + 1) * 2).map((color, index) => (
