@@ -34,8 +34,8 @@ export const HelpPage = () => {
               <div className="bg-muted/20 p-6 rounded-lg">
                 <p className="text-muted-foreground mb-4">
                   ヘルプページは現在作成中です。<br />
-                  詳細な使い方ガイドやよくある質問など、<br />
-                  お役立ち情報を準備しております。
+                  詳細な使い方ガイドやよくある質問などの<br />
+                  情報を準備しております。
                 </p>
                 <p className="text-sm text-muted-foreground">
                   しばらくお待ちください。
