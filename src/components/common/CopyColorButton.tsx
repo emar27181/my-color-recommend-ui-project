@@ -25,11 +25,14 @@ export const CopyColorButton = ({
   const handleCopy = async (e: React.MouseEvent) => {
     e.stopPropagation();
     
-    const result = await copyToClipboard(color);
+    // #を除いた6桁の英数字のみを抽出
+    const colorWithoutHash = color.replace('#', '');
+    
+    const result = await copyToClipboard(colorWithoutHash);
     
     if (result.success) {
       setIsCopied(true);
-      showToast(`${color} をコピーしました`, 'success');
+      showToast(`${colorWithoutHash} をコピーしました`, 'success');
       setTimeout(() => setIsCopied(false), 2000);
     } else {
       showToast('コピーに失敗しました', 'error');
@@ -45,7 +48,7 @@ export const CopyColorButton = ({
                    hover:bg-background/10 hover:scale-105 
                    transition-all duration-200 
                    ${className.includes('opacity') ? className : `opacity-80 hover:opacity-100 ${className}`}`}
-        title={`${color} をコピー`}
+        title={`${color.replace('#', '')} をコピー`}
       >
         {isCopied ? (
           <Check className="w-4 h-4 text-emerald-500" />
@@ -65,7 +68,7 @@ export const CopyColorButton = ({
                    hover:bg-background/10 hover:scale-105 
                    transition-all duration-200 
                    flex items-center gap-2 ${className.includes('opacity') ? className : `opacity-80 hover:opacity-100 ${className}`}`}
-        title={`${color} をコピー`}
+        title={`${color.replace('#', '')} をコピー`}
       >
         {isCopied ? (
           <Check className="w-4 h-4 text-emerald-500" />
