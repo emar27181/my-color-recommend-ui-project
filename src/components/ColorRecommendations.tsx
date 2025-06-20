@@ -13,7 +13,7 @@ export const ColorRecommendations = () => {
   };
 
   return (
-    <Card className="w-full h-full flex flex-col">
+    <Card className="w-full h-full flex flex-col pb-0">
       <CardHeader className="pb-1 pt-2 flex-shrink-0">
         <div className="mt-0">
           <div className={`${RESPONSIVE_GRID.schemes} ${RESPONSIVE_GRID.gap}`}>
@@ -115,7 +115,7 @@ export const ToneRecommendations = () => {
   }, [selectedColor, recommendedTones.length, generateRecommendedTones]);
 
   return (
-    <Card className="w-full h-full flex flex-col">
+    <Card className="w-full h-full flex flex-col pb-0">
       <CardHeader className="pb-1 pt-2 flex-shrink-0">
         {toneBaseColor && (
           <div className="mt-0 flex items-center gap-2">

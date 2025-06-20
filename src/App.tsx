@@ -56,17 +56,17 @@ function App() {
             {/* Steps 2 & 3: 色相推薦・トーン推薦 - 1画面内収納 */}
             <div className="flex-1 grid grid-cols-1 gap-1 min-h-0">
               {/* Step 2 */}
-              <section className="min-h-0 flex flex-col">
+              <section className="flex flex-col">
                 <h3 className="text-xs font-medium mb-0 text-foreground leading-tight flex-shrink-0">2. 色相(配色技法)推薦</h3>
-                <div className="flex-1 min-h-0">
+                <div className="flex-1">
                   <ColorRecommendations />
                 </div>
               </section>
 
               {/* Step 3 */}
-              <section className="min-h-0 flex flex-col mb-0">
+              <section className="flex flex-col mb-0">
                 <h3 className="text-xs font-medium mb-0 text-foreground leading-tight flex-shrink-0">3. トーン(明度・彩度)推薦</h3>
-                <div className="flex-1 min-h-0">
+                <div className="flex-1">
                   <ToneRecommendations />
                 </div>
               </section>
