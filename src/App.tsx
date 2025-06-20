@@ -32,7 +32,7 @@ function App() {
         </header>
 
         {/* メインコンテンツを1画面内に収める */}
-        <main 
+        <main
           ref={mainRef}
           className="h-screen overflow-auto px-4 py-2 pt-14"
           style={{ scrollMarginTop: '48px' }}
@@ -41,7 +41,7 @@ function App() {
           <div className="block xl:hidden h-full flex flex-col">
             {/* Step 1: ベース色選択 - コンパクト化 */}
             <section className="flex-shrink-0 mb-1">
-              <h3 className="text-xs font-medium text-foreground leading-tight mb-0">1. ベース色選択</h3>
+              <h3 className="text-xs font-medium text-foreground leading-tight mb-0">1. ベース色(推薦元)選択</h3>
               <div className="flex gap-1">
                 <div className="flex-1">
                   <ColorPicker />
@@ -57,7 +57,7 @@ function App() {
             <div className="flex-1 grid grid-cols-1 gap-1 min-h-0">
               {/* Step 2 */}
               <section className="min-h-0 flex flex-col">
-                <h3 className="text-xs font-medium mb-0 text-foreground leading-tight flex-shrink-0">2. 色相推薦</h3>
+                <h3 className="text-xs font-medium mb-0 text-foreground leading-tight flex-shrink-0">2. 色相(配色技法)推薦</h3>
                 <div className="flex-1 min-h-0">
                   <ColorRecommendations />
                 </div>
@@ -65,7 +65,7 @@ function App() {
 
               {/* Step 3 */}
               <section className="min-h-0 flex flex-col mb-0">
-                <h3 className="text-xs font-medium mb-0 text-foreground leading-tight flex-shrink-0">3. トーン推薦</h3>
+                <h3 className="text-xs font-medium mb-0 text-foreground leading-tight flex-shrink-0">3. トーン(明度・彩度)推薦</h3>
                 <div className="flex-1 min-h-0">
                   <ToneRecommendations />
                 </div>
