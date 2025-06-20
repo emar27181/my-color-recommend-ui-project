@@ -1,7 +1,4 @@
-import { useState } from 'react';
 import { useColorStore } from '@/store/colorStore';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ColorBlock } from '@/components/common/ColorBlock';
 import { CopyColorButton } from '@/components/common/CopyColorButton';
@@ -10,30 +7,10 @@ import { TYPOGRAPHY } from '@/constants/ui';
 
 export const ColorPicker = () => {
   const { selectedColor, setSelectedColor } = useColorStore();
-  const [inputColor, setInputColor] = useState(selectedColor);
 
   const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const color = e.target.value;
-    setInputColor(color);
     setSelectedColor(color);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputColor(e.target.value);
-  };
-
-  const handleInputSubmit = () => {
-    try {
-      setSelectedColor(inputColor);
-    } catch (error) {
-      console.error('Invalid color format:', error);
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleInputSubmit();
-    }
   };
 
   return (
@@ -61,18 +38,8 @@ export const ColorPicker = () => {
                   style={{ top: 0, left: 0 }}
                 />
               </div>
-              <div className="flex-1 min-w-0 flex items-center gap-2">
-                <Input
-                  type="text"
-                  value={inputColor}
-                  onChange={handleInputChange}
-                  onKeyPress={handleKeyPress}
-                  placeholder="#000000"
-                  className={`${TYPOGRAPHY.colorCode} flex-1`}
-                />
-                <Button onClick={handleInputSubmit} size="sm">
-                  適用
-                </Button>
+              <div className="flex-1 min-w-0">
+                <p className={`${TYPOGRAPHY.colorCode} truncate`}>{selectedColor}</p>
               </div>
               <CopyColorButton
                 color={selectedColor}
@@ -112,18 +79,8 @@ export const ColorPicker = () => {
               variant="minimal"
               className="opacity-100 flex-shrink-0"
             />
-            <div className="flex-1 min-w-0 flex items-center gap-1">
-              <Input
-                type="text"
-                value={inputColor}
-                onChange={handleInputChange}
-                onKeyPress={handleKeyPress}
-                placeholder="#000000"
-                className="text-xs font-mono flex-1"
-              />
-              <Button onClick={handleInputSubmit} size="sm" className="text-xs px-2 py-1">
-                適用
-              </Button>
+            <div className="flex-1 min-w-0">
+              <span className="text-xs font-mono text-muted-foreground truncate block">{selectedColor}</span>
             </div>
           </div>
         </div>
