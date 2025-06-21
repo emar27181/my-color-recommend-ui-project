@@ -228,6 +228,55 @@
 
 ---
 
+## 🎨 ボーダー・スタイリング統一管理ルール
+
+### 統一ボーダー仕様の原則
+- **一元管理**: すべてのボーダー（枠線・角丸）は `src/constants/ui.ts` で統一管理
+- **色相推薦基準**: 角の丸みは色相推薦カラーボックスの `rounded` (4px) を基準とする
+- **プリセット活用**: よく使われる組み合わせは `BORDER_PRESETS` として定義済み
+
+### ボーダースタイル定義
+```typescript
+// 枠線の太さ
+width: {
+  thin: 'border',     // 1px
+  normal: 'border-2', // 2px  
+  thick: 'border-4'   // 4px
+}
+
+// 枠線の色
+color: {
+  transparent: 'border-transparent',
+  default: 'border-border',
+  muted: 'border-gray-300',
+  accent: 'border-primary'
+}
+
+// 角の丸み（色相推薦カラーボックス基準）
+radius: {
+  none: 'rounded-none',
+  small: 'rounded',      // 4px - 基準
+  medium: 'rounded-md',  // 6px
+  large: 'rounded-lg',   // 8px
+  full: 'rounded-full'   // 完全な円形
+}
+```
+
+### ボーダープリセット使用例
+- **カラーブロック**: `BORDER_PRESETS.colorBlock` - 透明枠線 + 小さい角丸
+- **カード**: `BORDER_PRESETS.card` - 細い枠線 + 中程度の角丸  
+- **ボタン**: `BORDER_PRESETS.button` - 透明枠線 + 中程度の角丸
+- **アップロード**: `BORDER_PRESETS.upload` - 点線 + 大きい角丸
+- **アイコン**: `BORDER_PRESETS.icon` - 透明枠線のみ
+- **プレビュー**: `BORDER_PRESETS.preview` - 大きい角丸のみ
+
+### 実装ルール
+- **コンポーネント更新**: 既存のハードコードされたTailwindクラスは統一プリセットに置き換え
+- **新規コンポーネント**: 必ず `BORDER_PRESETS` を使用し、独自のボーダー指定禁止
+- **一貫性保持**: プロジェクト全体で同じ角丸・枠線仕様を維持
+
+---
+
 ## 🔧 技術仕様
 
 ### 使用ライブラリ
@@ -252,7 +301,7 @@ src/
 
 ---
 
-**最終更新**: 2025-06-20  
+**最終更新**: 2025-06-21  
 **適用プロジェクト**: 色推薦アプリ プロジェクト全体  
 
 このルールは、Claude Code セッションが毎回リセットされることを考慮して、**毎回最初に貼って読み込ませてください。**
