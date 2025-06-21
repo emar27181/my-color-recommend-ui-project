@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Construction, Clock } from 'lucide-react';
+import { ArrowLeft, Construction } from 'lucide-react';
 
 export const HelpPage = () => {
   return (

@@ -106,7 +106,7 @@ export const ColorRecommendations = () => {
 };
 
 export const ToneRecommendations = () => {
-  const { recommendedTones, toneBaseColor, selectedColor, generateRecommendedTones } = useColorStore();
+  const { recommendedTones, selectedColor, generateRecommendedTones } = useColorStore();
 
   React.useEffect(() => {
     if (recommendedTones.length === 0 && selectedColor) {

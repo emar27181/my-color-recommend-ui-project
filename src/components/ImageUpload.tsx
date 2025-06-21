@@ -1,10 +1,10 @@
 import { useState, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { useToastContext } from '@/contexts/ToastContext';
 import { useColorStore } from '@/store/colorStore';
 import { extractColorsFromImage, validateImageFile } from '@/lib/colorExtractor';
 import { ProgressBar } from '@/components/common/ProgressBar';
-import { Upload, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { Upload, Loader2 } from 'lucide-react';
 import type { ExtractedColor } from '@/lib/colorExtractor';
 
 interface ImageUploadProps {

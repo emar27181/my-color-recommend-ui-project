@@ -6,12 +6,11 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { ToastProvider } from '@/contexts/ToastContext';
 import { ToastContainer } from '@/components/ToastContainer';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { HelpCircle } from 'lucide-react';
 
 function App() {
-  const mainRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     // 初期表示時にページの最上端を表示
