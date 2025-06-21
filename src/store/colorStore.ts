@@ -215,7 +215,7 @@ const filterValidTones = (colors: string[], baseColor: string): string[] => {
 
 export const useColorStore = create<ColorState>((set, get) => {
   // デフォルト色でトーンを事前生成
-  const defaultColor = '#3b82f6';
+  const defaultColor = '#b51a00';
   const defaultTones = TONE_ADJUSTMENTS.map(adjustment => {
     try {
       const color = chroma(defaultColor);
