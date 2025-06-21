@@ -20,7 +20,7 @@ export const ThemeToggle = () => {
   return (
     <button
       onClick={toggleTheme}
-      className="p-2 rounded-lg bg-background border border-border hover:bg-muted transition-colors"
+      className="p-2 rounded-lg bg-background/50 border-none hover:bg-muted/50 transition-colors backdrop-blur-sm"
       title={isDark ? 'ライトモードに切り替え' : 'ダークモードに切り替え'}
     >
       {isDark ? (

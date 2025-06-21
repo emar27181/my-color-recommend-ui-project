@@ -124,21 +124,27 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
   
-  /* おしゃれなスクロールバー */
+  /* スクロールバーを非表示 */
   ::-webkit-scrollbar {
-    width: 8px;
+    display: none;
   }
   
-  ::-webkit-scrollbar-track {
-    @apply bg-muted;
+  /* Firefox用 */
+  * {
+    scrollbar-width: none;
   }
   
-  ::-webkit-scrollbar-thumb {
-    @apply bg-muted-foreground/30 rounded-full;
+  /* モバイル向けスクロール最適化 */
+  html, body {
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
   }
   
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted-foreground/50;
+  /* iOS Safari向けのスクロール問題対策 */
+  @supports (-webkit-touch-callout: none) {
+    body {
+      -webkit-overflow-scrolling: touch;
+    }
   }
 }
 

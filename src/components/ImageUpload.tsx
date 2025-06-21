@@ -1,9 +1,11 @@
 import { useState, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { useToastContext } from '@/contexts/ToastContext';
 import { useColorStore } from '@/store/colorStore';
 import { extractColorsFromImage, validateImageFile } from '@/lib/colorExtractor';
-import { Upload, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { ProgressBar } from '@/components/common/ProgressBar';
+import { Upload, Loader2 } from 'lucide-react';
+import { BORDER_PRESETS } from '@/constants/ui';
 import type { ExtractedColor } from '@/lib/colorExtractor';
 
 interface ImageUploadProps {
@@ -12,6 +14,7 @@ interface ImageUploadProps {
 
 export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { showToast } = useToastContext();
@@ -25,7 +28,8 @@ export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
     }
 
     setIsLoading(true);
-    
+    setProgress(0);
+
     try {
       // プレビュー画像を設定
       const reader = new FileReader();
@@ -34,21 +38,26 @@ export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
       };
       reader.readAsDataURL(file);
 
-      // 色を抽出
-      const result = await extractColorsFromImage(file, 8);
-      
+      // 色を抽出（プログレスコールバック付き）
+      const result = await extractColorsFromImage(file, 8, (progressValue) => {
+        setProgress(progressValue);
+      });
+
       // ストアに保存
       setExtractedColors(result.colors, result.dominantColor);
-      
+
       // 親コンポーネントに結果を通知
       onColorsExtracted?.(result.colors, result.dominantColor);
-      
+
       showToast(`${result.colors.length}色を抽出しました`, 'success');
     } catch (error) {
       console.error('Color extraction failed:', error);
       showToast('色の抽出に失敗しました', 'error');
+      setProgress(0);
     } finally {
       setIsLoading(false);
+      // プログレス完了後、少し待ってから非表示
+      setTimeout(() => setProgress(0), 1500);
     }
   };
 
@@ -69,20 +78,11 @@ export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
 
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <ImageIcon className="w-5 h-5" />
-          画像から色を抽出
-        </CardTitle>
-        <p className="text-sm text-muted-foreground">
-          画像をアップロードして、使用されている色を抽出します
-        </p>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <Card className="w-full h-full flex flex-col">
+      <CardContent className="space-y-1 pt-1 flex-1 flex flex-col">
         {/* アップロードエリア */}
         <div
-          className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer"
+          className={`${BORDER_PRESETS.upload} p-3 text-center hover:border-transparent transition-colors cursor-pointer flex-1 flex items-center justify-center`}
           onDrop={handleDrop}
           onDragOver={(e) => e.preventDefault()}
           onClick={() => fileInputRef.current?.click()}
@@ -94,21 +94,25 @@ export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
             onChange={handleFileInputChange}
             className="hidden"
           />
-          
+
           {isLoading ? (
             <div className="flex flex-col items-center gap-2">
               <Loader2 className="w-8 h-8 text-primary animate-spin" />
-              <p className="text-muted-foreground">色を抽出中...</p>
+              <div className="w-full max-w-xs">
+                <ProgressBar
+                  value={progress}
+                  size="md"
+                  variant="default"
+                  className="mb-2"
+                />
+                <p className="text-sm text-muted-foreground text-center">
+                  色を抽出中... ({Math.round(progress)}%)
+                </p>
+              </div>
             </div>
           ) : (
-            <div className="flex flex-col items-center gap-2">
-              <Upload className="w-8 h-8 text-muted-foreground" />
-              <p className="text-muted-foreground">
-                画像をドラッグ&ドロップするか、クリックして選択
-              </p>
-              <p className="text-xs text-muted-foreground">
-                JPEG、PNG、GIF、WebP（最大10MB）
-              </p>
+            <div className="flex flex-col items-center gap-0">
+              <Upload className="w-12 h-12 text-muted-foreground" />
             </div>
           )}
         </div>
@@ -116,12 +120,11 @@ export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
         {/* プレビュー画像 */}
         {previewImage && (
           <div className="mt-4">
-            <h3 className="text-sm font-medium mb-2">アップロードした画像:</h3>
             <div className="relative max-w-md mx-auto">
               <img
                 src={previewImage}
                 alt="アップロードされた画像"
-                className="w-full h-auto rounded-lg shadow-sm"
+                className={`w-full h-auto ${BORDER_PRESETS.preview} shadow-sm`}
                 style={{ maxHeight: '200px', objectFit: 'contain' }}
               />
             </div>

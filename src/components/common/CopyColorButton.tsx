@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Copy, Check, Palette } from 'lucide-react';
 import { copyToClipboard } from '@/lib/clipboard';
 import { useToastContext } from '@/contexts/ToastContext';
+import { BORDER_PRESETS } from '@/constants/ui';
 
 interface CopyColorButtonProps {
   color: string;
@@ -25,11 +26,14 @@ export const CopyColorButton = ({
   const handleCopy = async (e: React.MouseEvent) => {
     e.stopPropagation();
     
-    const result = await copyToClipboard(color);
+    // #を除いた6桁の英数字のみを抽出
+    const colorWithoutHash = color.replace('#', '');
+    
+    const result = await copyToClipboard(colorWithoutHash);
     
     if (result.success) {
       setIsCopied(true);
-      showToast(`${color} をコピーしました`, 'success');
+      showToast(`${colorWithoutHash} をコピーしました`, 'success');
       setTimeout(() => setIsCopied(false), 2000);
     } else {
       showToast('コピーに失敗しました', 'error');
@@ -41,11 +45,11 @@ export const CopyColorButton = ({
     return (
       <button
         onClick={handleCopy}
-        className={`p-2 rounded-full bg-background/80 backdrop-blur-sm border border-border/50 
-                   hover:bg-background hover:border-border hover:scale-105 
-                   transition-all duration-200 shadow-sm hover:shadow-md 
+        className={`p-1.5 bg-transparent ${BORDER_PRESETS.button}
+                   hover:bg-background/10 hover:scale-105 
+                   transition-all duration-200 
                    ${className.includes('opacity') ? className : `opacity-80 hover:opacity-100 ${className}`}`}
-        title={`${color} をコピー`}
+        title={`${color.replace('#', '')} をコピー`}
       >
         {isCopied ? (
           <Check className="w-4 h-4 text-emerald-500" />
@@ -61,11 +65,11 @@ export const CopyColorButton = ({
     return (
       <button
         onClick={handleCopy}
-        className={`px-3 py-2 rounded-lg bg-background/80 backdrop-blur-sm border border-border/50 
-                   hover:bg-background hover:border-border hover:scale-105 
-                   transition-all duration-200 shadow-sm hover:shadow-md 
+        className={`px-2 py-1.5 bg-transparent ${BORDER_PRESETS.button}
+                   hover:bg-background/10 hover:scale-105 
+                   transition-all duration-200 
                    flex items-center gap-2 ${className.includes('opacity') ? className : `opacity-80 hover:opacity-100 ${className}`}`}
-        title={`${color} をコピー`}
+        title={`${color.replace('#', '')} をコピー`}
       >
         {isCopied ? (
           <Check className="w-4 h-4 text-emerald-500" />
@@ -80,10 +84,10 @@ export const CopyColorButton = ({
   return (
     <button
       onClick={handleCopy}
-      className={`px-4 py-2 rounded-xl bg-gradient-to-r from-background/90 to-background/80 
-                 backdrop-blur-sm border border-border/50 hover:border-border 
-                 hover:scale-105 transition-all duration-200 shadow-sm hover:shadow-md 
-                 flex items-center gap-3 ${className}`}
+      className={`px-3 py-1.5 bg-transparent ${BORDER_PRESETS.button}
+                 hover:bg-background/10 hover:scale-105 
+                 transition-all duration-200 
+                 flex items-center gap-2 ${className}`}
       title={`${color} をコピー`}
     >
       <div className="flex items-center gap-2">
