@@ -35,13 +35,6 @@
 
 ---
 
-## 🌐 Netlifyに関する特記事項
-
-- サイト名（サブドメイン）には `color-recommend` を使用する
-- サイトがすでに存在していた場合は、`color-recommend-ui` や `color-recommend-app` などに切り替える
-- `netlify.toml` の生成など、プロジェクト設定ファイルはすべてGitで管理対象に含める
-
----
 
 ## 📁 その他の開発ルール
 
