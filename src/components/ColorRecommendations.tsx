@@ -30,7 +30,23 @@ export const ColorRecommendations = () => {
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className={`w-full flex items-center justify-between px-2 md:px-3 py-1.5 md:py-2 bg-transparent text-muted-foreground hover:bg-muted/20 text-xs md:text-sm font-medium transition-colors ${BORDER_PRESETS.button}`}
             >
-              <span className="truncate">{selectedSchemeData?.name || '配色技法を選択'}</span>
+              <span className="truncate">
+                {selectedSchemeData ? (
+                  <>
+                    {selectedSchemeData.name.split(':').map((part, index) => (
+                      <span key={index}>
+                        {index === 0 ? (
+                          <span className="font-bold">{part}</span>
+                        ) : (
+                          <span>:{part}</span>
+                        )}
+                      </span>
+                    ))}
+                  </>
+                ) : (
+                  '配色技法を選択'
+                )}
+              </span>
               <ChevronDown className={`w-3 h-3 md:w-4 md:h-4 transition-transform flex-shrink-0 ml-1 ${isDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
 
@@ -48,7 +64,17 @@ export const ColorRecommendations = () => {
                     }`}
                   >
                     <div>
-                      <div className="font-medium">{scheme.name}</div>
+                      <div className="font-medium">
+                        {scheme.name.split(':').map((part, index) => (
+                          <span key={index}>
+                            {index === 0 ? (
+                              <span className="font-bold">{part}</span>
+                            ) : (
+                              <span>:{part}</span>
+                            )}
+                          </span>
+                        ))}
+                      </div>
                       <div className="text-xs opacity-75 hidden md:block">{scheme.description}</div>
                     </div>
                   </button>
