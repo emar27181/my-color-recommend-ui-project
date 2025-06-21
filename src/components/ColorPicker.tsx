@@ -18,9 +18,9 @@ export const ColorPicker = () => {
       </CardHeader>
       <CardContent className="pt-0 flex-1 overflow-auto pb-0">
         {/* Desktop/Tablet Layout */}
-        <div className="hidden md:block">
-          <div className="bg-card border border-border rounded-sm p-1 shadow-sm hover:shadow-md transition-all duration-200">
-            <div className="flex items-center gap-3">
+        <div className="hidden md:block h-full">
+          <div className="p-1 transition-all duration-200 h-full flex items-center">
+            <div className="flex items-center gap-3 w-full">
               <div className="relative cursor-pointer">
                 <div className="bg-white rounded-full p-2 border border-transparent hover:shadow-md transition-all duration-200">
                   <Palette className="w-6 h-6 text-muted-foreground" />
@@ -47,8 +47,8 @@ export const ColorPicker = () => {
         </div>
 
         {/* Mobile Layout */}
-        <div className="block md:hidden">
-          <div className="bg-card border border-border rounded-sm p-1 shadow-sm flex items-center gap-1">
+        <div className="block md:hidden h-full">
+          <div className="p-1 flex items-center gap-1 h-full">
             <div className="relative cursor-pointer">
               <div className="bg-white rounded-full p-1.5 border border-transparent hover:shadow-md transition-all duration-200">
                 <Palette className="w-4 h-4 text-muted-foreground" />
