@@ -108,16 +108,16 @@ export const COLOR_SCHEMES: ColorScheme[] = [
 
 
 
-// トーン調整値の定義
+// トーン調整値の定義（明度・彩度のバリエーション）
 export const TONE_ADJUSTMENTS: ToneAdjustment[] = [
-  { id: 'darker', name: '', lightnessOffset: -0.2 },
-  { id: 'lighter', name: '', lightnessOffset: 0.2 },
-  { id: 'much_darker', name: '', lightnessOffset: -0.4 },
-  { id: 'much_lighter', name: '', lightnessOffset: 0.4 },
-  { id: 'desaturated', name: '', lightnessOffset: 0, saturationMultiplier: 0.5 },
-  { id: 'saturated', name: '', lightnessOffset: 0, saturationMultiplier: 1.5 },
-  { id: 'muted', name: '', lightnessOffset: -0.1, saturationMultiplier: 0.7 },
-  { id: 'vivid', name: '', lightnessOffset: 0.1, saturationMultiplier: 1.3 },
+  { id: 'very_light', name: '', lightnessOffset: 0.4 },
+  { id: 'light', name: '', lightnessOffset: 0.2 },
+  { id: 'original', name: '', lightnessOffset: 0 },
+  { id: 'dark', name: '', lightnessOffset: -0.2 },
+  { id: 'very_dark', name: '', lightnessOffset: -0.4 },
+  { id: 'muted', name: '', lightnessOffset: 0, saturationMultiplier: 0.6 },
+  { id: 'vivid', name: '', lightnessOffset: 0, saturationMultiplier: 1.4 },
+  { id: 'desaturated', name: '', lightnessOffset: 0, saturationMultiplier: 0.3 },
 ];
 
 export interface ColorState {
@@ -136,102 +136,6 @@ export interface ColorState {
   generateRecommendedTones: (baseColor: string) => void;
 }
 
-export const useColorStore = create<ColorState>((set, get) => ({
-  selectedColor: '#3b82f6', // デフォルトは青色
-  recommendedColors: [],
-  recommendedTones: [],
-  selectedScheme: 'complementary', // デフォルトはダイアード配色
-  toneBaseColor: null,
-  extractedColors: [],
-  dominantColor: null,
-
-  setSelectedColor: (color: string) => {
-    set({ selectedColor: color });
-    get().generateRecommendedColors();
-    // デフォルトでトーン推薦も生成
-    get().generateRecommendedTones(color);
-  },
-
-  setSelectedScheme: (schemeId: string) => {
-    set({ selectedScheme: schemeId });
-    get().generateRecommendedColors();
-  },
-
-  setExtractedColors: (colors: ExtractedColor[], dominantColor: ExtractedColor) => {
-    set({ extractedColors: colors, dominantColor });
-    // ドミナントカラーを自動的に選択色として設定
-    get().setSelectedColor(dominantColor.hex);
-  },
-
-  setColorFromExtracted: (color: string) => {
-    get().setSelectedColor(color);
-  },
-
-  generateRecommendedColors: () => {
-    const { selectedColor, selectedScheme } = get();
-    try {
-      const baseColor = chroma(selectedColor);
-      const hue = baseColor.get('hsl.h') || 0;
-      const saturation = baseColor.get('hsl.s');
-      const lightness = baseColor.get('hsl.l');
-
-      // 選択された配色技法を取得
-      const scheme = COLOR_SCHEMES.find(s => s.id === selectedScheme);
-      if (!scheme) {
-        console.error('Invalid color scheme:', selectedScheme);
-        set({ recommendedColors: [] });
-        return;
-      }
-
-      // 配色技法に基づく推薦色を生成
-      const recommendations = scheme.angles.map(angle => {
-        const newHue = (hue + angle) % 360;
-        return chroma.hsl(newHue, saturation, lightness).hex();
-      });
-
-      // 明るい→暗い順でソート
-      const sortedRecommendations = sortColorsByLightness(recommendations);
-
-      set({ recommendedColors: sortedRecommendations });
-    } catch (error) {
-      console.error('Failed to generate recommended colors:', error);
-      set({ recommendedColors: [] });
-    }
-  },
-
-  generateRecommendedTones: (baseColor: string) => {
-    try {
-      const color = chroma(baseColor);
-      const hue = color.get('hsl.h') || 0;
-      const saturation = color.get('hsl.s');
-      const lightness = color.get('hsl.l');
-
-      // TONE_ADJUSTMENTSに基づいてトーンを生成
-      const tones = TONE_ADJUSTMENTS.map(adjustment => {
-        const newLightness = Math.max(0, Math.min(1, lightness + adjustment.lightnessOffset));
-        const newSaturation = adjustment.saturationMultiplier
-          ? Math.max(0, Math.min(1, saturation * adjustment.saturationMultiplier))
-          : saturation;
-
-        return chroma.hsl(hue, newSaturation, newLightness).hex();
-      });
-
-      // 明るい→暗い順でソート
-      const sortedTones = sortColorsByLightness(tones);
-
-      set({ recommendedTones: sortedTones, toneBaseColor: baseColor });
-    } catch (error) {
-      console.error('Failed to generate recommended tones:', error);
-      set({ recommendedTones: [], toneBaseColor: null });
-    }
-  },
-}));
-
-// 初期化時にデフォルトの推薦色とトーンを生成
-const initialState = useColorStore.getState();
-initialState.generateRecommendedColors();
-initialState.generateRecommendedTones(initialState.selectedColor);
-
 // カラーソート関数: 明るい→暗いでソート
 const sortColorsByLightness = (colors: string[]): string[] => {
   return colors.sort((a, b) => {
@@ -246,9 +150,119 @@ const sortColorsByLightness = (colors: string[]): string[] => {
   });
 };
 
-// 初期状態で推薦色を生成
-setTimeout(() => {
-  console.log('Generating initial recommended colors...');
-  useColorStore.getState().generateRecommendedColors();
-  console.log('Recommended colors:', useColorStore.getState().recommendedColors);
-}, 0);
+export const useColorStore = create<ColorState>((set, get) => {
+  // デフォルト色でトーンを事前生成
+  const defaultColor = '#3b82f6';
+  const defaultTones = TONE_ADJUSTMENTS.map(adjustment => {
+    try {
+      const color = chroma(defaultColor);
+      const hue = color.get('hsl.h') || 0;
+      const saturation = color.get('hsl.s');
+      const lightness = color.get('hsl.l');
+      
+      const newLightness = Math.max(0, Math.min(1, lightness + adjustment.lightnessOffset));
+      const newSaturation = adjustment.saturationMultiplier
+        ? Math.max(0, Math.min(1, saturation * adjustment.saturationMultiplier))
+        : saturation;
+
+      return chroma.hsl(hue, newSaturation, newLightness).hex();
+    } catch (error) {
+      return defaultColor;
+    }
+  });
+
+  return {
+    selectedColor: defaultColor,
+    recommendedColors: [],
+    recommendedTones: sortColorsByLightness(defaultTones),
+    selectedScheme: 'complementary',
+    toneBaseColor: defaultColor,
+    extractedColors: [],
+    dominantColor: null,
+
+    setSelectedColor: (color: string) => {
+      set({ selectedColor: color });
+      get().generateRecommendedColors();
+      // デフォルトでトーン推薦も生成
+      get().generateRecommendedTones(color);
+    },
+
+    setSelectedScheme: (schemeId: string) => {
+      set({ selectedScheme: schemeId });
+      get().generateRecommendedColors();
+    },
+
+    setExtractedColors: (colors: ExtractedColor[], dominantColor: ExtractedColor) => {
+      set({ extractedColors: colors, dominantColor });
+      // ドミナントカラーを自動的に選択色として設定
+      get().setSelectedColor(dominantColor.hex);
+    },
+
+    setColorFromExtracted: (color: string) => {
+      get().setSelectedColor(color);
+    },
+
+    generateRecommendedColors: () => {
+      const { selectedColor, selectedScheme } = get();
+      try {
+        const baseColor = chroma(selectedColor);
+        const hue = baseColor.get('hsl.h') || 0;
+        const saturation = baseColor.get('hsl.s');
+        const lightness = baseColor.get('hsl.l');
+
+        // 選択された配色技法を取得
+        const scheme = COLOR_SCHEMES.find(s => s.id === selectedScheme);
+        if (!scheme) {
+          console.error('Invalid color scheme:', selectedScheme);
+          set({ recommendedColors: [] });
+          return;
+        }
+
+        // 配色技法に基づく推薦色を生成
+        const recommendations = scheme.angles.map(angle => {
+          const newHue = (hue + angle) % 360;
+          return chroma.hsl(newHue, saturation, lightness).hex();
+        });
+
+        // 明るい→暗い順でソート
+        const sortedRecommendations = sortColorsByLightness(recommendations);
+
+        set({ recommendedColors: sortedRecommendations });
+      } catch (error) {
+        console.error('Failed to generate recommended colors:', error);
+        set({ recommendedColors: [] });
+      }
+    },
+
+    generateRecommendedTones: (baseColor: string) => {
+      try {
+        const color = chroma(baseColor);
+        const hue = color.get('hsl.h') || 0;
+        const saturation = color.get('hsl.s');
+        const lightness = color.get('hsl.l');
+
+        // TONE_ADJUSTMENTSに基づいてトーンを生成
+        const tones = TONE_ADJUSTMENTS.map(adjustment => {
+          const newLightness = Math.max(0, Math.min(1, lightness + adjustment.lightnessOffset));
+          const newSaturation = adjustment.saturationMultiplier
+            ? Math.max(0, Math.min(1, saturation * adjustment.saturationMultiplier))
+            : saturation;
+
+          return chroma.hsl(hue, newSaturation, newLightness).hex();
+        });
+
+        // 明るい→暗い順でソート
+        const sortedTones = sortColorsByLightness(tones);
+
+        set({ recommendedTones: sortedTones, toneBaseColor: baseColor });
+      } catch (error) {
+        console.error('Failed to generate recommended tones:', error);
+        set({ recommendedTones: [], toneBaseColor: null });
+      }
+    },
+  };
+});
+
+// 初期化時にデフォルトの推薦色を生成
+const initialState = useColorStore.getState();
+initialState.generateRecommendedColors();
