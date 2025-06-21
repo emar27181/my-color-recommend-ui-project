@@ -40,8 +40,8 @@ export const BORDER_STYLES = {
  * よく使われるボーダー組み合わせ
  */
 export const BORDER_PRESETS = {
-  // 色表示用（透明枠線 + 小さい角丸）
-  colorBlock: `${BORDER_STYLES.width.normal} ${BORDER_STYLES.color.transparent} ${BORDER_STYLES.radius.small}`,
+  // 色表示用（透明枠線 + 中程度の角丸）
+  colorBlock: `${BORDER_STYLES.width.normal} ${BORDER_STYLES.color.transparent} ${BORDER_STYLES.radius.medium}`,
   
   // カード用（細い枠線 + 中程度の角丸）
   card: `${BORDER_STYLES.width.thin} ${BORDER_STYLES.color.default} ${BORDER_STYLES.radius.medium}`,
