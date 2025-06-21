@@ -29,20 +29,20 @@ export const ColorRecommendations = () => {
             {/* ドロップダウンボタン */}
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="w-full flex items-center justify-between px-3 py-2 bg-muted text-muted-foreground hover:bg-muted/80 rounded text-sm font-medium transition-colors"
+              className="w-full flex items-center justify-between px-2 md:px-3 py-1.5 md:py-2 bg-transparent text-muted-foreground hover:bg-muted/20 rounded text-xs md:text-sm font-medium transition-colors border border-transparent"
             >
-              <span>{selectedSchemeData?.name || '配色技法を選択'}</span>
-              <ChevronDown className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              <span className="truncate">{selectedSchemeData?.name || '配色技法を選択'}</span>
+              <ChevronDown className={`w-3 h-3 md:w-4 md:h-4 transition-transform flex-shrink-0 ml-1 ${isDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {/* ドロップダウンメニュー */}
             {isDropdownOpen && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-background border border-border rounded shadow-lg z-10 max-h-60 overflow-y-auto">
+              <div className="absolute top-full left-0 right-0 mt-1 bg-background border border-transparent rounded shadow-lg z-10 max-h-60 overflow-y-auto">
                 {COLOR_SCHEMES.map((scheme) => (
                   <button
                     key={scheme.id}
                     onClick={() => handleSchemeSelect(scheme.id)}
-                    className={`w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors ${
+                    className={`w-full text-left px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm hover:bg-muted transition-colors ${
                       selectedScheme === scheme.id
                         ? 'bg-primary text-primary-foreground'
                         : 'text-foreground'
@@ -50,7 +50,7 @@ export const ColorRecommendations = () => {
                   >
                     <div>
                       <div className="font-medium">{scheme.name}</div>
-                      <div className="text-xs opacity-75">{scheme.description}</div>
+                      <div className="text-xs opacity-75 hidden md:block">{scheme.description}</div>
                     </div>
                   </button>
                 ))}
@@ -113,7 +113,7 @@ export const ColorRecommendations = () => {
                     <div key={index} className="flex items-center gap-1 bg-card border border-border rounded-sm p-1 shadow-sm flex-1 cursor-pointer hover:shadow-md transition-all duration-200"
                       onClick={() => handleGenerateTones(color)}>
                       <div
-                        className="border-2 border-border rounded-sm cursor-pointer hover:scale-110 transition-all duration-200 flex-shrink-0"
+                        className="border-2 border-transparent rounded-sm cursor-pointer hover:scale-110 transition-all duration-200 flex-shrink-0"
                         style={{
                           backgroundColor: color,
                           width: '32px',
@@ -194,7 +194,7 @@ export const ToneRecommendations = () => {
                   {recommendedTones.slice(rowIndex * 2, (rowIndex + 1) * 2).map((tone, index) => (
                     <div key={index} className="flex items-center gap-1 bg-card border border-border rounded-sm p-1 shadow-sm flex-1">
                       <div
-                        className="border-2 border-border rounded-sm cursor-pointer hover:scale-110 transition-all duration-200 flex-shrink-0"
+                        className="border-2 border-transparent rounded-sm cursor-pointer hover:scale-110 transition-all duration-200 flex-shrink-0"
                         style={{
                           backgroundColor: tone,
                           width: '32px',

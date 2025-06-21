@@ -57,7 +57,7 @@ export const ExtractedColorsDisplay = () => {
                     <div key={index} className="flex items-center gap-2 bg-card border border-border rounded-sm p-1 shadow-sm flex-1 cursor-pointer hover:shadow-md transition-all duration-200"
                       onClick={() => handleColorSelect(color.hex)}>
                       <div
-                        className="border-2 border-border rounded-sm cursor-pointer hover:scale-110 transition-all duration-200 flex-shrink-0"
+                        className="border-2 border-transparent rounded-sm cursor-pointer hover:scale-110 transition-all duration-200 flex-shrink-0"
                         style={{
                           backgroundColor: color.hex,
                           width: '32px',
