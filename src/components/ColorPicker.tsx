@@ -1,7 +1,7 @@
 import { useColorStore } from '@/store/colorStore';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { CopyColorButton } from '@/components/common/CopyColorButton';
-import { TYPOGRAPHY } from '@/constants/ui';
+import { TYPOGRAPHY, BORDER_PRESETS } from '@/constants/ui';
 import { Palette } from 'lucide-react';
 
 export const ColorPicker = () => {
@@ -22,7 +22,7 @@ export const ColorPicker = () => {
           <div className="p-1 transition-all duration-200 h-full flex items-center">
             <div className="flex items-center gap-3 w-full">
               <div className="relative cursor-pointer">
-                <div className="bg-white rounded-full p-2 border border-transparent hover:shadow-md transition-all duration-200">
+                <div className={`bg-white rounded-full p-2 ${BORDER_PRESETS.icon} hover:shadow-md transition-all duration-200`}>
                   <Palette className="w-6 h-6 text-muted-foreground" />
                 </div>
                 <input
@@ -50,7 +50,7 @@ export const ColorPicker = () => {
         <div className="block md:hidden h-full">
           <div className="p-1 flex items-center gap-1 h-full">
             <div className="relative cursor-pointer">
-              <div className="bg-white rounded-full p-1.5 border border-transparent hover:shadow-md transition-all duration-200">
+              <div className={`bg-white rounded-full p-1.5 ${BORDER_PRESETS.icon} hover:shadow-md transition-all duration-200`}>
                 <Palette className="w-4 h-4 text-muted-foreground" />
               </div>
               <input

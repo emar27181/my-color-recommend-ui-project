@@ -1,7 +1,6 @@
-import React from 'react';
 import { ColorBlock } from '@/components/common/ColorBlock';
 import { CopyColorButton } from '@/components/common/CopyColorButton';
-import { TYPOGRAPHY } from '@/constants/ui';
+import { TYPOGRAPHY, BORDER_PRESETS } from '@/constants/ui';
 
 interface ColorItemProps {
   color: string;
@@ -36,7 +35,7 @@ export const ColorItem = ({
   if (!compact) {
     return (
       <div 
-        className={`bg-card border border-border rounded-sm p-1 shadow-sm hover:shadow-md transition-all duration-200 ${
+        className={`bg-card ${BORDER_PRESETS.card} p-1 shadow-sm hover:shadow-md transition-all duration-200 ${
           clickable ? 'cursor-pointer' : ''
         } group ${className}`}
         onClick={handleClick}
@@ -67,7 +66,7 @@ export const ColorItem = ({
   // モバイル版コンパクトレイアウト
   return (
     <div 
-      className={`flex items-center gap-1 bg-card border border-border rounded-sm p-1 shadow-sm flex-1 ${
+      className={`flex items-center gap-1 bg-card ${BORDER_PRESETS.card} p-1 shadow-sm flex-1 ${
         clickable ? 'cursor-pointer hover:shadow-md' : ''
       } transition-all duration-200 ${className}`}
       onClick={handleClick}
@@ -77,7 +76,7 @@ export const ColorItem = ({
         height: '32px'
       }}>
         <div
-          className="border-2 border-transparent rounded-sm cursor-pointer hover:scale-110 transition-all duration-200"
+          className={`${BORDER_PRESETS.colorBlock} cursor-pointer hover:scale-110 transition-all duration-200`}
           style={{
             backgroundColor: color,
             width: '24px',

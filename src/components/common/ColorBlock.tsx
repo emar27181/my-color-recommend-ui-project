@@ -1,4 +1,4 @@
-import { COLOR_BLOCK_SPEC } from '@/constants/ui';
+import { COLOR_BLOCK_SPEC, BORDER_PRESETS } from '@/constants/ui';
 import { Palette } from 'lucide-react';
 
 interface ColorBlockProps {
@@ -35,7 +35,7 @@ export const ColorBlock = ({
         title={title}
       />
       {showPicker && (
-        <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1 border border-gray-300">
+        <div className={`absolute -bottom-1 -right-1 bg-white rounded-full p-1 ${BORDER_PRESETS.icon}`}>
           <Palette className="w-4 h-4 text-gray-600" />
         </div>
       )}

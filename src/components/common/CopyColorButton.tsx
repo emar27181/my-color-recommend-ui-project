@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Copy, Check, Palette } from 'lucide-react';
 import { copyToClipboard } from '@/lib/clipboard';
 import { useToastContext } from '@/contexts/ToastContext';
+import { BORDER_PRESETS } from '@/constants/ui';
 
 interface CopyColorButtonProps {
   color: string;
@@ -44,7 +45,7 @@ export const CopyColorButton = ({
     return (
       <button
         onClick={handleCopy}
-        className={`p-1.5 rounded-md bg-transparent border-transparent 
+        className={`p-1.5 bg-transparent ${BORDER_PRESETS.button}
                    hover:bg-background/10 hover:scale-105 
                    transition-all duration-200 
                    ${className.includes('opacity') ? className : `opacity-80 hover:opacity-100 ${className}`}`}
@@ -64,7 +65,7 @@ export const CopyColorButton = ({
     return (
       <button
         onClick={handleCopy}
-        className={`px-2 py-1.5 rounded-md bg-transparent border-transparent 
+        className={`px-2 py-1.5 bg-transparent ${BORDER_PRESETS.button}
                    hover:bg-background/10 hover:scale-105 
                    transition-all duration-200 
                    flex items-center gap-2 ${className.includes('opacity') ? className : `opacity-80 hover:opacity-100 ${className}`}`}
@@ -83,7 +84,7 @@ export const CopyColorButton = ({
   return (
     <button
       onClick={handleCopy}
-      className={`px-3 py-1.5 rounded-lg bg-transparent border-transparent 
+      className={`px-3 py-1.5 bg-transparent ${BORDER_PRESETS.button}
                  hover:bg-background/10 hover:scale-105 
                  transition-all duration-200 
                  flex items-center gap-2 ${className}`}

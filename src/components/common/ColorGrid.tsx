@@ -1,4 +1,3 @@
-import React from 'react';
 import { ColorItem } from '@/components/common/ColorItem';
 import { RESPONSIVE_GRID } from '@/constants/ui';
 

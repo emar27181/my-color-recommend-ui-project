@@ -5,6 +5,7 @@ import { useColorStore } from '@/store/colorStore';
 import { extractColorsFromImage, validateImageFile } from '@/lib/colorExtractor';
 import { ProgressBar } from '@/components/common/ProgressBar';
 import { Upload, Loader2 } from 'lucide-react';
+import { BORDER_PRESETS } from '@/constants/ui';
 import type { ExtractedColor } from '@/lib/colorExtractor';
 
 interface ImageUploadProps {
@@ -81,7 +82,7 @@ export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
       <CardContent className="space-y-1 pt-1 flex-1 flex flex-col">
         {/* アップロードエリア */}
         <div
-          className="border-2 border-dashed border-transparent rounded-lg p-3 text-center hover:border-transparent transition-colors cursor-pointer flex-1 flex items-center justify-center"
+          className={`${BORDER_PRESETS.upload} p-3 text-center hover:border-transparent transition-colors cursor-pointer flex-1 flex items-center justify-center`}
           onDrop={handleDrop}
           onDragOver={(e) => e.preventDefault()}
           onClick={() => fileInputRef.current?.click()}
@@ -123,7 +124,7 @@ export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
               <img
                 src={previewImage}
                 alt="アップロードされた画像"
-                className="w-full h-auto rounded-lg shadow-sm"
+                className={`w-full h-auto ${BORDER_PRESETS.preview} shadow-sm`}
                 style={{ maxHeight: '200px', objectFit: 'contain' }}
               />
             </div>
