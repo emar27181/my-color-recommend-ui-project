@@ -20,12 +20,15 @@ export const ColorBlock = ({
   showPicker = false
 }: ColorBlockProps) => {
   return (
-    <div className="relative">
+    <div className="relative flex items-center justify-center" style={{ 
+      width: `${COLOR_BLOCK_SPEC.width}px`,
+      height: `${COLOR_BLOCK_SPEC.height}px`
+    }}>
       <div 
         className={`${COLOR_BLOCK_SPEC.className} ${className}`}
         style={{ 
-          width: `${COLOR_BLOCK_SPEC.width}px`,
-          height: `${COLOR_BLOCK_SPEC.height}px`,
+          width: `${COLOR_BLOCK_SPEC.colorWidth}px`,
+          height: `${COLOR_BLOCK_SPEC.colorHeight}px`,
           backgroundColor: color 
         }}
         onClick={onClick}

@@ -4,9 +4,13 @@
  * 色表示ブロックの統一仕様
  */
 export const COLOR_BLOCK_SPEC = {
-  // サイズ
+  // サイズ（コンポーネント全体）
   width: 48,
   height: 48,
+  
+  // 色表示エリアのサイズ（95%）
+  colorWidth: 46,
+  colorHeight: 46,
   
   // CSSクラス
   className: 'border-2 border-transparent rounded cursor-pointer hover:scale-110 transition-all duration-200',

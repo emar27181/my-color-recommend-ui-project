@@ -72,15 +72,20 @@ export const ColorItem = ({
       } transition-all duration-200 ${className}`}
       onClick={handleClick}
     >
-      <div
-        className="border-2 border-transparent rounded-sm cursor-pointer hover:scale-110 transition-all duration-200 flex-shrink-0"
-        style={{
-          backgroundColor: color,
-          width: '32px',
-          height: '32px'
-        }}
-        title={title || color}
-      />
+      <div className="relative flex items-center justify-center flex-shrink-0" style={{
+        width: '32px',
+        height: '32px'
+      }}>
+        <div
+          className="border-2 border-transparent rounded-sm cursor-pointer hover:scale-110 transition-all duration-200"
+          style={{
+            backgroundColor: color,
+            width: '24px',
+            height: '24px'
+          }}
+          title={title || color}
+        />
+      </div>
       <div onClick={(e) => e.stopPropagation()}>
         <CopyColorButton
           color={color}
