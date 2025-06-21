@@ -4,34 +4,70 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ColorBlock } from '@/components/common/ColorBlock';
 import { CopyColorButton } from '@/components/common/CopyColorButton';
 import { RESPONSIVE_GRID, TYPOGRAPHY } from '@/constants/ui';
+import { ChevronDown } from 'lucide-react';
 
 export const ColorRecommendations = () => {
   const { recommendedColors, selectedScheme, setSelectedScheme, generateRecommendedTones } = useColorStore();
+  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
 
   const handleGenerateTones = (color: string) => {
     generateRecommendedTones(color);
   };
 
+  const selectedSchemeData = COLOR_SCHEMES.find(scheme => scheme.id === selectedScheme);
+
+  const handleSchemeSelect = (schemeId: string) => {
+    setSelectedScheme(schemeId);
+    setIsDropdownOpen(false);
+  };
+
   return (
-    <Card className="w-full flex flex-col pb-0" style={{ height: 'calc(3.5rem + 48px * 3)' }}>
+    <Card className="w-full flex flex-col pb-0" style={{ height: '144px' }}>
       <CardHeader className="pb-1 pt-2 flex-shrink-0">
         <div className="mt-0">
-          <div className={`${RESPONSIVE_GRID.schemes} ${RESPONSIVE_GRID.gap}`}>
-            {COLOR_SCHEMES.map((scheme) => (
-              <button
-                key={scheme.id}
-                onClick={() => setSelectedScheme(scheme.id)}
-                className={`px-2 py-1 rounded-lg text-xs font-medium transition-all ${selectedScheme === scheme.id
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                  }`}
-              >
-                {scheme.name}
-              </button>
-            ))}
+          <div className="relative">
+            {/* ドロップダウンボタン */}
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="w-full flex items-center justify-between px-3 py-2 bg-muted text-muted-foreground hover:bg-muted/80 rounded text-sm font-medium transition-colors"
+            >
+              <span>{selectedSchemeData?.name || '配色技法を選択'}</span>
+              <ChevronDown className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {/* ドロップダウンメニュー */}
+            {isDropdownOpen && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-background border border-border rounded shadow-lg z-10 max-h-60 overflow-y-auto">
+                {COLOR_SCHEMES.map((scheme) => (
+                  <button
+                    key={scheme.id}
+                    onClick={() => handleSchemeSelect(scheme.id)}
+                    className={`w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors ${
+                      selectedScheme === scheme.id
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-foreground'
+                    }`}
+                  >
+                    <div>
+                      <div className="font-medium">{scheme.name}</div>
+                      <div className="text-xs opacity-75">{scheme.description}</div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </CardHeader>
+      
+      {/* ドロップダウンが開いている時のオーバーレイ */}
+      {isDropdownOpen && (
+        <div 
+          className="fixed inset-0 z-5" 
+          onClick={() => setIsDropdownOpen(false)}
+        />
+      )}
+      
       <CardContent className="pt-0 flex-1 overflow-auto pb-0 min-h-0">
         {recommendedColors.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-0 px-2">
