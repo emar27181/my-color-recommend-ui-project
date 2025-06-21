@@ -123,7 +123,7 @@ const generateToneAdjustments = (): ToneAdjustment[] => {
   const adjustments: ToneAdjustment[] = [];
 
   // 明度バリエーション
-  TONE_LIGHTNESS_VARIATIONS.forEach((lightness, index) => {
+  TONE_LIGHTNESS_VARIATIONS.forEach((lightness) => {
     adjustments.push({
       id: `lightness_${lightness > 0 ? 'plus' : lightness < 0 ? 'minus' : ''}${Math.abs(lightness)}`,
       name: '',
@@ -183,6 +183,36 @@ const sortColorsByLightness = (colors: string[]): string[] => {
   });
 };
 
+// 重複色・極端な色を除外する関数
+const filterValidTones = (colors: string[], baseColor: string): string[] => {
+  const seen = new Set<string>();
+  const validColors: string[] = [];
+  
+  for (const color of colors) {
+    const upperColor = color.toUpperCase();
+    
+    // 重複チェック
+    if (seen.has(upperColor)) {
+      continue;
+    }
+    
+    // 極端な色（完全な黒・白）を除外
+    if (upperColor === '#000000' || upperColor === '#FFFFFF') {
+      continue;
+    }
+    
+    // ベースカラーとの重複チェック
+    if (upperColor === baseColor.toUpperCase()) {
+      continue;
+    }
+    
+    seen.add(upperColor);
+    validColors.push(color);
+  }
+  
+  return validColors;
+};
+
 export const useColorStore = create<ColorState>((set, get) => {
   // デフォルト色でトーンを事前生成
   const defaultColor = '#3b82f6';
@@ -203,11 +233,14 @@ export const useColorStore = create<ColorState>((set, get) => {
       return defaultColor;
     }
   });
+  
+  // デフォルトトーンも重複色・極端な色を除外
+  const filteredDefaultTones = filterValidTones(defaultTones, defaultColor);
 
   return {
     selectedColor: defaultColor,
     recommendedColors: [],
-    recommendedTones: sortColorsByLightness(defaultTones),
+    recommendedTones: sortColorsByLightness(filteredDefaultTones),
     selectedScheme: 'complementary',
     toneBaseColor: defaultColor,
     extractedColors: [],
@@ -284,8 +317,11 @@ export const useColorStore = create<ColorState>((set, get) => {
           return chroma.hsl(hue, newSaturation, newLightness).hex();
         });
 
+        // 重複色・極端な色を除外
+        const filteredTones = filterValidTones(tones, baseColor);
+
         // 明るい→暗い順でソート
-        const sortedTones = sortColorsByLightness(tones);
+        const sortedTones = sortColorsByLightness(filteredTones);
 
         set({ recommendedTones: sortedTones, toneBaseColor: baseColor });
       } catch (error) {
