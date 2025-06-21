@@ -114,15 +114,39 @@
 
 ## 📐 レイアウト設計原則
 
-### 水平レイアウト優先
+### アプリケーション全体レイアウト
+
+#### メインレイアウト構造
+- **コンテナ**: `container mx-auto` でセンタリング
+- **モバイル/タブレット** (< 1280px): 縦積みレイアウト `space-y-6`
+- **デスクトップ** (≥ 1280px): グリッドレイアウト
+  - 上段: 3列グリッド `grid-cols-3 gap-6`
+  - 下段: 2列グリッド `grid-cols-2 gap-6`
+
+#### 主要コンポーネント配置
+1. **ColorPicker** - 手動色選択（左上/モバイル1番目）
+2. **ImageUpload** - 画像アップロード（中央上/モバイル2番目）
+3. **ExtractedColorsDisplay** - 抽出色表示（右上/モバイル3番目）
+4. **ColorRecommendations** - 色推薦（左下/モバイル4番目）
+5. **ToneRecommendations** - トーン推薦（右下/モバイル5番目）
+
+### コンポーネント内レイアウト原則
+
+#### 水平レイアウト優先
 - **カラーピッカー表示**: 色ブロック + カラーコード + コピーボタンを横並び
 - **推薦色表示**: 同様に横並び維持
 - **縦長回避**: `flex items-center gap-3/4` で水平配置統一
 
-### レスポンシブグリッド
-- **色表示**: `grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5`
-- **配色技法**: `grid-cols-2 sm:grid-cols-4 md:grid-cols-6`
-- **ギャップ**: `gap-3` 統一
+#### レスポンシブグリッドシステム
+- **色表示グリッド**: `grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5`
+- **配色技法ボタン**: `grid-cols-2 sm:grid-cols-4 md:grid-cols-6`
+- **ギャップ**: `gap-3` 統一（12px）
+
+### スペーシングシステム
+- **アプリレベル**: モバイル `p-4`、デスクトップ `p-6`
+- **セクション間**: モバイル `space-y-6`、デスクトップ `gap-6`
+- **カード内**: `p-4` から `p-6` （コンポーネント依存）
+- **要素間**: ColorItem内 `gap-4`（デスクトップ）、`gap-1`（モバイル）
 
 ---
 
@@ -142,13 +166,11 @@
 
 ## 🎛 配色技法設定
 
-### 英語名使用
-- **Dominant**: ドミナント配色
-- **Analogous**: 類似色配色  
-- **Dyad**: 補色配色（旧：補色配色）
-- **Triad**: 三角配色（旧：三角配色）
-- **Tetrad**: 四角配色（旧：四角配色）
-- **Split**: 分割補色配色（旧：分割補色配色）
+### 表示形式ルール
+- **形式**: `○○配色(x色): (説明文)` の統一フォーマット
+- **例**: `ダイアード配色(2色): 対照的な色相の組み合わせ`
+- **色数**: `angles` 配列の長さに基づく自動表示
+- **説明**: 配色技法の特徴を簡潔に説明
 
 ### ボタンデザイン
 - **形状**: コンパクトな角丸ボタン
@@ -277,13 +299,265 @@ radius: {
 
 ---
 
+## 📱 レイアウト・アーキテクチャ詳細仕様
+
+### アプリケーション全体構造
+
+#### 最上位レイアウト（App.tsx）
+```
+ToastProvider
+└── div (min-h-screen flex flex-col)
+    ├── header (固定ヘッダー)
+    │   └── container
+    │       └── NavigationMenu + [HelpButton, ThemeToggle]
+    ├── main (flex-1 メインコンテンツ)
+    │   ├── Mobile/Tablet レイアウト (block xl:hidden)
+    │   └── Desktop レイアウト (hidden xl:block)
+    └── ToastContainer (固定位置)
+```
+
+#### 基本レイアウトパターン
+- **全画面**: `min-h-screen flex flex-col` - 画面全体を縦方向のフレックスコンテナ
+- **ヘッダー固定**: `flex-shrink-0` でヘッダーサイズ固定
+- **メインコンテンツ**: `flex-1` で残り領域を占有
+- **レスポンシブ切り替え**: `xl:` ブレークポイント（1280px）でレイアウト変更
+
+### レスポンシブレイアウト詳細
+
+#### モバイル・タブレット（~1279px）
+```
+main (px-4 pb-2)
+└── section.1 ベースカラー選択 (flex-shrink-0 mb-1)
+    └── div (flex gap-1)
+        ├── ColorPicker (flex-1)
+        └── ImageUpload (flex-1)
+    └── ExtractedColorsDisplay
+└── div.2-3 推薦セクション (space-y-1)
+    ├── section.2 色相推薦
+    └── section.3 トーン推薦
+```
+
+#### デスクトップ（1280px~）
+```
+main (h-full flex flex-col)
+└── section.1 ベースカラー選択 (flex-shrink-0 mb-2)
+    └── div (grid grid-cols-3 gap-4)
+        ├── ColorPicker
+        ├── ImageUpload
+        └── ExtractedColorsDisplay
+└── div.2-3 推薦セクション (flex-1 grid grid-cols-2 gap-4)
+    ├── section.2 色相推薦 (min-h-0 flex flex-col)
+    └── section.3 トーン推薦 (min-h-0 flex flex-col)
+```
+
+### 主要UIコンポーネント一覧
+
+#### レイアウト・構造系
+| コンポーネント名 | ファイル | 役割 |
+|------------------|----------|------|
+| App | `/src/App.tsx` | 最上位アプリケーション構造 |
+| NavigationMenu | `/src/components/NavigationMenu.tsx` | ハンバーガーメニューナビゲーション |
+| ThemeToggle | `/src/components/ThemeToggle.tsx` | ライト・ダークモード切り替え |
+| ToastContainer | `/src/components/ToastContainer.tsx` | 通知メッセージ表示 |
+
+#### 機能系メインコンポーネント
+| コンポーネント名 | ファイル | 役割 |
+|------------------|----------|------|
+| ColorPicker | `/src/components/ColorPicker.tsx` | カラーピッカー（パレットアイコン式） |
+| ImageUpload | `/src/components/ImageUpload.tsx` | 画像アップロード・色抽出 |
+| ExtractedColorsDisplay | `/src/components/ExtractedColorsDisplay.tsx` | 抽出色表示・選択 |
+| ColorRecommendations | `/src/components/ColorRecommendations.tsx` | 色相推薦・配色技法選択 |
+| ToneRecommendations | `/src/components/ColorRecommendations.tsx` | トーン推薦表示 |
+
+#### 共通・再利用系コンポーネント
+| コンポーネント名 | ファイル | 役割 |
+|------------------|----------|------|
+| ColorGrid | `/src/components/common/ColorGrid.tsx` | 統一カラーグリッドレイアウト |
+| ColorItem | `/src/components/common/ColorItem.tsx` | 色表示アイテム（デスクトップ・モバイル対応） |
+| ColorBlock | `/src/components/common/ColorBlock.tsx` | 統一色表示ブロック |
+| CopyColorButton | `/src/components/common/CopyColorButton.tsx` | 統一コピーボタン |
+| ProgressBar | `/src/components/common/ProgressBar.tsx` | プログレスバー |
+
+#### shadcn/ui基盤コンポーネント
+| コンポーネント名 | ファイル | 役割 |
+|------------------|----------|------|
+| Card | `/src/components/ui/card.tsx` | カード・コンテナ |
+| Button | `/src/components/ui/button.tsx` | ボタン |
+| Input | `/src/components/ui/input.tsx` | 入力フィールド |
+| Toast | `/src/components/ui/toast.tsx` | トースト通知 |
+
+### グリッドシステム・レスポンシブ仕様
+
+#### 定義済みグリッドパターン（constants/ui.ts）
+```typescript
+RESPONSIVE_GRID = {
+  colors: 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5',
+  schemes: 'grid-cols-2 sm:grid-cols-4 md:grid-cols-6',
+  gap: 'gap-3',
+  padding: 'p-4'
+}
+```
+
+#### ブレークポイント定義
+- **xs**: 475px（拡張）
+- **sm**: 640px（標準Tailwind）
+- **md**: 768px（標準Tailwind）
+- **lg**: 1024px（標準Tailwind）
+- **xl**: 1280px（メイン切り替えポイント）
+- **2xl**: 1536px（拡張）
+
+#### カラーグリッドレスポンシブ動作
+- **モバイル**: 2列固定（`flex gap-1` による2列レイアウト）
+- **タブレット～**: 3-5列可変（`grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5`）
+
+### スペーシング・余白システム
+
+#### セクション間スペーシング
+- **モバイル**: `mb-1` (4px), `space-y-1` (4px) - 超コンパクト
+- **デスクトップ**: `mb-2` (8px), `gap-4` (16px) - 標準
+
+#### カード内部スペーシング
+- **ヘッダー**: `pb-1 pt-2` (上8px, 下4px)
+- **コンテンツ**: `pt-1` (上4px), `pb-0` (下0px)
+  
+#### モバイル最適化余白
+- **メインコンテナ**: `px-4 pb-2` (横16px, 下8px)
+- **最終セクション**: `mb-0` で下部余白完全削除
+- **タイトル**: `text-xs leading-tight` 超コンパクト
+
+### ヘッダー・ナビゲーション構造
+
+#### ヘッダーレイアウト
+```
+header (border-b border-border bg-background)
+└── container (mx-auto px-4 py-3)
+    └── flex (justify-between items-center)
+        ├── NavigationMenu
+        └── div (flex items-center gap-2)
+            ├── HelpButton (Link to="/help")
+            └── ThemeToggle
+```
+
+#### NavigationMenu仕様
+- **トリガー**: ハンバーガーアイコン（Menu/X）
+- **レイアウト**: ドロップダウン式メニュー
+- **背景**: backdrop-blur-sm 効果
+- **メニュー項目**: ホーム、ダミーページ1-3、ヘルプ
+
+### カードレイアウト詳細仕様
+
+#### Card基本構造
+```
+Card (統一border-presets)
+├── CardHeader (pb-1 pt-2 flex-shrink-0)
+└── CardContent (pt-0 flex-1 overflow-auto pb-0)
+```
+
+#### 高さ制約システム
+- **ColorRecommendations**: 固定高さ `144px`
+- **その他**: `h-full` で親コンテナに従う
+- **フレックス**: `min-h-0` でオーバーフロー制御
+
+### カラー表示レイアウト仕様
+
+#### ColorItem レスポンシブ構造
+- **デスクトップ**: `flex items-center gap-4` - 横並び標準レイアウト
+- **モバイル**: 2列コンパクトレイアウト - `flex-1` で等幅分割
+
+#### 色要素配置順序
+1. **ColorBlock** - 色表示ブロック
+2. **CopyColorButton** - コピーボタン
+3. **カラーコード** - HEX値表示
+
+#### ColorGrid 動作パターン
+- **空状態**: 中央配置のプレースホルダー表示
+- **データ有り**: レスポンシブグリッド表示
+- **クリック動作**: `onColorClick` コールバック実行
+
+---
+
 ## 🔧 技術仕様
+
+### 状態管理・データフロー
+
+#### Zustandストア構造（colorStore.ts）
+```typescript
+interface ColorState {
+  selectedColor: string;           // 選択中のベースカラー
+  recommendedColors: string[];     // 色相推薦結果
+  recommendedTones: string[];      // トーン推薦結果
+  selectedScheme: string;          // 選択中の配色技法
+  toneBaseColor: string | null;    // トーン生成の基準色
+  extractedColors: ExtractedColor[]; // 画像から抽出された色
+  dominantColor: ExtractedColor | null; // ドミナントカラー
+}
+```
+
+#### 色推薦アルゴリズム
+- **色相推薦**: HSL色空間での色相角度操作
+- **トーン推薦**: 明度・彩度の段階的変化
+- **ソート機能**: `chroma.js` lightness値による明るい→暗い順
+- **重複除去**: 同一色・極端な色（#000000, #FFFFFF）の自動除外
+
+#### 配色技法データ
+- **総計**: 13種類の配色技法
+- **角度ベース**: 色相環での角度指定による色生成
+- **アルゴリズム**: Identity, Analogous, Dyad, Triad, Tetrad, Split, Pentad, Hexad
+
+### CSS・スタイリング仕様
+
+#### Tailwind CSS設定
+- **ダークモード**: class-based切り替え
+- **カスタムブレークポイント**: xs(475px), 2xl(1536px)
+- **フォント設定**: Inter（メイン）, JetBrains Mono（コード）
+- **カラーシステム**: CSS変数ベースのテーマ対応
+
+#### CSS変数システム
+```css
+:root {
+  --background: oklch(1 0 0);      /* ライトモード背景 */
+  --foreground: oklch(0.145 0 0);  /* ライトモード文字 */
+  --primary: oklch(0.205 0 0);     /* プライマリ色 */
+  --card: oklch(1 0 0);            /* カード背景 */
+  --border: oklch(0.922 0 0);      /* 境界線 */
+}
+
+.dark {
+  --background: oklch(0.145 0 0);  /* ダークモード背景 */
+  --foreground: oklch(0.985 0 0);  /* ダークモード文字 */
+  /* ... その他ダークモード変数 */
+}
+```
+
+#### モバイル最適化CSS
+- **スクロールバー非表示**: webkit-scrollbar, scrollbar-width
+- **タッチスクロール**: -webkit-overflow-scrolling: touch
+- **オーバーフロー制御**: overflow-x: hidden
+
+#### カスタムアニメーション
+- **fadeIn**: opacity + translateY 変化
+- **scaleIn**: opacity + scale 変化
+- **グラスモーフィズム**: backdrop-filter blur効果
+
+### パフォーマンス・最適化
+
+#### 色処理最適化
+- **遅延評価**: 必要時のみ色計算実行
+- **重複排除**: Set使用による効率的な重複除去
+- **エラーハンドリング**: chroma.js例外の適切な処理
+
+#### レンダリング最適化
+- **条件分岐レンダリング**: 空配列時のプレースホルダー表示
+- **レスポンシブ分岐**: CSS Grid vs Flexbox の適切な使い分け
+- **画像最適化**: objectFit, maxHeight による表示制御
 
 ### 使用ライブラリ
 - **アイコン**: lucide-react
-- **色操作**: chroma-js
-- **状態管理**: zustand
+- **色操作**: chroma-js（色相・明度・彩度計算）
+- **状態管理**: zustand（軽量グローバル状態）
 - **UI**: shadcn/ui + Tailwind CSS
+- **型定義**: TypeScript（厳密型チェック）
+- **画像処理**: ColorThief（色抽出）
 
 ### ファイル構成
 ```
@@ -298,6 +572,24 @@ src/
 └── store/
     └── colorStore.ts           # 色・配色技法管理 + グラデーションソート
 ```
+
+---
+
+---
+
+## 📱 現在のレイアウト状態
+
+### アプリケーション構成（2025-06-21時点）
+- **メインレイアウト**: レスポンシブグリッド（モバイル縦積み ↔ デスクトップ3+2列）
+- **色表示**: ColorBlock（48x48px、6px角丸）統一仕様
+- **カード**: 中程度角丸（6px）、統一ボーダー
+- **スペーシング**: gap-3（12px）基準、モバイルp-4/デスクトップp-6
+
+### 主要機能エリア
+1. **色選択セクション**: ColorPicker（手動選択）
+2. **画像処理セクション**: ImageUpload + ExtractedColorsDisplay
+3. **推薦システム**: ColorRecommendations（配色技法選択）
+4. **トーン生成**: ToneRecommendations（明度・彩度バリエーション）
 
 ---
 
