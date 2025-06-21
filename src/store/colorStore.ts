@@ -108,17 +108,50 @@ export const COLOR_SCHEMES: ColorScheme[] = [
 
 
 
-// トーン調整値の定義（明度・彩度のバリエーション）
-export const TONE_ADJUSTMENTS: ToneAdjustment[] = [
-  { id: 'very_light', name: '', lightnessOffset: 0.4 },
-  { id: 'light', name: '', lightnessOffset: 0.2 },
-  { id: 'original', name: '', lightnessOffset: 0 },
-  { id: 'dark', name: '', lightnessOffset: -0.2 },
-  { id: 'very_dark', name: '', lightnessOffset: -0.4 },
-  { id: 'muted', name: '', lightnessOffset: 0, saturationMultiplier: 0.6 },
-  { id: 'vivid', name: '', lightnessOffset: 0, saturationMultiplier: 1.4 },
-  { id: 'desaturated', name: '', lightnessOffset: 0, saturationMultiplier: 0.3 },
-];
+// トーン変化量設定（パーセント指定）
+// 使用例: [20, -20] → 明るく・暗くの2パターン
+// 使用例: [30, 10, 0, -10, -30] → 5段階の明度変化
+export const TONE_LIGHTNESS_VARIATIONS = [-20, 20, -40, 40, -60, 60, -80, 80]; // 明度変化量（%）
+
+// 使用例: [30, -30] → 鮮やか・くすんだの2パターン  
+// 使用例: [0, -50, 50] → オリジナル・淡い・鮮やかの3パターン
+// 20, 40, 60, 80のバリエーションでプラスマイナス2パターン追加
+export const TONE_SATURATION_VARIATIONS = [-20, 20, -40, 40, -60, 60, -80, 80]; // 彩度変化量（%、0=変化なし）
+
+// 設定に基づいてトーン調整値を自動生成する関数
+const generateToneAdjustments = (): ToneAdjustment[] => {
+  const adjustments: ToneAdjustment[] = [];
+
+  // 明度バリエーション
+  TONE_LIGHTNESS_VARIATIONS.forEach((lightness, index) => {
+    adjustments.push({
+      id: `lightness_${lightness > 0 ? 'plus' : lightness < 0 ? 'minus' : ''}${Math.abs(lightness)}`,
+      name: '',
+      lightnessOffset: lightness / 100, // パーセントを小数に変換
+    });
+  });
+
+  // 彩度バリエーション（明度0は除く）
+  TONE_SATURATION_VARIATIONS.filter(sat => sat !== 0).forEach((saturation) => {
+    adjustments.push({
+      id: `saturation_${saturation > 0 ? 'plus' : 'minus'}${Math.abs(saturation)}`,
+      name: '',
+      lightnessOffset: 0,
+      saturationMultiplier: 1 + (saturation / 100), // パーセントを倍率に変換
+    });
+  });
+
+  return adjustments;
+};
+
+// 自動生成されたトーン調整値
+export const TONE_ADJUSTMENTS: ToneAdjustment[] = generateToneAdjustments();
+
+// デバッグ用：現在のトーン設定を確認
+console.log('Current tone settings:');
+console.log('Lightness variations:', TONE_LIGHTNESS_VARIATIONS);
+console.log('Saturation variations:', TONE_SATURATION_VARIATIONS);
+console.log('Generated adjustments:', TONE_ADJUSTMENTS.length, 'patterns');
 
 export interface ColorState {
   selectedColor: string;
@@ -159,7 +192,7 @@ export const useColorStore = create<ColorState>((set, get) => {
       const hue = color.get('hsl.h') || 0;
       const saturation = color.get('hsl.s');
       const lightness = color.get('hsl.l');
-      
+
       const newLightness = Math.max(0, Math.min(1, lightness + adjustment.lightnessOffset));
       const newSaturation = adjustment.saturationMultiplier
         ? Math.max(0, Math.min(1, saturation * adjustment.saturationMultiplier))
