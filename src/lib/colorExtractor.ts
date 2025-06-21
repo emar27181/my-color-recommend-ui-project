@@ -12,9 +12,66 @@ export interface ColorExtractionResult {
   dominantColor: ExtractedColor;
 }
 
+// ΔE値によるカラークラスタリング関数
+const clusterColorsByDeltaE = (colors: ExtractedColor[], threshold: number = 10): ExtractedColor[] => {
+  const clusters: ExtractedColor[][] = [];
+  
+  for (const color of colors) {
+    let merged = false;
+    
+    // 既存のクラスターから近い色を探す
+    for (const cluster of clusters) {
+      const representative = cluster[0];
+      const deltaE = chroma.deltaE(chroma(color.hex), chroma(representative.hex));
+      
+      if (deltaE <= threshold) {
+        cluster.push(color);
+        merged = true;
+        break;
+      }
+    }
+    
+    // 近い色がなければ新しいクラスターを作成
+    if (!merged) {
+      clusters.push([color]);
+    }
+  }
+  
+  // 各クラスターで加重平均を計算
+  return clusters.map(cluster => {
+    if (cluster.length === 1) {
+      return cluster[0];
+    }
+    
+    // 使用率による加重平均
+    const totalUsage = cluster.reduce((sum, color) => sum + color.usage, 0);
+    
+    let weightedR = 0, weightedG = 0, weightedB = 0;
+    
+    for (const color of cluster) {
+      const weight = color.usage / totalUsage;
+      weightedR += color.rgb[0] * weight;
+      weightedG += color.rgb[1] * weight;
+      weightedB += color.rgb[2] * weight;
+    }
+    
+    const avgRgb: [number, number, number] = [
+      Math.round(weightedR),
+      Math.round(weightedG), 
+      Math.round(weightedB)
+    ];
+    
+    return {
+      hex: chroma.rgb(avgRgb[0], avgRgb[1], avgRgb[2]).hex(),
+      rgb: avgRgb,
+      usage: totalUsage
+    };
+  }).sort((a, b) => b.usage - a.usage);
+};
+
 export const extractColorsFromImage = async (
   file: File, 
-  maxColors: number = 5,
+  maxColors: number = 30,
   onProgress?: (progress: number) => void
 ): Promise<ColorExtractionResult> => {
   return new Promise((resolve, reject) => {
@@ -105,7 +162,7 @@ export const extractColorsFromImage = async (
         onProgress?.(90); // ピクセル分析完了
         
         // ExtractedColor形式に変換
-        const colors: ExtractedColor[] = palette.map((rgb: [number, number, number]) => {
+        const rawColors: ExtractedColor[] = palette.map((rgb: [number, number, number]) => {
           const hex = chroma.rgb(rgb[0], rgb[1], rgb[2]).hex();
           const count = colorCounts.get(hex) || 0;
           const usage = count / totalSamples;
@@ -115,7 +172,15 @@ export const extractColorsFromImage = async (
             rgb,
             usage,
           };
-        }).sort((a, b) => b.usage - a.usage);
+        })
+        .filter(color => color.usage > 0) // 0%の色を除外
+        .sort((a, b) => b.usage - a.usage);
+        
+        // ΔE値によるクラスタリングで色を統合
+        const clusteredColors = clusterColorsByDeltaE(rawColors, 10);
+        
+        // 最終的な色数を制限（元のmaxColorsに合わせる）
+        const colors = clusteredColors.slice(0, Math.min(clusteredColors.length, 8));
 
         const dominantHex = chroma.rgb(dominantRgb[0], dominantRgb[1], dominantRgb[2]).hex();
         const dominantUsage = colorCounts.get(dominantHex) || 0;
@@ -127,17 +192,21 @@ export const extractColorsFromImage = async (
         };
 
         const isDominantIncluded = colors.some(color => color.hex === dominantColor.hex);
-        if (!isDominantIncluded) {
+        // ドミナントカラーも0%でなければ追加
+        if (!isDominantIncluded && dominantColor.usage > 0) {
           colors.unshift(dominantColor);
-          if (colors.length > maxColors) {
+          if (colors.length > 8) {
             colors.pop();
           }
         }
         
+        // 最終的に0%の色を再度除外（念のため）
+        const finalColors = colors.filter(color => color.usage > 0);
+        
         onProgress?.(100); // 完了
 
         resolve({
-          colors,
+          colors: finalColors,
           dominantColor,
         });
       } catch (error) {
