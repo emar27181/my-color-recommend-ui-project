@@ -12,6 +12,7 @@ export const ColorRecommendations = () => {
   const { recommendedColors, selectedScheme, setSelectedScheme, generateRecommendedTones, selectedColor } = useColorStore();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
   const [hoveredScheme, setHoveredScheme] = React.useState<string | null>(null);
+  const [mousePosition, setMousePosition] = React.useState({ x: 0, y: 0 });
   
 
   const handleGenerateTones = (color: string) => {
@@ -33,6 +34,38 @@ export const ColorRecommendations = () => {
     } catch {
       return 0;
     }
+  };
+
+  // マウス位置を更新するハンドラー
+  const handleMouseMove = (event: React.MouseEvent) => {
+    setMousePosition({ x: event.clientX, y: event.clientY });
+  };
+
+  // 色相環の表示位置を計算（画面端での調整を含む）
+  const getTooltipPosition = () => {
+    const tooltipWidth = 160;
+    const tooltipHeight = 160;
+    const offset = 20;
+    
+    let left = mousePosition.x + offset;
+    let top = mousePosition.y - tooltipHeight / 2;
+    
+    // 右端はみ出し防止
+    if (left + tooltipWidth > window.innerWidth) {
+      left = mousePosition.x - tooltipWidth - offset;
+    }
+    
+    // 上端はみ出し防止
+    if (top < 0) {
+      top = 10;
+    }
+    
+    // 下端はみ出し防止
+    if (top + tooltipHeight > window.innerHeight) {
+      top = window.innerHeight - tooltipHeight - 10;
+    }
+    
+    return { left, top };
   };
 
   return (
@@ -74,6 +107,7 @@ export const ColorRecommendations = () => {
                     onClick={() => handleSchemeSelect(scheme.id)}
                     onMouseEnter={() => setHoveredScheme(scheme.id)}
                     onMouseLeave={() => setHoveredScheme(null)}
+                    onMouseMove={handleMouseMove}
                     className={`w-full text-left px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm hover:bg-muted transition-colors relative ${
                       selectedScheme === scheme.id
                         ? 'bg-primary text-primary-foreground'
@@ -102,12 +136,12 @@ export const ColorRecommendations = () => {
             {/* 色相環オーバーレイ表示（Portal使用） */}
             {hoveredScheme && createPortal(
               <div 
-                className="fixed z-50 bg-card border border-border rounded-lg p-4 shadow-2xl"
+                className="fixed z-50 bg-card border border-border rounded-lg p-4 shadow-2xl pointer-events-none"
                 role="tooltip"
                 aria-label={`${COLOR_SCHEMES.find(s => s.id === hoveredScheme)?.name} の配色パターン`}
                 style={{ 
-                  top: '8rem',
-                  right: '0px',
+                  left: `${getTooltipPosition().left}px`,
+                  top: `${getTooltipPosition().top}px`,
                   width: '160px',
                   height: '160px'
                 }}
