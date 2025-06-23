@@ -1,13 +1,45 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { useColorStore, COLOR_SCHEMES } from '@/store/colorStore';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ColorGrid } from '@/components/common/ColorGrid';
+import { ColorWheel } from '@/components/common/ColorWheel';
 import { ChevronDown } from 'lucide-react';
 import { BORDER_PRESETS } from '@/constants/ui';
+import chroma from 'chroma-js';
 
 export const ColorRecommendations = () => {
-  const { recommendedColors, selectedScheme, setSelectedScheme, generateRecommendedTones } = useColorStore();
+  const { recommendedColors, selectedScheme, setSelectedScheme, generateRecommendedTones, selectedColor } = useColorStore();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+  const [hoveredScheme, setHoveredScheme] = React.useState<string | null>(null);
+  const [mousePosition, setMousePosition] = React.useState({ x: 0, y: 0 });
+  const [autoHideTimer, setAutoHideTimer] = React.useState<NodeJS.Timeout | null>(null);
+  
+  // 色相環の自動非表示タイマー管理（モバイルのみ）
+  React.useEffect(() => {
+    // モバイルデバイスかどうかを判定
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+    
+    if (hoveredScheme && isMobile) {
+      // モバイルの場合のみ3秒後に自動非表示
+      const timer = setTimeout(() => {
+        setHoveredScheme(null);
+      }, 3000);
+      
+      setAutoHideTimer(timer);
+      
+      // クリーンアップ関数で前のタイマーをクリア
+      return () => {
+        clearTimeout(timer);
+      };
+    } else {
+      // PC版またはhoverがない場合はタイマーをクリア
+      if (autoHideTimer) {
+        clearTimeout(autoHideTimer);
+        setAutoHideTimer(null);
+      }
+    }
+  }, [hoveredScheme]);
 
   const handleGenerateTones = (color: string) => {
     generateRecommendedTones(color);
@@ -18,7 +50,65 @@ export const ColorRecommendations = () => {
   const handleSchemeSelect = (schemeId: string) => {
     setSelectedScheme(schemeId);
     setIsDropdownOpen(false);
+    // PC版のみ選択完了時に色相環を非表示（モバイルは自動タイマーで管理）
+    if (!isMobile) {
+      setHoveredScheme(null);
+    }
   };
+
+  // ベースカラーから色相角度を取得
+  const getBaseHue = () => {
+    if (!selectedColor) return 0;
+    try {
+      return chroma(selectedColor).get('hsl.h') || 0;
+    } catch {
+      return 0;
+    }
+  };
+
+  // マウス位置を更新するハンドラー
+  const handleMouseMove = (event: React.MouseEvent) => {
+    setMousePosition({ x: event.clientX, y: event.clientY });
+  };
+
+  // 色相環の表示位置を計算（PC: マウス追従、モバイル: 画面中央）
+  const getTooltipPosition = () => {
+    const tooltipWidth = 200;
+    const tooltipHeight = 200;
+    
+    if (isMobile) {
+      // モバイル版: 画面中央に固定表示
+      return {
+        left: (window.innerWidth - tooltipWidth) / 2,
+        top: (window.innerHeight - tooltipHeight) / 2
+      };
+    }
+    
+    // PC版: マウス位置ベース（従来の処理）
+    const offset = 20;
+    let left = mousePosition.x + offset;
+    let top = mousePosition.y - tooltipHeight / 2;
+    
+    // 右端はみ出し防止
+    if (left + tooltipWidth > window.innerWidth) {
+      left = mousePosition.x - tooltipWidth - offset;
+    }
+    
+    // 上端はみ出し防止
+    if (top < 0) {
+      top = 10;
+    }
+    
+    // 下端はみ出し防止
+    if (top + tooltipHeight > window.innerHeight) {
+      top = window.innerHeight - tooltipHeight - 10;
+    }
+    
+    return { left, top };
+  };
+
+  // モバイルデバイスかどうかを判定
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
 
   return (
     <Card className="w-full flex flex-col pb-0" style={{ height: '144px' }}>
@@ -52,12 +142,28 @@ export const ColorRecommendations = () => {
 
             {/* ドロップダウンメニュー */}
             {isDropdownOpen && (
-              <div className={`absolute top-full left-0 right-0 mt-1 bg-background ${BORDER_PRESETS.button} shadow-lg z-10 max-h-60 overflow-y-auto`}>
+              <div 
+                className={`absolute top-full left-0 right-0 mt-1 bg-background ${BORDER_PRESETS.button} shadow-lg z-10 max-h-60 overflow-y-auto`}
+                onMouseLeave={() => {
+                  // PC版のみマウスリーブで色相環を非表示
+                  if (!isMobile) {
+                    setHoveredScheme(null);
+                  }
+                }}
+              >
                 {COLOR_SCHEMES.map((scheme) => (
                   <button
                     key={scheme.id}
                     onClick={() => handleSchemeSelect(scheme.id)}
-                    className={`w-full text-left px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm hover:bg-muted transition-colors ${
+                    onMouseEnter={() => setHoveredScheme(scheme.id)}
+                    onMouseLeave={() => {
+                      // PC版のみマウスリーブで色相環を非表示
+                      if (!isMobile) {
+                        setHoveredScheme(null);
+                      }
+                    }}
+                    onMouseMove={handleMouseMove}
+                    className={`w-full text-left px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm hover:bg-muted transition-colors relative ${
                       selectedScheme === scheme.id
                         ? 'bg-primary text-primary-foreground'
                         : 'text-foreground'
@@ -81,6 +187,33 @@ export const ColorRecommendations = () => {
                 ))}
               </div>
             )}
+
+            {/* 色相環オーバーレイ表示（Portal使用） */}
+            {hoveredScheme && createPortal(
+              <div 
+                className={`fixed z-50 border border-border rounded-lg p-4 shadow-2xl pointer-events-none ${
+                  isMobile ? 'bg-card/80 backdrop-blur-sm' : 'bg-card'
+                }`}
+                role="tooltip"
+                aria-label={`${COLOR_SCHEMES.find(s => s.id === hoveredScheme)?.name} の配色パターン`}
+                style={{ 
+                  left: `${getTooltipPosition().left}px`,
+                  top: `${getTooltipPosition().top}px`,
+                  width: '200px',
+                  height: '200px'
+                }}
+              >
+                {/* 色相環コンポーネントのみ */}
+                <div className="flex items-center justify-center h-full w-full">
+                  <ColorWheel
+                    radius={125}
+                    schemeId={hoveredScheme}
+                    baseHue={getBaseHue()}
+                  />
+                </div>
+              </div>,
+              document.body
+            )}
           </div>
         </div>
       </CardHeader>
@@ -89,7 +222,13 @@ export const ColorRecommendations = () => {
       {isDropdownOpen && (
         <div 
           className="fixed inset-0 z-5" 
-          onClick={() => setIsDropdownOpen(false)}
+          onClick={() => {
+            setIsDropdownOpen(false);
+            // PC版のみドロップダウン閉じ時に色相環も非表示
+            if (!isMobile) {
+              setHoveredScheme(null);
+            }
+          }}
         />
       )}
       
