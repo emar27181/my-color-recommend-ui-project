@@ -15,10 +15,13 @@ export const ColorRecommendations = () => {
   const [mousePosition, setMousePosition] = React.useState({ x: 0, y: 0 });
   const [autoHideTimer, setAutoHideTimer] = React.useState<NodeJS.Timeout | null>(null);
   
-  // 色相環の自動非表示タイマー管理
+  // 色相環の自動非表示タイマー管理（モバイルのみ）
   React.useEffect(() => {
-    if (hoveredScheme) {
-      // 3秒後に自動非表示
+    // モバイルデバイスかどうかを判定
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+    
+    if (hoveredScheme && isMobile) {
+      // モバイルの場合のみ3秒後に自動非表示
       const timer = setTimeout(() => {
         setHoveredScheme(null);
       }, 3000);
@@ -30,7 +33,7 @@ export const ColorRecommendations = () => {
         clearTimeout(timer);
       };
     } else {
-      // hoveredSchemeがnullになったらタイマーをクリア
+      // PC版またはhoverがない場合はタイマーをクリア
       if (autoHideTimer) {
         clearTimeout(autoHideTimer);
         setAutoHideTimer(null);
@@ -47,6 +50,10 @@ export const ColorRecommendations = () => {
   const handleSchemeSelect = (schemeId: string) => {
     setSelectedScheme(schemeId);
     setIsDropdownOpen(false);
+    // PC版のみ選択完了時に色相環を非表示（モバイルは自動タイマーで管理）
+    if (!isMobile) {
+      setHoveredScheme(null);
+    }
   };
 
   // ベースカラーから色相角度を取得
@@ -91,6 +98,9 @@ export const ColorRecommendations = () => {
     return { left, top };
   };
 
+  // モバイルデバイスかどうかを判定
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+
   return (
     <Card className="w-full flex flex-col pb-0" style={{ height: '144px' }}>
       <CardHeader className="pb-1 pt-2 flex-shrink-0">
@@ -123,13 +133,26 @@ export const ColorRecommendations = () => {
 
             {/* ドロップダウンメニュー */}
             {isDropdownOpen && (
-              <div className={`absolute top-full left-0 right-0 mt-1 bg-background ${BORDER_PRESETS.button} shadow-lg z-10 max-h-60 overflow-y-auto`}>
+              <div 
+                className={`absolute top-full left-0 right-0 mt-1 bg-background ${BORDER_PRESETS.button} shadow-lg z-10 max-h-60 overflow-y-auto`}
+                onMouseLeave={() => {
+                  // PC版のみマウスリーブで色相環を非表示
+                  if (!isMobile) {
+                    setHoveredScheme(null);
+                  }
+                }}
+              >
                 {COLOR_SCHEMES.map((scheme) => (
                   <button
                     key={scheme.id}
                     onClick={() => handleSchemeSelect(scheme.id)}
                     onMouseEnter={() => setHoveredScheme(scheme.id)}
-                    onMouseLeave={() => setHoveredScheme(null)}
+                    onMouseLeave={() => {
+                      // PC版のみマウスリーブで色相環を非表示
+                      if (!isMobile) {
+                        setHoveredScheme(null);
+                      }
+                    }}
                     onMouseMove={handleMouseMove}
                     className={`w-full text-left px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm hover:bg-muted transition-colors relative ${
                       selectedScheme === scheme.id
@@ -159,7 +182,9 @@ export const ColorRecommendations = () => {
             {/* 色相環オーバーレイ表示（Portal使用） */}
             {hoveredScheme && createPortal(
               <div 
-                className="fixed z-50 bg-card border border-border rounded-lg p-4 shadow-2xl pointer-events-none"
+                className={`fixed z-50 border border-border rounded-lg p-4 shadow-2xl pointer-events-none ${
+                  isMobile ? 'bg-card/80 backdrop-blur-sm' : 'bg-card'
+                }`}
                 role="tooltip"
                 aria-label={`${COLOR_SCHEMES.find(s => s.id === hoveredScheme)?.name} の配色パターン`}
                 style={{ 
@@ -188,7 +213,13 @@ export const ColorRecommendations = () => {
       {isDropdownOpen && (
         <div 
           className="fixed inset-0 z-5" 
-          onClick={() => setIsDropdownOpen(false)}
+          onClick={() => {
+            setIsDropdownOpen(false);
+            // PC版のみドロップダウン閉じ時に色相環も非表示
+            if (!isMobile) {
+              setHoveredScheme(null);
+            }
+          }}
         />
       )}
       
