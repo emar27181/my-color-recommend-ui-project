@@ -17,14 +17,16 @@ interface ColorWheelProps {
  * 配色技法のangles配列に基づいて色の配置を視覚化
  */
 export const ColorWheel: React.FC<ColorWheelProps> = ({ 
-  radius = 50, 
+  radius = 125, // デフォルトサイズを直接指定
   schemeId,
   baseHue: _baseHue = 0, // 現在は未使用（配色技法の純粋な角度関係を表示）
   className = ''
 }) => {
-  const size = radius * 2;
+  const containerRadius = radius; // 外枠半径
+  const wheelRadius = 115; // 色相環半径 (外枠より少し小さく)
+  const size = containerRadius * 2;
   const strokeWidth = 2;
-  const plotRadius = radius * 0.75; // プロット点の配置半径
+  const plotRadius = 86; // プロット点の配置半径 (wheelRadius * 0.75相当)
 
   // 選択された配色技法のanglesを取得
   const scheme = schemeId ? COLOR_SCHEMES.find(s => s.id === schemeId) : null;
@@ -36,8 +38,8 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
     // SVGでは0度が右（3時方向）なので、真上にするには -90度オフセット
     const radian = (angle - 90) * Math.PI / 180;
     return {
-      x: radius + plotRadius * Math.cos(radian),
-      y: radius + plotRadius * Math.sin(radian)
+      x: containerRadius + plotRadius * Math.cos(radian),
+      y: containerRadius + plotRadius * Math.sin(radian)
     };
   };
 
@@ -53,9 +55,9 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
       >
         {/* 外側の円（色相環の枠） */}
         <circle
-          cx={radius}
-          cy={radius}
-          r={radius - strokeWidth}
+          cx={containerRadius}
+          cy={containerRadius}
+          r={wheelRadius - strokeWidth}
           fill="none"
           stroke="hsl(var(--border))"
           strokeWidth={strokeWidth}
@@ -64,8 +66,8 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
         
         {/* 軌道線（プロット点が配置される円） */}
         <circle
-          cx={radius}
-          cy={radius}
+          cx={containerRadius}
+          cy={containerRadius}
           r={plotRadius}
           fill="none"
           stroke="#999999"
@@ -82,8 +84,8 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
             <g key={`${angle}-${index}`}>
               {/* 中心からプロット点への線 */}
               <line
-                x1={radius}
-                y1={radius}
+                x1={containerRadius}
+                y1={containerRadius}
                 x2={coords.x}
                 y2={coords.y}
                 stroke="#666666"
@@ -107,8 +109,8 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
         
         {/* 内側の円（中央部分） - 最後に描画して最前面に表示 */}
         <circle
-          cx={radius}
-          cy={radius}
+          cx={containerRadius}
+          cy={containerRadius}
           r={4}
           fill="hsl(var(--background))"
           stroke="hsl(var(--border))"

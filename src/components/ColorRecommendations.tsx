@@ -73,8 +73,8 @@ export const ColorRecommendations = () => {
 
   // 色相環の表示位置を計算（PC: マウス追従、モバイル: 画面中央）
   const getTooltipPosition = () => {
-    const tooltipWidth = 160;
-    const tooltipHeight = 160;
+    const tooltipWidth = 200;
+    const tooltipHeight = 200;
     
     if (isMobile) {
       // モバイル版: 画面中央に固定表示
@@ -199,14 +199,14 @@ export const ColorRecommendations = () => {
                 style={{ 
                   left: `${getTooltipPosition().left}px`,
                   top: `${getTooltipPosition().top}px`,
-                  width: '160px',
-                  height: '160px'
+                  width: '200px',
+                  height: '200px'
                 }}
               >
                 {/* 色相環コンポーネントのみ */}
                 <div className="flex items-center justify-center h-full w-full">
                   <ColorWheel
-                    radius={56}
+                    radius={125}
                     schemeId={hoveredScheme}
                     baseHue={getBaseHue()}
                   />
