@@ -563,14 +563,41 @@ interface ColorState {
 ```
 src/
 ├── components/
+│   ├── ColorPicker.tsx             # カラーピッカー（パレットアイコン式）
+│   ├── ColorRecommendations.tsx    # 色相推薦・配色技法選択
+│   ├── ExtractedColorsDisplay.tsx  # 抽出色表示・選択
+│   ├── ImageUpload.tsx             # 画像アップロード・色抽出
+│   ├── NavigationMenu.tsx          # ハンバーガーメニューナビゲーション
+│   ├── ThemeToggle.tsx             # ライト・ダークモード切り替え
+│   ├── ToastContainer.tsx          # 通知メッセージ表示
 │   ├── common/
-│   │   ├── ColorBlock.tsx      # 統一色表示
-│   │   └── CopyColorButton.tsx # 統一コピーボタン
-│   └── ThemeToggle.tsx         # テーマ切り替え
+│   │   ├── ColorBlock.tsx          # 統一色表示ブロック
+│   │   ├── ColorGrid.tsx           # 統一カラーグリッドレイアウト
+│   │   ├── ColorItem.tsx           # 色表示アイテム（レスポンシブ対応）
+│   │   ├── CopyColorButton.tsx     # 統一コピーボタン
+│   │   └── ProgressBar.tsx         # プログレスバー
+│   └── ui/
+│       ├── button.tsx              # shadcn/ui ボタン
+│       ├── card.tsx                # shadcn/ui カード
+│       ├── input.tsx               # shadcn/ui 入力フィールド
+│       └── toast.tsx               # shadcn/ui トースト
 ├── constants/
-│   └── ui.ts                   # UI統一定数
-└── store/
-    └── colorStore.ts           # 色・配色技法管理 + グラデーションソート
+│   └── ui.ts                       # UI統一定数・ボーダープリセット
+├── contexts/
+│   └── ToastContext.tsx            # トースト通知コンテキスト
+├── hooks/
+│   ├── useScrollVisibility.ts      # スクロール表示制御
+│   └── useToast.ts                 # トースト通知フック
+├── lib/
+│   ├── clipboard.ts                # クリップボード操作
+│   ├── colorExtractor.ts           # 色抽出ロジック
+│   └── utils.ts                    # ユーティリティ関数
+├── pages/
+│   └── HelpPage.tsx                # ヘルプページ
+├── store/
+│   └── colorStore.ts               # 色・配色技法管理 + グラデーションソート
+└── types/
+    └── colorthief.d.ts             # ColorThief型定義
 ```
 
 ---
@@ -593,7 +620,34 @@ src/
 
 ---
 
-**最終更新**: 2025-06-21  
+## 🧹 コード整理・クリーンアップルール
+
+### 不要ファイル削除対象
+以下のファイルは開発中の実験的コンポーネントで本番環境では不要のため削除対象：
+
+#### テスト・実験用コンポーネント（削除対象）
+- `/src/AppSimple.tsx` - 未使用の簡易版アプリ
+- `/src/components/ColorPickerTest.tsx` - 未使用のUI実験コンポーネント  
+- `/src/components/HorizontalColorTest.tsx` - 未使用のレイアウト実験コンポーネント
+- `/src/components/SimpleTest.tsx` - AppSimple.tsx でのみ使用される基本テストコンポーネント
+- `/src/components/test/` - 空ディレクトリ（実際のテストファイルは存在しない）
+
+#### ダミーページ（要確認）
+- `/src/pages/DummyPage1.tsx`
+- `/src/pages/DummyPage2.tsx` 
+- `/src/pages/DummyPage3.tsx`
+
+**削除理由**: これらは本番機能と重複する実験的コンポーネントで、実際の機能は本番コンポーネント（ColorPicker.tsx、ColorItem.tsx等）で実装済み
+
+### ファイル整理ルール
+1. **実験的コンポーネント禁止**: `*Test.tsx` 形式の実験用コンポーネントは作成しない
+2. **本番コンポーネント優先**: 機能実装は必ず本番用コンポーネント（ColorPicker.tsx等）で行う
+3. **未使用ファイル削除**: import されていないコンポーネントは定期的に削除
+4. **ディレクトリ構造維持**: 空ディレクトリは削除し、必要な場合のみ作成
+
+---
+
+**最終更新**: 2025-06-23  
 **適用プロジェクト**: 色推薦アプリ プロジェクト全体  
 
 このルールは、Claude Code セッションが毎回リセットされることを考慮して、**毎回最初に貼って読み込ませてください。**
