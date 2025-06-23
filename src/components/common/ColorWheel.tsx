@@ -73,17 +73,6 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
           strokeDasharray="5,3"
         />
         
-        {/* 内側の円（中央部分） */}
-        <circle
-          cx={radius}
-          cy={radius}
-          r={radius * 0.25}
-          fill="hsl(var(--background))"
-          stroke="hsl(var(--border))"
-          strokeWidth={1}
-          className="opacity-80"
-        />
-        
         {/* 配色技法のプロット点を表示 */}
         {angles.map((angle, index) => {
           const coords = getCoordinates(angle);
@@ -91,46 +80,42 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
           
           return (
             <g key={`${angle}-${index}`}>
+              {/* 中心からプロット点への線 */}
+              <line
+                x1={radius}
+                y1={radius}
+                x2={coords.x}
+                y2={coords.y}
+                stroke="#666666"
+                strokeWidth={2}
+                className="opacity-80"
+              />
+              
               {/* プロット点 */}
               <circle
                 cx={coords.x}
                 cy={coords.y}
-                r={isBaseColor ? 6 : 4}
+                r={4}
                 fill={isBaseColor ? "hsl(var(--primary))" : "hsl(var(--accent))"}
                 stroke={isBaseColor ? "hsl(var(--primary-foreground))" : "hsl(var(--accent-foreground))"}
                 strokeWidth={isBaseColor ? 2 : 1}
                 className="drop-shadow-sm"
               />
-              
-              {/* 中心からプロット点への線 */}
-              {!isBaseColor && (
-                <line
-                  x1={radius}
-                  y1={radius}
-                  x2={coords.x}
-                  y2={coords.y}
-                  stroke="hsl(var(--muted-foreground))"
-                  strokeWidth={1}
-                  strokeDasharray="2,2"
-                  className="opacity-50"
-                />
-              )}
             </g>
           );
         })}
         
-        {/* ベースカラーから中心への線 */}
-        {angles.length > 0 && (
-          <line
-            x1={radius}
-            y1={radius}
-            x2={getCoordinates(0).x}
-            y2={getCoordinates(0).y}
-            stroke="hsl(var(--primary))"
-            strokeWidth={2}
-            className="opacity-70"
-          />
-        )}
+        {/* 内側の円（中央部分） - 最後に描画して最前面に表示 */}
+        <circle
+          cx={radius}
+          cy={radius}
+          r={4}
+          fill="hsl(var(--background))"
+          stroke="hsl(var(--border))"
+          strokeWidth={1}
+          className="opacity-80"
+        />
+        
         
       </svg>
     </div>
