@@ -71,12 +71,21 @@ export const ColorRecommendations = () => {
     setMousePosition({ x: event.clientX, y: event.clientY });
   };
 
-  // 色相環の表示位置を計算（画面端での調整を含む）
+  // 色相環の表示位置を計算（PC: マウス追従、モバイル: 画面中央）
   const getTooltipPosition = () => {
     const tooltipWidth = 160;
     const tooltipHeight = 160;
-    const offset = 20;
     
+    if (isMobile) {
+      // モバイル版: 画面中央に固定表示
+      return {
+        left: (window.innerWidth - tooltipWidth) / 2,
+        top: (window.innerHeight - tooltipHeight) / 2
+      };
+    }
+    
+    // PC版: マウス位置ベース（従来の処理）
+    const offset = 20;
     let left = mousePosition.x + offset;
     let top = mousePosition.y - tooltipHeight / 2;
     
