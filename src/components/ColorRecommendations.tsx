@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { useColorStore, COLOR_SCHEMES } from '@/store/colorStore';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ColorGrid } from '@/components/common/ColorGrid';
@@ -98,13 +99,15 @@ export const ColorRecommendations = () => {
               </div>
             )}
 
-            {/* 色相環オーバーレイ表示 */}
-            {hoveredScheme && (
+            {/* 色相環オーバーレイ表示（Portal使用） */}
+            {hoveredScheme && createPortal(
               <div 
-                className="fixed top-32 right-4 z-40 bg-card border border-border rounded-lg p-4 shadow-2xl"
+                className="fixed z-50 bg-card border border-border rounded-lg p-4 shadow-2xl"
                 role="tooltip"
                 aria-label={`${COLOR_SCHEMES.find(s => s.id === hoveredScheme)?.name} の配色パターン`}
                 style={{ 
+                  top: '8rem',
+                  right: '0px',
                   width: '160px',
                   height: '160px'
                 }}
@@ -117,7 +120,8 @@ export const ColorRecommendations = () => {
                     baseHue={getBaseHue()}
                   />
                 </div>
-              </div>
+              </div>,
+              document.body
             )}
           </div>
         </div>
