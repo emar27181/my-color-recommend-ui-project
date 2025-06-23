@@ -2,12 +2,16 @@ import React from 'react';
 import { useColorStore, COLOR_SCHEMES } from '@/store/colorStore';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ColorGrid } from '@/components/common/ColorGrid';
+import { ColorWheel } from '@/components/common/ColorWheel';
 import { ChevronDown } from 'lucide-react';
 import { BORDER_PRESETS } from '@/constants/ui';
+import chroma from 'chroma-js';
 
 export const ColorRecommendations = () => {
-  const { recommendedColors, selectedScheme, setSelectedScheme, generateRecommendedTones } = useColorStore();
+  const { recommendedColors, selectedScheme, setSelectedScheme, generateRecommendedTones, selectedColor } = useColorStore();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+  const [hoveredScheme, setHoveredScheme] = React.useState<string | null>(null);
+  
 
   const handleGenerateTones = (color: string) => {
     generateRecommendedTones(color);
@@ -18,6 +22,16 @@ export const ColorRecommendations = () => {
   const handleSchemeSelect = (schemeId: string) => {
     setSelectedScheme(schemeId);
     setIsDropdownOpen(false);
+  };
+
+  // ベースカラーから色相角度を取得
+  const getBaseHue = () => {
+    if (!selectedColor) return 0;
+    try {
+      return chroma(selectedColor).get('hsl.h') || 0;
+    } catch {
+      return 0;
+    }
   };
 
   return (
@@ -57,7 +71,9 @@ export const ColorRecommendations = () => {
                   <button
                     key={scheme.id}
                     onClick={() => handleSchemeSelect(scheme.id)}
-                    className={`w-full text-left px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm hover:bg-muted transition-colors ${
+                    onMouseEnter={() => setHoveredScheme(scheme.id)}
+                    onMouseLeave={() => setHoveredScheme(null)}
+                    className={`w-full text-left px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm hover:bg-muted transition-colors relative ${
                       selectedScheme === scheme.id
                         ? 'bg-primary text-primary-foreground'
                         : 'text-foreground'
@@ -79,6 +95,28 @@ export const ColorRecommendations = () => {
                     </div>
                   </button>
                 ))}
+              </div>
+            )}
+
+            {/* 色相環オーバーレイ表示 */}
+            {hoveredScheme && (
+              <div 
+                className="fixed top-32 right-4 z-40 bg-card border border-border rounded-lg p-4 shadow-2xl"
+                role="tooltip"
+                aria-label={`${COLOR_SCHEMES.find(s => s.id === hoveredScheme)?.name} の配色パターン`}
+                style={{ 
+                  width: '160px',
+                  height: '160px'
+                }}
+              >
+                {/* 色相環コンポーネントのみ */}
+                <div className="flex justify-center">
+                  <ColorWheel
+                    radius={60}
+                    schemeId={hoveredScheme}
+                    baseHue={getBaseHue()}
+                  />
+                </div>
               </div>
             )}
           </div>
