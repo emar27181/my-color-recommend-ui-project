@@ -113,9 +113,9 @@ export const ColorRecommendations = () => {
                 }}
               >
                 {/* 色相環コンポーネントのみ */}
-                <div className="flex justify-center">
+                <div className="flex items-center justify-center h-full w-full">
                   <ColorWheel
-                    radius={60}
+                    radius={56}
                     schemeId={hoveredScheme}
                     baseHue={getBaseHue()}
                   />

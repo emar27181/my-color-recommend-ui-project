@@ -30,9 +30,11 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
   const scheme = schemeId ? COLOR_SCHEMES.find(s => s.id === schemeId) : null;
   const angles = scheme?.angles || [0];
 
-  // 角度から座標を計算する関数（SVGでは-90度オフセットが必要）
+  // 角度から座標を計算する関数（ベースカラーを真上に配置）
   const getCoordinates = (angle: number) => {
-    const radian = ((baseHue + angle) - 90) * Math.PI / 180;
+    // ベースカラー（angle=0）を真上（12時方向）に配置
+    // SVGでは0度が右（3時方向）なので、真上にするには -90度オフセット
+    const radian = (angle - 90) * Math.PI / 180;
     return {
       x: radius + plotRadius * Math.cos(radian),
       y: radius + plotRadius * Math.sin(radian)
@@ -58,6 +60,17 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
           stroke="hsl(var(--border))"
           strokeWidth={strokeWidth}
           className="opacity-60"
+        />
+        
+        {/* 軌道線（プロット点が配置される円） */}
+        <circle
+          cx={radius}
+          cy={radius}
+          r={plotRadius}
+          fill="none"
+          stroke="#999999"
+          strokeWidth={1.5}
+          strokeDasharray="5,3"
         />
         
         {/* 内側の円（中央部分） */}
@@ -119,18 +132,6 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
           />
         )}
         
-        {/* 配色技法名の表示 */}
-        {scheme && (
-          <text
-            x={radius}
-            y={radius - radius * 0.4}
-            textAnchor="middle"
-            className="fill-muted-foreground text-xs font-medium"
-            fontSize="8"
-          >
-            {angles.length}色
-          </text>
-        )}
       </svg>
     </div>
   );
