@@ -13,7 +13,30 @@ export const ColorRecommendations = () => {
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
   const [hoveredScheme, setHoveredScheme] = React.useState<string | null>(null);
   const [mousePosition, setMousePosition] = React.useState({ x: 0, y: 0 });
+  const [autoHideTimer, setAutoHideTimer] = React.useState<NodeJS.Timeout | null>(null);
   
+  // 色相環の自動非表示タイマー管理
+  React.useEffect(() => {
+    if (hoveredScheme) {
+      // 3秒後に自動非表示
+      const timer = setTimeout(() => {
+        setHoveredScheme(null);
+      }, 3000);
+      
+      setAutoHideTimer(timer);
+      
+      // クリーンアップ関数で前のタイマーをクリア
+      return () => {
+        clearTimeout(timer);
+      };
+    } else {
+      // hoveredSchemeがnullになったらタイマーをクリア
+      if (autoHideTimer) {
+        clearTimeout(autoHideTimer);
+        setAutoHideTimer(null);
+      }
+    }
+  }, [hoveredScheme]);
 
   const handleGenerateTones = (color: string) => {
     generateRecommendedTones(color);
