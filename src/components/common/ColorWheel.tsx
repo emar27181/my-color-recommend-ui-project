@@ -19,7 +19,7 @@ interface ColorWheelProps {
 export const ColorWheel: React.FC<ColorWheelProps> = ({ 
   radius = 50, 
   schemeId,
-  baseHue = 0,
+  baseHue: _baseHue = 0, // 現在は未使用（配色技法の純粋な角度関係を表示）
   className = ''
 }) => {
   const size = radius * 2;
@@ -32,7 +32,7 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
 
   // 角度から座標を計算する関数（ベースカラーを真上に配置）
   const getCoordinates = (angle: number) => {
-    // ベースカラー（angle=0）を真上（12時方向）に配置
+    // 配色技法の角度のみを使用し、ベースカラー（angle=0）を真上に配置
     // SVGでは0度が右（3時方向）なので、真上にするには -90度オフセット
     const radian = (angle - 90) * Math.PI / 180;
     return {
