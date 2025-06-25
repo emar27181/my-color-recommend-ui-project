@@ -4,6 +4,7 @@ import { useColorStore, COLOR_SCHEMES } from '@/store/colorStore';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ColorGrid } from '@/components/common/ColorGrid';
 import { ColorWheel } from '@/components/common/ColorWheel';
+import { ColorWheelMini } from '@/components/common/ColorWheelMini';
 import { ChevronDown } from 'lucide-react';
 import { BORDER_PRESETS } from '@/constants/ui';
 import chroma from 'chroma-js';
@@ -115,76 +116,82 @@ export const ColorRecommendations = () => {
       <CardHeader className="pb-1 pt-2 flex-shrink-0">
         <div className="mt-0">
           <div className="relative">
-            {/* ドロップダウンボタン */}
+            {/* 新しい配色技法選択バー（色相環付き） */}
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className={`w-full flex items-center justify-between px-2 md:px-3 py-1.5 md:py-2 bg-transparent text-muted-foreground hover:bg-muted/20 text-xs md:text-sm font-medium transition-colors ${BORDER_PRESETS.button}`}
             >
-              <span className="truncate">
-                {selectedSchemeData ? (
-                  <>
-                    {selectedSchemeData.name.split(':').map((part, index) => (
-                      <span key={index}>
-                        {index === 0 ? (
-                          <span className="font-bold">{part}</span>
-                        ) : (
-                          <span>:{part}</span>
-                        )}
-                      </span>
-                    ))}
-                  </>
-                ) : (
-                  '配色技法を選択'
+              <div className="flex items-center gap-3">
+                {/* 選択中の配色技法の色相環 */}
+                {selectedSchemeData && (
+                  <ColorWheelMini
+                    radius={12}
+                    schemeId={selectedScheme}
+                  />
                 )}
-              </span>
+                <span className="truncate">
+                  {selectedSchemeData ? (
+                    <>
+                      {selectedSchemeData.name.split(':').map((part, index) => (
+                        <span key={index}>
+                          {index === 0 ? (
+                            <span className="font-bold">{part}</span>
+                          ) : (
+                            <span>:{part}</span>
+                          )}
+                        </span>
+                      ))}
+                    </>
+                  ) : (
+                    '配色技法を選択'
+                  )}
+                </span>
+              </div>
               <ChevronDown className={`w-3 h-3 md:w-4 md:h-4 transition-transform flex-shrink-0 ml-1 ${isDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
 
-            {/* ドロップダウンメニュー */}
+            {/* 展開時の配色技法一覧 */}
             {isDropdownOpen && (
               <div 
                 className={`absolute top-full left-0 right-0 mt-1 bg-background ${BORDER_PRESETS.button} shadow-lg z-10 max-h-60 overflow-y-auto`}
-                onMouseLeave={() => {
-                  // PC版のみマウスリーブで色相環を非表示
-                  if (!isMobile) {
-                    setHoveredScheme(null);
-                  }
-                }}
               >
-                {COLOR_SCHEMES.map((scheme) => (
-                  <button
-                    key={scheme.id}
-                    onClick={() => handleSchemeSelect(scheme.id)}
-                    onMouseEnter={() => setHoveredScheme(scheme.id)}
-                    onMouseLeave={() => {
-                      // PC版のみマウスリーブで色相環を非表示
-                      if (!isMobile) {
-                        setHoveredScheme(null);
-                      }
-                    }}
-                    onMouseMove={handleMouseMove}
-                    className={`w-full text-left px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm hover:bg-muted transition-colors relative ${
-                      selectedScheme === scheme.id
-                        ? 'bg-primary text-primary-foreground'
-                        : 'text-foreground'
-                    }`}
-                  >
-                    <div>
-                      <div className="font-medium">
-                        {scheme.name.split(':').map((part, index) => (
-                          <span key={index}>
-                            {index === 0 ? (
-                              <span className="font-bold">{part}</span>
-                            ) : (
-                              <span>:{part}</span>
-                            )}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="text-xs opacity-75 hidden md:block">{scheme.description}</div>
-                    </div>
-                  </button>
-                ))}
+                <div className="p-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                    {COLOR_SCHEMES.map((scheme) => (
+                      <button
+                        key={scheme.id}
+                        onClick={() => handleSchemeSelect(scheme.id)}
+                        onMouseEnter={() => setHoveredScheme(scheme.id)}
+                        onMouseLeave={() => {
+                          // PC版のみマウスリーブで色相環を非表示
+                          if (!isMobile) {
+                            setHoveredScheme(null);
+                          }
+                        }}
+                        onMouseMove={handleMouseMove}
+                        className={`flex flex-col items-center p-2 transition-all hover:scale-105 ${BORDER_PRESETS.button} ${
+                          selectedScheme === scheme.id
+                            ? 'bg-primary text-primary-foreground shadow-md'
+                            : 'bg-muted hover:bg-muted/80 text-foreground'
+                        }`}
+                      >
+                        {/* ミニ色相環 */}
+                        <div className="mb-2">
+                          <ColorWheelMini
+                            radius={20}
+                            schemeId={scheme.id}
+                          />
+                        </div>
+                        
+                        {/* 配色技法名 */}
+                        <div className="text-xs font-medium text-center leading-tight">
+                          {/* 配色技法名の最初の部分（色数含む）のみ表示 */}
+                          {scheme.name.split(':')[0]}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
 
