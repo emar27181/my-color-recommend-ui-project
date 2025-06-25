@@ -82,7 +82,7 @@ export const COLOR_SCHEMES: ColorScheme[] = [
   },
   {
     id: 'split_complementary',
-    name: 'スプリット配色(3色): 補色の両隣を使った配色',
+    name: 'スプリットコンプリメンタリー配色(3色): 補色の両隣を使った配色',
     description: '補色の両隣を使った配色',
     angles: [0, 150, 210],
   },
