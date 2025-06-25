@@ -14,33 +14,6 @@ export const ColorRecommendations = () => {
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
   const [hoveredScheme, setHoveredScheme] = React.useState<string | null>(null);
   const [mousePosition, setMousePosition] = React.useState({ x: 0, y: 0 });
-  const [autoHideTimer, setAutoHideTimer] = React.useState<NodeJS.Timeout | null>(null);
-  
-  // 色相環の自動非表示タイマー管理（モバイルのみ）
-  React.useEffect(() => {
-    // モバイルデバイスかどうかを判定
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
-    
-    if (hoveredScheme && isMobile) {
-      // モバイルの場合のみ3秒後に自動非表示
-      const timer = setTimeout(() => {
-        setHoveredScheme(null);
-      }, 3000);
-      
-      setAutoHideTimer(timer);
-      
-      // クリーンアップ関数で前のタイマーをクリア
-      return () => {
-        clearTimeout(timer);
-      };
-    } else {
-      // PC版またはhoverがない場合はタイマーをクリア
-      if (autoHideTimer) {
-        clearTimeout(autoHideTimer);
-        setAutoHideTimer(null);
-      }
-    }
-  }, [hoveredScheme]);
 
   const handleGenerateTones = (color: string) => {
     generateRecommendedTones(color);
@@ -51,10 +24,7 @@ export const ColorRecommendations = () => {
   const handleSchemeSelect = (schemeId: string) => {
     setSelectedScheme(schemeId);
     setIsDropdownOpen(false);
-    // PC版のみ選択完了時に色相環を非表示（モバイルは自動タイマーで管理）
-    if (!isMobile) {
-      setHoveredScheme(null);
-    }
+    setHoveredScheme(null); // 選択後は常に色相環を非表示
   };
 
   // ベースカラーから色相角度を取得
@@ -161,7 +131,12 @@ export const ColorRecommendations = () => {
                       <button
                         key={scheme.id}
                         onClick={() => handleSchemeSelect(scheme.id)}
-                        onMouseEnter={() => setHoveredScheme(scheme.id)}
+                        onMouseEnter={() => {
+                          // PC版のみマウスホバーで色相環を表示
+                          if (!isMobile) {
+                            setHoveredScheme(scheme.id);
+                          }
+                        }}
                         onMouseLeave={() => {
                           // PC版のみマウスリーブで色相環を非表示
                           if (!isMobile) {
@@ -231,10 +206,7 @@ export const ColorRecommendations = () => {
           className="fixed inset-0 z-5" 
           onClick={() => {
             setIsDropdownOpen(false);
-            // PC版のみドロップダウン閉じ時に色相環も非表示
-            if (!isMobile) {
-              setHoveredScheme(null);
-            }
+            setHoveredScheme(null); // ドロップダウン閉じ時は常に色相環を非表示
           }}
         />
       )}
