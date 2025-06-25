@@ -21,7 +21,7 @@ export const ColorPicker = () => {
         <div className="hidden md:block h-full">
           <div className="p-1 transition-all duration-200 h-full flex items-center">
             <div className="flex items-center gap-3 w-full">
-              <div className="relative cursor-pointer">
+              <div className="relative cursor-pointer" data-tutorial="color-picker">
                 <div className={`bg-white rounded-full p-2 ${BORDER_PRESETS.icon} hover:shadow-md transition-all duration-200`}>
                   <Palette className="w-6 h-6 text-muted-foreground" />
                 </div>

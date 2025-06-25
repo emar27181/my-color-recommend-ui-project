@@ -86,6 +86,7 @@ export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
           onDrop={handleDrop}
           onDragOver={(e) => e.preventDefault()}
           onClick={() => fileInputRef.current?.click()}
+          data-tutorial="image-upload"
         >
           <input
             ref={fileInputRef}

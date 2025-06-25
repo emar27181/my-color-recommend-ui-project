@@ -90,6 +90,7 @@ export const ColorRecommendations = () => {
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className={`w-full flex items-center justify-between px-2 md:px-3 py-1.5 md:py-2 bg-transparent text-muted-foreground hover:bg-muted/20 text-xs md:text-sm font-medium transition-colors ${BORDER_PRESETS.button}`}
+              data-tutorial="color-schemes"
             >
               <div className="flex items-center gap-3">
                 {/* 選択中の配色技法の色相環 */}
@@ -212,14 +213,16 @@ export const ColorRecommendations = () => {
       )}
       
       <CardContent className="pt-0 flex-1 overflow-auto pb-0 min-h-0">
-        <ColorGrid
-          colors={recommendedColors.map(color => ({
-            color,
-            title: `色: ${color} (タップでトーン生成)`
+        <div data-tutorial="recommended-colors">
+          <ColorGrid
+            colors={recommendedColors.map(color => ({
+              color,
+              title: `色: ${color} (タップでトーン生成)`
           }))}
           onColorClick={handleGenerateTones}
           emptyMessage="色を選択すると推薦色が表示されます"
         />
+        </div>
       </CardContent>
     </Card>
   );
@@ -239,14 +242,16 @@ export const ToneRecommendations = () => {
       <CardHeader className="pb-1 pt-2 flex-shrink-0">
       </CardHeader>
       <CardContent className="pt-0 flex-1 overflow-auto pb-0 min-h-0">
-        <ColorGrid
-          colors={recommendedTones.map(tone => ({
-            color: tone,
-            title: tone
-          }))}
+        <div data-tutorial="tone-variations">
+          <ColorGrid
+            colors={recommendedTones.map(tone => ({
+              color: tone,
+              title: tone
+            }))}
           clickable={false}
           emptyMessage="トーン推薦がありません"
         />
+        </div>
       </CardContent>
     </Card>
   );
