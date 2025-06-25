@@ -126,7 +126,7 @@ export const ColorRecommendations = () => {
                 className={`absolute top-full left-0 right-0 mt-1 bg-background ${BORDER_PRESETS.button} shadow-lg z-10 max-h-60 overflow-y-auto`}
               >
                 <div className="p-3">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                  <div className="grid grid-cols-2 xl:grid-cols-6 gap-3">
                     {COLOR_SCHEMES.map((scheme) => (
                       <button
                         key={scheme.id}
@@ -144,22 +144,22 @@ export const ColorRecommendations = () => {
                           }
                         }}
                         onMouseMove={handleMouseMove}
-                        className={`flex flex-col items-center p-2 transition-all hover:scale-105 ${BORDER_PRESETS.button} ${
+                        className={`flex items-center p-2 transition-all hover:scale-105 ${BORDER_PRESETS.button} ${
                           selectedScheme === scheme.id
                             ? 'bg-primary text-primary-foreground shadow-md'
                             : 'bg-muted hover:bg-muted/80 text-foreground'
                         }`}
                       >
                         {/* ミニ色相環 */}
-                        <div className="mb-2">
+                        <div className="mr-2 flex-shrink-0">
                           <ColorWheelMini
-                            radius={20}
+                            radius={28}
                             schemeId={scheme.id}
                           />
                         </div>
                         
                         {/* 配色技法名 */}
-                        <div className="text-xs font-medium text-center leading-tight">
+                        <div className="text-xs font-medium leading-tight min-w-0 flex-1">
                           {/* 配色技法名の最初の部分（色数含む）のみ表示 */}
                           {scheme.name.split(':')[0]}
                         </div>
