@@ -55,7 +55,6 @@ export const ColorWheelMini: React.FC<ColorWheelMiniProps> = ({
           fill="none"
           stroke="hsl(var(--border))"
           strokeWidth={strokeWidth}
-          className="opacity-60"
         />
         
         {/* 軌道線（プロット点が配置される円） */}
@@ -84,7 +83,6 @@ export const ColorWheelMini: React.FC<ColorWheelMiniProps> = ({
                 y2={coords.y}
                 stroke="#666666"
                 strokeWidth={0.5}
-                className="opacity-80"
               />
               
               {/* プロット点 */}
@@ -92,25 +90,15 @@ export const ColorWheelMini: React.FC<ColorWheelMiniProps> = ({
                 cx={coords.x}
                 cy={coords.y}
                 r={isBaseColor ? 2 : 1.5}
-                fill={isBaseColor ? "hsl(var(--primary))" : "hsl(var(--accent))"}
-                stroke={isBaseColor ? "hsl(var(--primary-foreground))" : "hsl(var(--accent-foreground))"}
-                strokeWidth={isBaseColor ? 1 : 0.5}
+                fill="#3b82f6"
+                stroke="#ffffff"
+                strokeWidth={isBaseColor ? 0.8 : 0.5}
                 className="drop-shadow-sm"
               />
             </g>
           );
         })}
         
-        {/* 内側の円（中央部分） */}
-        <circle
-          cx={containerRadius}
-          cy={containerRadius}
-          r={1.5}
-          fill="hsl(var(--background))"
-          stroke="hsl(var(--border))"
-          strokeWidth={0.5}
-          className="opacity-80"
-        />
       </svg>
     </div>
   );
