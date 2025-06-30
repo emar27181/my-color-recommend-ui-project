@@ -19,7 +19,7 @@ interface ColorWheelProps {
 export const ColorWheel: React.FC<ColorWheelProps> = ({ 
   radius = 125, // デフォルトサイズを直接指定
   schemeId,
-  baseHue: _baseHue = 0, // 現在は未使用（配色技法の純粋な角度関係を表示）
+  baseHue = 0, // ベースカラーの実際の色相値
   className = ''
 }) => {
   const containerRadius = radius; // 外枠半径
@@ -32,11 +32,12 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
   const scheme = schemeId ? COLOR_SCHEMES.find(s => s.id === schemeId) : null;
   const angles = scheme?.angles || [0];
 
-  // 角度から座標を計算する関数（ベースカラーを真上に配置）
+  // 角度から座標を計算する関数（hue=0を12時位置に固定）
   const getCoordinates = (angle: number) => {
-    // 配色技法の角度のみを使用し、ベースカラー（angle=0）を真上に配置
-    // SVGでは0度が右（3時方向）なので、真上にするには -90度オフセット
-    const radian = (angle - 90) * Math.PI / 180;
+    // 配色技法の角度にベースカラーの色相値を加算
+    // hue=0が12時位置になるよう -90度オフセット
+    const actualHue = (baseHue + angle) % 360;
+    const radian = (actualHue - 90) * Math.PI / 180;
     return {
       x: containerRadius + plotRadius * Math.cos(radian),
       y: containerRadius + plotRadius * Math.sin(radian)
@@ -78,9 +79,9 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
         {angles.map((angle, index) => {
           const coords = getCoordinates(angle);
           const isBaseColor = angle === 0;
-          // 角度を色相に変換（HSL形式）
-          const hue = angle;
-          const pointColor = `hsl(${hue}, 70%, 50%)`;
+          // 実際の色相値を計算（ベースカラーの色相 + 配色技法の角度）
+          const actualHue = (baseHue + angle) % 360;
+          const pointColor = `hsl(${actualHue}, 70%, 50%)`;
           
           return (
             <g key={`${angle}-${index}`}>
@@ -101,7 +102,7 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
                 r={4}
                 fill={pointColor}
                 stroke="#ffffff"
-                strokeWidth={isBaseColor ? 1.5 : 1}
+                strokeWidth={isBaseColor ? 2 : 1}
                 className="drop-shadow-sm"
               />
             </g>

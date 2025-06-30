@@ -4,9 +4,10 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ColorWheelMini } from '@/components/common/ColorWheelMini';
 import { ChevronDown } from 'lucide-react';
 import { BORDER_PRESETS } from '@/constants/ui';
+import chroma from 'chroma-js';
 
 export const ColorSchemeOverview = () => {
-  const { selectedScheme, setSelectedScheme } = useColorStore();
+  const { selectedScheme, setSelectedScheme, selectedColor } = useColorStore();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const selectedSchemeData = COLOR_SCHEMES.find(scheme => scheme.id === selectedScheme);
@@ -18,6 +19,16 @@ export const ColorSchemeOverview = () => {
 
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded);
+  };
+
+  // ベースカラーから色相角度を取得
+  const getBaseHue = () => {
+    if (!selectedColor) return 0;
+    try {
+      return chroma(selectedColor).get('hsl.h') || 0;
+    } catch {
+      return 0;
+    }
   };
 
   return (
@@ -35,6 +46,7 @@ export const ColorSchemeOverview = () => {
                 <ColorWheelMini
                   radius={12}
                   schemeId={selectedScheme}
+                  baseHue={getBaseHue()}
                 />
               )}
               <span className="truncate">
@@ -79,6 +91,7 @@ export const ColorSchemeOverview = () => {
                   <ColorWheelMini
                     radius={20}
                     schemeId={scheme.id}
+                    baseHue={getBaseHue()}
                   />
                 </div>
                 

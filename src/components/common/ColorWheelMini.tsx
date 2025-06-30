@@ -6,6 +6,8 @@ interface ColorWheelMiniProps {
   radius?: number;
   /** 現在選択されている配色技法のID */
   schemeId?: string;
+  /** ベースカラーの色相角度（0-360度） */
+  baseHue?: number;
   /** 追加のCSSクラス */
   className?: string;
 }
@@ -17,6 +19,7 @@ interface ColorWheelMiniProps {
 export const ColorWheelMini: React.FC<ColorWheelMiniProps> = ({
   radius = 24, // 小さなサイズ
   schemeId,
+  baseHue = 0, // ベースカラーの実際の色相値
   className = ''
 }) => {
   const containerRadius = radius;
@@ -29,9 +32,12 @@ export const ColorWheelMini: React.FC<ColorWheelMiniProps> = ({
   const scheme = schemeId ? COLOR_SCHEMES.find(s => s.id === schemeId) : null;
   const angles = scheme?.angles || [0];
 
-  // 角度から座標を計算する関数（ベースカラーを真上に配置）
+  // 角度から座標を計算する関数（hue=0を12時位置に固定）
   const getCoordinates = (angle: number) => {
-    const radian = (angle - 90) * Math.PI / 180;
+    // 配色技法の角度にベースカラーの色相値を加算
+    // hue=0が12時位置になるよう -90度オフセット
+    const actualHue = (baseHue + angle) % 360;
+    const radian = (actualHue - 90) * Math.PI / 180;
     return {
       x: containerRadius + plotRadius * Math.cos(radian),
       y: containerRadius + plotRadius * Math.sin(radian)
@@ -72,10 +78,10 @@ export const ColorWheelMini: React.FC<ColorWheelMiniProps> = ({
         {/* 配色技法のプロット点を表示 */}
         {angles.map((angle, index) => {
           const coords = getCoordinates(angle);
-          //const isBaseColor = angle === 0;
-          // 角度を色相に変換（HSL形式）
-          const hue = angle;
-          const pointColor = `hsl(${hue}, 70%, 50%)`;
+          const isBaseColor = angle === 0;
+          // 実際の色相値を計算（ベースカラーの色相 + 配色技法の角度）
+          const actualHue = (baseHue + angle) % 360;
+          const pointColor = `hsl(${actualHue}, 70%, 50%)`;
 
           return (
             <g key={`${angle}-${index}`}>
@@ -96,7 +102,7 @@ export const ColorWheelMini: React.FC<ColorWheelMiniProps> = ({
                 r={1.5}
                 fill={pointColor}
                 stroke="#ffffff"
-                strokeWidth={0.5}
+                strokeWidth={isBaseColor ? 0.8 : 0.5}
                 className="drop-shadow-sm"
               />
             </g>

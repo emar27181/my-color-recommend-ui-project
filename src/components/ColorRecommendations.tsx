@@ -162,6 +162,7 @@ export const ColorRecommendations = () => {
                           <ColorWheelMini
                             radius={28}
                             schemeId={scheme.id}
+                            baseHue={getBaseHue()}
                           />
                         </div>
                         
