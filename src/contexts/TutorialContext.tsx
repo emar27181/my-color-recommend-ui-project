@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import type { ReactNode } from 'react';
 
 interface TutorialStep {
   id: string;
@@ -6,6 +7,8 @@ interface TutorialStep {
   description: string;
   targetElement: string;
   position: 'top' | 'bottom' | 'left' | 'right' | 'center';
+  autoAdvance?: boolean;
+  actionType?: 'click' | 'change' | 'upload';
 }
 
 interface TutorialContextType {
@@ -18,6 +21,7 @@ interface TutorialContextType {
   closeTutorial: () => void;
   skipTutorial: () => void;
   getCurrentStep: () => TutorialStep | null;
+  onUserAction: (actionType: string, targetElement?: string) => void;
 }
 
 const tutorialSteps: TutorialStep[] = [
@@ -33,12 +37,14 @@ const tutorialSteps: TutorialStep[] = [
     title: 'まずはじめに：ベースカラーを選択',
     description: 'ここのカラーパレットアイコンをクリックして、基準となる色を選んでください。この色をもとに、相性の良い色の組み合わせを生成します。',
     targetElement: '[data-tutorial="color-picker"]',
-    position: 'bottom'
+    position: 'bottom',
+    autoAdvance: true,
+    actionType: 'click'
   },
   {
     id: 'image-upload',
     title: '次に：画像からの色抽出も可能',
-    description: 'お好みの画像をここにドラッグ&ドロップまたはクリックしてアップロードすると、画像から主要な色を自動抽出できます。写真の色味を参考にしたい時に便利です。',
+    description: 'お好みの画像をここにドラッグ&ドロップまたはクリックしてアップロードすると、画像から主要な色を自動抽出できます。写真の色味を参考にしたい時に便利です。スキップして配色技法の選択に進むこともできます。',
     targetElement: '[data-tutorial="image-upload"]',
     position: 'bottom'
   },
@@ -47,7 +53,9 @@ const tutorialSteps: TutorialStep[] = [
     title: '配色技法を選択しましょう',
     description: 'このドロップダウンボタンをクリックして、様々な配色技法から選択できます。「ダイアード配色」「トライアド配色」など、プロが使う配色理論に基づいた組み合わせが生成されます。',
     targetElement: '[data-tutorial="color-schemes"]',
-    position: 'top'
+    position: 'top',
+    autoAdvance: true,
+    actionType: 'click'
   },
   {
     id: 'color-wheel',
@@ -59,9 +67,11 @@ const tutorialSteps: TutorialStep[] = [
   {
     id: 'recommended-colors',
     title: '生成された推薦色を活用',
-    description: 'ここに表示された色をクリックすると、カラーコードが自動的にクリップボードにコピーされます。デザインソフトなどで即座に使用できます。',
+    description: 'ここに表示された色をクリックすると、カラーコードが自動的にクリップボードにコピーされます。デザインソフトなどで即座に使用できます。色をクリックしてみてください。',
     targetElement: '[data-tutorial="recommended-colors"]',
-    position: 'top'
+    position: 'top',
+    autoAdvance: true,
+    actionType: 'click'
   },
   {
     id: 'tone-variations',
@@ -77,6 +87,7 @@ const TutorialContext = createContext<TutorialContextType | undefined>(undefined
 export const TutorialProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isActive, setIsActive] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+  const [waitingForAction, setWaitingForAction] = useState(false);
 
   const startTutorial = () => {
     setIsActive(true);
@@ -110,6 +121,42 @@ export const TutorialProvider: React.FC<{ children: ReactNode }> = ({ children }
     return tutorialSteps[currentStep] || null;
   };
 
+  const onUserAction = (actionType: string, targetElement?: string) => {
+    if (!isActive || !waitingForAction) return;
+    
+    const currentStepData = getCurrentStep();
+    if (!currentStepData?.autoAdvance) return;
+
+    // アクションタイプとターゲット要素がマッチするかチェック
+    const actionMatches = currentStepData.actionType === actionType;
+    const targetMatches = !targetElement || 
+      !currentStepData.targetElement || 
+      document.querySelector(currentStepData.targetElement)?.contains(document.querySelector(targetElement) as Node);
+
+    if (actionMatches && targetMatches) {
+      setWaitingForAction(false);
+      // 少し遅延してから次のステップに進む
+      setTimeout(() => {
+        nextStep();
+      }, 1500);
+    }
+  };
+
+  // ステップが変わったときに自動進行の状態をセット
+  useEffect(() => {
+    if (!isActive) {
+      setWaitingForAction(false);
+      return;
+    }
+
+    const currentStepData = getCurrentStep();
+    if (currentStepData?.autoAdvance && currentStepData.position !== 'center') {
+      setWaitingForAction(true);
+    } else {
+      setWaitingForAction(false);
+    }
+  }, [currentStep, isActive]);
+
   return (
     <TutorialContext.Provider
       value={{
@@ -122,6 +169,7 @@ export const TutorialProvider: React.FC<{ children: ReactNode }> = ({ children }
         closeTutorial,
         skipTutorial,
         getCurrentStep,
+        onUserAction,
       }}
     >
       {children}

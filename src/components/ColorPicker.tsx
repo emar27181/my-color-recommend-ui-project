@@ -2,14 +2,18 @@ import { useColorStore } from '@/store/colorStore';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { CopyColorButton } from '@/components/common/CopyColorButton';
 import { TYPOGRAPHY, BORDER_PRESETS } from '@/constants/ui';
+import { useTutorial } from '@/contexts/TutorialContext';
 import { Palette } from 'lucide-react';
 
 export const ColorPicker = () => {
   const { selectedColor, setSelectedColor } = useColorStore();
+  const { onUserAction } = useTutorial();
 
   const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const color = e.target.value;
     setSelectedColor(color);
+    // チュートリアルの自動進行をトリガー
+    onUserAction('click', '[data-tutorial="color-picker"]');
   };
 
   return (

@@ -5,18 +5,22 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ColorGrid } from '@/components/common/ColorGrid';
 import { ColorWheel } from '@/components/common/ColorWheel';
 import { ColorWheelMini } from '@/components/common/ColorWheelMini';
+import { useTutorial } from '@/contexts/TutorialContext';
 import { ChevronDown } from 'lucide-react';
 import { BORDER_PRESETS } from '@/constants/ui';
 import chroma from 'chroma-js';
 
 export const ColorRecommendations = () => {
   const { recommendedColors, selectedScheme, setSelectedScheme, generateRecommendedTones, selectedColor } = useColorStore();
+  const { onUserAction } = useTutorial();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
   const [hoveredScheme, setHoveredScheme] = React.useState<string | null>(null);
   const [mousePosition, setMousePosition] = React.useState({ x: 0, y: 0 });
 
   const handleGenerateTones = (color: string) => {
     generateRecommendedTones(color);
+    // チュートリアルの自動進行をトリガー
+    onUserAction('click', '[data-tutorial="recommended-colors"]');
   };
 
   const selectedSchemeData = COLOR_SCHEMES.find(scheme => scheme.id === selectedScheme);
@@ -25,6 +29,8 @@ export const ColorRecommendations = () => {
     setSelectedScheme(schemeId);
     setIsDropdownOpen(false);
     setHoveredScheme(null); // 選択後は常に色相環を非表示
+    // チュートリアルの自動進行をトリガー
+    onUserAction('click', '[data-tutorial="color-schemes"]');
   };
 
   // ベースカラーから色相角度を取得

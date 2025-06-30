@@ -13,7 +13,7 @@ interface ColorWheelMiniProps {
  * ミニサイズの色相環表示コンポーネント
  * 配色技法一括表示用の小さなサイズ
  */
-export const ColorWheelMini: React.FC<ColorWheelMiniProps> = ({ 
+export const ColorWheelMini: React.FC<ColorWheelMiniProps> = ({
   radius = 24, // 小さなサイズ
   schemeId,
   className = ''
@@ -39,9 +39,9 @@ export const ColorWheelMini: React.FC<ColorWheelMiniProps> = ({
 
   return (
     <div className={`inline-block ${className}`}>
-      <svg 
-        width={size} 
-        height={size} 
+      <svg
+        width={size}
+        height={size}
         viewBox={`0 0 ${size} ${size}`}
         className="drop-shadow-sm"
         role="img"
@@ -56,7 +56,7 @@ export const ColorWheelMini: React.FC<ColorWheelMiniProps> = ({
           stroke="hsl(var(--border))"
           strokeWidth={strokeWidth}
         />
-        
+
         {/* 軌道線（プロット点が配置される円） */}
         <circle
           cx={containerRadius}
@@ -67,12 +67,12 @@ export const ColorWheelMini: React.FC<ColorWheelMiniProps> = ({
           strokeWidth={0.5}
           strokeDasharray="2,1"
         />
-        
+
         {/* 配色技法のプロット点を表示 */}
         {angles.map((angle, index) => {
           const coords = getCoordinates(angle);
-          const isBaseColor = angle === 0;
-          
+          //const isBaseColor = angle === 0;
+
           return (
             <g key={`${angle}-${index}`}>
               {/* 中心からプロット点への線 */}
@@ -84,7 +84,7 @@ export const ColorWheelMini: React.FC<ColorWheelMiniProps> = ({
                 stroke="#666666"
                 strokeWidth={0.5}
               />
-              
+
               {/* プロット点 */}
               <circle
                 cx={coords.x}
@@ -98,7 +98,7 @@ export const ColorWheelMini: React.FC<ColorWheelMiniProps> = ({
             </g>
           );
         })}
-        
+
       </svg>
     </div>
   );
