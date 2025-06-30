@@ -1,3 +1,4 @@
+import React from 'react';
 import { COLOR_SCHEMES } from '@/store/colorStore';
 
 interface ColorWheelMiniProps {
@@ -72,6 +73,9 @@ export const ColorWheelMini: React.FC<ColorWheelMiniProps> = ({
         {angles.map((angle, index) => {
           const coords = getCoordinates(angle);
           //const isBaseColor = angle === 0;
+          // 角度を色相に変換（HSL形式）
+          const hue = angle;
+          const pointColor = `hsl(${hue}, 70%, 50%)`;
 
           return (
             <g key={`${angle}-${index}`}>
@@ -90,7 +94,7 @@ export const ColorWheelMini: React.FC<ColorWheelMiniProps> = ({
                 cx={coords.x}
                 cy={coords.y}
                 r={1.5}
-                fill="#3b82f6"
+                fill={pointColor}
                 stroke="#ffffff"
                 strokeWidth={0.5}
                 className="drop-shadow-sm"

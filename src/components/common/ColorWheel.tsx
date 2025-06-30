@@ -78,6 +78,9 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
         {angles.map((angle, index) => {
           const coords = getCoordinates(angle);
           const isBaseColor = angle === 0;
+          // 角度を色相に変換（HSL形式）
+          const hue = angle;
+          const pointColor = `hsl(${hue}, 70%, 50%)`;
           
           return (
             <g key={`${angle}-${index}`}>
@@ -96,7 +99,7 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
                 cx={coords.x}
                 cy={coords.y}
                 r={4}
-                fill="#3b82f6"
+                fill={pointColor}
                 stroke="#ffffff"
                 strokeWidth={isBaseColor ? 1.5 : 1}
                 className="drop-shadow-sm"
