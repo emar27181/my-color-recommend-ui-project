@@ -192,19 +192,17 @@ const SwipeRecommender = () => {
 
   return (
     <div 
-      className="h-screen w-screen flex flex-col relative overflow-hidden"
-      style={{ backgroundColor: currentPalette?.mainColor || '#000000' }}
+      className="h-screen w-screen flex flex-col relative overflow-hidden bg-background"
     >
       {/* Status Bar */}
       <div className="absolute top-8 left-6 right-6 md:top-12 md:left-12 md:right-12 z-20 flex items-center justify-between">
         {/* Back Button */}
         <button
           onClick={handleGoBack}
-          className="p-3 rounded-2xl transition-all duration-200 hover:scale-110 active:scale-95"
+          className="p-3 rounded-2xl transition-all duration-200 hover:scale-110 active:scale-95 text-foreground"
           style={{ 
             backgroundColor: 'transparent',
-            border: 'transparent',
-            color: textColor
+            border: 'transparent'
           }}
         >
           <ArrowLeft className="w-5 h-5" />
@@ -212,10 +210,7 @@ const SwipeRecommender = () => {
 
         {/* Counter */}
         <div 
-          className="px-4 py-2 rounded-2xl text-sm font-medium font-display"
-          style={{ 
-            color: textColor
-          }}
+          className="px-4 py-2 rounded-2xl text-sm font-medium font-display text-foreground"
         >
           {currentIndex + 1} / {palettes.length}
         </div>
@@ -223,11 +218,10 @@ const SwipeRecommender = () => {
         {/* Favorite Button */}
         <button
           onClick={handleAddToFavorites}
-          className="p-3 rounded-2xl transition-all duration-200 hover:scale-110 active:scale-95"
+          className="p-3 rounded-2xl transition-all duration-200 hover:scale-110 active:scale-95 text-foreground"
           style={{ 
             backgroundColor: 'transparent',
-            border: 'transparent',
-            color: textColor
+            border: 'transparent'
           }}
         >
           <Star className={`w-5 h-5 ${favorites.includes(currentPalette?.id || '') ? 'fill-current' : ''}`} />
@@ -259,7 +253,7 @@ const SwipeRecommender = () => {
             <div 
               className="rounded-[2rem] p-8 pb-16 mb-8 backdrop-blur-md shadow-2xl w-full md:w-[640px] md:h-[400px]"
               style={{ 
-                backgroundColor: `${textColor}05`,
+                backgroundColor: currentPalette.mainColor,
                 border: `4px solid ${textColor}30`
               }}
             >

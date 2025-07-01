@@ -584,7 +584,8 @@ Card (統一border-presets)
 ### 背景・レイアウト
 - **フルスクリーン**: `h-screen w-screen` - デバイス全画面使用
 - **余白除去**: html, body, #root すべて margin:0 padding:0
-- **背景色**: 各パレットのmainColorが画面全体を覆う
+- **背景色**: `bg-background`でテーマ対応（白/黒）
+- **カード色**: 各パレットのmainColorがカード背景
 - **コンテンツ配置**: `flex-1 flex items-center justify-center`
 
 ### ナビゲーション連携
