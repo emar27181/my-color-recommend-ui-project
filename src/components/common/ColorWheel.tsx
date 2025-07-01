@@ -99,10 +99,10 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
               <circle
                 cx={coords.x}
                 cy={coords.y}
-                r={4}
+                r={6}
                 fill={pointColor}
                 stroke="#ffffff"
-                strokeWidth={isBaseColor ? 2 : 1}
+                strokeWidth={isBaseColor ? 3 : 2}
                 className="drop-shadow-sm"
               />
             </g>
