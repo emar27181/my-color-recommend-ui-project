@@ -15,11 +15,13 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "colorthief": "^2.6.0",
+    "framer-motion": "^12.20.5",
     "lucide-react": "^0.515.0",
     "react": "^19.1.0",
     "react-color-wheel": "^0.0.3",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.2",
+    "react-swipeable": "^7.0.2",
     "tailwind-merge": "^3.3.1",
     "zustand": "^5.0.5"
   },
