@@ -28,6 +28,10 @@ const SwipeRecommender = () => {
   const currentPalette = palettes[currentIndex];
   const isLastCard = currentIndex >= palettes.length - 1;
 
+  // Debug logging
+  console.log('Current palette:', currentPalette);
+  console.log('Palettes data:', palettes);
+
   const handleSwipe = (liked: boolean) => {
     if (isAnimating || !currentPalette) return;
     
@@ -163,9 +167,19 @@ const SwipeRecommender = () => {
                 className="w-full h-32 rounded-lg mb-2"
                 style={{ backgroundColor: currentPalette.mainColor }}
               />
-              <p className="text-center text-sm font-mono text-muted-foreground">
-                {currentPalette.mainColor}
-              </p>
+              <div className="flex items-center justify-center gap-2">
+                <div 
+                  className="w-6 h-6 rounded border-2 border-gray-400 shadow-sm flex-shrink-0"
+                  style={{ 
+                    backgroundColor: currentPalette.mainColor,
+                    minWidth: '24px',
+                    minHeight: '24px'
+                  }}
+                />
+                <p className="text-center text-sm font-mono text-muted-foreground">
+                  {currentPalette.mainColor}
+                </p>
+              </div>
             </div>
 
             {/* Color Palette */}
@@ -178,9 +192,19 @@ const SwipeRecommender = () => {
                       className="w-full h-12 rounded"
                       style={{ backgroundColor: color }}
                     />
-                    <p className="text-xs font-mono text-muted-foreground mt-1 text-center">
-                      {color}
-                    </p>
+                    <div className="flex items-center justify-center gap-1 mt-1">
+                      <div 
+                        className="w-4 h-4 rounded border border-gray-400 shadow-sm flex-shrink-0"
+                        style={{ 
+                          backgroundColor: color,
+                          minWidth: '16px',
+                          minHeight: '16px'
+                        }}
+                      />
+                      <p className="text-xs font-mono text-muted-foreground text-center">
+                        {color}
+                      </p>
+                    </div>
                   </div>
                 ))}
               </div>
