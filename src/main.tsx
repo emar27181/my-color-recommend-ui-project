@@ -7,6 +7,7 @@ import { HelpPage } from './pages/HelpPage.tsx'
 import SwipeRecommender from './pages/SwipeRecommender.tsx'
 import { ToastProvider } from './contexts/ToastContext'
 import { TutorialProvider } from './contexts/TutorialContext'
+import { Layout } from './components/Layout.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -14,9 +15,9 @@ createRoot(document.getElementById('root')!).render(
       <TutorialProvider>
         <Router>
           <Routes>
-            <Route path="/" element={<App />} />
-            <Route path="/help" element={<HelpPage />} />
-            <Route path="/swipe" element={<SwipeRecommender />} />
+            <Route path="/" element={<Layout><App /></Layout>} />
+            <Route path="/help" element={<Layout><HelpPage /></Layout>} />
+            <Route path="/swipe" element={<Layout><SwipeRecommender /></Layout>} />
           </Routes>
         </Router>
       </TutorialProvider>

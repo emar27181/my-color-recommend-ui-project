@@ -28,7 +28,6 @@ export const TutorialOverlay: React.FC<TutorialOverlayProps> = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [tooltipOffset, setTooltipOffset] = useState({ x: 0, y: 0 });
-  const [initialTooltipPos, setInitialTooltipPos] = useState({ x: 0, y: 0 });
 
   const currentStepData = getCurrentStep();
 
@@ -256,12 +255,6 @@ export const TutorialOverlay: React.FC<TutorialOverlayProps> = () => {
     setIsDragging(true);
     setDragStart({ x: e.clientX, y: e.clientY });
     
-    // 現在のツールチップ位置を記録
-    const tooltipPos = getTooltipPosition();
-    setInitialTooltipPos({ 
-      x: parseFloat(tooltipPos.left.replace('px', '')), 
-      y: parseFloat(tooltipPos.top.replace('px', '')) 
-    });
     
     e.preventDefault();
   };

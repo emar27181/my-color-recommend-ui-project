@@ -189,13 +189,15 @@ const SwipeRecommender = () => {
   }
 
   const textColor = currentPalette ? getContrastColor(currentPalette.mainColor) : '#ffffff';
+  // テーマカラーの逆色（ダークモードなら白、ライトモードなら黒）
+  const themeTextColor = document.documentElement.classList.contains('dark') ? '#ffffff' : '#000000';
 
   return (
     <div 
       className="h-screen w-screen flex flex-col relative overflow-hidden bg-background"
     >
-      {/* Status Bar */}
-      <div className="absolute top-8 left-6 right-6 md:top-12 md:left-12 md:right-12 z-20 flex items-center justify-between">
+      {/* Status Bar - moved below navigation */}
+      <div className="absolute top-16 left-6 right-6 md:top-20 md:left-12 md:right-12 z-20 flex items-center justify-between">
         {/* Back Button */}
         <button
           onClick={handleGoBack}
@@ -228,8 +230,8 @@ const SwipeRecommender = () => {
         </button>
       </div>
 
-      {/* Main Card Area */}
-      <div className="flex-1 flex items-center justify-center px-8 py-8">
+      {/* Main Card Area - centered left/right */}
+      <div className="flex-1 flex items-center justify-center px-4 py-8">
         <div className="relative w-[80vw] max-w-sm md:w-[640px]">
           <motion.div
             {...swipeHandlers}
@@ -261,13 +263,13 @@ const SwipeRecommender = () => {
               <div className="text-center mb-8">
                 <h1 
                   className="text-4xl font-bold mb-4 tracking-[0.2em] font-mono leading-none"
-                  style={{ color: textColor }}
+                  style={{ color: themeTextColor }}
                 >
                   {currentPalette.mainColor}
                 </h1>
                 <p 
                   className="text-base opacity-70 font-stylish font-medium tracking-widest uppercase"
-                  style={{ color: textColor }}
+                  style={{ color: themeTextColor }}
                 >
                   Main Color
                 </p>
@@ -302,23 +304,23 @@ const SwipeRecommender = () => {
               <div className="space-y-4 mx-auto w-[90%]">
                 <div 
                   className="flex items-center justify-between py-4 px-6 rounded-[1.25rem] border-0"
-                  style={{ backgroundColor: `${textColor}03` }}
+                  style={{ backgroundColor: `${themeTextColor}03` }}
                 >
-                  <span className="text-sm opacity-60 font-stylish tracking-wider uppercase" style={{ color: textColor }}>
+                  <span className="text-sm opacity-60 font-stylish tracking-wider uppercase" style={{ color: themeTextColor }}>
                     Technique
                   </span>
-                  <span className="font-semibold font-heading text-base" style={{ color: textColor }}>
+                  <span className="font-semibold font-heading text-base" style={{ color: themeTextColor }}>
                     {currentPalette.technique}
                   </span>
                 </div>
                 <div 
                   className="flex items-center justify-between py-4 px-6 rounded-[1.25rem] border-0"
-                  style={{ backgroundColor: `${textColor}03` }}
+                  style={{ backgroundColor: `${themeTextColor}03` }}
                 >
-                  <span className="text-sm opacity-60 font-stylish tracking-wider uppercase" style={{ color: textColor }}>
+                  <span className="text-sm opacity-60 font-stylish tracking-wider uppercase" style={{ color: themeTextColor }}>
                     Tone
                   </span>
-                  <span className="font-semibold font-heading text-base" style={{ color: textColor }}>
+                  <span className="font-semibold font-heading text-base" style={{ color: themeTextColor }}>
                     {currentPalette.tone}
                   </span>
                 </div>
@@ -331,8 +333,8 @@ const SwipeRecommender = () => {
                     key={index}
                     className="px-4 py-2 text-sm rounded-[1rem] font-stylish font-medium tracking-wide border-0"
                     style={{ 
-                      backgroundColor: `${textColor}06`,
-                      color: textColor
+                      backgroundColor: `${themeTextColor}06`,
+                      color: themeTextColor
                     }}
                   >
                     {tag}

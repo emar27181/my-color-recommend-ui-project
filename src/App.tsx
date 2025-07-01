@@ -2,63 +2,16 @@ import { ColorPicker } from '@/components/ColorPicker';
 import { ColorRecommendations, ToneRecommendations } from '@/components/ColorRecommendations';
 import { ImageUpload } from '@/components/ImageUpload';
 import { ExtractedColorsDisplay } from '@/components/ExtractedColorsDisplay';
-import { ThemeToggle } from '@/components/ThemeToggle';
-import { NavigationMenu } from '@/components/NavigationMenu';
-import { ToastProvider } from '@/contexts/ToastContext';
-import { ToastContainer } from '@/components/ToastContainer';
-import { TutorialProvider, useTutorial } from '@/contexts/TutorialContext';
-import { TutorialOverlay } from '@/components/tutorial/TutorialOverlay';
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { HelpCircle, Play, ClipboardPenLine } from 'lucide-react';
 
-const AppContent = () => {
-  const { startTutorial } = useTutorial();
-
+const App = () => {
   useEffect(() => {
     // 初期表示時にページの最上端を表示
     window.scrollTo(0, 0);
   }, []);
 
   return (
-    <div className="bg-background text-foreground min-h-screen flex flex-col">
-        {/* ヘッダーを画面上部に表示 */}
-        <header className="border-b border-border bg-background flex-shrink-0">
-          <div className="container mx-auto px-4 py-3">
-            <div className="flex justify-between items-center">
-              <NavigationMenu />
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={startTutorial}
-                  className="p-2 rounded-lg bg-background/50 border-none hover:bg-muted/50 transition-colors backdrop-blur-sm"
-                  title="チュートリアルを開始"
-                >
-                  <Play className="w-5 h-5 text-foreground" />
-                </button>
-                <Link
-                  to="/swipe"
-                  className="p-2 rounded-lg bg-background/50 border-none hover:bg-muted/50 transition-colors backdrop-blur-sm"
-                  title="スワイプ推薦"
-                >
-                  <ClipboardPenLine className="w-5 h-5 text-foreground" />
-                </Link>
-                <Link
-                  to="/help"
-                  className="p-2 rounded-lg bg-background/50 border-none hover:bg-muted/50 transition-colors backdrop-blur-sm"
-                  title="ヘルプページ"
-                >
-                  <HelpCircle className="w-5 h-5 text-foreground" />
-                </Link>
-                <ThemeToggle />
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* メインコンテンツ */}
-        <main
-          className="flex-1 px-4 pb-2 overflow-y-auto"
-        >
+    <main className="flex-1 px-4 pb-2 overflow-y-auto">
           {/* Mobile/Tablet: Single Screen Layout */}
           <div className="block xl:hidden flex flex-col">
             {/* Step 1: ベース色選択 - コンパクト化 */}
@@ -119,22 +72,8 @@ const AppContent = () => {
               </section>
             </div>
           </div>
-        </main>
-
-        <ToastContainer />
-        <TutorialOverlay />
-      </div>
+    </main>
   );
 };
-
-function App() {
-  return (
-    <ToastProvider>
-      <TutorialProvider>
-        <AppContent />
-      </TutorialProvider>
-    </ToastProvider>
-  );
-}
 
 export default App;

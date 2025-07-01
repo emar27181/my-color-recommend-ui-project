@@ -1,7 +1,6 @@
 import { useColorStore } from '@/store/colorStore';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { CopyColorButton } from '@/components/common/CopyColorButton';
-import { ColorBlock } from '@/components/common/ColorBlock';
 import { TYPOGRAPHY, BORDER_PRESETS } from '@/constants/ui';
 import { useTutorial } from '@/contexts/TutorialContext';
 import { Palette } from 'lucide-react';

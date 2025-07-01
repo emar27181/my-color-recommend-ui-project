@@ -4,23 +4,7 @@ import { ArrowLeft, Construction } from 'lucide-react';
 
 export const HelpPage = () => {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border bg-background">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center gap-3">
-            <Link
-              to="/"
-              className="p-2 rounded-lg hover:bg-muted/50 transition-colors"
-              title="ホームに戻る"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <h1 className="text-xl font-semibold">ヘルプ</h1>
-          </div>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-6">
+    <main className="flex-1 container mx-auto px-4 py-6">
         <div className="max-w-2xl mx-auto">
           <Card>
             <CardHeader className="text-center">
@@ -54,7 +38,6 @@ export const HelpPage = () => {
             </CardContent>
           </Card>
         </div>
-      </main>
-    </div>
+    </main>
   );
 };
