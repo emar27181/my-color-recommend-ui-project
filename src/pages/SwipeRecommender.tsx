@@ -144,7 +144,7 @@ const SwipeRecommender = () => {
       style={{ backgroundColor: currentPalette?.mainColor || '#000000' }}
     >
       {/* Status Bar */}
-      <div className="absolute top-8 left-8 right-8 z-20 flex items-center justify-between">
+      <div className="absolute top-8 left-8 right-8 z-20 flex items-center justify-start">
         <div 
           className="px-4 py-2 rounded-2xl backdrop-blur-md text-sm font-medium font-display border-0"
           style={{ 
@@ -153,15 +153,6 @@ const SwipeRecommender = () => {
           }}
         >
           {currentIndex + 1} / {palettes.length}
-        </div>
-        <div 
-          className="px-4 py-2 rounded-2xl backdrop-blur-md text-sm font-medium font-display border-0"
-          style={{ 
-            backgroundColor: `${textColor}08`,
-            color: textColor
-          }}
-        >
-          SWIPE TO RATE
         </div>
       </div>
 
@@ -188,14 +179,14 @@ const SwipeRecommender = () => {
           >
             {/* Main Color Info Card */}
             <div 
-              className="rounded-[2rem] p-10 mb-8 backdrop-blur-md shadow-2xl"
+              className="rounded-[2rem] p-8 pb-16 mb-8 backdrop-blur-md shadow-2xl"
               style={{ 
                 backgroundColor: `${textColor}05`,
                 border: `4px solid ${textColor}30`
               }}
             >
               {/* Main Color Code */}
-              <div className="text-center mb-10">
+              <div className="text-center mb-8">
                 <h1 
                   className="text-4xl font-bold mb-4 tracking-[0.2em] font-mono leading-none"
                   style={{ color: textColor }}
@@ -279,49 +270,9 @@ const SwipeRecommender = () => {
             </div>
           </motion.div>
 
-          {/* Swipe Indicators */}
-          <div className="absolute top-16 left-8 right-8 flex justify-between pointer-events-none z-10">
-            <motion.div
-              animate={{ 
-                opacity: dragX > 50 ? 1 : 0,
-                scale: dragX > 50 ? 1.1 : 1
-              }}
-              className="bg-green-500/95 text-white px-6 py-3 rounded-[1.25rem] text-base font-bold font-display shadow-2xl backdrop-blur-sm"
-            >
-              ❤️ LIKE
-            </motion.div>
-            <motion.div
-              animate={{ 
-                opacity: dragX < -50 ? 1 : 0,
-                scale: dragX < -50 ? 1.1 : 1
-              }}
-              className="bg-red-500/95 text-white px-6 py-3 rounded-[1.25rem] text-base font-bold font-display shadow-2xl backdrop-blur-sm"
-            >
-              ❌ NOPE
-            </motion.div>
-          </div>
         </div>
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex-shrink-0 p-8 pb-12">
-        <div className="flex justify-center space-x-12">
-          <button
-            onClick={() => handleSwipe(false)}
-            disabled={isAnimating}
-            className="flex items-center justify-center w-20 h-20 bg-red-500/85 hover:bg-red-500/95 disabled:bg-red-300/40 text-white rounded-[1.5rem] shadow-2xl transition-all duration-300 transform hover:scale-110 active:scale-95 backdrop-blur-md border-0"
-          >
-            <X className="w-9 h-9" strokeWidth={2.5} />
-          </button>
-          <button
-            onClick={() => handleSwipe(true)}
-            disabled={isAnimating}
-            className="flex items-center justify-center w-20 h-20 bg-green-500/85 hover:bg-green-500/95 disabled:bg-green-300/40 text-white rounded-[1.5rem] shadow-2xl transition-all duration-300 transform hover:scale-110 active:scale-95 backdrop-blur-md border-0"
-          >
-            <Heart className="w-9 h-9" strokeWidth={2.5} />
-          </button>
-        </div>
-      </div>
     </div>
   );
 };
