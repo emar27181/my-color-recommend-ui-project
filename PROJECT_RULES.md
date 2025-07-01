@@ -507,8 +507,10 @@ header (border-b border-border bg-background)
     └── flex (justify-between items-center)
         ├── NavigationMenu
         └── div (flex items-center gap-2)
-            ├── HelpButton (Link to="/help")
-            └── ThemeToggle
+            ├── TutorialButton (Play icon)
+            ├── SwipeButton (ClipboardPenLine icon, Link to="/swipe")
+            ├── HelpButton (HelpCircle icon, Link to="/help")
+            └── ThemeToggle (Sun/Moon icon)
 ```
 
 #### NavigationMenu仕様
@@ -570,10 +572,13 @@ Card (統一border-presets)
 - **スプリングアニメーション**: `stiffness: 300, damping: 30`
 
 ### UI要素配置
-- **カウンター表示**: レスポンシブ位置設定
+- **ナビゲーション要素**: レスポンシブ位置設定 `justify-between`
   - モバイル: `top-8 left-6 right-6`
   - PC: `top-12 left-12 right-12`
-- **視認性**: `backgroundColor: ${textColor}12`, border付き、shadow-lg
+- **戻るボタン**: `<ArrowLeft>` - ホームページ（/）へのナビゲーション
+- **カウンター表示**: 中央配置、透明背景、`color: textColor` のみ
+- **お気に入りボタン**: `<Star>` - パレットをお気に入りに追加、填充で状態表示
+- **ボタンスタイル**: 完全透明（`backgroundColor: transparent`, `border: transparent`）
 - **スクロール制御**: position:fixed + touchmove preventDefault
 
 ### 背景・レイアウト
@@ -581,6 +586,11 @@ Card (統一border-presets)
 - **余白除去**: html, body, #root すべて margin:0 padding:0
 - **背景色**: 各パレットのmainColorが画面全体を覆う
 - **コンテンツ配置**: `flex-1 flex items-center justify-center`
+
+### ナビゲーション連携
+- **ホームページアクセス**: ヘッダー右側に`ClipboardPenLine`アイコンで`/swipe`リンク
+- **戻る機能**: スワイプページから`ArrowLeft`ボタンで`/`へ戻る
+- **お気に入り機能**: `Star`アイコンで配色パレットをローカル保存
 
 ---
 

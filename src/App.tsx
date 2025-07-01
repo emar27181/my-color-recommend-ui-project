@@ -10,7 +10,7 @@ import { TutorialProvider, useTutorial } from '@/contexts/TutorialContext';
 import { TutorialOverlay } from '@/components/tutorial/TutorialOverlay';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { HelpCircle, Play } from 'lucide-react';
+import { HelpCircle, Play, ClipboardPenLine } from 'lucide-react';
 
 const AppContent = () => {
   const { startTutorial } = useTutorial();
@@ -35,6 +35,13 @@ const AppContent = () => {
                 >
                   <Play className="w-5 h-5 text-foreground" />
                 </button>
+                <Link
+                  to="/swipe"
+                  className="p-2 rounded-lg bg-background/50 border-none hover:bg-muted/50 transition-colors backdrop-blur-sm"
+                  title="スワイプ推薦"
+                >
+                  <ClipboardPenLine className="w-5 h-5 text-foreground" />
+                </Link>
                 <Link
                   to="/help"
                   className="p-2 rounded-lg bg-background/50 border-none hover:bg-muted/50 transition-colors backdrop-blur-sm"

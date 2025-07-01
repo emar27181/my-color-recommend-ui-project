@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion, type PanInfo } from 'framer-motion';
 import { useSwipeable } from 'react-swipeable';
-import { Heart, X, RotateCcw } from 'lucide-react';
+import { Heart, X, RotateCcw, ArrowLeft, Star } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import palettesData from '@/data/palettes.json';
 
 // コントラスト比を計算して適切なテキスト色を決定
@@ -32,6 +33,8 @@ const SwipeRecommender = () => {
   const [swipeResults, setSwipeResults] = useState<SwipeResult[]>([]);
   const [isAnimating, setIsAnimating] = useState(false);
   const [dragX, setDragX] = useState(0);
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const navigate = useNavigate();
 
   // スワイプ画面でのスクロール禁止（モバイル対応）
   useEffect(() => {
@@ -120,6 +123,18 @@ const SwipeRecommender = () => {
     setDragX(0);
   };
 
+  const handleAddToFavorites = () => {
+    if (!currentPalette) return;
+    
+    if (!favorites.includes(currentPalette.id)) {
+      setFavorites(prev => [...prev, currentPalette.id]);
+    }
+  };
+
+  const handleGoBack = () => {
+    navigate('/');
+  };
+
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => handleSwipe(false),
     onSwipedRight: () => handleSwipe(true),
@@ -181,17 +196,42 @@ const SwipeRecommender = () => {
       style={{ backgroundColor: currentPalette?.mainColor || '#000000' }}
     >
       {/* Status Bar */}
-      <div className="absolute top-8 left-6 right-6 md:top-12 md:left-12 md:right-12 z-20 flex items-center justify-start">
-        <div 
-          className="px-4 py-2 rounded-2xl backdrop-blur-md text-sm font-medium font-display shadow-lg"
+      <div className="absolute top-8 left-6 right-6 md:top-12 md:left-12 md:right-12 z-20 flex items-center justify-between">
+        {/* Back Button */}
+        <button
+          onClick={handleGoBack}
+          className="p-3 rounded-2xl transition-all duration-200 hover:scale-110 active:scale-95"
           style={{ 
-            backgroundColor: `${textColor}12`,
-            color: textColor,
-            border: `1px solid ${textColor}20`
+            backgroundColor: 'transparent',
+            border: 'transparent',
+            color: textColor
+          }}
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </button>
+
+        {/* Counter */}
+        <div 
+          className="px-4 py-2 rounded-2xl text-sm font-medium font-display"
+          style={{ 
+            color: textColor
           }}
         >
           {currentIndex + 1} / {palettes.length}
         </div>
+
+        {/* Favorite Button */}
+        <button
+          onClick={handleAddToFavorites}
+          className="p-3 rounded-2xl transition-all duration-200 hover:scale-110 active:scale-95"
+          style={{ 
+            backgroundColor: 'transparent',
+            border: 'transparent',
+            color: textColor
+          }}
+        >
+          <Star className={`w-5 h-5 ${favorites.includes(currentPalette?.id || '') ? 'fill-current' : ''}`} />
+        </button>
       </div>
 
       {/* Main Card Area */}
