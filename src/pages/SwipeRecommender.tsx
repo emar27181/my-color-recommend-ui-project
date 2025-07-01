@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, type PanInfo } from 'framer-motion';
 import { useSwipeable } from 'react-swipeable';
 import { Heart, X, RotateCcw } from 'lucide-react';
@@ -32,6 +32,43 @@ const SwipeRecommender = () => {
   const [swipeResults, setSwipeResults] = useState<SwipeResult[]>([]);
   const [isAnimating, setIsAnimating] = useState(false);
   const [dragX, setDragX] = useState(0);
+
+  // スワイプ画面でのスクロール禁止（モバイル対応）
+  useEffect(() => {
+    // 現在のbodyのoverflowを保存
+    const originalOverflow = document.body.style.overflow;
+    const originalOverflowX = document.body.style.overflowX;
+    const originalOverflowY = document.body.style.overflowY;
+    const originalPosition = document.body.style.position;
+    const originalHeight = document.body.style.height;
+    
+    // スクロールを禁止（モバイル対応）
+    document.body.style.overflow = 'hidden';
+    document.body.style.overflowX = 'hidden';
+    document.body.style.overflowY = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.height = '100%';
+    document.body.style.width = '100%';
+    
+    // タッチイベントでのスクロール防止
+    const preventTouchMove = (e: TouchEvent) => {
+      e.preventDefault();
+    };
+    
+    // パッシブでないタッチイベントリスナーを追加
+    document.addEventListener('touchmove', preventTouchMove, { passive: false });
+    
+    // クリーンアップ関数で元に戻す
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.body.style.overflowX = originalOverflowX;
+      document.body.style.overflowY = originalOverflowY;
+      document.body.style.position = originalPosition;
+      document.body.style.height = originalHeight;
+      document.body.style.width = '';
+      document.removeEventListener('touchmove', preventTouchMove);
+    };
+  }, []);
 
   const palettes: ColorPalette[] = palettesData;
   const currentPalette = palettes[currentIndex];
@@ -140,7 +177,7 @@ const SwipeRecommender = () => {
 
   return (
     <div 
-      className="min-h-screen flex flex-col relative overflow-hidden px-8 py-6"
+      className="h-screen w-screen flex flex-col relative overflow-hidden"
       style={{ backgroundColor: currentPalette?.mainColor || '#000000' }}
     >
       {/* Status Bar */}
@@ -158,7 +195,7 @@ const SwipeRecommender = () => {
 
       {/* Main Card Area */}
       <div className="flex-1 flex items-center justify-center px-8 py-8">
-        <div className="relative w-[80vw] max-w-sm">
+        <div className="relative w-[80vw] max-w-sm md:w-[640px]">
           <motion.div
             {...swipeHandlers}
             drag="x"
@@ -179,7 +216,7 @@ const SwipeRecommender = () => {
           >
             {/* Main Color Info Card */}
             <div 
-              className="rounded-[2rem] p-8 pb-16 mb-8 backdrop-blur-md shadow-2xl"
+              className="rounded-[2rem] p-8 pb-16 mb-8 backdrop-blur-md shadow-2xl md:w-[640px] md:h-[400px]"
               style={{ 
                 backgroundColor: `${textColor}05`,
                 border: `4px solid ${textColor}30`
