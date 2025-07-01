@@ -181,12 +181,13 @@ const SwipeRecommender = () => {
       style={{ backgroundColor: currentPalette?.mainColor || '#000000' }}
     >
       {/* Status Bar */}
-      <div className="absolute top-8 left-8 right-8 z-20 flex items-center justify-start">
+      <div className="absolute top-8 left-6 right-6 md:top-12 md:left-12 md:right-12 z-20 flex items-center justify-start">
         <div 
-          className="px-4 py-2 rounded-2xl backdrop-blur-md text-sm font-medium font-display border-0"
+          className="px-4 py-2 rounded-2xl backdrop-blur-md text-sm font-medium font-display border-0 shadow-lg"
           style={{ 
-            backgroundColor: `${textColor}08`,
-            color: textColor
+            backgroundColor: `${textColor}12`,
+            color: textColor,
+            border: `1px solid ${textColor}20`
           }}
         >
           {currentIndex + 1} / {palettes.length}
