@@ -549,6 +549,41 @@ Card (統一border-presets)
 
 ---
 
+## 🎯 スワイプ式色推薦ページ仕様
+
+### スワイプページ基本設計
+- **ルート**: `/swipe`
+- **レイアウト**: フルスクリーン背景、カード中央配置
+- **操作方法**: 水平スワイプジェスチャーによる評価
+- **画面制約**: 上下スクロール完全禁止、h-screen w-screen固定
+
+### カードデザイン仕様
+- **モバイル**: `w-[80vw] max-w-sm` - レスポンシブ幅
+- **PC版**: `w-[640px] h-[400px]` - 黄金比（8:5）固定サイズ
+- **カード構造**: `w-full` で親コンテナに合わせて調整
+- **角丸**: `rounded-[2rem]` - 大きな角丸で現代的デザイン
+
+### アニメーション・インタラクション
+- **回転制限**: `Math.max(-30, Math.min(30, dragX * 0.15))` - ±30度まで
+- **スワイプ閾値**: 100px または velocity 500px/s
+- **フェードアウト**: `x: ±300, opacity: 0` でカード退場
+- **スプリングアニメーション**: `stiffness: 300, damping: 30`
+
+### UI要素配置
+- **カウンター表示**: レスポンシブ位置設定
+  - モバイル: `top-8 left-6 right-6`
+  - PC: `top-12 left-12 right-12`
+- **視認性**: `backgroundColor: ${textColor}12`, border付き、shadow-lg
+- **スクロール制御**: position:fixed + touchmove preventDefault
+
+### 背景・レイアウト
+- **フルスクリーン**: `h-screen w-screen` - デバイス全画面使用
+- **余白除去**: html, body, #root すべて margin:0 padding:0
+- **背景色**: 各パレットのmainColorが画面全体を覆う
+- **コンテンツ配置**: `flex-1 flex items-center justify-center`
+
+---
+
 ## 🔧 技術仕様
 
 ### 状態管理・データフロー

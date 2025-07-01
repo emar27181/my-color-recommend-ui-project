@@ -183,7 +183,7 @@ const SwipeRecommender = () => {
       {/* Status Bar */}
       <div className="absolute top-8 left-6 right-6 md:top-12 md:left-12 md:right-12 z-20 flex items-center justify-start">
         <div 
-          className="px-4 py-2 rounded-2xl backdrop-blur-md text-sm font-medium font-display border-0 shadow-lg"
+          className="px-4 py-2 rounded-2xl backdrop-blur-md text-sm font-medium font-display shadow-lg"
           style={{ 
             backgroundColor: `${textColor}12`,
             color: textColor,
@@ -205,7 +205,7 @@ const SwipeRecommender = () => {
             onDrag={(_, info) => setDragX(info.offset.x)}
             animate={{
               x: isAnimating ? (swipeResults[swipeResults.length - 1]?.liked ? 300 : -300) : 0,
-              rotate: dragX * 0.15,
+              rotate: Math.max(-30, Math.min(30, dragX * 0.15)),
               opacity: isAnimating ? 0 : 1
             }}
             transition={{
@@ -217,7 +217,7 @@ const SwipeRecommender = () => {
           >
             {/* Main Color Info Card */}
             <div 
-              className="rounded-[2rem] p-8 pb-16 mb-8 backdrop-blur-md shadow-2xl md:w-[640px] md:h-[400px]"
+              className="rounded-[2rem] p-8 pb-16 mb-8 backdrop-blur-md shadow-2xl w-full md:w-[640px] md:h-[400px]"
               style={{ 
                 backgroundColor: `${textColor}05`,
                 border: `4px solid ${textColor}30`
