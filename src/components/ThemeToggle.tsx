@@ -2,7 +2,13 @@ import { useState, useEffect } from 'react';
 import { Sun, Moon } from 'lucide-react';
 
 export const ThemeToggle = () => {
-  const [isDark, setIsDark] = useState(false); // デフォルトはライトモード
+  const [isDark, setIsDark] = useState(true); // デフォルトはダークモード
+
+  useEffect(() => {
+    const root = document.documentElement;
+    // 初期化時にダークモードを設定
+    root.classList.add('dark');
+  }, []);
 
   useEffect(() => {
     const root = document.documentElement;
