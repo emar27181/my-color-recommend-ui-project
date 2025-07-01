@@ -4,6 +4,15 @@ import { useSwipeable } from 'react-swipeable';
 import { Heart, X, RotateCcw } from 'lucide-react';
 import palettesData from '@/data/palettes.json';
 
+// コントラスト比を計算して適切なテキスト色を決定
+const getContrastColor = (hexColor: string): string => {
+  const r = parseInt(hexColor.slice(1, 3), 16);
+  const g = parseInt(hexColor.slice(3, 5), 16);
+  const b = parseInt(hexColor.slice(5, 7), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.5 ? '#000000' : '#ffffff';
+};
+
 interface ColorPalette {
   id: string;
   colors: string[];
@@ -127,22 +136,38 @@ const SwipeRecommender = () => {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <header className="flex-shrink-0 p-4 border-b border-border">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold text-foreground">スワイプ式色推薦</h1>
-          <div className="text-sm text-muted-foreground">
-            {currentIndex + 1} / {palettes.length}
-          </div>
-        </div>
-      </header>
+  const textColor = currentPalette ? getContrastColor(currentPalette.mainColor) : '#ffffff';
 
-      {/* Main Content */}
-      <div className="flex-1 flex items-center justify-center p-4">
-        <div className="relative w-full max-w-sm">
-          {/* Color Card */}
+  return (
+    <div 
+      className="min-h-screen flex flex-col relative overflow-hidden px-8 py-6"
+      style={{ backgroundColor: currentPalette?.mainColor || '#000000' }}
+    >
+      {/* Status Bar */}
+      <div className="absolute top-8 left-8 right-8 z-20 flex items-center justify-between">
+        <div 
+          className="px-4 py-2 rounded-2xl backdrop-blur-md text-sm font-medium font-display border-0"
+          style={{ 
+            backgroundColor: `${textColor}08`,
+            color: textColor
+          }}
+        >
+          {currentIndex + 1} / {palettes.length}
+        </div>
+        <div 
+          className="px-4 py-2 rounded-2xl backdrop-blur-md text-sm font-medium font-display border-0"
+          style={{ 
+            backgroundColor: `${textColor}08`,
+            color: textColor
+          }}
+        >
+          SWIPE TO RATE
+        </div>
+      </div>
+
+      {/* Main Card Area */}
+      <div className="flex-1 flex items-center justify-center px-8 py-8">
+        <div className="relative w-[80vw] max-w-sm">
           <motion.div
             {...swipeHandlers}
             drag="x"
@@ -151,7 +176,7 @@ const SwipeRecommender = () => {
             onDrag={(_, info) => setDragX(info.offset.x)}
             animate={{
               x: isAnimating ? (swipeResults[swipeResults.length - 1]?.liked ? 300 : -300) : 0,
-              rotate: dragX * 0.1,
+              rotate: dragX * 0.15,
               opacity: isAnimating ? 0 : 1
             }}
             transition={{
@@ -159,116 +184,141 @@ const SwipeRecommender = () => {
               stiffness: 300,
               damping: 30
             }}
-            className="bg-card border border-border rounded-xl p-6 shadow-lg cursor-grab active:cursor-grabbing select-none"
+            className="cursor-grab active:cursor-grabbing select-none"
           >
-            {/* Main Color */}
-            <div className="mb-4">
-              <div 
-                className="w-full h-32 rounded-lg mb-2"
-                style={{ backgroundColor: currentPalette.mainColor }}
-              />
-              <div className="flex items-center justify-center gap-2">
-                <div 
-                  className="w-6 h-6 rounded border-2 border-gray-400 shadow-sm flex-shrink-0"
-                  style={{ 
-                    backgroundColor: currentPalette.mainColor,
-                    minWidth: '24px',
-                    minHeight: '24px'
-                  }}
-                />
-                <p className="text-center text-sm font-mono text-muted-foreground">
+            {/* Main Color Info Card */}
+            <div 
+              className="rounded-[2rem] p-10 mb-8 backdrop-blur-md shadow-2xl"
+              style={{ 
+                backgroundColor: `${textColor}05`,
+                border: `4px solid ${textColor}30`
+              }}
+            >
+              {/* Main Color Code */}
+              <div className="text-center mb-10">
+                <h1 
+                  className="text-4xl font-bold mb-4 tracking-[0.2em] font-mono leading-none"
+                  style={{ color: textColor }}
+                >
                   {currentPalette.mainColor}
+                </h1>
+                <p 
+                  className="text-base opacity-70 font-stylish font-medium tracking-widest uppercase"
+                  style={{ color: textColor }}
+                >
+                  Main Color
                 </p>
               </div>
-            </div>
 
-            {/* Color Palette */}
-            <div className="mb-4">
-              <h3 className="text-sm font-medium text-foreground mb-2">カラーパレット</h3>
-              <div className="flex space-x-2">
-                {currentPalette.colors.map((color, index) => (
-                  <div key={index} className="flex-1">
-                    <div 
-                      className="w-full h-12 rounded"
+              {/* Color Palette Strip */}
+              <div className="mb-8 mx-auto w-[90%]">
+                <div className="flex rounded-[1.5rem] overflow-hidden shadow-xl h-20">
+                  {currentPalette.colors.map((color, index) => (
+                    <div
+                      key={index}
+                      className="flex-1 relative group transition-all duration-300 hover:scale-105"
                       style={{ backgroundColor: color }}
-                    />
-                    <div className="flex items-center justify-center gap-1 mt-1">
-                      <div 
-                        className="w-4 h-4 rounded border border-gray-400 shadow-sm flex-shrink-0"
-                        style={{ 
-                          backgroundColor: color,
-                          minWidth: '16px',
-                          minHeight: '16px'
-                        }}
-                      />
-                      <p className="text-xs font-mono text-muted-foreground text-center">
-                        {color}
-                      </p>
+                    >
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                        <span 
+                          className="text-xs font-mono font-medium px-3 py-2 rounded-xl backdrop-blur-md shadow-lg"
+                          style={{ 
+                            backgroundColor: `${getContrastColor(color)}25`,
+                            color: getContrastColor(color)
+                          }}
+                        >
+                          {color}
+                        </span>
+                      </div>
                     </div>
-                  </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Meta Info */}
+              <div className="space-y-4 mx-auto w-[90%]">
+                <div 
+                  className="flex items-center justify-between py-4 px-6 rounded-[1.25rem] border-0"
+                  style={{ backgroundColor: `${textColor}03` }}
+                >
+                  <span className="text-sm opacity-60 font-stylish tracking-wider uppercase" style={{ color: textColor }}>
+                    Technique
+                  </span>
+                  <span className="font-semibold font-heading text-base" style={{ color: textColor }}>
+                    {currentPalette.technique}
+                  </span>
+                </div>
+                <div 
+                  className="flex items-center justify-between py-4 px-6 rounded-[1.25rem] border-0"
+                  style={{ backgroundColor: `${textColor}03` }}
+                >
+                  <span className="text-sm opacity-60 font-stylish tracking-wider uppercase" style={{ color: textColor }}>
+                    Tone
+                  </span>
+                  <span className="font-semibold font-heading text-base" style={{ color: textColor }}>
+                    {currentPalette.tone}
+                  </span>
+                </div>
+              </div>
+
+              {/* Tags */}
+              <div className="flex flex-wrap gap-3 mt-6 mx-auto w-[90%]">
+                {currentPalette.tags.map((tag, index) => (
+                  <span 
+                    key={index}
+                    className="px-4 py-2 text-sm rounded-[1rem] font-stylish font-medium tracking-wide border-0"
+                    style={{ 
+                      backgroundColor: `${textColor}06`,
+                      color: textColor
+                    }}
+                  >
+                    {tag}
+                  </span>
                 ))}
               </div>
-            </div>
-
-            {/* Technique and Tone */}
-            <div className="mb-4 space-y-2">
-              <div>
-                <span className="text-sm font-medium text-foreground">配色技法: </span>
-                <span className="text-sm text-muted-foreground">{currentPalette.technique}</span>
-              </div>
-              <div>
-                <span className="text-sm font-medium text-foreground">トーン: </span>
-                <span className="text-sm text-muted-foreground">{currentPalette.tone}</span>
-              </div>
-            </div>
-
-            {/* Tags */}
-            <div className="flex flex-wrap gap-2">
-              {currentPalette.tags.map((tag, index) => (
-                <span 
-                  key={index}
-                  className="px-2 py-1 bg-muted text-muted-foreground text-xs rounded-full"
-                >
-                  {tag}
-                </span>
-              ))}
             </div>
           </motion.div>
 
           {/* Swipe Indicators */}
-          <div className="absolute top-4 left-4 right-4 flex justify-between pointer-events-none">
+          <div className="absolute top-16 left-8 right-8 flex justify-between pointer-events-none z-10">
             <motion.div
-              animate={{ opacity: dragX > 50 ? 1 : 0 }}
-              className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium"
+              animate={{ 
+                opacity: dragX > 50 ? 1 : 0,
+                scale: dragX > 50 ? 1.1 : 1
+              }}
+              className="bg-green-500/95 text-white px-6 py-3 rounded-[1.25rem] text-base font-bold font-display shadow-2xl backdrop-blur-sm"
             >
-              LIKE
+              ❤️ LIKE
             </motion.div>
             <motion.div
-              animate={{ opacity: dragX < -50 ? 1 : 0 }}
-              className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium"
+              animate={{ 
+                opacity: dragX < -50 ? 1 : 0,
+                scale: dragX < -50 ? 1.1 : 1
+              }}
+              className="bg-red-500/95 text-white px-6 py-3 rounded-[1.25rem] text-base font-bold font-display shadow-2xl backdrop-blur-sm"
             >
-              NOPE
+              ❌ NOPE
             </motion.div>
           </div>
         </div>
       </div>
 
       {/* Action Buttons */}
-      <div className="flex-shrink-0 p-4">
-        <div className="flex justify-center space-x-4">
+      <div className="flex-shrink-0 p-8 pb-12">
+        <div className="flex justify-center space-x-12">
           <button
             onClick={() => handleSwipe(false)}
             disabled={isAnimating}
-            className="flex items-center justify-center w-16 h-16 bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white rounded-full shadow-lg transition-colors"
+            className="flex items-center justify-center w-20 h-20 bg-red-500/85 hover:bg-red-500/95 disabled:bg-red-300/40 text-white rounded-[1.5rem] shadow-2xl transition-all duration-300 transform hover:scale-110 active:scale-95 backdrop-blur-md border-0"
           >
-            <X className="w-8 h-8" />
+            <X className="w-9 h-9" strokeWidth={2.5} />
           </button>
           <button
             onClick={() => handleSwipe(true)}
             disabled={isAnimating}
-            className="flex items-center justify-center w-16 h-16 bg-green-500 hover:bg-green-600 disabled:bg-green-300 text-white rounded-full shadow-lg transition-colors"
+            className="flex items-center justify-center w-20 h-20 bg-green-500/85 hover:bg-green-500/95 disabled:bg-green-300/40 text-white rounded-[1.5rem] shadow-2xl transition-all duration-300 transform hover:scale-110 active:scale-95 backdrop-blur-md border-0"
           >
-            <Heart className="w-8 h-8" />
+            <Heart className="w-9 h-9" strokeWidth={2.5} />
           </button>
         </div>
       </div>

@@ -16,9 +16,11 @@ export default {
         '16': 'repeat(16, minmax(0, 1fr))',
       },
       fontFamily: {
-        'sans': ['Inter', 'SF Pro Display', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        'mono': ['JetBrains Mono', 'Fira Code', 'SF Mono', 'Monaco', 'Consolas', 'monospace'],
-        'display': ['Clash Display', 'Inter', 'SF Pro Display', 'sans-serif'],
+        'sans': ['Outfit', 'Inter', 'SF Pro Display', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        'mono': ['Space Mono', 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Monaco', 'Consolas', 'monospace'],
+        'display': ['Syne', 'Outfit', 'sans-serif'],
+        'heading': ['Space Grotesk', 'Outfit', 'sans-serif'],
+        'stylish': ['Syne', 'sans-serif'],
       },
       colors: {
         border: 'hsl(var(--border))',
