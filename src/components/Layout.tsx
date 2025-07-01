@@ -21,7 +21,6 @@ export const Layout = ({ children, showHeader = true }: LayoutProps) => {
         <header className="border-b border-border bg-background flex-shrink-0">
           <div className="container mx-auto px-4 py-3">
             <div className="flex justify-between items-center">
-              <NavigationMenu />
               <div className="flex items-center gap-2">
                 <button
                   onClick={startTutorial}
@@ -46,6 +45,7 @@ export const Layout = ({ children, showHeader = true }: LayoutProps) => {
                 </Link>
                 <ThemeToggle />
               </div>
+              <NavigationMenu />
             </div>
           </div>
         </header>
