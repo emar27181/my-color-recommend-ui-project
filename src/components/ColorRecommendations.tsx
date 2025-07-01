@@ -104,6 +104,7 @@ export const ColorRecommendations = () => {
                   <ColorWheelMini
                     radius={12}
                     schemeId={selectedScheme}
+                    baseHue={getBaseHue()}
                   />
                 )}
                 <span className="truncate">
