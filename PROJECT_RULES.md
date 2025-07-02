@@ -926,7 +926,101 @@ src/
 
 ---
 
-**最終更新**: 2025-07-01  
+## 📝 開発履歴・セッションログ
+
+### 🎯 メジャー機能追加履歴
+
+#### [2025-07-01] スワイプ式色推薦ページ実装
+- **スワイプ式色推薦ページ**: `/swipe` ルートで新しいモバイルアプリ風UI実装
+  - **フルスクリーン背景**: メインカラーが画面全体を占める没入型デザイン
+  - **スワイプ操作**: framer-motion + react-swipeableによる滑らかなジェスチャー操作
+  - **配色カード**: 10種類の配色パレットサンプルデータ（`src/data/palettes.json`）
+  - **評価システム**: Like/Dislikeスワイプによる配色評価・統計表示
+  - **レスポンシブ対応**: 画面幅80%のカードサイズで適切な余白確保
+
+#### [2025-06-17] 全面UIリデザイン・モバイル最適化
+- **グラデーション並び替え機能**: `sortColorsByLightness`関数でchroma.js lightness値による明るい→暗い順ソート
+- **スマホ用2列レイアウト**: 40px色ブロック + コピーボタン + カラーコード
+- **モダンUIデザイン**: ナビゲーション固定ヘッダー + バックドロップブラー
+- **ミニマルデザイン適用**: 冗長な説明文削除、ステップ名明確化
+- **角丸デザイン変更**: `rounded`（4px）→ `rounded-sm`（2px）でシャープ化
+
+#### [2025-06-20] 超コンパクトモバイル表示
+- **モバイル単画面表示最適化**: セクションタイトル縮小、余白網羅的削減
+- **固定ヘッダーとビューポート最適化**: ナビゲーションバー直下からコンテンツ表示
+- **下部余白完全削除**: 画面下部に不要な背景色領域を残さない設計
+
+### 🔧 技術改善履歴
+
+#### 色表示技術の進化
+1. **ピクセルサイズ表示** → **Canvas要素** → **48px Button統一**
+2. **近似計算** → **実際のピクセル分析（deltaE色差使用）**
+3. **バラバラなサイズ** → **48px統一仕様**
+4. **複雑なレイアウト** → **シンプルなモバイルUI**
+
+#### UI統一化・コンポーネント化
+- **統一ColorBlockコンポーネント**: 全色表示を統一（`src/components/common/ColorBlock.tsx`）
+- **統一CopyColorButtonコンポーネント**: 3種類のバリアント（minimal, compact, full）
+- **UI統一定数**: `src/constants/ui.ts`で48px Canvas仕様を統一定義
+- **ボーダー・スタイリング統一管理**: `BORDER_PRESETS`での一元管理
+
+#### レスポンシブ・モバイルファースト
+- **レスポンシブグリッド**: 2-6列のモバイル対応グリッド統一
+- **モバイルファーストデザイン**: 縦並びカード型レイアウトでタッチ操作最適化
+- **アクセシビリティ向上**: 十分な色見本サイズと明確なラベリング
+
+#### 国際化・ナイトモード
+- **配色技法名英語化**: 補色配色→Dyad、三角配色→Triad、四角配色→Tetrad等
+- **ナイトモードデフォルト**: App.tsxに`dark`クラス追加
+- **おしゃれフォント設定**: Inter（メイン）、JetBrains Mono（コード）
+
+### 📋 主要コミット履歴
+
+#### 最新（2025-07-01）
+- `f145dad` - Update PROJECT_RULES.md with latest layout and navigation structure
+- `c07eb47` - Add CLAUDE.md with complete project rules for session persistence
+- `8967eda` - Move hamburger menu to right side of navigation bar
+- `428cc97` - Add global navigation layout and refactor page structure
+
+#### グラデーション・モバイル最適化（2025-06-17）
+- `ed210e0` - Add gradient sorting for color recommendations
+- `9c5be61` - Consolidate project rules into single PROJECT_RULES.md
+- `b401e56` - Implement mobile 2-column layout for color and tone recommendations
+- `d4900c4` - Implement modern minimal UI design overhaul
+- `cf4225e` - Add mandatory copy button implementation rules
+
+#### コンパクト表示・構文修正（2025-06-20）
+- `2884c0c` - Optimize mobile UI spacing for compact single-screen display
+- `d3597e6` - Further optimize mobile spacing and fix syntax errors
+- `bb77e3f` - Remove bottom margin and add mobile optimization rules
+
+#### 色表示技術確立（2025-06-16）
+- `581d730` - Improve responsive design for color recommendation pages
+- `99a9c07` - Fix color extraction percentage calculation and standardize color display sizes
+- `3a3b09d` - Standardize all color displays to 64px and document UI specifications
+
+### 🏗️ 現在のアーキテクチャ状態
+
+#### UI統一仕様
+- **色表示**: 48px × 48px Canvas要素、`border-2 border-gray-300`、`rounded-sm`（2px）
+- **レスポンシブグリッド**: 色表示2-5列、配色技法2-6列、`gap-3`統一
+- **モバイル最適化**: `pt-1 pb-0`、超コンパクト表示、シングルスクリーン設計
+
+#### 技術スタック
+- **色処理**: ColorThief + chroma-js、deltaE色差判定、実際ピクセル数計算
+- **状態管理**: Zustand（軽量グローバル状態）
+- **UI**: shadcn/ui + Tailwind CSS、モバイルファーストデザイン
+- **配色技法**: 13種類（Identity, Analogous, Dyad, Triad, Tetrad, Split, Pentad, Hexad等）
+
+#### コンポーネント構成
+- **統一レイアウト**: Layout.tsx（全ページ共通ヘッダー・ナビゲーション）
+- **色表示統一**: ColorBlock.tsx、CopyColorButton.tsx
+- **レスポンシブグリッド**: ColorGrid.tsx、ColorItem.tsx
+- **配色技法**: ColorRecommendations.tsx、ToneRecommendations.tsx
+
+---
+
+**最終更新**: 2025-07-02  
 **適用プロジェクト**: 色推薦アプリ プロジェクト全体  
 
 このルールは、Claude Code セッションが毎回リセットされることを考慮して、**毎回最初に貼って読み込ませてください。**
