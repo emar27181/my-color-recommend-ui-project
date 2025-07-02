@@ -16,7 +16,7 @@ export const Layout = ({ children, showHeader = true }: LayoutProps) => {
     <div className="bg-background text-foreground min-h-screen flex flex-col">
       {showHeader && (
         <header className="border-b border-border bg-background flex-shrink-0">
-          <div className="container mx-auto px-4 py-3">
+          <div className="container mx-auto px-4 py-4">
             <div className="flex justify-between items-center relative">
               <Link
                 to="/"
