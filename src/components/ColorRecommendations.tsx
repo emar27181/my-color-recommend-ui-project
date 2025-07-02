@@ -88,7 +88,7 @@ export const ColorRecommendations = () => {
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
 
   return (
-    <Card className="w-full flex flex-col pb-0" style={{ height: '144px' }}>
+    <Card className="w-full flex flex-col pb-0" style={{ height: '144px', minWidth: '0' }}>
       <CardHeader className="pb-1 pt-2 flex-shrink-0">
         <div className="mt-0">
           <div className="relative">
@@ -131,10 +131,11 @@ export const ColorRecommendations = () => {
             {/* 展開時の配色技法一覧 */}
             {isDropdownOpen && (
               <div 
-                className={`absolute top-full left-0 right-0 mt-1 bg-background ${BORDER_PRESETS.button} shadow-lg z-10 max-h-60 overflow-y-auto`}
+                className={`absolute top-full left-0 mt-1 bg-background ${BORDER_PRESETS.button} shadow-lg z-10 max-h-60 overflow-y-auto`}
+                style={{ minWidth: '600px' }}
               >
-                <div className="p-3">
-                  <div className="grid grid-cols-2 xl:grid-cols-6 gap-3">
+                <div className="p-3 min-w-0">
+                  <div className="grid grid-cols-4 gap-3 w-full">
                     {COLOR_SCHEMES.map((scheme) => (
                       <button
                         key={scheme.id}
