@@ -140,19 +140,6 @@ export const ColorRecommendations = () => {
                       <button
                         key={scheme.id}
                         onClick={() => handleSchemeSelect(scheme.id)}
-                        onMouseEnter={() => {
-                          // PC版のみマウスホバーで色相環を表示
-                          if (!isMobile) {
-                            setHoveredScheme(scheme.id);
-                          }
-                        }}
-                        onMouseLeave={() => {
-                          // PC版のみマウスリーブで色相環を非表示
-                          if (!isMobile) {
-                            setHoveredScheme(null);
-                          }
-                        }}
-                        onMouseMove={handleMouseMove}
                         className={`flex items-center p-2 transition-all hover:scale-105 border border-border rounded-md ${
                           selectedScheme === scheme.id
                             ? 'bg-primary text-primary-foreground shadow-md'
@@ -180,32 +167,6 @@ export const ColorRecommendations = () => {
               </div>
             )}
 
-            {/* 色相環オーバーレイ表示（Portal使用） */}
-            {hoveredScheme && createPortal(
-              <div 
-                className={`fixed z-50 p-4 shadow-2xl pointer-events-none ${BORDER_PRESETS.colorBlock} ${
-                  isMobile ? 'bg-background/80 backdrop-blur-sm' : 'bg-background'
-                }`}
-                role="tooltip"
-                aria-label={`${COLOR_SCHEMES.find(s => s.id === hoveredScheme)?.name} の配色パターン`}
-                style={{ 
-                  left: `${getTooltipPosition().left}px`,
-                  top: `${getTooltipPosition().top}px`,
-                  width: '200px',
-                  height: '200px'
-                }}
-              >
-                {/* 色相環コンポーネントのみ */}
-                <div className="flex items-center justify-center h-full w-full">
-                  <ColorWheel
-                    radius={125}
-                    schemeId={hoveredScheme}
-                    baseHue={getBaseHue()}
-                  />
-                </div>
-              </div>,
-              document.body
-            )}
           </div>
         </div>
       </CardHeader>
