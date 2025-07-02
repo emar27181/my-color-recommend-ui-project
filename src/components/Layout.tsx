@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { HelpCircle, Play, ClipboardPenLine } from 'lucide-react';
+import { HelpCircle, Play, ClipboardPenLine, Home } from 'lucide-react';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { ToastContainer } from '@/components/ToastContainer';
@@ -22,6 +22,13 @@ export const Layout = ({ children, showHeader = true }: LayoutProps) => {
           <div className="container mx-auto px-4 py-3">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
+                <Link
+                  to="/"
+                  className="p-2 rounded-lg bg-background/50 border-none hover:bg-muted/50 transition-colors backdrop-blur-sm"
+                  title="ホームページ"
+                >
+                  <Home className="w-5 h-5 text-foreground" />
+                </Link>
                 <button
                   onClick={startTutorial}
                   className="p-2 rounded-lg bg-background/50 border-none hover:bg-muted/50 transition-colors backdrop-blur-sm"
