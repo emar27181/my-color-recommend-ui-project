@@ -95,7 +95,7 @@ export const ColorRecommendations = () => {
             {/* 新しい配色技法選択バー（色相環付き） */}
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className={`w-full flex items-center justify-between px-2 md:px-3 py-1.5 md:py-2 bg-transparent text-muted-foreground hover:bg-muted/20 text-xs md:text-sm font-medium transition-colors ${BORDER_PRESETS.button}`}
+              className={`w-full flex items-center justify-between px-2 md:px-3 py-1.5 md:py-2 bg-background text-muted-foreground hover:bg-muted/20 text-xs md:text-sm font-medium transition-colors border border-border rounded-md`}
               data-tutorial="color-schemes"
             >
               <div className="flex items-center gap-3">
@@ -152,10 +152,10 @@ export const ColorRecommendations = () => {
                           }
                         }}
                         onMouseMove={handleMouseMove}
-                        className={`flex items-center p-2 transition-all hover:scale-105 ${BORDER_PRESETS.button} ${
+                        className={`flex items-center p-2 transition-all hover:scale-105 border border-border rounded-md ${
                           selectedScheme === scheme.id
                             ? 'bg-primary text-primary-foreground shadow-md'
-                            : 'bg-muted hover:bg-muted/80 text-foreground'
+                            : 'bg-background hover:bg-muted/80 text-foreground'
                         }`}
                       >
                         {/* ミニ色相環 */}
@@ -182,8 +182,8 @@ export const ColorRecommendations = () => {
             {/* 色相環オーバーレイ表示（Portal使用） */}
             {hoveredScheme && createPortal(
               <div 
-                className={`fixed z-50 border border-border rounded-lg p-4 shadow-2xl pointer-events-none ${
-                  isMobile ? 'bg-card/80 backdrop-blur-sm' : 'bg-card'
+                className={`fixed z-50 p-4 shadow-2xl pointer-events-none ${BORDER_PRESETS.colorBlock} ${
+                  isMobile ? 'bg-background/80 backdrop-blur-sm' : 'bg-background'
                 }`}
                 role="tooltip"
                 aria-label={`${COLOR_SCHEMES.find(s => s.id === hoveredScheme)?.name} の配色パターン`}
