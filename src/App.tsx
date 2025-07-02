@@ -8,6 +8,9 @@ const App = () => {
   useEffect(() => {
     // 初期表示時にページの最上端を表示
     window.scrollTo(0, 0);
+    
+    // ダークモードをデフォルトに設定
+    document.documentElement.classList.add('dark');
   }, []);
 
   return (
