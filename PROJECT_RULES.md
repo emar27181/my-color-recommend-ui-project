@@ -123,6 +123,12 @@
 
 ### アプリケーション全体レイアウト
 
+#### 統一レイアウト構造（2025-07-01更新）
+- **全ページ共通**: Layoutコンポーネント（`src/components/Layout.tsx`）でラップ
+- **グローバルヘッダー**: ナビゲーションメニュー + ボタン群（チュートリアル・スワイプ・ヘルプ・テーマ切り替え）
+- **統一ナビゲーション**: 全ページで同じヘッダーナビゲーションを表示
+- **レスポンシブヘッダー**: `border-b border-border bg-background flex-shrink-0`
+
 #### メインレイアウト構造
 - **コンテナ**: `container mx-auto` でセンタリング
 - **モバイル/タブレット** (< 1280px): 縦積みレイアウト `space-y-6`
@@ -428,7 +434,8 @@ main (h-full flex flex-col)
 #### レイアウト・構造系
 | コンポーネント名 | ファイル | 役割 |
 |------------------|----------|------|
-| App | `/src/App.tsx` | 最上位アプリケーション構造 |
+| Layout | `/src/components/Layout.tsx` | 全ページ共通レイアウト・ヘッダー統一 |
+| App | `/src/App.tsx` | ホームページメインコンテンツ |
 | NavigationMenu | `/src/components/NavigationMenu.tsx` | ハンバーガーメニューナビゲーション |
 | ThemeToggle | `/src/components/ThemeToggle.tsx` | ライト・ダークモード切り替え |
 | ToastContainer | `/src/components/ToastContainer.tsx` | 通知メッセージ表示 |
@@ -498,19 +505,26 @@ RESPONSIVE_GRID = {
 - **最終セクション**: `mb-0` で下部余白完全削除
 - **タイトル**: `text-xs leading-tight` 超コンパクト
 
-### ヘッダー・ナビゲーション構造
+### ヘッダー・ナビゲーション構造（2025-07-01更新）
+
+#### 統一Layoutコンポーネント
+- **ファイル**: `src/components/Layout.tsx`
+- **用途**: 全ページ共通のヘッダー・フッター・基本構造
+- **ルーティング**: main.tsxで各ページをLayoutでラップ
+- **props**: `showHeader?: boolean` でヘッダー表示制御
 
 #### ヘッダーレイアウト
 ```
-header (border-b border-border bg-background)
-└── container (mx-auto px-4 py-3)
-    └── flex (justify-between items-center)
-        ├── NavigationMenu
-        └── div (flex items-center gap-2)
-            ├── TutorialButton (Play icon)
-            ├── SwipeButton (ClipboardPenLine icon, Link to="/swipe")
-            ├── HelpButton (HelpCircle icon, Link to="/help")
-            └── ThemeToggle (Sun/Moon icon)
+Layout
+└── header (border-b border-border bg-background flex-shrink-0)
+    └── container (mx-auto px-4 py-3)
+        └── flex (justify-between items-center)
+            ├── div (flex items-center gap-2)
+            │   ├── TutorialButton (Play icon)
+            │   ├── SwipeButton (ClipboardPenLine icon, Link to="/swipe")
+            │   ├── HelpButton (HelpCircle icon, Link to="/help")
+            │   └── ThemeToggle (Sun/Moon icon)
+            └── NavigationMenu (ハンバーガーメニュー - 右端配置)
 ```
 
 #### NavigationMenu仕様
@@ -518,6 +532,11 @@ header (border-b border-border bg-background)
 - **レイアウト**: ドロップダウン式メニュー
 - **背景**: backdrop-blur-sm 効果
 - **メニュー項目**: ホーム、ダミーページ1-3、ヘルプ
+
+#### ページ配置調整ルール
+- **スワイプページ**: ステータスバー位置を `top-16` (モバイル) / `top-20` (デスクトップ) に調整
+- **一般ページ**: ヘッダー下の適切な余白を確保
+- **個別ヘッダー禁止**: 各ページで独自ヘッダーを作成せず、Layout統一を使用
 
 ### カードレイアウト詳細仕様
 
@@ -682,6 +701,7 @@ interface ColorState {
 ```
 src/
 ├── components/
+│   ├── Layout.tsx                  # 全ページ共通レイアウト・ヘッダー統一
 │   ├── ColorPicker.tsx             # カラーピッカー（パレットアイコン式）
 │   ├── ColorRecommendations.tsx    # 色相推薦・配色技法選択
 │   ├── ExtractedColorsDisplay.tsx  # 抽出色表示・選択
