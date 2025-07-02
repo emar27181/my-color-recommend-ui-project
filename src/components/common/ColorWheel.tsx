@@ -23,10 +23,10 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
   className = ''
 }) => {
   const containerRadius = radius; // 外枠半径
-  const wheelRadius = 115; // 色相環半径 (外枠より少し小さく)
+  const wheelRadius = radius - 2; // 色相環半径 (コンテナぎりぎりまで大きく)
   const size = containerRadius * 2;
   const strokeWidth = 2;
-  const plotRadius = 86; // プロット点の配置半径 (wheelRadius * 0.75相当)
+  const plotRadius = radius * 0.85; // プロット点の配置半径 (より外側に)
 
   // 選択された配色技法のanglesを取得
   const scheme = schemeId ? COLOR_SCHEMES.find(s => s.id === schemeId) : null;

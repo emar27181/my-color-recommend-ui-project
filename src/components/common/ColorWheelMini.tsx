@@ -23,10 +23,10 @@ export const ColorWheelMini: React.FC<ColorWheelMiniProps> = ({
   className = ''
 }) => {
   const containerRadius = radius;
-  const wheelRadius = radius - 2; // 外枠より少し小さく
+  const wheelRadius = radius - 0.5; // 外枠ぎりぎりまで大きく
   const size = containerRadius * 2;
   const strokeWidth = 1;
-  const plotRadius = radius * 0.6; // プロット点の配置半径
+  const plotRadius = radius * 0.8; // プロット点の配置半径 (より外側に)
 
   // 選択された配色技法のanglesを取得
   const scheme = schemeId ? COLOR_SCHEMES.find(s => s.id === schemeId) : null;
