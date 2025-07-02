@@ -21,13 +21,13 @@ export const NavigationMenu = ({ className = '' }: NavigationMenuProps) => {
       {/* Hamburger Menu Button */}
       <button
         onClick={toggleMenu}
-        className="p-2 rounded-lg bg-transparent border-none hover:bg-muted/50 transition-colors"
+        className="p-2 rounded-lg bg-transparent border-none hover:bg-muted/50 transition-colors text-foreground"
         aria-label="メニューを開く"
       >
         {isOpen ? (
-          <X className="w-6 h-6 text-foreground" />
+          <X className="w-6 h-6" />
         ) : (
-          <Menu className="w-6 h-6 text-foreground" />
+          <Menu className="w-6 h-6" />
         )}
       </button>
 
@@ -48,14 +48,14 @@ export const NavigationMenu = ({ className = '' }: NavigationMenuProps) => {
                   startTutorial();
                   setIsOpen(false);
                 }}
-                className="p-3 hover:bg-muted/50 transition-colors rounded-lg flex items-center justify-center"
+                className="p-3 hover:bg-muted/50 transition-colors rounded-lg flex items-center justify-center text-foreground"
                 title="チュートリアル"
               >
                 <Play className="w-5 h-5" />
               </button>
               <Link
                 to="/swipe"
-                className="p-3 hover:bg-muted/50 transition-colors rounded-lg flex items-center justify-center"
+                className="p-3 hover:bg-muted/50 transition-colors rounded-lg flex items-center justify-center text-foreground"
                 onClick={toggleMenu}
                 title="スワイプ推薦"
               >
@@ -63,7 +63,7 @@ export const NavigationMenu = ({ className = '' }: NavigationMenuProps) => {
               </Link>
               <Link
                 to="/help"
-                className="p-3 hover:bg-muted/50 transition-colors rounded-lg flex items-center justify-center"
+                className="p-3 hover:bg-muted/50 transition-colors rounded-lg flex items-center justify-center text-foreground"
                 onClick={toggleMenu}
                 title="ヘルプ"
               >
