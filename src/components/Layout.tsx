@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Home } from 'lucide-react';
 import { NavigationMenu } from '@/components/NavigationMenu';
+import { LanguageToggle } from '@/components/LanguageToggle';
 import { ToastContainer } from '@/components/ToastContainer';
 import { TutorialOverlay } from '@/components/tutorial/TutorialOverlay';
 
@@ -25,8 +26,11 @@ export const Layout = ({ children, showHeader = true }: LayoutProps) => {
               >
                 <Home className="w-5 h-5 text-foreground" />
               </Link>
-              <div className="relative">
-                <NavigationMenu />
+              <div className="flex items-center gap-2">
+                <LanguageToggle />
+                <div className="relative">
+                  <NavigationMenu />
+                </div>
               </div>
             </div>
           </div>
