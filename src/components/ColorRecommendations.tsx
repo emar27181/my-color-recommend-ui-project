@@ -75,11 +75,11 @@ export const ColorRecommendations = () => {
             {/* 展開時の配色技法一覧 */}
             {isDropdownOpen && (
               <div 
-                className={`absolute top-full left-0 mt-1 bg-background ${BORDER_PRESETS.button} shadow-lg z-10 max-h-60 overflow-y-auto`}
-                style={{ minWidth: '600px' }}
+                className={`absolute top-full left-0 sm:left-0 mt-1 bg-background ${BORDER_PRESETS.button} shadow-lg z-10 max-h-60 overflow-y-auto w-full sm:w-auto`}
+                style={{ width: 'min(600px, calc(100vw - 2rem))' }}
               >
                 <div className="p-3 min-w-0">
-                  <div className="grid grid-cols-4 gap-3 w-full">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full">
                     {COLOR_SCHEMES.map((scheme) => (
                       <button
                         key={scheme.id}
@@ -129,7 +129,8 @@ export const ColorRecommendations = () => {
           <ColorGrid
             colors={recommendedColors.map(color => ({
               color,
-              title: `${t('colorRecommendations.generateTones')}: ${color}`
+              title: `${t('colorRecommendations.generateTones')}: ${color}`,
+              showClickIcon: true
           }))}
           onColorClick={handleGenerateTones}
           emptyMessage={t('colorRecommendations.noRecommendations')}
