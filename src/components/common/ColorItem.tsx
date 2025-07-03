@@ -1,6 +1,8 @@
 import { ColorBlock } from '@/components/common/ColorBlock';
 import { CopyColorButton } from '@/components/common/CopyColorButton';
 import { TYPOGRAPHY, BORDER_PRESETS } from '@/constants/ui';
+import { MousePointerClick } from 'lucide-react';
+import chroma from 'chroma-js';
 
 interface ColorItemProps {
   color: string;
@@ -10,6 +12,7 @@ interface ColorItemProps {
   subtitle?: string;
   compact?: boolean;
   clickable?: boolean;
+  showClickIcon?: boolean;
 }
 
 /**
@@ -23,11 +26,24 @@ export const ColorItem = ({
   title,
   subtitle,
   compact = false,
-  clickable = true
+  clickable = true,
+  showClickIcon = false
 }: ColorItemProps) => {
   const handleClick = () => {
     if (clickable && onClick) {
       onClick();
+    }
+  };
+
+  // ベースカラーとのコントラスト比を考慮したアイコン色を取得
+  const getIconColor = () => {
+    try {
+      const colorObj = chroma(color);
+      const lightness = colorObj.get('hsl.l');
+      // 明るい色には暗いアイコン、暗い色には明るいアイコン
+      return lightness > 0.5 ? '#374151' : '#f9fafb'; // gray-700 or gray-50
+    } catch {
+      return '#6b7280'; // デフォルト: gray-500
     }
   };
 
@@ -44,6 +60,7 @@ export const ColorItem = ({
           <ColorBlock
             color={color}
             title={title || color}
+            showClickIcon={showClickIcon}
           />
           <div className="flex-1 min-w-0">
             <p className={`${TYPOGRAPHY.colorCode} truncate`}>{color}</p>
@@ -76,14 +93,21 @@ export const ColorItem = ({
         height: '32px'
       }}>
         <div
-          className={`${BORDER_PRESETS.colorBlock} cursor-pointer hover:scale-110 transition-all duration-200`}
+          className={`${BORDER_PRESETS.colorBlock} cursor-pointer hover:scale-110 transition-all duration-200 flex items-center justify-center`}
           style={{
             backgroundColor: color,
             width: '24px',
             height: '24px'
           }}
           title={title || color}
-        />
+        >
+          {showClickIcon && (
+            <MousePointerClick 
+              className="w-3 h-3" 
+              style={{ color: getIconColor() }}
+            />
+          )}
+        </div>
       </div>
       <div onClick={(e) => e.stopPropagation()}>
         <CopyColorButton

@@ -5,6 +5,7 @@ interface ColorData {
   color: string;
   title?: string;
   subtitle?: string;
+  showClickIcon?: boolean;
 }
 
 interface ColorGridProps {
@@ -53,6 +54,7 @@ export const ColorGrid = ({
             subtitle={colorData.subtitle}
             onClick={() => onColorClick?.(colorData.color)}
             clickable={clickable}
+            showClickIcon={colorData.showClickIcon}
           />
         ))}
       </div>
@@ -70,6 +72,7 @@ export const ColorGrid = ({
                 onClick={() => onColorClick?.(colorData.color)}
                 compact={true}
                 clickable={clickable}
+                showClickIcon={colorData.showClickIcon}
               />
             ))}
           </div>
