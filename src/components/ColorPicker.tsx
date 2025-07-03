@@ -4,11 +4,13 @@ import { CopyColorButton } from '@/components/common/CopyColorButton';
 import { TYPOGRAPHY, BORDER_PRESETS } from '@/constants/ui';
 import { useTutorial } from '@/contexts/TutorialContext';
 import { Palette } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import chroma from 'chroma-js';
 
 export const ColorPicker = () => {
   const { selectedColor, setSelectedColor } = useColorStore();
   const { onUserAction } = useTutorial();
+  const { t } = useTranslation();
 
   const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const color = e.target.value;
@@ -45,7 +47,7 @@ export const ColorPicker = () => {
                     value={selectedColor}
                     onChange={handleColorChange}
                     className="absolute inset-0 opacity-0 w-full h-full cursor-pointer z-10"
-                    title="クリックで色を選択"
+                    title={t('colorPicker.clickToSelect')}
                   />
                   <div 
                     className={`${BORDER_PRESETS.colorBlock} flex items-center justify-center pointer-events-none`}
@@ -54,7 +56,7 @@ export const ColorPicker = () => {
                       width: '46px',
                       height: '46px'
                     }}
-                    title={`選択中の色: ${selectedColor} - クリックで変更`}
+                    title={`${t('colorPicker.selectedColor')}: ${selectedColor} - ${t('colorPicker.clickToChange')}`}
                   >
                     <Palette 
                       className="w-5 h-5" 
@@ -85,7 +87,7 @@ export const ColorPicker = () => {
                   value={selectedColor}
                   onChange={handleColorChange}
                   className="absolute inset-0 opacity-0 w-full h-full cursor-pointer z-10"
-                  title="クリックで色を選択"
+                  title={t('colorPicker.clickToSelect')}
                 />
                 <div 
                   className={`${BORDER_PRESETS.colorBlock} flex items-center justify-center pointer-events-none`}
@@ -94,7 +96,7 @@ export const ColorPicker = () => {
                     width: '24px',
                     height: '24px'
                   }}
-                  title={`選択中の色: ${selectedColor} - タップで変更`}
+                  title={`${t('colorPicker.selectedColor')}: ${selectedColor} - ${t('colorPicker.tapToChange')}`}
                 >
                   <Palette 
                     className="w-3 h-3" 
