@@ -1,9 +1,7 @@
 import React from 'react';
-import { createPortal } from 'react-dom';
 import { useColorStore, COLOR_SCHEMES } from '@/store/colorStore';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ColorGrid } from '@/components/common/ColorGrid';
-import { ColorWheel } from '@/components/common/ColorWheel';
 import { ColorWheelMini } from '@/components/common/ColorWheelMini';
 import { useTutorial } from '@/contexts/TutorialContext';
 import { ChevronDown } from 'lucide-react';
@@ -14,8 +12,6 @@ export const ColorRecommendations = () => {
   const { recommendedColors, selectedScheme, setSelectedScheme, generateRecommendedTones, selectedColor } = useColorStore();
   const { onUserAction } = useTutorial();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
-  const [hoveredScheme, setHoveredScheme] = React.useState<string | null>(null);
-  const [mousePosition, setMousePosition] = React.useState({ x: 0, y: 0 });
 
   const handleGenerateTones = (color: string) => {
     generateRecommendedTones(color);
@@ -28,7 +24,6 @@ export const ColorRecommendations = () => {
   const handleSchemeSelect = (schemeId: string) => {
     setSelectedScheme(schemeId);
     setIsDropdownOpen(false);
-    setHoveredScheme(null); // 選択後は常に色相環を非表示
     // チュートリアルの自動進行をトリガー
     onUserAction('click', '[data-tutorial="color-schemes"]');
   };
@@ -43,49 +38,6 @@ export const ColorRecommendations = () => {
     }
   };
 
-  // マウス位置を更新するハンドラー
-  const handleMouseMove = (event: React.MouseEvent) => {
-    setMousePosition({ x: event.clientX, y: event.clientY });
-  };
-
-  // 色相環の表示位置を計算（PC: マウス追従、モバイル: 画面中央）
-  const getTooltipPosition = () => {
-    const tooltipWidth = 200;
-    const tooltipHeight = 200;
-    
-    if (isMobile) {
-      // モバイル版: 画面中央に固定表示
-      return {
-        left: (window.innerWidth - tooltipWidth) / 2,
-        top: (window.innerHeight - tooltipHeight) / 2
-      };
-    }
-    
-    // PC版: マウス位置ベース（従来の処理）
-    const offset = 20;
-    let left = mousePosition.x + offset;
-    let top = mousePosition.y - tooltipHeight / 2;
-    
-    // 右端はみ出し防止
-    if (left + tooltipWidth > window.innerWidth) {
-      left = mousePosition.x - tooltipWidth - offset;
-    }
-    
-    // 上端はみ出し防止
-    if (top < 0) {
-      top = 10;
-    }
-    
-    // 下端はみ出し防止
-    if (top + tooltipHeight > window.innerHeight) {
-      top = window.innerHeight - tooltipHeight - 10;
-    }
-    
-    return { left, top };
-  };
-
-  // モバイルデバイスかどうかを判定
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
 
   return (
     <Card className="w-full flex flex-col pb-0" style={{ height: '144px', minWidth: '0' }}>
@@ -177,7 +129,6 @@ export const ColorRecommendations = () => {
           className="fixed inset-0 z-5" 
           onClick={() => {
             setIsDropdownOpen(false);
-            setHoveredScheme(null); // ドロップダウン閉じ時は常に色相環を非表示
           }}
         />
       )}
