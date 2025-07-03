@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ColorGrid } from '@/components/common/ColorGrid';
 import { ColorWheelMini } from '@/components/common/ColorWheelMini';
 import { useTutorial } from '@/contexts/TutorialContext';
+import { useTranslation } from 'react-i18next';
 import { ChevronDown } from 'lucide-react';
 import { BORDER_PRESETS } from '@/constants/ui';
 import chroma from 'chroma-js';
@@ -11,6 +12,7 @@ import chroma from 'chroma-js';
 export const ColorRecommendations = () => {
   const { recommendedColors, selectedScheme, setSelectedScheme, generateRecommendedTones, selectedColor } = useColorStore();
   const { onUserAction } = useTutorial();
+  const { t } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
 
   const handleGenerateTones = (color: string) => {
@@ -61,19 +63,9 @@ export const ColorRecommendations = () => {
                 )}
                 <span className="truncate">
                   {selectedSchemeData ? (
-                    <>
-                      {selectedSchemeData.name.split(':').map((part, index) => (
-                        <span key={index}>
-                          {index === 0 ? (
-                            <span className="font-bold">{part}</span>
-                          ) : (
-                            <span>:{part}</span>
-                          )}
-                        </span>
-                      ))}
-                    </>
+                    <span className="font-bold">{t(`colorSchemes.${selectedSchemeData.id}`)}</span>
                   ) : (
-                    '配色技法を選択'
+                    t('colorRecommendations.selectScheme')
                   )}
                 </span>
               </div>
@@ -109,8 +101,7 @@ export const ColorRecommendations = () => {
                         
                         {/* 配色技法名 */}
                         <div className="text-xs font-medium leading-tight min-w-0 flex-1">
-                          {/* 配色技法名の最初の部分（色数含む）のみ表示 */}
-                          {scheme.name.split(':')[0]}
+                          {t(`colorSchemes.${scheme.id}`)}
                         </div>
                       </button>
                     ))}
@@ -138,10 +129,10 @@ export const ColorRecommendations = () => {
           <ColorGrid
             colors={recommendedColors.map(color => ({
               color,
-              title: `色: ${color} (タップでトーン生成)`
+              title: `${t('colorRecommendations.generateTones')}: ${color}`
           }))}
           onColorClick={handleGenerateTones}
-          emptyMessage="色を選択すると推薦色が表示されます"
+          emptyMessage={t('colorRecommendations.noRecommendations')}
         />
         </div>
       </CardContent>
@@ -151,6 +142,7 @@ export const ColorRecommendations = () => {
 
 export const ToneRecommendations = () => {
   const { recommendedTones, selectedColor, generateRecommendedTones } = useColorStore();
+  const { t } = useTranslation();
 
   React.useEffect(() => {
     if (recommendedTones.length === 0 && selectedColor) {
@@ -170,7 +162,7 @@ export const ToneRecommendations = () => {
               title: tone
             }))}
           clickable={false}
-          emptyMessage="トーン推薦がありません"
+          emptyMessage={t('toneRecommendations.noTones')}
         />
         </div>
       </CardContent>
