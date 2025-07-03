@@ -1,0 +1,73 @@
+{
+  "app": {
+    "title": "色推薦アプリ",
+    "steps": {
+      "baseColorSelection": "ベースカラー(推薦元)選択",
+      "baseColorSelectionShort": "ベース色選択",
+      "colorRecommendation": "色相(配色技法)推薦",
+      "colorRecommendationShort": "色相推薦",
+      "toneRecommendation": "トーン(明度・彩度)推薦",
+      "toneRecommendationShort": "トーン推薦"
+    }
+  },
+  "colorPicker": {
+    "clickToSelect": "クリックで色を選択",
+    "selectedColor": "選択中の色",
+    "clickToChange": "クリックで変更",
+    "tapToChange": "タップで変更"
+  },
+  "imageUpload": {
+    "invalidFile": "無効なファイルです",
+    "uploadImage": "画像をアップロード",
+    "dragAndDrop": "画像をドラッグ&ドロップまたはクリックして選択",
+    "processing": "処理中...",
+    "extractionComplete": "色抽出完了！",
+    "extractionFailed": "色抽出に失敗しました"
+  },
+  "extractedColors": {
+    "title": "抽出された色",
+    "dominant": "ドミナント",
+    "selectColor": "色を選択してください",
+    "noColors": "色が抽出されていません"
+  },
+  "colorRecommendations": {
+    "title": "色相推薦",
+    "selectScheme": "配色技法を選択",
+    "noRecommendations": "色を選択すると推薦色が表示されます",
+    "generateTones": "トーン生成"
+  },
+  "toneRecommendations": {
+    "title": "トーン推薦",
+    "noTones": "トーン推薦がありません",
+    "selectBaseColor": "ベース色を選択してください"
+  },
+  "colorSchemes": {
+    "identity": "アイデンティティ配色(1色)",
+    "analogous_1": "アナロジー配色(2色)",
+    "analogous_2": "アナロジー配色(2色)",
+    "complementary": "ダイアード配色(2色)",
+    "intermediate_1": "インターミディエート配色(2色)",
+    "intermediate_2": "インターミディエート配色(2色)",
+    "opponent": "オポーネント配色(2色)",
+    "dominant_1": "ドミナント配色(3色)",
+    "dominant_2": "ドミナント配色(3色)",
+    "triadic": "トライアド配色(3色)",
+    "split_complementary": "スプリットコンプリメンタリー配色(3色)",
+    "tetradic": "テトラード配色(4色)",
+    "pentad": "ペンタード配色(5色)",
+    "hexad": "ヘクサード配色(6色)"
+  },
+  "navigation": {
+    "home": "ホーム",
+    "swipe": "スワイプ",
+    "help": "ヘルプ",
+    "tutorial": "チュートリアル"
+  },
+  "common": {
+    "copy": "コピー",
+    "copied": "コピーしました！",
+    "loading": "読み込み中...",
+    "error": "エラー",
+    "success": "成功"
+  }
+}

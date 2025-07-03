@@ -1,0 +1,73 @@
+{
+  "app": {
+    "title": "Color Recommendation App",
+    "steps": {
+      "baseColorSelection": "Base Color (Source) Selection",
+      "baseColorSelectionShort": "Base Color Selection",
+      "colorRecommendation": "Hue (Color Scheme) Recommendation",
+      "colorRecommendationShort": "Hue Recommendation",
+      "toneRecommendation": "Tone (Brightness & Saturation) Recommendation", 
+      "toneRecommendationShort": "Tone Recommendation"
+    }
+  },
+  "colorPicker": {
+    "clickToSelect": "Click to select color",
+    "selectedColor": "Selected color",
+    "clickToChange": "Click to change",
+    "tapToChange": "Tap to change"
+  },
+  "imageUpload": {
+    "invalidFile": "Invalid file",
+    "uploadImage": "Upload Image",
+    "dragAndDrop": "Drag & drop an image or click to select",
+    "processing": "Processing...",
+    "extractionComplete": "Color extraction complete!",
+    "extractionFailed": "Color extraction failed"
+  },
+  "extractedColors": {
+    "title": "Extracted Colors",
+    "dominant": "Dominant",
+    "selectColor": "Please select a color",
+    "noColors": "No colors extracted"
+  },
+  "colorRecommendations": {
+    "title": "Hue Recommendations",
+    "selectScheme": "Select Color Scheme",
+    "noRecommendations": "Select a color to view recommendations",
+    "generateTones": "Generate Tones"
+  },
+  "toneRecommendations": {
+    "title": "Tone Recommendations", 
+    "noTones": "No tone recommendations",
+    "selectBaseColor": "Please select a base color"
+  },
+  "colorSchemes": {
+    "identity": "Identity (1 color)",
+    "analogous_1": "Analogous (2 colors)",
+    "analogous_2": "Analogous (2 colors)",
+    "complementary": "Dyad (2 colors)",
+    "intermediate_1": "Intermediate (2 colors)",
+    "intermediate_2": "Intermediate (2 colors)",
+    "opponent": "Opponent (2 colors)",
+    "dominant_1": "Dominant (3 colors)",
+    "dominant_2": "Dominant (3 colors)",
+    "triadic": "Triad (3 colors)",
+    "split_complementary": "Split-Complementary (3 colors)",
+    "tetradic": "Tetrad (4 colors)",
+    "pentad": "Pentad (5 colors)",
+    "hexad": "Hexad (6 colors)"
+  },
+  "navigation": {
+    "home": "Home",
+    "swipe": "Swipe",
+    "help": "Help", 
+    "tutorial": "Tutorial"
+  },
+  "common": {
+    "copy": "Copy",
+    "copied": "Copied!",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  }
+}
