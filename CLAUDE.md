@@ -51,6 +51,15 @@
 - **アイコン**: 太陽（ライト）⇔ 月（ダーク）
 - **即座反映**: クリック時にリアルタイムでテーマ変更
 
+### 言語切り替え
+- **対応言語**: 日本語（デフォルト）⇔ 英語
+- **配置**: ヘッダー右側、ナビゲーションメニューの左隣
+- **アイコン**: `Languages`（lucide-react）
+- **表示**: 「JP」⇔「EN」テキストラベル
+- **デザイン**: 完全透明ボタン（`bg-transparent border-transparent hover:bg-transparent hover:border-transparent`）
+- **実装**: `react-i18next`ライブラリ使用、localStorage永続化
+- **自動検出**: ブラウザ言語から初期言語設定
+
 ---
 
 ## 🎨 色表示ブロック統一仕様
