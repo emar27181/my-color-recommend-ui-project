@@ -160,7 +160,8 @@ export const ToneRecommendations = () => {
           <ColorGrid
             colors={recommendedTones.map(tone => ({
               color: tone,
-              title: tone
+              title: tone,
+              showClickIcon: false
             }))}
           clickable={false}
           emptyMessage={t('toneRecommendations.noTones')}
