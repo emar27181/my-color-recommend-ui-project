@@ -1,7 +1,7 @@
 import { ColorBlock } from '@/components/common/ColorBlock';
 import { CopyColorButton } from '@/components/common/CopyColorButton';
 import { TYPOGRAPHY, BORDER_PRESETS } from '@/constants/ui';
-import { MousePointerClick } from 'lucide-react';
+import { SquareMousePointer } from 'lucide-react';
 import chroma from 'chroma-js';
 
 interface ColorItemProps {
@@ -102,7 +102,7 @@ export const ColorItem = ({
           title={title || color}
         >
           {showClickIcon && (
-            <MousePointerClick 
+            <SquareMousePointer 
               className="w-3 h-3" 
               style={{ color: getIconColor() }}
             />

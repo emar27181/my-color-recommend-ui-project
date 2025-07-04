@@ -1,5 +1,5 @@
 import { COLOR_BLOCK_SPEC, BORDER_PRESETS } from '@/constants/ui';
-import { Palette, MousePointerClick } from 'lucide-react';
+import { Palette, SquareMousePointer } from 'lucide-react';
 import chroma from 'chroma-js';
 
 interface ColorBlockProps {
@@ -50,7 +50,7 @@ export const ColorBlock = ({
         title={title}
       >
         {showClickIcon && (
-          <MousePointerClick 
+          <SquareMousePointer 
             className="w-5 h-5" 
             style={{ color: getIconColor() }}
           />
