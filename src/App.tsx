@@ -9,6 +9,9 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const App = () => {
   const { t } = useTranslation();
+  const [isBaseColorCollapsed, setIsBaseColorCollapsed] = useState(false);
+  const [isColorRecommendationCollapsed, setIsColorRecommendationCollapsed] = useState(false);
+  const [isToneRecommendationCollapsed, setIsToneRecommendationCollapsed] = useState(false);
   const [isSkinColorCollapsed, setIsSkinColorCollapsed] = useState(true);
 
   useEffect(() => {
@@ -25,30 +28,64 @@ const App = () => {
       <div className="block xl:hidden flex flex-col">
         {/* Step 1: ベース色選択 - コンパクト化 */}
         <section className="flex-shrink-0 mb-1">
-          <h3 className="text-xs font-medium text-foreground leading-tight mb-0">1. {t('app.steps.baseColorSelection')}</h3>
-          <div className="flex gap-1">
-            <div className="flex-1">
-              <ColorPicker />
-            </div>
-            <div className="flex-1">
-              <ImageUpload />
-            </div>
-          </div>
-          <ExtractedColorsDisplay />
+          <h3 
+            className="text-xs font-medium text-foreground leading-tight mb-0 cursor-pointer flex items-center justify-between"
+            onClick={() => setIsBaseColorCollapsed(!isBaseColorCollapsed)}
+          >
+            <span>1. {t('app.steps.baseColorSelection')}</span>
+            {isBaseColorCollapsed ? (
+              <ChevronDown className="w-4 h-4" />
+            ) : (
+              <ChevronUp className="w-4 h-4" />
+            )}
+          </h3>
+          {!isBaseColorCollapsed && (
+            <>
+              <div className="flex gap-1">
+                <div className="flex-1">
+                  <ColorPicker />
+                </div>
+                <div className="flex-1">
+                  <ImageUpload />
+                </div>
+              </div>
+              <ExtractedColorsDisplay />
+            </>
+          )}
         </section>
 
         {/* Steps 2, 3 & 4: 色相推薦・トーン推薦・肌色推薦 - 動的サイズ */}
         <div className="space-y-1">
           {/* Step 2 */}
           <section>
-            <h3 className="text-xs font-medium mb-0 text-foreground leading-tight">2. {t('app.steps.colorRecommendation')}</h3>
-            <ColorRecommendations />
+            <h3 
+              className="text-xs font-medium mb-0 text-foreground leading-tight cursor-pointer flex items-center justify-between"
+              onClick={() => setIsColorRecommendationCollapsed(!isColorRecommendationCollapsed)}
+            >
+              <span>2. {t('app.steps.colorRecommendation')}</span>
+              {isColorRecommendationCollapsed ? (
+                <ChevronDown className="w-4 h-4" />
+              ) : (
+                <ChevronUp className="w-4 h-4" />
+              )}
+            </h3>
+            {!isColorRecommendationCollapsed && <ColorRecommendations />}
           </section>
 
           {/* Step 3 */}
           <section>
-            <h3 className="text-xs font-medium mb-0 text-foreground leading-tight">3. {t('app.steps.toneRecommendation')}</h3>
-            <ToneRecommendations />
+            <h3 
+              className="text-xs font-medium mb-0 text-foreground leading-tight cursor-pointer flex items-center justify-between"
+              onClick={() => setIsToneRecommendationCollapsed(!isToneRecommendationCollapsed)}
+            >
+              <span>3. {t('app.steps.toneRecommendation')}</span>
+              {isToneRecommendationCollapsed ? (
+                <ChevronDown className="w-4 h-4" />
+              ) : (
+                <ChevronUp className="w-4 h-4" />
+              )}
+            </h3>
+            {!isToneRecommendationCollapsed && <ToneRecommendations />}
           </section>
 
           {/* Step 4 */}
@@ -73,27 +110,63 @@ const App = () => {
       <div className="hidden xl:block h-full flex flex-col">
         {/* Step 1: ベース色選択 - 上部コンパクト配置 */}
         <section className="flex-shrink-0 mb-2">
-          <h2 className="text-lg font-medium mb-1 text-foreground">1. {t('app.steps.baseColorSelectionShort')}</h2>
-          <div className="grid grid-cols-3 gap-4">
-            <ColorPicker />
-            <ImageUpload />
-            <ExtractedColorsDisplay />
-          </div>
+          <h2 
+            className="text-lg font-medium mb-1 text-foreground cursor-pointer flex items-center justify-between"
+            onClick={() => setIsBaseColorCollapsed(!isBaseColorCollapsed)}
+          >
+            <span>1. {t('app.steps.baseColorSelectionShort')}</span>
+            {isBaseColorCollapsed ? (
+              <ChevronDown className="w-5 h-5" />
+            ) : (
+              <ChevronUp className="w-5 h-5" />
+            )}
+          </h2>
+          {!isBaseColorCollapsed && (
+            <div className="grid grid-cols-3 gap-4">
+              <ColorPicker />
+              <ImageUpload />
+              <ExtractedColorsDisplay />
+            </div>
+          )}
         </section>
 
         {/* Steps 2, 3 & 4: 色相推薦・トーン推薦・肌色推薦 - 並列表示 */}
         <div className="flex-1 grid grid-cols-3 gap-4 min-h-0">
           <section className="min-h-0 flex flex-col">
-            <h2 className="text-lg font-medium mb-1 text-foreground flex-shrink-0">2. {t('app.steps.colorRecommendationShort')}</h2>
-            <div className="flex-1 min-h-0">
-              <ColorRecommendations />
-            </div>
+            <h2 
+              className="text-lg font-medium mb-1 text-foreground flex-shrink-0 cursor-pointer flex items-center justify-between"
+              onClick={() => setIsColorRecommendationCollapsed(!isColorRecommendationCollapsed)}
+            >
+              <span>2. {t('app.steps.colorRecommendationShort')}</span>
+              {isColorRecommendationCollapsed ? (
+                <ChevronDown className="w-5 h-5" />
+              ) : (
+                <ChevronUp className="w-5 h-5" />
+              )}
+            </h2>
+            {!isColorRecommendationCollapsed && (
+              <div className="flex-1 min-h-0">
+                <ColorRecommendations />
+              </div>
+            )}
           </section>
           <section className="min-h-0 flex flex-col">
-            <h2 className="text-lg font-medium mb-1 text-foreground flex-shrink-0">3. {t('app.steps.toneRecommendationShort')}</h2>
-            <div className="flex-1 min-h-0">
-              <ToneRecommendations />
-            </div>
+            <h2 
+              className="text-lg font-medium mb-1 text-foreground flex-shrink-0 cursor-pointer flex items-center justify-between"
+              onClick={() => setIsToneRecommendationCollapsed(!isToneRecommendationCollapsed)}
+            >
+              <span>3. {t('app.steps.toneRecommendationShort')}</span>
+              {isToneRecommendationCollapsed ? (
+                <ChevronDown className="w-5 h-5" />
+              ) : (
+                <ChevronUp className="w-5 h-5" />
+              )}
+            </h2>
+            {!isToneRecommendationCollapsed && (
+              <div className="flex-1 min-h-0">
+                <ToneRecommendations />
+              </div>
+            )}
           </section>
           <section className="min-h-0 flex flex-col mb-0">
             <h2 
