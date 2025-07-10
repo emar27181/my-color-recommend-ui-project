@@ -3,11 +3,13 @@ import { ColorRecommendations, ToneRecommendations } from '@/components/ColorRec
 import { ImageUpload } from '@/components/ImageUpload';
 import { ExtractedColorsDisplay } from '@/components/ExtractedColorsDisplay';
 import { SkinColorRecommendations } from '@/components/SkinColorRecommendations';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const App = () => {
   const { t } = useTranslation();
+  const [isSkinColorCollapsed, setIsSkinColorCollapsed] = useState(true);
 
   useEffect(() => {
     // 初期表示時にページの最上端を表示
@@ -51,8 +53,18 @@ const App = () => {
 
           {/* Step 4 */}
           <section>
-            <h3 className="text-xs font-medium mb-0 text-foreground leading-tight">α. 肌色推薦</h3>
-            <SkinColorRecommendations />
+            <h3 
+              className="text-xs font-medium mb-0 text-foreground leading-tight cursor-pointer flex items-center justify-between"
+              onClick={() => setIsSkinColorCollapsed(!isSkinColorCollapsed)}
+            >
+              <span>α. 肌色推薦</span>
+              {isSkinColorCollapsed ? (
+                <ChevronDown className="w-4 h-4" />
+              ) : (
+                <ChevronUp className="w-4 h-4" />
+              )}
+            </h3>
+            {!isSkinColorCollapsed && <SkinColorRecommendations />}
           </section>
         </div>
       </div>
@@ -84,10 +96,22 @@ const App = () => {
             </div>
           </section>
           <section className="min-h-0 flex flex-col mb-0">
-            <h2 className="text-lg font-medium mb-1 text-foreground flex-shrink-0">α. 肌色推薦</h2>
-            <div className="flex-1 min-h-0">
-              <SkinColorRecommendations />
-            </div>
+            <h2 
+              className="text-lg font-medium mb-1 text-foreground flex-shrink-0 cursor-pointer flex items-center justify-between"
+              onClick={() => setIsSkinColorCollapsed(!isSkinColorCollapsed)}
+            >
+              <span>α. 肌色推薦</span>
+              {isSkinColorCollapsed ? (
+                <ChevronDown className="w-5 h-5" />
+              ) : (
+                <ChevronUp className="w-5 h-5" />
+              )}
+            </h2>
+            {!isSkinColorCollapsed && (
+              <div className="flex-1 min-h-0">
+                <SkinColorRecommendations />
+              </div>
+            )}
           </section>
         </div>
       </div>
