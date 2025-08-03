@@ -3,6 +3,7 @@ import { ColorRecommendations, ToneRecommendations } from '@/components/ColorRec
 import { ImageUpload } from '@/components/ImageUpload';
 import { ExtractedColorsDisplay } from '@/components/ExtractedColorsDisplay';
 import { SkinColorRecommendations } from '@/components/SkinColorRecommendations';
+import { PaintCanvas } from '@/components/PaintCanvas';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronUp } from 'lucide-react';
@@ -13,6 +14,7 @@ const App = () => {
   const [isColorRecommendationCollapsed, setIsColorRecommendationCollapsed] = useState(false);
   const [isToneRecommendationCollapsed, setIsToneRecommendationCollapsed] = useState(false);
   const [isSkinColorCollapsed, setIsSkinColorCollapsed] = useState(true);
+  const [isPaintCanvasCollapsed, setIsPaintCanvasCollapsed] = useState(false);
 
   useEffect(() => {
     // 初期表示時にページの最上端を表示
@@ -103,6 +105,22 @@ const App = () => {
             </h3>
             {!isSkinColorCollapsed && <SkinColorRecommendations />}
           </section>
+
+          {/* Step 5: Paint Canvas - Tablet and larger */}
+          <section className="md:block">
+            <h3 
+              className="text-xs font-medium mb-0 text-foreground leading-tight cursor-pointer flex items-center justify-between"
+              onClick={() => setIsPaintCanvasCollapsed(!isPaintCanvasCollapsed)}
+            >
+              <span>β. 試し塗りキャンバス</span>
+              {isPaintCanvasCollapsed ? (
+                <ChevronDown className="w-4 h-4" />
+              ) : (
+                <ChevronUp className="w-4 h-4" />
+              )}
+            </h3>
+            {!isPaintCanvasCollapsed && <PaintCanvas />}
+          </section>
         </div>
       </div>
 
@@ -130,8 +148,8 @@ const App = () => {
           )}
         </section>
 
-        {/* Steps 2, 3 & 4: 色相推薦・トーン推薦・肌色推薦 - 並列表示 */}
-        <div className="flex-1 grid grid-cols-3 gap-4 min-h-0">
+        {/* Steps 2, 3, 4 & 5: 色相推薦・トーン推薦・肌色推薦・試し塗りキャンバス - 並列表示 */}
+        <div className="flex-1 grid grid-cols-4 gap-4 min-h-0">
           <section className="min-h-0 flex flex-col">
             <h2 
               className="text-lg font-medium mb-1 text-foreground flex-shrink-0 cursor-pointer flex items-center justify-between"
@@ -168,7 +186,7 @@ const App = () => {
               </div>
             )}
           </section>
-          <section className="min-h-0 flex flex-col mb-0">
+          <section className="min-h-0 flex flex-col">
             <h2 
               className="text-lg font-medium mb-1 text-foreground flex-shrink-0 cursor-pointer flex items-center justify-between"
               onClick={() => setIsSkinColorCollapsed(!isSkinColorCollapsed)}
@@ -183,6 +201,24 @@ const App = () => {
             {!isSkinColorCollapsed && (
               <div className="flex-1 min-h-0">
                 <SkinColorRecommendations />
+              </div>
+            )}
+          </section>
+          <section className="min-h-0 flex flex-col mb-0">
+            <h2 
+              className="text-lg font-medium mb-1 text-foreground flex-shrink-0 cursor-pointer flex items-center justify-between"
+              onClick={() => setIsPaintCanvasCollapsed(!isPaintCanvasCollapsed)}
+            >
+              <span>β. 試し塗りキャンバス</span>
+              {isPaintCanvasCollapsed ? (
+                <ChevronDown className="w-5 h-5" />
+              ) : (
+                <ChevronUp className="w-5 h-5" />
+              )}
+            </h2>
+            {!isPaintCanvasCollapsed && (
+              <div className="flex-1 min-h-0">
+                <PaintCanvas />
               </div>
             )}
           </section>
