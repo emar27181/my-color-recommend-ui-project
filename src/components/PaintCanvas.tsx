@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CircleDashed, Palette, Plus, Minus, Eraser, Edit } from 'lucide-react';
+import { CircleDashed, Palette, Plus, Minus, Eraser, Edit, PaintBucket } from 'lucide-react';
 
 interface PaintCanvasProps {
   className?: string;
@@ -13,6 +13,8 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
   const [penSize, setPenSize] = useState(8);
   const [isEraserMode, setIsEraserMode] = useState(false);
+  const [isFillMode, setIsFillMode] = useState(false);
+  const [fillColor, setFillColor] = useState('#000000');
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // キャンバスの初期化
@@ -62,6 +64,67 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     }
   }, [context, isEraserMode]);
 
+  // フラッドフィル（塗りつぶし）アルゴリズム
+  const floodFill = useCallback((startX: number, startY: number, newColor: string) => {
+    if (!context || !canvasRef.current) return;
+    
+    const canvas = canvasRef.current;
+    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    const pixels = imageData.data;
+    
+    // 新しい色をRGBAに変換
+    const hex = newColor.replace('#', '');
+    const newR = parseInt(hex.substring(0, 2), 16);
+    const newG = parseInt(hex.substring(2, 4), 16);
+    const newB = parseInt(hex.substring(4, 6), 16);
+    const newA = 255;
+    
+    // 開始点の色を取得
+    const startIndex = (Math.floor(startY) * canvas.width + Math.floor(startX)) * 4;
+    const startR = pixels[startIndex];
+    const startG = pixels[startIndex + 1];
+    const startB = pixels[startIndex + 2];
+    const startA = pixels[startIndex + 3];
+    
+    // 同じ色の場合は何もしない
+    if (startR === newR && startG === newG && startB === newB && startA === newA) {
+      return;
+    }
+    
+    // スタックベースのフラッドフィル
+    const stack: { x: number; y: number }[] = [{ x: Math.floor(startX), y: Math.floor(startY) }];
+    
+    while (stack.length > 0) {
+      const { x, y } = stack.pop()!;
+      
+      if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) continue;
+      
+      const index = (y * canvas.width + x) * 4;
+      
+      // 現在のピクセルが開始色と同じかチェック
+      if (pixels[index] === startR && 
+          pixels[index + 1] === startG && 
+          pixels[index + 2] === startB && 
+          pixels[index + 3] === startA) {
+        
+        // 新しい色に塗り替え
+        pixels[index] = newR;
+        pixels[index + 1] = newG;
+        pixels[index + 2] = newB;
+        pixels[index + 3] = newA;
+        
+        // 隣接する4方向をスタックに追加
+        stack.push({ x: x + 1, y });
+        stack.push({ x: x - 1, y });
+        stack.push({ x, y: y + 1 });
+        stack.push({ x, y: y - 1 });
+      }
+    }
+    
+    // 変更されたピクセルデータをキャンバスに反映
+    context.putImageData(imageData, 0, 0);
+  }, [context]);
+
   // コンポーネントアンマウント時のクリーンアップ
   useEffect(() => {
     return () => {
@@ -93,8 +156,15 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
   const startDrawing = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!context || !canvasRef.current) return;
     
-    setIsDrawing(true);
     const { x, y } = getScaledCoordinates(e.clientX, e.clientY);
+    
+    // 塗りつぶしモードの場合
+    if (isFillMode) {
+      floodFill(x, y, fillColor);
+      return;
+    }
+    
+    setIsDrawing(true);
     
     // 描画設定を確実に適用
     context.globalCompositeOperation = 'source-over'; // 常に通常描画モード
@@ -109,7 +179,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     
     context.beginPath();
     context.moveTo(x, y);
-  }, [context, getScaledCoordinates, penSize, isEraserMode]);
+  }, [context, getScaledCoordinates, penSize, isEraserMode, isFillMode, fillColor, floodFill]);
 
   // 描画中
   const draw = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -141,9 +211,16 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     e.preventDefault();
     if (!context || !canvasRef.current) return;
     
-    setIsDrawing(true);
     const touch = e.touches[0];
     const { x, y } = getScaledCoordinates(touch.clientX, touch.clientY);
+    
+    // 塗りつぶしモードの場合
+    if (isFillMode) {
+      floodFill(x, y, fillColor);
+      return;
+    }
+    
+    setIsDrawing(true);
     
     // 描画設定を確実に適用
     context.globalCompositeOperation = 'source-over'; // 常に通常描画モード
@@ -158,7 +235,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     
     context.beginPath();
     context.moveTo(x, y);
-  }, [context, getScaledCoordinates, penSize, isEraserMode]);
+  }, [context, getScaledCoordinates, penSize, isEraserMode, isFillMode, fillColor, floodFill]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault();
@@ -254,19 +331,54 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
             試し塗りキャンバス
           </h3>
           <div className="flex items-center gap-2">
-            {/* ペン/消しゴムモード切り替え */}
-            <Button
-              onClick={() => setIsEraserMode(!isEraserMode)}
-              variant={isEraserMode ? "default" : "outline"}
-              size="sm"
-              className="h-8 px-3"
-            >
-              {isEraserMode ? (
-                <Eraser className="w-4 h-4 text-foreground" />
-              ) : (
+            {/* ペン/消しゴム/塗りつぶしモード切り替え */}
+            <div className="flex gap-1">
+              <Button
+                onClick={() => {
+                  setIsEraserMode(false);
+                  setIsFillMode(false);
+                }}
+                variant={!isEraserMode && !isFillMode ? "default" : "outline"}
+                size="sm"
+                className="h-8 px-2"
+              >
                 <Edit className="w-4 h-4 text-foreground" />
-              )}
-            </Button>
+              </Button>
+              <Button
+                onClick={() => {
+                  setIsEraserMode(true);
+                  setIsFillMode(false);
+                }}
+                variant={isEraserMode ? "default" : "outline"}
+                size="sm"
+                className="h-8 px-2"
+              >
+                <Eraser className="w-4 h-4 text-foreground" />
+              </Button>
+              <Button
+                onClick={() => {
+                  setIsEraserMode(false);
+                  setIsFillMode(true);
+                }}
+                variant={isFillMode ? "default" : "outline"}
+                size="sm"
+                className="h-8 px-2"
+              >
+                <PaintBucket className="w-4 h-4 text-foreground" />
+              </Button>
+            </div>
+            {/* 塗りつぶし色選択（塗りつぶしモード時のみ表示） */}
+            {isFillMode && (
+              <div className="flex items-center gap-1">
+                <input
+                  type="color"
+                  value={fillColor}
+                  onChange={(e) => setFillColor(e.target.value)}
+                  className="w-8 h-8 rounded border-2 border-border cursor-pointer"
+                  title="塗りつぶし色"
+                />
+              </div>
+            )}
             {/* ペンサイズ調整 */}
             <div className="flex items-center gap-1">
               <Button
@@ -317,7 +429,9 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
         <div className="relative flex-1 flex flex-col">
           <canvas
             ref={canvasRef}
-            className="border border-border rounded-md cursor-crosshair bg-white"
+            className={`border border-border rounded-md bg-white ${
+              isFillMode ? 'cursor-pointer' : 'cursor-crosshair'
+            }`}
             style={{ width: '100%', height: 'auto' }}
             onMouseDown={startDrawing}
             onMouseMove={draw}
