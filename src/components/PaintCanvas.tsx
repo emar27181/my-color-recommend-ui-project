@@ -274,14 +274,13 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     
     // 塗りつぶしモードの場合
     if (isFillMode) {
-      // 塗りつぶし前の状態を履歴に保存
-      saveToHistory();
       floodFill(x, y, fillColor);
+      // 塗りつぶし後に履歴を保存
+      setTimeout(() => {
+        saveToHistory();
+      }, 10);
       return;
     }
-    
-    // 描画開始前の状態を履歴に保存
-    saveToHistory();
     
     setIsDrawing(true);
     
@@ -323,7 +322,12 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     if (!context) return;
     setIsDrawing(false);
     context.closePath();
-  }, [context]);
+    
+    // 描画終了時に履歴を保存
+    setTimeout(() => {
+      saveToHistory();
+    }, 10);
+  }, [context, saveToHistory]);
 
   // タッチイベント対応
   const handleTouchStart = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
@@ -335,14 +339,13 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     
     // 塗りつぶしモードの場合
     if (isFillMode) {
-      // 塗りつぶし前の状態を履歴に保存
-      saveToHistory();
       floodFill(x, y, fillColor);
+      // 塗りつぶし後に履歴を保存
+      setTimeout(() => {
+        saveToHistory();
+      }, 10);
       return;
     }
-    
-    // 描画開始前の状態を履歴に保存
-    saveToHistory();
     
     setIsDrawing(true);
     
@@ -385,14 +388,16 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     if (!context) return;
     setIsDrawing(false);
     context.closePath();
-  }, [context]);
+    
+    // 描画終了時に履歴を保存
+    setTimeout(() => {
+      saveToHistory();
+    }, 10);
+  }, [context, saveToHistory]);
 
   // キャンバスをクリア
   const clearCanvas = useCallback(() => {
     if (!context || !canvasRef.current) return;
-    
-    // クリア前の状態を履歴に保存
-    saveToHistory();
     
     // 背景をクリア
     context.save();
@@ -407,6 +412,11 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     context.lineWidth = penSize;
     context.lineCap = 'round';
     context.lineJoin = 'round';
+    
+    // クリア後に履歴を保存
+    setTimeout(() => {
+      saveToHistory();
+    }, 10);
   }, [context, penSize, isEraserMode, saveToHistory]);
 
   // ペンサイズ変更関数
