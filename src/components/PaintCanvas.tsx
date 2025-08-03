@@ -164,7 +164,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
           <canvas
             ref={canvasRef}
             className="border border-border rounded-md cursor-crosshair bg-white"
-            style={{ width: '25%', height: 'auto', maxWidth: '100px' }}
+            style={{ width: '60%', height: 'auto', maxWidth: '200px' }}
             onMouseDown={startDrawing}
             onMouseMove={draw}
             onMouseUp={stopDrawing}
