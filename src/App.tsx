@@ -15,6 +15,7 @@ const App = () => {
   const [isToneRecommendationCollapsed, setIsToneRecommendationCollapsed] = useState(false);
   const [isSkinColorCollapsed, setIsSkinColorCollapsed] = useState(true);
   const [isPaintCanvasCollapsed, setIsPaintCanvasCollapsed] = useState(false);
+  const [isDebugMode, setIsDebugMode] = useState(false);
 
   useEffect(() => {
     // 初期表示時にページの最上端を表示
@@ -22,10 +23,25 @@ const App = () => {
 
     // ダークモードをデフォルトに設定
     document.documentElement.classList.add('dark');
+
+    // F5キーでデバッグモード切り替え
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'F5') {
+        event.preventDefault(); // ページリロードを防ぐ
+        setIsDebugMode(prev => !prev);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    
+    // クリーンアップ
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   return (
-    <main className="flex-1 px-4 pb-2 min-h-0 flex flex-col">
+    <main className="flex-1 pb-2 min-h-0 flex flex-col" style={isDebugMode ? { backgroundColor: 'green' } : {}}>
       {/* Mobile/Tablet: Single Screen Layout */}
       <div className="hidden flex flex-col overflow-y-auto">
         {/* Step 1: ベース色選択 - コンパクト化 */}
@@ -114,18 +130,16 @@ const App = () => {
       </div>
 
       {/* Desktop: Left Canvas + Right Color Tools Layout */}
-      <div className="flex flex-1 gap-6">
+      <div className="flex flex-1 gap-6" style={isDebugMode ? { padding: '32px', backgroundColor: 'yellow' } : { padding: '16px' }}>
         {/* Left: Paint Canvas */}
-        <div className="w-1/2 flex flex-col min-h-0">
-          <section className="flex-1 flex flex-col">
-            <div className="flex-1 min-h-0">
-              <PaintCanvas />
-            </div>
-          </section>
+        <div className="w-1/2 flex flex-col min-h-0" style={isDebugMode ? { padding: '32px', backgroundColor: 'red' } : { padding: '16px' }}>
+          {isDebugMode && <h1 className="text-4xl text-black">LEFT PANEL</h1>}
+          <PaintCanvas />
         </div>
 
         {/* Right: Color Tools in Vertical Layout */}
-        <div className="w-1/2 flex flex-col space-y-4 min-h-0 overflow-y-auto">
+        <div className="w-1/2 flex flex-col space-y-4 min-h-0 overflow-y-auto" style={isDebugMode ? { padding: '32px', backgroundColor: 'blue' } : { padding: '16px' }}>
+          {isDebugMode && <h1 className="text-4xl text-black">RIGHT PANEL</h1>}
           {/* Step 1: ベース色選択 */}
           <section className="flex-shrink-0">
             <h2 
