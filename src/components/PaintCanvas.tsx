@@ -1,8 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Eraser, RotateCcw, Palette } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+import { RotateCcw, Palette } from 'lucide-react';
 
 interface PaintCanvasProps {
   className?: string;
@@ -12,7 +11,6 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
-  const { t } = useTranslation();
 
   // キャンバスの初期化
   useEffect(() => {
@@ -39,30 +37,50 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     }
   }, []);
 
+  // 座標計算のヘルパー関数
+  const getScaledCoordinates = useCallback((clientX: number, clientY: number) => {
+    if (!canvasRef.current) return { x: 0, y: 0 };
+    
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    
+    // 表示サイズと実際のキャンバスサイズの比率を計算
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    // スケールを考慮した座標計算
+    const x = (clientX - rect.left) * scaleX;
+    const y = (clientY - rect.top) * scaleY;
+    
+    return { x, y };
+  }, []);
+
   // 描画開始
   const startDrawing = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!context || !canvasRef.current) return;
     
     setIsDrawing(true);
-    const rect = canvasRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const { x, y } = getScaledCoordinates(e.clientX, e.clientY);
+    
+    // 描画設定を確実に適用
+    context.strokeStyle = '#000000';
+    context.lineWidth = 20;
+    context.lineCap = 'round';
+    context.lineJoin = 'round';
     
     context.beginPath();
     context.moveTo(x, y);
-  }, [context]);
+  }, [context, getScaledCoordinates]);
 
   // 描画中
   const draw = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isDrawing || !context || !canvasRef.current) return;
     
-    const rect = canvasRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const { x, y } = getScaledCoordinates(e.clientX, e.clientY);
     
     context.lineTo(x, y);
     context.stroke();
-  }, [isDrawing, context]);
+  }, [isDrawing, context, getScaledCoordinates]);
 
   // 描画終了
   const stopDrawing = useCallback(() => {
@@ -77,27 +95,29 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     if (!context || !canvasRef.current) return;
     
     setIsDrawing(true);
-    const rect = canvasRef.current.getBoundingClientRect();
     const touch = e.touches[0];
-    const x = touch.clientX - rect.left;
-    const y = touch.clientY - rect.top;
+    const { x, y } = getScaledCoordinates(touch.clientX, touch.clientY);
+    
+    // 描画設定を確実に適用
+    context.strokeStyle = '#000000';
+    context.lineWidth = 20;
+    context.lineCap = 'round';
+    context.lineJoin = 'round';
     
     context.beginPath();
     context.moveTo(x, y);
-  }, [context]);
+  }, [context, getScaledCoordinates]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault();
     if (!isDrawing || !context || !canvasRef.current) return;
     
-    const rect = canvasRef.current.getBoundingClientRect();
     const touch = e.touches[0];
-    const x = touch.clientX - rect.left;
-    const y = touch.clientY - rect.top;
+    const { x, y } = getScaledCoordinates(touch.clientX, touch.clientY);
     
     context.lineTo(x, y);
     context.stroke();
-  }, [isDrawing, context]);
+  }, [isDrawing, context, getScaledCoordinates]);
 
   const handleTouchEnd = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault();
@@ -110,8 +130,15 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
   const clearCanvas = useCallback(() => {
     if (!context || !canvasRef.current) return;
     
+    // 背景をクリア
     context.fillStyle = '#ffffff';
     context.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    
+    // 描画設定を再設定
+    context.strokeStyle = '#000000';
+    context.lineWidth = 20;
+    context.lineCap = 'round';
+    context.lineJoin = 'round';
   }, [context]);
 
   return (
