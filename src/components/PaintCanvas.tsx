@@ -49,13 +49,15 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     }
   }, [context, penSize]);
 
-  // 消しゴムモード変更時にglobalCompositeOperationを更新
+  // 消しゴムモード変更時にstrokeStyleを更新
   useEffect(() => {
     if (context) {
       console.log('Setting eraser mode to:', isEraserMode);
-      context.globalCompositeOperation = isEraserMode ? 'destination-out' : 'source-over';
-      if (!isEraserMode) {
-        context.strokeStyle = '#000000';
+      context.globalCompositeOperation = 'source-over'; // 常に通常描画モード
+      if (isEraserMode) {
+        context.strokeStyle = '#ffffff'; // 消しゴムは白色
+      } else {
+        context.strokeStyle = '#000000'; // 通常は黒色
       }
     }
   }, [context, isEraserMode]);
@@ -95,11 +97,11 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     const { x, y } = getScaledCoordinates(e.clientX, e.clientY);
     
     // 描画設定を確実に適用
+    context.globalCompositeOperation = 'source-over'; // 常に通常描画モード
     if (isEraserMode) {
-      context.globalCompositeOperation = 'destination-out'; // 消しゴムモード
+      context.strokeStyle = '#ffffff'; // 消しゴムは白色で描画
     } else {
-      context.globalCompositeOperation = 'source-over'; // 通常の描画モード
-      context.strokeStyle = '#000000';
+      context.strokeStyle = '#000000'; // 通常は黒色
     }
     context.lineWidth = penSize;
     context.lineCap = 'round';
@@ -116,10 +118,11 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     const { x, y } = getScaledCoordinates(e.clientX, e.clientY);
     
     // 描画設定を確実に維持
+    context.globalCompositeOperation = 'source-over';
     if (isEraserMode) {
-      context.globalCompositeOperation = 'destination-out';
+      context.strokeStyle = '#ffffff'; // 消しゴムは白色で描画
     } else {
-      context.globalCompositeOperation = 'source-over';
+      context.strokeStyle = '#000000'; // 通常は黒色
     }
     
     context.lineTo(x, y);
@@ -143,11 +146,11 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     const { x, y } = getScaledCoordinates(touch.clientX, touch.clientY);
     
     // 描画設定を確実に適用
+    context.globalCompositeOperation = 'source-over'; // 常に通常描画モード
     if (isEraserMode) {
-      context.globalCompositeOperation = 'destination-out'; // 消しゴムモード
+      context.strokeStyle = '#ffffff'; // 消しゴムは白色で描画
     } else {
-      context.globalCompositeOperation = 'source-over'; // 通常の描画モード
-      context.strokeStyle = '#000000';
+      context.strokeStyle = '#000000'; // 通常は黒色
     }
     context.lineWidth = penSize;
     context.lineCap = 'round';
@@ -165,10 +168,11 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     const { x, y } = getScaledCoordinates(touch.clientX, touch.clientY);
     
     // 描画設定を確実に維持
+    context.globalCompositeOperation = 'source-over';
     if (isEraserMode) {
-      context.globalCompositeOperation = 'destination-out';
+      context.strokeStyle = '#ffffff'; // 消しゴムは白色で描画
     } else {
-      context.globalCompositeOperation = 'source-over';
+      context.strokeStyle = '#000000'; // 通常は黒色
     }
     
     context.lineTo(x, y);
@@ -194,11 +198,11 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     context.restore();
     
     // 描画設定を再設定
-    context.strokeStyle = '#000000';
+    context.globalCompositeOperation = 'source-over';
+    context.strokeStyle = isEraserMode ? '#ffffff' : '#000000';
     context.lineWidth = penSize;
     context.lineCap = 'round';
     context.lineJoin = 'round';
-    context.globalCompositeOperation = isEraserMode ? 'destination-out' : 'source-over';
   }, [context, penSize, isEraserMode]);
 
   // ペンサイズ変更関数
