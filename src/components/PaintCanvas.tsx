@@ -12,6 +12,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
   const [penSize, setPenSize] = useState(8);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // キャンバスの初期化
   useEffect(() => {
@@ -45,6 +46,15 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
       context.lineWidth = penSize;
     }
   }, [context, penSize]);
+
+  // コンポーネントアンマウント時のクリーンアップ
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, []);
 
   // 座標計算のヘルパー関数
   const getScaledCoordinates = useCallback((clientX: number, clientY: number) => {
@@ -152,11 +162,42 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
 
   // ペンサイズ変更関数
   const increasePenSize = useCallback(() => {
-    setPenSize(prev => Math.min(prev + 2, 20)); // 最大20px
+    setPenSize(prev => Math.min(prev + 2, 200)); // 最大200px
   }, []);
 
   const decreasePenSize = useCallback(() => {
     setPenSize(prev => Math.max(prev - 2, 2)); // 最小2px
+  }, []);
+
+  // 長押し開始
+  const startLongPress = useCallback((increment: boolean) => {
+    // 最初の1回を即座に実行
+    if (increment) {
+      increasePenSize();
+    } else {
+      decreasePenSize();
+    }
+    
+    // 300ms後から連続実行開始
+    const timeoutId = setTimeout(() => {
+      intervalRef.current = setInterval(() => {
+        if (increment) {
+          setPenSize(prev => Math.min(prev + 2, 200));
+        } else {
+          setPenSize(prev => Math.max(prev - 2, 2));
+        }
+      }, 100); // 100ms間隔で連続実行
+    }, 300);
+
+    return timeoutId;
+  }, [increasePenSize, decreasePenSize]);
+
+  // 長押し終了
+  const stopLongPress = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
   }, []);
 
   return (
@@ -172,6 +213,11 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
             <div className="flex items-center gap-1">
               <Button
                 onClick={decreasePenSize}
+                onMouseDown={() => startLongPress(false)}
+                onMouseUp={stopLongPress}
+                onMouseLeave={stopLongPress}
+                onTouchStart={() => startLongPress(false)}
+                onTouchEnd={stopLongPress}
                 variant="outline"
                 size="sm"
                 className="h-8 w-8 p-0"
@@ -184,10 +230,15 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
               </span>
               <Button
                 onClick={increasePenSize}
+                onMouseDown={() => startLongPress(true)}
+                onMouseUp={stopLongPress}
+                onMouseLeave={stopLongPress}
+                onTouchStart={() => startLongPress(true)}
+                onTouchEnd={stopLongPress}
                 variant="outline"
                 size="sm"
                 className="h-8 w-8 p-0"
-                disabled={penSize >= 20}
+                disabled={penSize >= 200}
               >
                 <Plus className="w-3 h-3 text-foreground" />
               </Button>
