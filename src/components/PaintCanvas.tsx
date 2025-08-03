@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CircleDashed, Palette } from 'lucide-react';
+import { CircleDashed, Palette, Plus, Minus } from 'lucide-react';
 
 interface PaintCanvasProps {
   className?: string;
@@ -11,6 +11,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
+  const [penSize, setPenSize] = useState(8);
 
   // キャンバスの初期化
   useEffect(() => {
@@ -26,7 +27,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctx.strokeStyle = '#000000'; // 黒色固定
-        ctx.lineWidth = 8; // 太さ8px（超高解像度対応）
+        ctx.lineWidth = 8; // 初期ペンサイズ
         
         // 背景を白に設定
         ctx.fillStyle = '#ffffff';
@@ -36,6 +37,14 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
       }
     }
   }, []);
+
+  // contextが設定された時とペンサイズ変更時にcanvasに反映
+  useEffect(() => {
+    if (context) {
+      console.log('Setting pen size to:', penSize);
+      context.lineWidth = penSize;
+    }
+  }, [context, penSize]);
 
   // 座標計算のヘルパー関数
   const getScaledCoordinates = useCallback((clientX: number, clientY: number) => {
@@ -64,13 +73,13 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     
     // 描画設定を確実に適用
     context.strokeStyle = '#000000';
-    context.lineWidth = 8;
+    context.lineWidth = penSize;
     context.lineCap = 'round';
     context.lineJoin = 'round';
     
     context.beginPath();
     context.moveTo(x, y);
-  }, [context, getScaledCoordinates]);
+  }, [context, getScaledCoordinates, penSize]);
 
   // 描画中
   const draw = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -100,13 +109,13 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     
     // 描画設定を確実に適用
     context.strokeStyle = '#000000';
-    context.lineWidth = 8;
+    context.lineWidth = penSize;
     context.lineCap = 'round';
     context.lineJoin = 'round';
     
     context.beginPath();
     context.moveTo(x, y);
-  }, [context, getScaledCoordinates]);
+  }, [context, getScaledCoordinates, penSize]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault();
@@ -136,10 +145,19 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     
     // 描画設定を再設定
     context.strokeStyle = '#000000';
-    context.lineWidth = 8;
+    context.lineWidth = penSize;
     context.lineCap = 'round';
     context.lineJoin = 'round';
-  }, [context]);
+  }, [context, penSize]);
+
+  // ペンサイズ変更関数
+  const increasePenSize = useCallback(() => {
+    setPenSize(prev => Math.min(prev + 2, 20)); // 最大20px
+  }, []);
+
+  const decreasePenSize = useCallback(() => {
+    setPenSize(prev => Math.max(prev - 2, 2)); // 最小2px
+  }, []);
 
   return (
     <Card className={`w-full h-full flex flex-col bg-background border-transparent ${className}`}>
@@ -149,14 +167,41 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
             <Palette className="w-4 h-4" />
             試し塗りキャンバス
           </h3>
-          <Button
-            onClick={clearCanvas}
-            variant="outline"
-            size="sm"
-            className="h-8 px-2"
-          >
-            <CircleDashed className="w-4 h-4 text-foreground" />
-          </Button>
+          <div className="flex items-center gap-2">
+            {/* ペンサイズ調整 */}
+            <div className="flex items-center gap-1">
+              <Button
+                onClick={decreasePenSize}
+                variant="outline"
+                size="sm"
+                className="h-8 w-8 p-0"
+                disabled={penSize <= 2}
+              >
+                <Minus className="w-3 h-3 text-foreground" />
+              </Button>
+              <span className="text-xs font-mono text-foreground min-w-[24px] text-center">
+                {penSize}
+              </span>
+              <Button
+                onClick={increasePenSize}
+                variant="outline"
+                size="sm"
+                className="h-8 w-8 p-0"
+                disabled={penSize >= 20}
+              >
+                <Plus className="w-3 h-3 text-foreground" />
+              </Button>
+            </div>
+            {/* リセットボタン */}
+            <Button
+              onClick={clearCanvas}
+              variant="outline"
+              size="sm"
+              className="h-8 px-2"
+            >
+              <CircleDashed className="w-4 h-4 text-foreground" />
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="pt-1 pb-4 flex-1 flex flex-col">
