@@ -142,7 +142,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
   }, [context]);
 
   return (
-    <Card className={`w-full h-full flex flex-col ${className}`}>
+    <Card className={`w-full h-full flex flex-col bg-background border-transparent ${className}`}>
       <CardHeader className="pb-1 pt-2">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-medium flex items-center gap-2">
