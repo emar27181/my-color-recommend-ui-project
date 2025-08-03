@@ -142,7 +142,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
   }, [context]);
 
   return (
-    <Card className={`w-full ${className}`}>
+    <Card className={`w-full h-full flex flex-col ${className}`}>
       <CardHeader className="pb-1 pt-2">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-medium flex items-center gap-2">
@@ -159,12 +159,12 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="pt-1 pb-4">
-        <div className="relative">
+      <CardContent className="pt-1 pb-4 flex-1 flex flex-col">
+        <div className="relative flex-1 flex flex-col">
           <canvas
             ref={canvasRef}
             className="border border-border rounded-md cursor-crosshair bg-white"
-            style={{ width: '50vw', height: 'auto' }}
+            style={{ width: '100%', height: 'auto' }}
             onMouseDown={startDrawing}
             onMouseMove={draw}
             onMouseUp={stopDrawing}
@@ -173,9 +173,6 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
           />
-          <div className="mt-2 text-xs text-muted-foreground text-center">
-            クリックまたはタッチしてドラッグで描画できます（黒色・超高解像度1920x1440）
-          </div>
         </div>
       </CardContent>
     </Card>

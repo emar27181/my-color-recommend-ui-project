@@ -25,9 +25,9 @@ const App = () => {
   }, []);
 
   return (
-    <main className="flex-1 px-4 pb-2 overflow-y-auto">
+    <main className="flex-1 px-4 pb-2 h-full flex flex-col">
       {/* Mobile/Tablet: Single Screen Layout */}
-      <div className="block xl:hidden flex flex-col">
+      <div className="block lg:hidden flex flex-col overflow-y-auto">
         {/* Step 1: ベース色選択 - コンパクト化 */}
         <section className="flex-shrink-0 mb-1">
           <h3 
@@ -124,35 +124,58 @@ const App = () => {
         </div>
       </div>
 
-      {/* Desktop: Single Screen Layout */}
-      <div className="hidden xl:block h-full flex flex-col">
-        {/* Step 1: ベース色選択 - 上部コンパクト配置 */}
-        <section className="flex-shrink-0 mb-2">
-          <h2 
-            className="text-lg font-medium mb-1 text-foreground cursor-pointer flex items-center justify-between"
-            onClick={() => setIsBaseColorCollapsed(!isBaseColorCollapsed)}
-          >
-            <span>1. {t('app.steps.baseColorSelectionShort')}</span>
-            {isBaseColorCollapsed ? (
-              <ChevronDown className="w-5 h-5" />
-            ) : (
-              <ChevronUp className="w-5 h-5" />
-            )}
-          </h2>
-          {!isBaseColorCollapsed && (
-            <div className="grid grid-cols-3 gap-4">
-              <ColorPicker />
-              <ImageUpload />
-              <ExtractedColorsDisplay />
-            </div>
-          )}
-        </section>
-
-        {/* Steps 2, 3, 4 & 5: 色相推薦・トーン推薦・肌色推薦・試し塗りキャンバス - 並列表示 */}
-        <div className="flex-1 grid grid-cols-4 gap-4 min-h-0">
-          <section className="min-h-0 flex flex-col">
+      {/* Desktop: Left Canvas + Right Color Tools Layout */}
+      <div className="flex h-full gap-6">
+        {/* Left: Paint Canvas */}
+        <div className="w-1/2 flex flex-col">
+          <section className="h-full">
             <h2 
-              className="text-lg font-medium mb-1 text-foreground flex-shrink-0 cursor-pointer flex items-center justify-between"
+              className="text-lg font-medium mb-2 text-foreground cursor-pointer flex items-center justify-between"
+              onClick={() => setIsPaintCanvasCollapsed(!isPaintCanvasCollapsed)}
+            >
+              <span>試し塗りキャンバス</span>
+              {isPaintCanvasCollapsed ? (
+                <ChevronDown className="w-5 h-5" />
+              ) : (
+                <ChevronUp className="w-5 h-5" />
+              )}
+            </h2>
+            {!isPaintCanvasCollapsed && (
+              <div className="h-full">
+                <PaintCanvas />
+              </div>
+            )}
+          </section>
+        </div>
+
+        {/* Right: Color Tools in Vertical Layout */}
+        <div className="w-1/2 flex flex-col space-y-4 overflow-y-auto">
+          {/* Step 1: ベース色選択 */}
+          <section className="flex-shrink-0">
+            <h2 
+              className="text-lg font-medium mb-2 text-foreground cursor-pointer flex items-center justify-between"
+              onClick={() => setIsBaseColorCollapsed(!isBaseColorCollapsed)}
+            >
+              <span>1. {t('app.steps.baseColorSelectionShort')}</span>
+              {isBaseColorCollapsed ? (
+                <ChevronDown className="w-5 h-5" />
+              ) : (
+                <ChevronUp className="w-5 h-5" />
+              )}
+            </h2>
+            {!isBaseColorCollapsed && (
+              <div className="grid grid-cols-3 gap-4">
+                <ColorPicker />
+                <ImageUpload />
+                <ExtractedColorsDisplay />
+              </div>
+            )}
+          </section>
+
+          {/* Step 2: 色相推薦 */}
+          <section className="flex-shrink-0">
+            <h2 
+              className="text-lg font-medium mb-2 text-foreground cursor-pointer flex items-center justify-between"
               onClick={() => setIsColorRecommendationCollapsed(!isColorRecommendationCollapsed)}
             >
               <span>2. {t('app.steps.colorRecommendationShort')}</span>
@@ -162,15 +185,13 @@ const App = () => {
                 <ChevronUp className="w-5 h-5" />
               )}
             </h2>
-            {!isColorRecommendationCollapsed && (
-              <div className="flex-1 min-h-0">
-                <ColorRecommendations />
-              </div>
-            )}
+            {!isColorRecommendationCollapsed && <ColorRecommendations />}
           </section>
-          <section className="min-h-0 flex flex-col">
+
+          {/* Step 3: トーン推薦 */}
+          <section className="flex-shrink-0">
             <h2 
-              className="text-lg font-medium mb-1 text-foreground flex-shrink-0 cursor-pointer flex items-center justify-between"
+              className="text-lg font-medium mb-2 text-foreground cursor-pointer flex items-center justify-between"
               onClick={() => setIsToneRecommendationCollapsed(!isToneRecommendationCollapsed)}
             >
               <span>3. {t('app.steps.toneRecommendationShort')}</span>
@@ -180,15 +201,13 @@ const App = () => {
                 <ChevronUp className="w-5 h-5" />
               )}
             </h2>
-            {!isToneRecommendationCollapsed && (
-              <div className="flex-1 min-h-0">
-                <ToneRecommendations />
-              </div>
-            )}
+            {!isToneRecommendationCollapsed && <ToneRecommendations />}
           </section>
-          <section className="min-h-0 flex flex-col">
+
+          {/* Step 4: 肌色推薦 */}
+          <section className="flex-shrink-0">
             <h2 
-              className="text-lg font-medium mb-1 text-foreground flex-shrink-0 cursor-pointer flex items-center justify-between"
+              className="text-lg font-medium mb-2 text-foreground cursor-pointer flex items-center justify-between"
               onClick={() => setIsSkinColorCollapsed(!isSkinColorCollapsed)}
             >
               <span>α. 肌色推薦</span>
@@ -198,29 +217,7 @@ const App = () => {
                 <ChevronUp className="w-5 h-5" />
               )}
             </h2>
-            {!isSkinColorCollapsed && (
-              <div className="flex-1 min-h-0">
-                <SkinColorRecommendations />
-              </div>
-            )}
-          </section>
-          <section className="min-h-0 flex flex-col mb-0">
-            <h2 
-              className="text-lg font-medium mb-1 text-foreground flex-shrink-0 cursor-pointer flex items-center justify-between"
-              onClick={() => setIsPaintCanvasCollapsed(!isPaintCanvasCollapsed)}
-            >
-              <span>β. 試し塗りキャンバス</span>
-              {isPaintCanvasCollapsed ? (
-                <ChevronDown className="w-5 h-5" />
-              ) : (
-                <ChevronUp className="w-5 h-5" />
-              )}
-            </h2>
-            {!isPaintCanvasCollapsed && (
-              <div className="flex-1 min-h-0">
-                <PaintCanvas />
-              </div>
-            )}
+            {!isSkinColorCollapsed && <SkinColorRecommendations />}
           </section>
         </div>
       </div>
