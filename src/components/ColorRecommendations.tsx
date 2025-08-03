@@ -10,12 +10,14 @@ import { BORDER_PRESETS } from '@/constants/ui';
 import chroma from 'chroma-js';
 
 export const ColorRecommendations = () => {
-  const { recommendedColors, selectedScheme, setSelectedScheme, generateRecommendedTones, selectedColor } = useColorStore();
+  const { recommendedColors, selectedScheme, setSelectedScheme, generateRecommendedTones, selectedColor, setSelectedColor } = useColorStore();
   const { onUserAction } = useTutorial();
   const { t } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
 
   const handleGenerateTones = (color: string) => {
+    // クリックされた色を描画色として設定
+    setSelectedColor(color);
     generateRecommendedTones(color);
     // チュートリアルの自動進行をトリガー
     onUserAction('click', '[data-tutorial="recommended-colors"]');
@@ -142,7 +144,7 @@ export const ColorRecommendations = () => {
 };
 
 export const ToneRecommendations = () => {
-  const { recommendedTones, selectedColor, generateRecommendedTones } = useColorStore();
+  const { recommendedTones, selectedColor, generateRecommendedTones, setSelectedColor } = useColorStore();
   const { t } = useTranslation();
 
   React.useEffect(() => {
@@ -150,6 +152,11 @@ export const ToneRecommendations = () => {
       generateRecommendedTones(selectedColor);
     }
   }, [selectedColor, recommendedTones.length, generateRecommendedTones]);
+
+  const handleToneClick = (color: string) => {
+    // クリックされた色を描画色として設定
+    setSelectedColor(color);
+  };
 
   return (
     <Card className="w-full flex flex-col pb-0">
@@ -163,9 +170,10 @@ export const ToneRecommendations = () => {
               title: tone,
               showClickIcon: false
             }))}
-          clickable={false}
-          emptyMessage={t('toneRecommendations.noTones')}
-        />
+            onColorClick={handleToneClick}
+            clickable={true}
+            emptyMessage={t('toneRecommendations.noTones')}
+          />
         </div>
       </CardContent>
     </Card>

@@ -7,9 +7,11 @@ import { PaintCanvas } from '@/components/PaintCanvas';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useColorStore } from '@/store/colorStore';
 
 const App = () => {
   const { t } = useTranslation();
+  const selectedColor = useColorStore((state) => state.selectedColor);
   const [isBaseColorCollapsed, setIsBaseColorCollapsed] = useState(false);
   const [isColorRecommendationCollapsed, setIsColorRecommendationCollapsed] = useState(false);
   const [isToneRecommendationCollapsed, setIsToneRecommendationCollapsed] = useState(false);
@@ -124,7 +126,7 @@ const App = () => {
 
           {/* Step 5: Paint Canvas - Tablet and larger */}
           <section className="md:block">
-            <PaintCanvas />
+            <PaintCanvas selectedColor={selectedColor} />
           </section>
         </div>
       </div>
@@ -134,7 +136,7 @@ const App = () => {
         {/* Left: Paint Canvas */}
         <div className="w-1/2 flex flex-col min-h-0" style={isDebugMode ? { padding: '32px', backgroundColor: 'red' } : { padding: '16px' }}>
           {isDebugMode && <h1 className="text-4xl text-black">LEFT PANEL</h1>}
-          <PaintCanvas />
+          <PaintCanvas selectedColor={selectedColor} />
         </div>
 
         {/* Right: Color Tools in Vertical Layout */}

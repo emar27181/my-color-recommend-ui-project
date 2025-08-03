@@ -5,9 +5,10 @@ import { CircleDashed, Palette, Plus, Minus, Eraser, Edit, PaintBucket, Undo, Re
 
 interface PaintCanvasProps {
   className?: string;
+  selectedColor?: string;
 }
 
-export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
+export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', selectedColor }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
@@ -15,6 +16,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
   const [isEraserMode, setIsEraserMode] = useState(false);
   const [isFillMode, setIsFillMode] = useState(false);
   const [fillColor, setFillColor] = useState('#000000');
+  const [drawColor, setDrawColor] = useState('#000000');
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   
   // Undo/Redo履歴管理
@@ -138,6 +140,13 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     }
   }, [context, penSize]);
 
+  // 選択色が変更された時にdrawColorを更新
+  useEffect(() => {
+    if (selectedColor) {
+      setDrawColor(selectedColor);
+    }
+  }, [selectedColor]);
+
   // 消しゴムモード変更時にstrokeStyleを更新
   useEffect(() => {
     if (context) {
@@ -146,10 +155,10 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
       if (isEraserMode) {
         context.strokeStyle = '#ffffff'; // 消しゴムは白色
       } else {
-        context.strokeStyle = '#000000'; // 通常は黒色
+        context.strokeStyle = drawColor; // 選択された色
       }
     }
-  }, [context, isEraserMode]);
+  }, [context, isEraserMode, drawColor]);
 
   // フラッドフィル（塗りつぶし）アルゴリズム
   const floodFill = useCallback((startX: number, startY: number, newColor: string) => {
@@ -289,7 +298,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     if (isEraserMode) {
       context.strokeStyle = '#ffffff'; // 消しゴムは白色で描画
     } else {
-      context.strokeStyle = '#000000'; // 通常は黒色
+      context.strokeStyle = drawColor; // 選択された色
     }
     context.lineWidth = penSize;
     context.lineCap = 'round';
@@ -297,7 +306,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     
     context.beginPath();
     context.moveTo(x, y);
-  }, [context, getScaledCoordinates, penSize, isEraserMode, isFillMode, fillColor, floodFill]);
+  }, [context, getScaledCoordinates, penSize, isEraserMode, isFillMode, fillColor, drawColor, floodFill]);
 
   // 描画中
   const draw = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -310,12 +319,12 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     if (isEraserMode) {
       context.strokeStyle = '#ffffff'; // 消しゴムは白色で描画
     } else {
-      context.strokeStyle = '#000000'; // 通常は黒色
+      context.strokeStyle = drawColor; // 選択された色
     }
     
     context.lineTo(x, y);
     context.stroke();
-  }, [isDrawing, context, getScaledCoordinates, isEraserMode]);
+  }, [isDrawing, context, getScaledCoordinates, isEraserMode, drawColor]);
 
   // 描画終了
   const stopDrawing = useCallback(() => {
@@ -354,7 +363,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     if (isEraserMode) {
       context.strokeStyle = '#ffffff'; // 消しゴムは白色で描画
     } else {
-      context.strokeStyle = '#000000'; // 通常は黒色
+      context.strokeStyle = drawColor; // 選択された色
     }
     context.lineWidth = penSize;
     context.lineCap = 'round';
@@ -362,7 +371,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     
     context.beginPath();
     context.moveTo(x, y);
-  }, [context, getScaledCoordinates, penSize, isEraserMode, isFillMode, fillColor, floodFill]);
+  }, [context, getScaledCoordinates, penSize, isEraserMode, isFillMode, fillColor, drawColor, floodFill]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault();
@@ -376,12 +385,12 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     if (isEraserMode) {
       context.strokeStyle = '#ffffff'; // 消しゴムは白色で描画
     } else {
-      context.strokeStyle = '#000000'; // 通常は黒色
+      context.strokeStyle = drawColor; // 選択された色
     }
     
     context.lineTo(x, y);
     context.stroke();
-  }, [isDrawing, context, getScaledCoordinates, isEraserMode]);
+  }, [isDrawing, context, getScaledCoordinates, isEraserMode, drawColor]);
 
   const handleTouchEnd = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault();
@@ -408,7 +417,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     
     // 描画設定を再設定
     context.globalCompositeOperation = 'source-over';
-    context.strokeStyle = isEraserMode ? '#ffffff' : '#000000';
+    context.strokeStyle = isEraserMode ? '#ffffff' : drawColor;
     context.lineWidth = penSize;
     context.lineCap = 'round';
     context.lineJoin = 'round';
@@ -417,7 +426,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     setTimeout(() => {
       saveToHistory();
     }, 10);
-  }, [context, penSize, isEraserMode, saveToHistory]);
+  }, [context, penSize, isEraserMode, drawColor, saveToHistory]);
 
   // ペンサイズ変更関数
   const increasePenSize = useCallback(() => {
