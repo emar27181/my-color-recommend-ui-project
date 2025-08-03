@@ -355,10 +355,11 @@ radius: {
   - **ライトモード**: 暗い色（`oklch(0.145 0 0)`）
   - **ダークモード**: 白っぽい色（`oklch(0.985 0 0)`）
 - **ライブラリ**: `lucide-react` アイコンセット使用
+- **アイコン選定**: [Lucide公式サイト](https://lucide.dev)から適切なアイコンを選択
 
 ### 適用対象アイコン
 - **ナビゲーション**: Home, Menu, X, ChevronUp, ChevronDown
-- **機能アイコン**: Sun/Moon（テーマ切り替え）, RotateCcw（リセット）, Copy, Check（コピー）
+- **機能アイコン**: Sun/Moon（テーマ切り替え）, CircleDashed（リセット）, Copy, Check（コピー）
 - **UI要素**: Languages, Bug（デバッグ）, Palette, UploadCloud等
 
 ### 実装ルール
@@ -370,13 +371,19 @@ radius: {
 ### 実装例
 ```tsx
 // ✅ 正しい実装
-<RotateCcw className="w-4 h-4 text-foreground" />
+<CircleDashed className="w-4 h-4 text-foreground" />
 <Home className="w-5 h-5 text-foreground" />
 
 // ❌ 避けるべき実装
-<RotateCcw className="w-4 h-4 text-gray-600" />
+<CircleDashed className="w-4 h-4 text-gray-600" />
 <Home className="w-5 h-5" /> // 色指定なし
 ```
+
+### アイコン選定ガイドライン
+- **公式サイト参照**: https://lucide.dev でアイコンを検索・確認
+- **機能適合性**: アイコンの意味が機能と一致することを確認
+- **視覚的一貫性**: プロジェクト全体で統一された印象を保つ
+- **アクセシビリティ**: 明確で理解しやすいアイコンを選択
 
 ---
 
