@@ -45,14 +45,15 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
         
         setContext(ctx);
         
-        // 初期状態を履歴に保存
+        // 初期状態を履歴に保存（白い背景）
         setTimeout(() => {
           if (canvasRef.current) {
             const dataURL = canvasRef.current.toDataURL();
+            console.log('Initial history saved:', dataURL.substring(0, 50) + '...');
             setHistory([dataURL]);
             setHistoryIndex(0);
           }
-        }, 100);
+        }, 200);
       }
     }
   }, []);
@@ -64,23 +65,26 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     const canvas = canvasRef.current;
     const dataURL = canvas.toDataURL();
     
+    console.log('Saving to history - current index:', historyIndex);
+    
     setHistory(prevHistory => {
       // 現在のインデックス以降の履歴を削除（新しい操作時）
       const newHistory = prevHistory.slice(0, historyIndex + 1);
       newHistory.push(dataURL);
       
+      console.log('New history length:', newHistory.length);
+      
       // 最大サイズを超えた場合、古い履歴を削除
       if (newHistory.length > maxHistorySize) {
         newHistory.shift();
+        console.log('History trimmed to max size');
         return newHistory;
       }
       
+      // インデックスを更新
+      setHistoryIndex(newHistory.length - 1);
+      console.log('New history index:', newHistory.length - 1);
       return newHistory;
-    });
-    
-    setHistoryIndex(prevIndex => {
-      const newIndex = Math.min(prevIndex + 1, maxHistorySize - 1);
-      return newIndex;
     });
   }, [historyIndex, maxHistorySize]);
 
@@ -106,10 +110,14 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
 
   // Undo機能
   const undo = useCallback(() => {
+    console.log('Undo called - historyIndex:', historyIndex, 'history.length:', history.length);
     if (historyIndex > 0) {
       const newIndex = historyIndex - 1;
+      console.log('Restoring to index:', newIndex);
       setHistoryIndex(newIndex);
       restoreFromHistory(history[newIndex]);
+    } else {
+      console.log('Cannot undo - at beginning of history');
     }
   }, [historyIndex, history, restoreFromHistory]);
 
@@ -266,13 +274,14 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     
     // 塗りつぶしモードの場合
     if (isFillMode) {
+      // 塗りつぶし前の状態を履歴に保存
+      saveToHistory();
       floodFill(x, y, fillColor);
-      // 塗りつぶし後に履歴を保存
-      setTimeout(() => {
-        saveToHistory();
-      }, 10);
       return;
     }
+    
+    // 描画開始前の状態を履歴に保存
+    saveToHistory();
     
     setIsDrawing(true);
     
@@ -314,12 +323,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     if (!context) return;
     setIsDrawing(false);
     context.closePath();
-    
-    // 描画終了時に履歴を保存
-    setTimeout(() => {
-      saveToHistory();
-    }, 10);
-  }, [context, saveToHistory]);
+  }, [context]);
 
   // タッチイベント対応
   const handleTouchStart = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
@@ -331,13 +335,14 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     
     // 塗りつぶしモードの場合
     if (isFillMode) {
+      // 塗りつぶし前の状態を履歴に保存
+      saveToHistory();
       floodFill(x, y, fillColor);
-      // 塗りつぶし後に履歴を保存
-      setTimeout(() => {
-        saveToHistory();
-      }, 10);
       return;
     }
+    
+    // 描画開始前の状態を履歴に保存
+    saveToHistory();
     
     setIsDrawing(true);
     
@@ -380,16 +385,14 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     if (!context) return;
     setIsDrawing(false);
     context.closePath();
-    
-    // 描画終了時に履歴を保存
-    setTimeout(() => {
-      saveToHistory();
-    }, 10);
-  }, [context, saveToHistory]);
+  }, [context]);
 
   // キャンバスをクリア
   const clearCanvas = useCallback(() => {
     if (!context || !canvasRef.current) return;
+    
+    // クリア前の状態を履歴に保存
+    saveToHistory();
     
     // 背景をクリア
     context.save();
@@ -404,11 +407,6 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     context.lineWidth = penSize;
     context.lineCap = 'round';
     context.lineJoin = 'round';
-    
-    // クリア後に履歴を保存
-    setTimeout(() => {
-      saveToHistory();
-    }, 10);
   }, [context, penSize, isEraserMode, saveToHistory]);
 
   // ペンサイズ変更関数
