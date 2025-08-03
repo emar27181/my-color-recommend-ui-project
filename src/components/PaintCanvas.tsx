@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CircleDashed, Palette, Plus, Minus } from 'lucide-react';
+import { CircleDashed, Palette, Plus, Minus, Eraser, Edit } from 'lucide-react';
 
 interface PaintCanvasProps {
   className?: string;
@@ -12,6 +12,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
   const [penSize, setPenSize] = useState(8);
+  const [isEraserMode, setIsEraserMode] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // キャンバスの初期化
@@ -29,6 +30,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
         ctx.lineJoin = 'round';
         ctx.strokeStyle = '#000000'; // 黒色固定
         ctx.lineWidth = 8; // 初期ペンサイズ
+        ctx.globalCompositeOperation = 'source-over'; // 初期は通常描画モード
         
         // 背景を白に設定
         ctx.fillStyle = '#ffffff';
@@ -46,6 +48,17 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
       context.lineWidth = penSize;
     }
   }, [context, penSize]);
+
+  // 消しゴムモード変更時にglobalCompositeOperationを更新
+  useEffect(() => {
+    if (context) {
+      console.log('Setting eraser mode to:', isEraserMode);
+      context.globalCompositeOperation = isEraserMode ? 'destination-out' : 'source-over';
+      if (!isEraserMode) {
+        context.strokeStyle = '#000000';
+      }
+    }
+  }, [context, isEraserMode]);
 
   // コンポーネントアンマウント時のクリーンアップ
   useEffect(() => {
@@ -82,14 +95,19 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     const { x, y } = getScaledCoordinates(e.clientX, e.clientY);
     
     // 描画設定を確実に適用
-    context.strokeStyle = '#000000';
+    if (isEraserMode) {
+      context.globalCompositeOperation = 'destination-out'; // 消しゴムモード
+    } else {
+      context.globalCompositeOperation = 'source-over'; // 通常の描画モード
+      context.strokeStyle = '#000000';
+    }
     context.lineWidth = penSize;
     context.lineCap = 'round';
     context.lineJoin = 'round';
     
     context.beginPath();
     context.moveTo(x, y);
-  }, [context, getScaledCoordinates, penSize]);
+  }, [context, getScaledCoordinates, penSize, isEraserMode]);
 
   // 描画中
   const draw = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -97,9 +115,16 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     
     const { x, y } = getScaledCoordinates(e.clientX, e.clientY);
     
+    // 描画設定を確実に維持
+    if (isEraserMode) {
+      context.globalCompositeOperation = 'destination-out';
+    } else {
+      context.globalCompositeOperation = 'source-over';
+    }
+    
     context.lineTo(x, y);
     context.stroke();
-  }, [isDrawing, context, getScaledCoordinates]);
+  }, [isDrawing, context, getScaledCoordinates, isEraserMode]);
 
   // 描画終了
   const stopDrawing = useCallback(() => {
@@ -118,14 +143,19 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     const { x, y } = getScaledCoordinates(touch.clientX, touch.clientY);
     
     // 描画設定を確実に適用
-    context.strokeStyle = '#000000';
+    if (isEraserMode) {
+      context.globalCompositeOperation = 'destination-out'; // 消しゴムモード
+    } else {
+      context.globalCompositeOperation = 'source-over'; // 通常の描画モード
+      context.strokeStyle = '#000000';
+    }
     context.lineWidth = penSize;
     context.lineCap = 'round';
     context.lineJoin = 'round';
     
     context.beginPath();
     context.moveTo(x, y);
-  }, [context, getScaledCoordinates, penSize]);
+  }, [context, getScaledCoordinates, penSize, isEraserMode]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault();
@@ -134,9 +164,16 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     const touch = e.touches[0];
     const { x, y } = getScaledCoordinates(touch.clientX, touch.clientY);
     
+    // 描画設定を確実に維持
+    if (isEraserMode) {
+      context.globalCompositeOperation = 'destination-out';
+    } else {
+      context.globalCompositeOperation = 'source-over';
+    }
+    
     context.lineTo(x, y);
     context.stroke();
-  }, [isDrawing, context, getScaledCoordinates]);
+  }, [isDrawing, context, getScaledCoordinates, isEraserMode]);
 
   const handleTouchEnd = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault();
@@ -150,15 +187,19 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     if (!context || !canvasRef.current) return;
     
     // 背景をクリア
+    context.save();
+    context.globalCompositeOperation = 'source-over';
     context.fillStyle = '#ffffff';
     context.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    context.restore();
     
     // 描画設定を再設定
     context.strokeStyle = '#000000';
     context.lineWidth = penSize;
     context.lineCap = 'round';
     context.lineJoin = 'round';
-  }, [context, penSize]);
+    context.globalCompositeOperation = isEraserMode ? 'destination-out' : 'source-over';
+  }, [context, penSize, isEraserMode]);
 
   // ペンサイズ変更関数
   const increasePenSize = useCallback(() => {
@@ -209,6 +250,19 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
             試し塗りキャンバス
           </h3>
           <div className="flex items-center gap-2">
+            {/* ペン/消しゴムモード切り替え */}
+            <Button
+              onClick={() => setIsEraserMode(!isEraserMode)}
+              variant={isEraserMode ? "default" : "outline"}
+              size="sm"
+              className="h-8 px-3"
+            >
+              {isEraserMode ? (
+                <Eraser className="w-4 h-4 text-foreground" />
+              ) : (
+                <Edit className="w-4 h-4 text-foreground" />
+              )}
+            </Button>
             {/* ペンサイズ調整 */}
             <div className="flex items-center gap-1">
               <Button
