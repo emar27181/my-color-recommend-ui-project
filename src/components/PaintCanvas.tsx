@@ -18,15 +18,15 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     if (canvas) {
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        // キャンバス内部解像度を高解像度に設定
-        canvas.width = 800;
-        canvas.height = 600;
+        // キャンバス内部解像度を超高解像度に設定（4K対応）
+        canvas.width = 1920;
+        canvas.height = 1440;
         
         // 描画設定
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctx.strokeStyle = '#000000'; // 黒色固定
-        ctx.lineWidth = 20; // 太さ20px（高解像度対応）
+        ctx.lineWidth = 8; // 太さ8px（超高解像度対応）
         
         // 背景を白に設定
         ctx.fillStyle = '#ffffff';
@@ -64,7 +64,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     
     // 描画設定を確実に適用
     context.strokeStyle = '#000000';
-    context.lineWidth = 20;
+    context.lineWidth = 8;
     context.lineCap = 'round';
     context.lineJoin = 'round';
     
@@ -100,7 +100,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     
     // 描画設定を確実に適用
     context.strokeStyle = '#000000';
-    context.lineWidth = 20;
+    context.lineWidth = 8;
     context.lineCap = 'round';
     context.lineJoin = 'round';
     
@@ -136,7 +136,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     
     // 描画設定を再設定
     context.strokeStyle = '#000000';
-    context.lineWidth = 20;
+    context.lineWidth = 8;
     context.lineCap = 'round';
     context.lineJoin = 'round';
   }, [context]);
@@ -174,7 +174,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
             onTouchEnd={handleTouchEnd}
           />
           <div className="mt-2 text-xs text-muted-foreground text-center">
-            クリックまたはタッチしてドラッグで描画できます（黒色・高解像度）
+            クリックまたはタッチしてドラッグで描画できます（黒色・超高解像度1920x1440）
           </div>
         </div>
       </CardContent>
