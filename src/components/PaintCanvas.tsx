@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CircleDashed, Palette, Plus, Minus, Eraser, Edit, PaintBucket } from 'lucide-react';
+import { CircleDashed, Palette, Plus, Minus, Eraser, Edit, PaintBucket, Undo, Redo } from 'lucide-react';
 
 interface PaintCanvasProps {
   className?: string;
@@ -16,6 +16,11 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
   const [isFillMode, setIsFillMode] = useState(false);
   const [fillColor, setFillColor] = useState('#000000');
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Undo/Redo履歴管理
+  const [history, setHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const maxHistorySize = 50; // 最大履歴保存数
 
   // キャンバスの初期化
   useEffect(() => {
@@ -39,9 +44,83 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
         setContext(ctx);
+        
+        // 初期状態を履歴に保存
+        setTimeout(() => {
+          if (canvasRef.current) {
+            const dataURL = canvasRef.current.toDataURL();
+            setHistory([dataURL]);
+            setHistoryIndex(0);
+          }
+        }, 100);
       }
     }
   }, []);
+
+  // 履歴に現在の状態を保存
+  const saveToHistory = useCallback(() => {
+    if (!canvasRef.current) return;
+    
+    const canvas = canvasRef.current;
+    const dataURL = canvas.toDataURL();
+    
+    setHistory(prevHistory => {
+      // 現在のインデックス以降の履歴を削除（新しい操作時）
+      const newHistory = prevHistory.slice(0, historyIndex + 1);
+      newHistory.push(dataURL);
+      
+      // 最大サイズを超えた場合、古い履歴を削除
+      if (newHistory.length > maxHistorySize) {
+        newHistory.shift();
+        return newHistory;
+      }
+      
+      return newHistory;
+    });
+    
+    setHistoryIndex(prevIndex => {
+      const newIndex = Math.min(prevIndex + 1, maxHistorySize - 1);
+      return newIndex;
+    });
+  }, [historyIndex, maxHistorySize]);
+
+  // 履歴から状態を復元
+  const restoreFromHistory = useCallback((dataURL: string) => {
+    if (!context || !canvasRef.current) return;
+    
+    const canvas = canvasRef.current;
+    const img = new Image();
+    
+    img.onload = () => {
+      // キャンバスをクリア
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      // 背景を白に設定
+      context.fillStyle = '#ffffff';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      // 画像を復元
+      context.drawImage(img, 0, 0);
+    };
+    
+    img.src = dataURL;
+  }, [context]);
+
+  // Undo機能
+  const undo = useCallback(() => {
+    if (historyIndex > 0) {
+      const newIndex = historyIndex - 1;
+      setHistoryIndex(newIndex);
+      restoreFromHistory(history[newIndex]);
+    }
+  }, [historyIndex, history, restoreFromHistory]);
+
+  // Redo機能
+  const redo = useCallback(() => {
+    if (historyIndex < history.length - 1) {
+      const newIndex = historyIndex + 1;
+      setHistoryIndex(newIndex);
+      restoreFromHistory(history[newIndex]);
+    }
+  }, [historyIndex, history, restoreFromHistory]);
 
   // contextが設定された時とペンサイズ変更時にcanvasに反映
   useEffect(() => {
@@ -125,6 +204,33 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     context.putImageData(imageData, 0, 0);
   }, [context]);
 
+  // キーボードショートカット
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey || event.metaKey) {
+        switch (event.key) {
+          case 'z':
+            event.preventDefault();
+            if (event.shiftKey) {
+              redo(); // Ctrl+Shift+Z または Cmd+Shift+Z
+            } else {
+              undo(); // Ctrl+Z または Cmd+Z
+            }
+            break;
+          case 'y':
+            event.preventDefault();
+            redo(); // Ctrl+Y または Cmd+Y
+            break;
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [undo, redo]);
+
   // コンポーネントアンマウント時のクリーンアップ
   useEffect(() => {
     return () => {
@@ -161,6 +267,10 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     // 塗りつぶしモードの場合
     if (isFillMode) {
       floodFill(x, y, fillColor);
+      // 塗りつぶし後に履歴を保存
+      setTimeout(() => {
+        saveToHistory();
+      }, 10);
       return;
     }
     
@@ -204,7 +314,12 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     if (!context) return;
     setIsDrawing(false);
     context.closePath();
-  }, [context]);
+    
+    // 描画終了時に履歴を保存
+    setTimeout(() => {
+      saveToHistory();
+    }, 10);
+  }, [context, saveToHistory]);
 
   // タッチイベント対応
   const handleTouchStart = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
@@ -217,6 +332,10 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     // 塗りつぶしモードの場合
     if (isFillMode) {
       floodFill(x, y, fillColor);
+      // 塗りつぶし後に履歴を保存
+      setTimeout(() => {
+        saveToHistory();
+      }, 10);
       return;
     }
     
@@ -261,7 +380,12 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     if (!context) return;
     setIsDrawing(false);
     context.closePath();
-  }, [context]);
+    
+    // 描画終了時に履歴を保存
+    setTimeout(() => {
+      saveToHistory();
+    }, 10);
+  }, [context, saveToHistory]);
 
   // キャンバスをクリア
   const clearCanvas = useCallback(() => {
@@ -280,7 +404,12 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     context.lineWidth = penSize;
     context.lineCap = 'round';
     context.lineJoin = 'round';
-  }, [context, penSize, isEraserMode]);
+    
+    // クリア後に履歴を保存
+    setTimeout(() => {
+      saveToHistory();
+    }, 10);
+  }, [context, penSize, isEraserMode, saveToHistory]);
 
   // ペンサイズ変更関数
   const increasePenSize = useCallback(() => {
@@ -379,6 +508,29 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
                 />
               </div>
             )}
+            {/* Undo/Redoボタン */}
+            <div className="flex gap-1">
+              <Button
+                onClick={undo}
+                variant="outline"
+                size="sm"
+                className="h-8 px-2"
+                disabled={historyIndex <= 0}
+                title="元に戻す (Ctrl+Z)"
+              >
+                <Undo className="w-4 h-4 text-foreground" />
+              </Button>
+              <Button
+                onClick={redo}
+                variant="outline"
+                size="sm"
+                className="h-8 px-2"
+                disabled={historyIndex >= history.length - 1}
+                title="やり直し (Ctrl+Y)"
+              >
+                <Redo className="w-4 h-4 text-foreground" />
+              </Button>
+            </div>
             {/* ペンサイズ調整 */}
             <div className="flex items-center gap-1">
               <Button
