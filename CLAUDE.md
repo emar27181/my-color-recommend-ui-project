@@ -347,6 +347,39 @@ radius: {
 
 ---
 
+## 🎨 アイコン統一ルール
+
+### アイコン色統一仕様
+- **統一クラス**: すべてのアイコンに `text-foreground` クラスを適用
+- **テーマ対応**: ライト・ダークモード自動切り替え
+  - **ライトモード**: 暗い色（`oklch(0.145 0 0)`）
+  - **ダークモード**: 白っぽい色（`oklch(0.985 0 0)`）
+- **ライブラリ**: `lucide-react` アイコンセット使用
+
+### 適用対象アイコン
+- **ナビゲーション**: Home, Menu, X, ChevronUp, ChevronDown
+- **機能アイコン**: Sun/Moon（テーマ切り替え）, RotateCcw（リセット）, Copy, Check（コピー）
+- **UI要素**: Languages, Bug（デバッグ）, Palette, UploadCloud等
+
+### 実装ルール
+- **必須クラス**: 新規アイコンには必ず `text-foreground` を追加
+- **固定色禁止**: `text-red-500` 等の固定色クラス使用禁止
+- **一貫性保持**: プロジェクト全体で統一された視覚体験を提供
+- **アクセシビリティ**: テーマ変更時の視認性を確保
+
+### 実装例
+```tsx
+// ✅ 正しい実装
+<RotateCcw className="w-4 h-4 text-foreground" />
+<Home className="w-5 h-5 text-foreground" />
+
+// ❌ 避けるべき実装
+<RotateCcw className="w-4 h-4 text-gray-600" />
+<Home className="w-5 h-5" /> // 色指定なし
+```
+
+---
+
 ## 🎨 色相環UI視覚補助ルール
 
 ### 基本仕様
