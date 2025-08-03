@@ -155,7 +155,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
             size="sm"
             className="h-8 px-2"
           >
-            <RotateCcw className="w-4 h-4" />
+            <RotateCcw className="w-4 h-4 text-foreground" />
           </Button>
         </div>
       </CardHeader>
