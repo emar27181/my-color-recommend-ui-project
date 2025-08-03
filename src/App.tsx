@@ -27,7 +27,7 @@ const App = () => {
   return (
     <main className="flex-1 px-4 pb-2 h-full flex flex-col">
       {/* Mobile/Tablet: Single Screen Layout */}
-      <div className="block lg:hidden flex flex-col overflow-y-auto">
+      <div className="lg:hidden flex flex-col overflow-y-auto">
         {/* Step 1: ベース色選択 - コンパクト化 */}
         <section className="flex-shrink-0 mb-1">
           <h3 
@@ -125,7 +125,7 @@ const App = () => {
       </div>
 
       {/* Desktop: Left Canvas + Right Color Tools Layout */}
-      <div className="flex h-full gap-6">
+      <div className="hidden lg:flex h-full gap-6">
         {/* Left: Paint Canvas */}
         <div className="w-1/2 flex flex-col">
           <section className="h-full">
