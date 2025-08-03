@@ -25,9 +25,9 @@ const App = () => {
   }, []);
 
   return (
-    <main className="flex-1 px-4 pb-2 h-full flex flex-col">
+    <main className="flex-1 px-4 pb-2 min-h-0 flex flex-col">
       {/* Mobile/Tablet: Single Screen Layout */}
-      <div className="lg:hidden flex flex-col overflow-y-auto">
+      <div className="hidden flex flex-col overflow-y-auto">
         {/* Step 1: ベース色選択 - コンパクト化 */}
         <section className="flex-shrink-0 mb-1">
           <h3 
@@ -108,48 +108,24 @@ const App = () => {
 
           {/* Step 5: Paint Canvas - Tablet and larger */}
           <section className="md:block">
-            <h3 
-              className="text-xs font-medium mb-0 text-foreground leading-tight cursor-pointer flex items-center justify-between"
-              onClick={() => setIsPaintCanvasCollapsed(!isPaintCanvasCollapsed)}
-            >
-              <span>β. 試し塗りキャンバス</span>
-              {isPaintCanvasCollapsed ? (
-                <ChevronDown className="w-4 h-4" />
-              ) : (
-                <ChevronUp className="w-4 h-4" />
-              )}
-            </h3>
-            {!isPaintCanvasCollapsed && <PaintCanvas />}
+            <PaintCanvas />
           </section>
         </div>
       </div>
 
       {/* Desktop: Left Canvas + Right Color Tools Layout */}
-      <div className="hidden lg:flex h-full gap-6">
+      <div className="flex flex-1 gap-6">
         {/* Left: Paint Canvas */}
-        <div className="w-1/2 flex flex-col">
-          <section className="h-full">
-            <h2 
-              className="text-lg font-medium mb-2 text-foreground cursor-pointer flex items-center justify-between"
-              onClick={() => setIsPaintCanvasCollapsed(!isPaintCanvasCollapsed)}
-            >
-              <span>試し塗りキャンバス</span>
-              {isPaintCanvasCollapsed ? (
-                <ChevronDown className="w-5 h-5" />
-              ) : (
-                <ChevronUp className="w-5 h-5" />
-              )}
-            </h2>
-            {!isPaintCanvasCollapsed && (
-              <div className="h-full">
-                <PaintCanvas />
-              </div>
-            )}
+        <div className="w-1/2 flex flex-col min-h-0">
+          <section className="flex-1 flex flex-col">
+            <div className="flex-1 min-h-0">
+              <PaintCanvas />
+            </div>
           </section>
         </div>
 
         {/* Right: Color Tools in Vertical Layout */}
-        <div className="w-1/2 flex flex-col space-y-4 overflow-y-auto">
+        <div className="w-1/2 flex flex-col space-y-4 min-h-0 overflow-y-auto">
           {/* Step 1: ベース色選択 */}
           <section className="flex-shrink-0">
             <h2 
