@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { RotateCcw, Palette } from 'lucide-react';
+import { CircleDashed, Palette } from 'lucide-react';
 
 interface PaintCanvasProps {
   className?: string;
@@ -155,7 +155,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
             size="sm"
             className="h-8 px-2"
           >
-            <RotateCcw className="w-4 h-4 text-foreground" />
+            <CircleDashed className="w-4 h-4 text-foreground" />
           </Button>
         </div>
       </CardHeader>
