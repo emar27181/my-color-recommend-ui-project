@@ -1,28 +1,47 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CircleDashed, Plus, Minus, Eraser, Pen, PaintBucket, Undo, Redo } from 'lucide-react';
+import { CircleDashed, Plus, Minus, Eraser, Pen, PaintBucket, Undo, Redo, Palette } from 'lucide-react';
+import { BORDER_PRESETS } from '@/constants/ui';
+import { useColorStore } from '@/store/colorStore';
+import chroma from 'chroma-js';
 
 interface PaintCanvasProps {
   className?: string;
-  selectedColor?: string;
 }
 
-export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', selectedColor }) => {
+export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
+  const { selectedColor, setSelectedColor } = useColorStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
   const [penSize, setPenSize] = useState(8);
   const [isEraserMode, setIsEraserMode] = useState(false);
   const [isFillMode, setIsFillMode] = useState(false);
-  const [fillColor, setFillColor] = useState('#000000');
-  const [drawColor, setDrawColor] = useState('#000000');
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Undo/Redo履歴管理
   const [history, setHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const maxHistorySize = 50; // 最大履歴保存数
+
+  // ベースカラーとのコントラスト比を考慮したアイコン色を取得
+  const getIconColor = () => {
+    try {
+      const color = chroma(selectedColor);
+      const lightness = color.get('hsl.l');
+      // 明るい色には暗いアイコン、暗い色には明るいアイコン
+      return lightness > 0.5 ? '#374151' : '#f9fafb'; // gray-700 or gray-50
+    } catch {
+      return '#6b7280'; // デフォルト: gray-500
+    }
+  };
+
+  // カラーピッカーの変更ハンドラー
+  const handleColorPickerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const color = e.target.value;
+    setSelectedColor(color);
+  };
 
   // キャンバスの初期化
   useEffect(() => {
@@ -146,15 +165,6 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
     }
   }, [context, penSize]);
 
-  // 選択色が変更された時にdrawColorとfillColorを更新
-  useEffect(() => {
-    if (selectedColor) {
-      console.log('PaintCanvas: selectedColor changed to:', selectedColor);
-      setDrawColor(selectedColor);
-      setFillColor(selectedColor);
-      console.log('PaintCanvas: Updated drawColor and fillColor to:', selectedColor);
-    }
-  }, [selectedColor]);
 
   // 消しゴムモード変更時にstrokeStyleを更新
   useEffect(() => {
@@ -164,10 +174,10 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
       if (isEraserMode) {
         context.strokeStyle = '#ffffff'; // 消しゴムは白色
       } else {
-        context.strokeStyle = drawColor; // 選択された色
+        context.strokeStyle = selectedColor; // 選択された色
       }
     }
-  }, [context, isEraserMode, drawColor]);
+  }, [context, isEraserMode, selectedColor]);
 
   // フラッドフィル（塗りつぶし）アルゴリズム
   const floodFill = useCallback((startX: number, startY: number, newColor: string) => {
@@ -216,7 +226,6 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
     const canBridgeGap = (fromX: number, fromY: number, dirX: number, dirY: number) => {
       // 隙間の向こう側に同じ色があり、かつ隙間が十分小さい場合のみ
       let gapPixels = 0;
-      let foundMatch = false;
       
       for (let dist = 1; dist <= gapBridgeDistance; dist++) {
         const checkX = fromX + dirX * dist;
@@ -228,7 +237,6 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
         
         if (isSimilarToStart(checkX, checkY)) {
           // 同じ色を見つけた
-          foundMatch = true;
           
           // 周辺の大部分が同じ色かチェック（より厳格に）
           let matchCount = 0;
@@ -429,12 +437,12 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
 
     // 塗りつぶしモードの場合
     if (isFillMode) {
-      console.log('PaintCanvas: Starting flood fill with color:', fillColor);
+      console.log('PaintCanvas: Starting flood fill with color:', selectedColor);
       // 塗りつぶし前に現在の状態を履歴に保存
       saveToHistory();
       // 少し待ってから塗りつぶし実行
       setTimeout(() => {
-        floodFill(x, y, fillColor);
+        floodFill(x, y, selectedColor);
       }, 10);
       return;
     }
@@ -449,7 +457,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
     if (isEraserMode) {
       context.strokeStyle = '#ffffff'; // 消しゴムは白色で描画
     } else {
-      context.strokeStyle = drawColor; // 選択された色
+      context.strokeStyle = selectedColor; // 選択された色
     }
     context.lineWidth = penSize;
     context.lineCap = 'round';
@@ -457,7 +465,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
 
     context.beginPath();
     context.moveTo(x, y);
-  }, [context, getScaledCoordinates, penSize, isEraserMode, isFillMode, fillColor, drawColor, floodFill, saveToHistory]);
+  }, [context, getScaledCoordinates, penSize, isEraserMode, isFillMode, selectedColor, floodFill, saveToHistory]);
 
   // 描画中
   const draw = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -470,12 +478,12 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
     if (isEraserMode) {
       context.strokeStyle = '#ffffff'; // 消しゴムは白色で描画
     } else {
-      context.strokeStyle = drawColor; // 選択された色
+      context.strokeStyle = selectedColor; // 選択された色
     }
 
     context.lineTo(x, y);
     context.stroke();
-  }, [isDrawing, context, getScaledCoordinates, isEraserMode, drawColor]);
+  }, [isDrawing, context, getScaledCoordinates, isEraserMode, selectedColor]);
 
   // 描画終了
   const stopDrawing = useCallback(() => {
@@ -498,7 +506,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
       saveToHistory();
       // 少し待ってから塗りつぶし実行
       setTimeout(() => {
-        floodFill(x, y, fillColor);
+        floodFill(x, y, selectedColor);
       }, 10);
       return;
     }
@@ -513,7 +521,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
     if (isEraserMode) {
       context.strokeStyle = '#ffffff'; // 消しゴムは白色で描画
     } else {
-      context.strokeStyle = drawColor; // 選択された色
+      context.strokeStyle = selectedColor; // 選択された色
     }
     context.lineWidth = penSize;
     context.lineCap = 'round';
@@ -521,7 +529,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
 
     context.beginPath();
     context.moveTo(x, y);
-  }, [context, getScaledCoordinates, penSize, isEraserMode, isFillMode, fillColor, drawColor, floodFill, saveToHistory]);
+  }, [context, getScaledCoordinates, penSize, isEraserMode, isFillMode, selectedColor, floodFill, saveToHistory]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault();
@@ -535,12 +543,12 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
     if (isEraserMode) {
       context.strokeStyle = '#ffffff'; // 消しゴムは白色で描画
     } else {
-      context.strokeStyle = drawColor; // 選択された色
+      context.strokeStyle = selectedColor; // 選択された色
     }
 
     context.lineTo(x, y);
     context.stroke();
-  }, [isDrawing, context, getScaledCoordinates, isEraserMode, drawColor]);
+  }, [isDrawing, context, getScaledCoordinates, isEraserMode, selectedColor]);
 
   const handleTouchEnd = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault();
@@ -567,12 +575,12 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
 
       // 描画設定を再設定
       context.globalCompositeOperation = 'source-over';
-      context.strokeStyle = isEraserMode ? '#ffffff' : drawColor;
+      context.strokeStyle = isEraserMode ? '#ffffff' : selectedColor;
       context.lineWidth = penSize;
       context.lineCap = 'round';
       context.lineJoin = 'round';
     }, 10);
-  }, [context, penSize, isEraserMode, drawColor, saveToHistory]);
+  }, [context, penSize, isEraserMode, selectedColor, saveToHistory]);
 
   // ペンサイズ変更関数
   const increasePenSize = useCallback(() => {
@@ -622,16 +630,30 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
             0.キャンバス
           </h3>
           <div className="flex items-center gap-2">
-            {/* 現在の描画色表示 */}
-            <div 
-              className="border-2 border-gray-300 rounded-sm hover:scale-110 transition-transform cursor-pointer"
-              style={{ 
-                backgroundColor: drawColor,
-                width: '24px',
-                height: '24px'
-              }}
-              title={`描画色: ${drawColor}`}
-            />
+            {/* 現在の描画色表示（ColorPicker風） */}
+            <div className="relative cursor-pointer hover:scale-110 transition-all duration-200">
+              <input
+                type="color"
+                value={selectedColor}
+                onChange={handleColorPickerChange}
+                className="absolute inset-0 opacity-0 w-full h-full cursor-pointer z-10"
+                title={`描画色を変更: ${selectedColor}`}
+              />
+              <div 
+                className={`${BORDER_PRESETS.colorBlock} flex items-center justify-center pointer-events-none`}
+                style={{
+                  backgroundColor: selectedColor,
+                  width: '46px',
+                  height: '46px'
+                }}
+                title={`描画色: ${selectedColor} - クリックで変更`}
+              >
+                <Palette 
+                  className="w-5 h-5" 
+                  style={{ color: getIconColor() }}
+                />
+              </div>
+            </div>
             {/* ペン/消しゴム/塗りつぶしモード切り替え */}
             <div className="flex gap-1">
               <Button
