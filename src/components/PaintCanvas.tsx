@@ -517,21 +517,6 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
                 <PaintBucket className="w-4 h-4 text-foreground" />
               </Button>
             </div>
-            {/* 塗りつぶし色選択（塗りつぶしモード時のみ表示） */}
-            {isFillMode && (
-              <div className="flex items-center gap-1">
-                <input
-                  type="color"
-                  value={fillColor}
-                  onChange={(e) => setFillColor(e.target.value)}
-                  className="w-8 h-8 rounded border-2 border-border cursor-pointer"
-                  title={`塗りつぶし色: ${fillColor}`}
-                />
-                <span className="text-xs text-muted-foreground font-mono">
-                  {fillColor}
-                </span>
-              </div>
-            )}
             {/* Undo/Redoボタン */}
             <div className="flex gap-1">
               <Button
