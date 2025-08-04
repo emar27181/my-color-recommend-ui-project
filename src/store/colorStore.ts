@@ -318,7 +318,8 @@ export const useColorStore = create<ColorState>((set, get) => {
         
         const tones: string[] = [];
         
-        // 16パターンを生成（4×4の組み合わせ）
+        // 16パターンを固定順序で生成（4×4の組み合わせ）
+        // 各彩度ごとに明度20,40,60,80の順序で配置
         for (const saturation of saturations) {
           for (const lightness of lightnesses) {
             const hslColor = chroma.hsl(
@@ -330,13 +331,8 @@ export const useColorStore = create<ColorState>((set, get) => {
           }
         }
 
-        // 重複色・極端な色を除外
-        const filteredTones = filterValidTones(tones, baseColor);
-
-        // 明るい→暗い順でソート
-        const sortedTones = sortColorsByLightness(filteredTones);
-
-        set({ recommendedTones: sortedTones, toneBaseColor: baseColor });
+        // 配置を固定するため、ソートせずにそのまま使用
+        set({ recommendedTones: tones, toneBaseColor: baseColor });
       } catch (error) {
         console.error('Failed to generate recommended tones:', error);
         set({ recommendedTones: [], toneBaseColor: null });
