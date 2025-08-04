@@ -9,7 +9,11 @@ import { ChevronDown } from 'lucide-react';
 import { BORDER_PRESETS } from '@/constants/ui';
 import chroma from 'chroma-js';
 
-export const ColorRecommendations = () => {
+interface ColorRecommendationsProps {
+  isMobile?: boolean;
+}
+
+export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsProps) => {
   const { recommendedColors, selectedScheme, setSelectedScheme, generateRecommendedTones, selectedColor, setSelectedColor } = useColorStore();
   const { onUserAction } = useTutorial();
   const { t } = useTranslation();
@@ -135,6 +139,7 @@ export const ColorRecommendations = () => {
               showClickIcon: true
           }))}
           onColorClick={handleGenerateTones}
+          isMobile={isMobile}
           emptyMessage={t('colorRecommendations.noRecommendations')}
         />
         </div>
@@ -143,7 +148,11 @@ export const ColorRecommendations = () => {
   );
 };
 
-export const ToneRecommendations = () => {
+interface ToneRecommendationsProps {
+  isMobile?: boolean;
+}
+
+export const ToneRecommendations = ({ isMobile = false }: ToneRecommendationsProps) => {
   const { recommendedTones, selectedColor, generateRecommendedTones, setSelectedColor } = useColorStore();
   const { t } = useTranslation();
 
@@ -173,6 +182,7 @@ export const ToneRecommendations = () => {
             onColorClick={handleToneClick}
             clickable={true}
             gridType="tones"
+            isMobile={isMobile}
             emptyMessage={t('toneRecommendations.noTones')}
           />
         </div>

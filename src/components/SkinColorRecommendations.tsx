@@ -4,13 +4,14 @@ import { useColorStore } from '@/store/colorStore';
 
 interface SkinColorRecommendationsProps {
   className?: string;
+  isMobile?: boolean;
 }
 
 /**
  * 肌色推薦コンポーネント
  * 固定された肌色パレットを表示
  */
-export const SkinColorRecommendations = ({ className = '' }: SkinColorRecommendationsProps) => {
+export const SkinColorRecommendations = ({ className = '', isMobile = false }: SkinColorRecommendationsProps) => {
   const { setSelectedColor } = useColorStore();
 
   // 固定の肌色パレット（順番通り）
@@ -43,6 +44,7 @@ export const SkinColorRecommendations = ({ className = '' }: SkinColorRecommenda
         <ColorGrid
           colors={colorData}
           onColorClick={handleColorClick}
+          isMobile={isMobile}
           emptyMessage="肌色が読み込まれていません"
           clickable={true}
         />

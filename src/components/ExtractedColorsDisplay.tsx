@@ -2,7 +2,11 @@ import { useColorStore } from '@/store/colorStore';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ColorGrid } from '@/components/common/ColorGrid';
 
-export const ExtractedColorsDisplay = () => {
+interface ExtractedColorsDisplayProps {
+  isMobile?: boolean;
+}
+
+export const ExtractedColorsDisplay = ({ isMobile = false }: ExtractedColorsDisplayProps) => {
   const { extractedColors, setColorFromExtracted } = useColorStore();
 
   if (extractedColors.length === 0) {
@@ -26,6 +30,7 @@ export const ExtractedColorsDisplay = () => {
               subtitle: `${Math.round(color.usage * 100)}%`
             }))}
             onColorClick={handleColorSelect}
+            isMobile={isMobile}
             emptyMessage="画像から色が抽出されていません"
           />
         </CardContent>

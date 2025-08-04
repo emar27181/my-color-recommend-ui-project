@@ -75,6 +75,15 @@ const App = () => {
             📱 MOBILE/TABLET LAYOUT (&lt;800px)
           </div>
         )}
+        
+        {/* Step 0: Paint Canvas - モバイルでも表示 */}
+        <section className="flex-shrink-0 mb-1">
+          <h3 className="text-xs font-medium text-foreground leading-tight mb-1">
+            0. キャンバス
+          </h3>
+          <PaintCanvas />
+        </section>
+
         {/* Step 1: ベース色選択 - コンパクト化 */}
         <section className="flex-shrink-0 mb-1">
           <h3 
@@ -100,7 +109,7 @@ const App = () => {
                 </div>
               </div>
               {/* 2行目: 抽出された色の割合表示 */}
-              <ExtractedColorsDisplay />
+              <ExtractedColorsDisplay isMobile={isMobile} />
             </div>
           )}
         </section>
@@ -120,7 +129,7 @@ const App = () => {
                 <ChevronUp className="w-4 h-4" />
               )}
             </h3>
-            {!isColorRecommendationCollapsed && <ColorRecommendations />}
+            {!isColorRecommendationCollapsed && <ColorRecommendations isMobile={isMobile} />}
           </section>
 
           {/* Step 3 */}
@@ -136,10 +145,10 @@ const App = () => {
                 <ChevronUp className="w-4 h-4" />
               )}
             </h3>
-            {!isToneRecommendationCollapsed && <ToneRecommendations />}
+            {!isToneRecommendationCollapsed && <ToneRecommendations isMobile={isMobile} />}
           </section>
 
-          {/* Step 4 */}
+          {/* Step 4: 肌色推薦 */}
           <section>
             <h3 
               className="text-xs font-medium mb-0 text-foreground leading-tight cursor-pointer flex items-center justify-between"
@@ -152,15 +161,8 @@ const App = () => {
                 <ChevronUp className="w-4 h-4" />
               )}
             </h3>
-            {!isSkinColorCollapsed && <SkinColorRecommendations />}
+            {!isSkinColorCollapsed && <SkinColorRecommendations isMobile={isMobile} />}
           </section>
-
-          {/* Paint Canvas はデスクトップのみ */}
-          {isDebugMode && (
-            <div className="bg-orange-600 text-white p-2 text-center">
-              🚫 キャンバスはモバイルでは非表示
-            </div>
-          )}
         </div>
       </div>
 
@@ -201,7 +203,7 @@ const App = () => {
                   <ImageUpload />
                 </div>
                 {/* 2行目: 抽出された色の割合表示 */}
-                <ExtractedColorsDisplay />
+                <ExtractedColorsDisplay isMobile={isMobile} />
               </div>
             )}
           </section>
@@ -219,7 +221,7 @@ const App = () => {
                 <ChevronUp className="w-5 h-5" />
               )}
             </h3>
-            {!isColorRecommendationCollapsed && <ColorRecommendations />}
+            {!isColorRecommendationCollapsed && <ColorRecommendations isMobile={isMobile} />}
           </section>
 
           {/* Step 3: トーン推薦 */}
@@ -235,7 +237,7 @@ const App = () => {
                 <ChevronUp className="w-5 h-5" />
               )}
             </h3>
-            {!isToneRecommendationCollapsed && <ToneRecommendations />}
+            {!isToneRecommendationCollapsed && <ToneRecommendations isMobile={isMobile} />}
           </section>
 
           {/* Step 4: 肌色推薦 */}
@@ -251,7 +253,7 @@ const App = () => {
                 <ChevronUp className="w-5 h-5" />
               )}
             </h3>
-            {!isSkinColorCollapsed && <SkinColorRecommendations />}
+            {!isSkinColorCollapsed && <SkinColorRecommendations isMobile={isMobile} />}
           </section>
         </div>
       </div>

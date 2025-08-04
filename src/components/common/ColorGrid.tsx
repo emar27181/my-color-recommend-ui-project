@@ -15,6 +15,7 @@ interface ColorGridProps {
   emptyMessage?: string;
   clickable?: boolean;
   gridType?: 'colors' | 'tones'; // グリッドタイプを指定
+  isMobile?: boolean; // モバイル判定
 }
 
 /**
@@ -27,7 +28,8 @@ export const ColorGrid = ({
   className = '',
   emptyMessage = '色が選択されていません',
   clickable = true,
-  gridType = 'colors'
+  gridType = 'colors',
+  isMobile = false
 }: ColorGridProps) => {
   if (colors.length === 0) {
     return (
@@ -44,8 +46,15 @@ export const ColorGrid = ({
     );
   }
 
-  // グリッドタイプに応じたCSSクラスを決定
-  const gridClasses = gridType === 'tones' ? RESPONSIVE_GRID.tones : RESPONSIVE_GRID.colors;
+  // グリッドタイプとデバイスタイプに応じたCSSクラスを決定
+  let gridClasses: string;
+  if (isMobile) {
+    // モバイル: 2列表示
+    gridClasses = gridType === 'tones' ? RESPONSIVE_GRID.tonesMobile : RESPONSIVE_GRID.colorsMobile;
+  } else {
+    // デスクトップ: 4列表示
+    gridClasses = gridType === 'tones' ? RESPONSIVE_GRID.tones : RESPONSIVE_GRID.colors;
+  }
 
   return (
     <div className={`grid ${gridClasses} ${RESPONSIVE_GRID.gap} ${className}`}>
