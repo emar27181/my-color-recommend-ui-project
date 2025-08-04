@@ -55,7 +55,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
             setHistory([dataURL]);
             setHistoryIndex(0);
           }
-        }, 200);
+        }, 100);
       }
     }
   }, []);
@@ -80,15 +80,21 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
       if (newHistory.length > maxHistorySize) {
         newHistory.shift();
         console.log('History trimmed to max size');
+        // インデックスも調整
+        setHistoryIndex(newHistory.length - 1);
         return newHistory;
       }
 
-      // インデックスを更新
-      setHistoryIndex(newHistory.length - 1);
-      console.log('New history index:', newHistory.length - 1);
       return newHistory;
     });
-  }, [historyIndex, maxHistorySize]);
+
+    // インデックスを更新（履歴更新後）
+    setHistoryIndex(prevIndex => {
+      const newIndex = Math.min(prevIndex + 1, maxHistorySize - 1);
+      console.log('New history index:', newIndex);
+      return newIndex;
+    });
+  }, [historyIndex]);
 
   // 履歴から状態を復元
   const restoreFromHistory = useCallback((dataURL: string) => {
@@ -287,14 +293,18 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
     // 塗りつぶしモードの場合
     if (isFillMode) {
       console.log('PaintCanvas: Starting flood fill with color:', fillColor);
-      floodFill(x, y, fillColor);
-      // 塗りつぶし後に履歴を保存
+      // 塗りつぶし前に現在の状態を履歴に保存
+      saveToHistory();
+      // 少し待ってから塗りつぶし実行
       setTimeout(() => {
-        saveToHistory();
+        floodFill(x, y, fillColor);
       }, 10);
       return;
     }
 
+    // 描画開始前に現在の状態を履歴に保存
+    saveToHistory();
+    
     setIsDrawing(true);
 
     // 描画設定を確実に適用
@@ -310,7 +320,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
 
     context.beginPath();
     context.moveTo(x, y);
-  }, [context, getScaledCoordinates, penSize, isEraserMode, isFillMode, fillColor, drawColor, floodFill]);
+  }, [context, getScaledCoordinates, penSize, isEraserMode, isFillMode, fillColor, drawColor, floodFill, saveToHistory]);
 
   // 描画中
   const draw = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -335,12 +345,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
     if (!context) return;
     setIsDrawing(false);
     context.closePath();
-
-    // 描画終了時に履歴を保存
-    setTimeout(() => {
-      saveToHistory();
-    }, 10);
-  }, [context, saveToHistory]);
+  }, [context]);
 
   // タッチイベント対応
   const handleTouchStart = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
@@ -352,14 +357,18 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
 
     // 塗りつぶしモードの場合
     if (isFillMode) {
-      floodFill(x, y, fillColor);
-      // 塗りつぶし後に履歴を保存
+      // 塗りつぶし前に現在の状態を履歴に保存
+      saveToHistory();
+      // 少し待ってから塗りつぶし実行
       setTimeout(() => {
-        saveToHistory();
+        floodFill(x, y, fillColor);
       }, 10);
       return;
     }
 
+    // 描画開始前に現在の状態を履歴に保存
+    saveToHistory();
+    
     setIsDrawing(true);
 
     // 描画設定を確実に適用
@@ -375,7 +384,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
 
     context.beginPath();
     context.moveTo(x, y);
-  }, [context, getScaledCoordinates, penSize, isEraserMode, isFillMode, fillColor, drawColor, floodFill]);
+  }, [context, getScaledCoordinates, penSize, isEraserMode, isFillMode, fillColor, drawColor, floodFill, saveToHistory]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault();
@@ -401,34 +410,30 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
     if (!context) return;
     setIsDrawing(false);
     context.closePath();
-
-    // 描画終了時に履歴を保存
-    setTimeout(() => {
-      saveToHistory();
-    }, 10);
-  }, [context, saveToHistory]);
+  }, [context]);
 
   // キャンバスをクリア
   const clearCanvas = useCallback(() => {
     if (!context || !canvasRef.current) return;
 
-    // 背景をクリア
-    context.save();
-    context.globalCompositeOperation = 'source-over';
-    context.fillStyle = '#ffffff';
-    context.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-    context.restore();
+    // クリア前に現在の状態を履歴に保存
+    saveToHistory();
 
-    // 描画設定を再設定
-    context.globalCompositeOperation = 'source-over';
-    context.strokeStyle = isEraserMode ? '#ffffff' : drawColor;
-    context.lineWidth = penSize;
-    context.lineCap = 'round';
-    context.lineJoin = 'round';
-
-    // クリア後に履歴を保存
+    // 少し待ってからクリア実行
     setTimeout(() => {
-      saveToHistory();
+      // 背景をクリア
+      context.save();
+      context.globalCompositeOperation = 'source-over';
+      context.fillStyle = '#ffffff';
+      context.fillRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
+      context.restore();
+
+      // 描画設定を再設定
+      context.globalCompositeOperation = 'source-over';
+      context.strokeStyle = isEraserMode ? '#ffffff' : drawColor;
+      context.lineWidth = penSize;
+      context.lineCap = 'round';
+      context.lineJoin = 'round';
     }, 10);
   }, [context, penSize, isEraserMode, drawColor, saveToHistory]);
 
