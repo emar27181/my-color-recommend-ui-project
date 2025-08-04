@@ -1,5 +1,6 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { ColorGrid } from '@/components/common/ColorGrid';
+import { useColorStore } from '@/store/colorStore';
 
 interface SkinColorRecommendationsProps {
   className?: string;
@@ -10,6 +11,8 @@ interface SkinColorRecommendationsProps {
  * 固定された肌色パレットを表示
  */
 export const SkinColorRecommendations = ({ className = '' }: SkinColorRecommendationsProps) => {
+  const { setSelectedColor } = useColorStore();
+
   // 固定の肌色パレット（順番通り）
   const skinColors = [
     '#FFF5F0', // 色白系ベース
@@ -24,8 +27,13 @@ export const SkinColorRecommendations = ({ className = '' }: SkinColorRecommenda
     '#FFA582', // やや褐色系頬
   ];
 
+  const handleColorClick = (color: string) => {
+    setSelectedColor(color);
+  };
+
   const colorData = skinColors.map((color) => ({
     color,
+    title: `${color} (クリックで選択)`,
     showClickIcon: false,
   }));
 
@@ -34,8 +42,9 @@ export const SkinColorRecommendations = ({ className = '' }: SkinColorRecommenda
       <CardContent className="pt-1 flex-1 overflow-auto pb-0">
         <ColorGrid
           colors={colorData}
+          onColorClick={handleColorClick}
           emptyMessage="肌色が読み込まれていません"
-          clickable={false}
+          clickable={true}
         />
       </CardContent>
     </Card>
