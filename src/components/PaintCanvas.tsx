@@ -481,8 +481,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
     <Card className={`w-full h-full flex flex-col bg-background border-transparent ${className}`}>
       <CardHeader className="pb-1 pt-2">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-medium flex items-center gap-2">
-            <Palette className="w-4 h-4" />
+          <h2 className="text-sm font-medium">
             0.キャンバス
           </h2>
           <div className="flex items-center gap-2">
