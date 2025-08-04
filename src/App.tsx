@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 const App = () => {
   const { t } = useTranslation();
+  const [isCanvasCollapsed, setIsCanvasCollapsed] = useState(false);
   const [isBaseColorCollapsed, setIsBaseColorCollapsed] = useState(false);
   const [isColorRecommendationCollapsed, setIsColorRecommendationCollapsed] = useState(false);
   const [isToneRecommendationCollapsed, setIsToneRecommendationCollapsed] = useState(false);
@@ -78,10 +79,20 @@ const App = () => {
         
         {/* Step 0: Paint Canvas - モバイルでも表示 */}
         <section className="flex-shrink-0 mb-1">
-          <h3 className="text-xs font-medium text-foreground leading-tight mb-1">
-            0. キャンバス
+          <h3 
+            className="text-xs font-medium text-foreground leading-tight mb-0 cursor-pointer flex items-center justify-between"
+            onClick={() => setIsCanvasCollapsed(!isCanvasCollapsed)}
+          >
+            <span>0. キャンバス</span>
+            {isCanvasCollapsed ? (
+              <ChevronDown className="w-4 h-4" />
+            ) : (
+              <ChevronUp className="w-4 h-4" />
+            )}
           </h3>
-          <PaintCanvas />
+          {!isCanvasCollapsed && (
+            <PaintCanvas />
+          )}
         </section>
 
         {/* Step 1: ベース色選択 - コンパクト化 */}
@@ -176,7 +187,24 @@ const App = () => {
         {/* Left: Paint Canvas */}
         <div className="w-1/2 flex flex-col min-h-0" style={isDebugMode ? { padding: '32px', backgroundColor: 'red' } : { padding: '16px' }}>
           {isDebugMode && <h1 className="text-4xl text-black">LEFT PANEL</h1>}
-          <PaintCanvas />
+          <section className="flex-shrink-0 flex-1 flex flex-col min-h-0">
+            <h3 
+              className="text-lg font-medium mb-2 text-foreground cursor-pointer flex items-center justify-between"
+              onClick={() => setIsCanvasCollapsed(!isCanvasCollapsed)}
+            >
+              <span>0. キャンバス</span>
+              {isCanvasCollapsed ? (
+                <ChevronDown className="w-5 h-5" />
+              ) : (
+                <ChevronUp className="w-5 h-5" />
+              )}
+            </h3>
+            {!isCanvasCollapsed && (
+              <div className="flex-1 min-h-0">
+                <PaintCanvas />
+              </div>
+            )}
+          </section>
         </div>
 
         {/* Right: Color Tools in Vertical Layout */}
