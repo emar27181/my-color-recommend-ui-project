@@ -312,16 +312,16 @@ export const useColorStore = create<ColorState>((set, get) => {
         const color = chroma(baseColor);
         const hue = color.get('hsl.h') || 0;
 
-        // 固定の16パターン（saturation 20,40,60,80 × lightness 20,40,60,80）
-        const saturations = [20, 40, 60, 80]; // %
-        const lightnesses = [20, 40, 60, 80]; // %
+        // 固定の16パターン（saturation 20,40,60,80 × lightness 80,60,40,20）
+        const saturations = [20, 40, 60, 80]; // % (左から右へ：薄い→鮮やか)
+        const lightnesses = [80, 60, 40, 20]; // % (上から下へ：明るい→暗い)
         
         const tones: string[] = [];
         
         // 16パターンを固定順序で生成（4×4の組み合わせ）
-        // 各彩度ごとに明度20,40,60,80の順序で配置
-        for (const saturation of saturations) {
-          for (const lightness of lightnesses) {
+        // 各明度ごとに彩度20,40,60,80の順序で配置（上=明るい、下=暗い、左=薄い、右=鮮やか）
+        for (const lightness of lightnesses) {
+          for (const saturation of saturations) {
             const hslColor = chroma.hsl(
               hue, 
               saturation / 100,  // 0-1の範囲に変換
@@ -332,6 +332,8 @@ export const useColorStore = create<ColorState>((set, get) => {
         }
 
         // 配置を固定するため、ソートせずにそのまま使用
+        console.log('Generated tones order (first 4 = lightness80% with sat 20,40,60,80):', 
+          tones.slice(0, 4).map((tone, i) => `${i}: ${tone} (S:${saturations[i]}%)`));
         set({ recommendedTones: tones, toneBaseColor: baseColor });
       } catch (error) {
         console.error('Failed to generate recommended tones:', error);
@@ -341,6 +343,7 @@ export const useColorStore = create<ColorState>((set, get) => {
   };
 });
 
-// 初期化時にデフォルトの推薦色を生成
+// 初期化時にデフォルトの推薦色とトーン推薦を生成
 const initialState = useColorStore.getState();
 initialState.generateRecommendedColors();
+initialState.generateRecommendedTones(initialState.selectedColor);
