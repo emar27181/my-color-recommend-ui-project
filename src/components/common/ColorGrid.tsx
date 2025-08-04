@@ -1,5 +1,4 @@
 import { ColorItem } from '@/components/common/ColorItem';
-import { RESPONSIVE_GRID } from '@/constants/ui';
 
 interface ColorData {
   color: string;
