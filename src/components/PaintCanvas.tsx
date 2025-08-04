@@ -257,6 +257,30 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
     };
   }, [undo, redo]);
 
+  // iPadでのスクロール防止のためのタッチイベント制御
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const preventScroll = (e: TouchEvent) => {
+      // キャンバス上でのタッチイベントの場合のみスクロールを防止
+      if (e.target === canvas) {
+        e.preventDefault();
+      }
+    };
+
+    // パッシブでないイベントリスナーを追加
+    canvas.addEventListener('touchstart', preventScroll, { passive: false });
+    canvas.addEventListener('touchmove', preventScroll, { passive: false });
+    canvas.addEventListener('touchend', preventScroll, { passive: false });
+
+    return () => {
+      canvas.removeEventListener('touchstart', preventScroll);
+      canvas.removeEventListener('touchmove', preventScroll);
+      canvas.removeEventListener('touchend', preventScroll);
+    };
+  }, []);
+
   // コンポーネントアンマウント時のクリーンアップ
   useEffect(() => {
     return () => {
@@ -606,7 +630,11 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
             ref={canvasRef}
             className={`border border-border rounded-md bg-white ${isFillMode ? 'cursor-pointer' : 'cursor-crosshair'
               }`}
-            style={{ width: '100%', height: 'auto' }}
+            style={{ 
+              width: '100%', 
+              height: 'auto',
+              touchAction: 'none'
+            }}
             onMouseDown={startDrawing}
             onMouseMove={draw}
             onMouseUp={stopDrawing}
