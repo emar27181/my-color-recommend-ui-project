@@ -17,7 +17,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
-  const [penSize, setPenSize] = useState(8);
+  const [penSize, setPenSize] = useState(20);
   const [isEraserMode, setIsEraserMode] = useState(false);
   const [isFillMode, setIsFillMode] = useState(false);
   const [isEditingPenSize, setIsEditingPenSize] = useState(false);
@@ -62,7 +62,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctx.strokeStyle = '#000000'; // 黒色固定
-        ctx.lineWidth = 8; // 初期ペンサイズ
+        ctx.lineWidth = 20; // 初期ペンサイズ
         ctx.globalCompositeOperation = 'source-over'; // 初期は通常描画モード
 
         // 背景を白に設定
@@ -810,10 +810,9 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
   return (
     <Card className={`w-full h-full flex flex-col bg-background border-transparent ${className}`}>
       <CardHeader className="pb-1 pt-2">
-        <div className="flex items-center justify-end">
-          <div className="flex items-center gap-2">
-              {/* 現在の描画色表示（ColorPicker風） */}
-            <div className="relative cursor-pointer hover:scale-110 transition-all duration-200">
+        <div className="flex flex-wrap items-center justify-start gap-2">
+          {/* 現在の描画色表示（ColorPicker風） */}
+          <div className="relative cursor-pointer hover:scale-110 transition-all duration-200 flex-shrink-0">
               <input
                 type="color"
                 value={selectedColor}
@@ -822,22 +821,20 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
                 title={`描画色を変更: ${selectedColor}`}
               />
               <div 
-                className={`${BORDER_PRESETS.colorBlock} flex items-center justify-center pointer-events-none`}
+                className={`${BORDER_PRESETS.colorBlock} flex items-center justify-center pointer-events-none w-6 h-6 sm:w-8 sm:h-8`}
                 style={{
-                  backgroundColor: selectedColor,
-                  width: '24px',
-                  height: '24px'
+                  backgroundColor: selectedColor
                 }}
                 title={`描画色: ${selectedColor} - クリックで変更`}
               >
                 <Palette 
-                  className="w-3 h-3" 
+                  className="w-3 h-3 sm:w-4 sm:h-4" 
                   style={{ color: getIconColor() }}
                 />
               </div>
-            </div>
-            {/* ペン/消しゴム/塗りつぶしモード切り替え */}
-            <div className="flex gap-1">
+          </div>
+          {/* ペン/消しゴム/塗りつぶしモード切り替え */}
+          <div className="flex flex-wrap gap-1 flex-shrink-0">
               <Button
                 onClick={() => {
                   setIsEraserMode(false);
@@ -845,7 +842,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
                 }}
                 variant={!isEraserMode && !isFillMode ? "default" : "outline"}
                 size="sm"
-                className="h-8 px-2"
+                className="h-6 px-1 sm:h-8 sm:px-2"
               >
                 <Pen className="w-4 h-4 text-foreground" />
               </Button>
@@ -856,7 +853,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
                 }}
                 variant={isEraserMode ? "default" : "outline"}
                 size="sm"
-                className="h-8 px-2"
+                className="h-6 px-1 sm:h-8 sm:px-2"
               >
                 <Eraser className="w-4 h-4 text-foreground" />
               </Button>
@@ -867,18 +864,18 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
                 }}
                 variant={isFillMode ? "default" : "outline"}
                 size="sm"
-                className="h-8 px-2"
+                className="h-6 px-1 sm:h-8 sm:px-2"
               >
                 <PaintBucket className="w-4 h-4 text-foreground" />
               </Button>
-            </div>
-            {/* Undo/Redoボタン */}
-            <div className="flex gap-1">
+          </div>
+          {/* Undo/Redoボタン */}
+          <div className="flex flex-wrap gap-1 flex-shrink-0">
               <Button
                 onClick={undo}
                 variant="outline"
                 size="sm"
-                className="h-8 px-2"
+                className="h-6 px-1 sm:h-8 sm:px-2"
                 disabled={historyIndex <= 0}
                 title="元に戻す (Ctrl+Z)"
               >
@@ -888,20 +885,20 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
                 onClick={redo}
                 variant="outline"
                 size="sm"
-                className="h-8 px-2"
+                className="h-6 px-1 sm:h-8 sm:px-2"
                 disabled={historyIndex >= history.length - 1}
                 title="やり直し (Ctrl+Y)"
               >
                 <Redo className="w-4 h-4 text-foreground" />
               </Button>
-            </div>
-            {/* ペンサイズ調整 */}
-            <div className="flex items-center gap-1">
+          </div>
+          {/* ペンサイズ調整 */}
+          <div className="flex flex-wrap items-center gap-1 flex-shrink-0">
               <Button
                 onClick={decreasePenSize}
                 variant="outline"
                 size="sm"
-                className="h-8 w-8 p-0"
+                className="h-6 w-6 p-0 sm:h-8 sm:w-8"
                 disabled={penSize <= 2}
               >
                 <Minus className="w-3 h-3 text-foreground" />
@@ -917,12 +914,12 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
                   onKeyDown={handlePenSizeKeyDown}
                   min="2"
                   max="200"
-                  className="text-xs font-mono text-foreground min-w-[24px] text-center bg-transparent border border-border rounded px-1 h-6 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+                  className="text-xs font-mono text-foreground min-w-[20px] sm:min-w-[24px] text-center bg-transparent border border-border rounded px-0.5 sm:px-1 h-5 sm:h-6 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
                   autoFocus
                 />
               ) : (
                 <span 
-                  className="text-xs font-mono text-foreground min-w-[24px] text-center cursor-pointer hover:bg-muted rounded px-1 py-1"
+                  className="text-xs font-mono text-foreground min-w-[20px] sm:min-w-[24px] text-center cursor-pointer hover:bg-muted rounded px-0.5 sm:px-1 py-0.5 sm:py-1"
                   onClick={handlePenSizeEdit}
                   title="クリックして数値入力"
                 >
@@ -933,18 +930,20 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
                 onClick={increasePenSize}
                 variant="outline"
                 size="sm"
-                className="h-8 w-8 p-0"
+                className="h-6 w-6 p-0 sm:h-8 sm:w-8"
                 disabled={penSize >= 200}
               >
                 <Plus className="w-3 h-3 text-foreground" />
               </Button>
-            </div>
+          </div>
+          {/* その他のボタングループ - リセット、色抽出、ダウンロード */}
+          <div className="flex flex-wrap gap-1 flex-shrink-0">
             {/* リセットボタン */}
             <Button
               onClick={clearCanvas}
               variant="outline"
               size="sm"
-              className="h-8 px-2"
+              className="h-6 px-1 sm:h-8 sm:px-2"
             >
               <CircleDashed className="w-4 h-4 text-foreground" />
             </Button>
@@ -953,7 +952,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
               onClick={extractColorsFromCanvas}
               variant="outline"
               size="sm"
-              className="h-8 px-2"
+              className="h-6 px-1 sm:h-8 sm:px-2"
               disabled={isExtractingColors}
               title="キャンバスから色を抽出"
             >
@@ -964,7 +963,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
               onClick={downloadCanvas}
               variant="outline"
               size="sm"
-              className="h-8 px-2"
+              className="h-6 px-1 sm:h-8 sm:px-2"
               title="キャンバスをPNG画像でダウンロード"
             >
               <Download className="w-4 h-4 text-foreground" />
