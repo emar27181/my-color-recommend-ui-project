@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CircleDashed, Palette, Plus, Minus, Eraser, Edit, PaintBucket, Undo, Redo } from 'lucide-react';
+import { CircleDashed, Palette, Plus, Minus, Eraser, Pen, PaintBucket, Undo, Redo } from 'lucide-react';
 
 interface PaintCanvasProps {
   className?: string;
@@ -497,7 +497,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
                 size="sm"
                 className="h-8 px-2"
               >
-                <Edit className="w-4 h-4 text-foreground" />
+                <Pen className="w-4 h-4 text-foreground" />
               </Button>
               <Button
                 onClick={() => {
