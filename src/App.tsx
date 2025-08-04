@@ -56,7 +56,8 @@ const App = () => {
             )}
           </h3>
           {!isBaseColorCollapsed && (
-            <>
+            <div className="space-y-1">
+              {/* 1行目: カラーピッカー + 画像アップロード */}
               <div className="flex gap-1">
                 <div className="flex-1">
                   <ColorPicker />
@@ -65,8 +66,9 @@ const App = () => {
                   <ImageUpload />
                 </div>
               </div>
+              {/* 2行目: 抽出された色の割合表示 */}
               <ExtractedColorsDisplay />
-            </>
+            </div>
           )}
         </section>
 
@@ -152,9 +154,13 @@ const App = () => {
               )}
             </h3>
             {!isBaseColorCollapsed && (
-              <div className="grid grid-cols-3 gap-4">
-                <ColorPicker />
-                <ImageUpload />
+              <div className="space-y-4">
+                {/* 1行目: カラーピッカー + 画像アップロード */}
+                <div className="grid grid-cols-2 gap-4">
+                  <ColorPicker />
+                  <ImageUpload />
+                </div>
+                {/* 2行目: 抽出された色の割合表示 */}
                 <ExtractedColorsDisplay />
               </div>
             )}

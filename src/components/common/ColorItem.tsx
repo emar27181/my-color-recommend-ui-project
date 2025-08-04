@@ -47,34 +47,36 @@ export const ColorItem = ({
     }
   };
 
-  // デスクトップ版レイアウト
+  // デスクトップ版レイアウト（縦2段）
   if (!compact) {
     return (
       <div 
-        className={`bg-card ${BORDER_PRESETS.card} p-1 shadow-sm hover:shadow-md transition-all duration-200 ${
+        className={`bg-card ${BORDER_PRESETS.card} p-2 shadow-sm hover:shadow-md transition-all duration-200 ${
           clickable ? 'cursor-pointer' : ''
         } group ${className}`}
         onClick={handleClick}
       >
-        <div className="flex items-center gap-4">
+        {/* 1行目: カラーボックス + コピーボタン */}
+        <div className="flex items-center justify-between mb-2">
           <ColorBlock
             color={color}
             title={title || color}
             showClickIcon={showClickIcon}
           />
-          <div className="flex-1 min-w-0">
-            <p className={`${TYPOGRAPHY.colorCode} truncate`}>{color}</p>
-            {subtitle && (
-              <p className={TYPOGRAPHY.usage}>
-                {subtitle}
-              </p>
-            )}
-          </div>
           <CopyColorButton
             color={color}
             variant="minimal"
             className="opacity-100"
           />
+        </div>
+        {/* 2行目: HEXコード + 使用割合 */}
+        <div className="text-center space-y-1">
+          <p className={`${TYPOGRAPHY.colorCode}`}>{color}</p>
+          {subtitle && (
+            <p className={`${TYPOGRAPHY.usage}`}>
+              {subtitle}
+            </p>
+          )}
         </div>
       </div>
     );
