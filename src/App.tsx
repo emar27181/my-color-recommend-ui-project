@@ -144,7 +144,7 @@ const App = () => {
           {isDebugMode && <h1 className="text-4xl text-black">RIGHT PANEL</h1>}
           {/* Step 1: ベース色選択 */}
           <section className="flex-shrink-0">
-            <h2 
+            <h3 
               className="text-lg font-medium mb-2 text-foreground cursor-pointer flex items-center justify-between"
               onClick={() => setIsBaseColorCollapsed(!isBaseColorCollapsed)}
             >
@@ -154,7 +154,7 @@ const App = () => {
               ) : (
                 <ChevronUp className="w-5 h-5" />
               )}
-            </h2>
+            </h3>
             {!isBaseColorCollapsed && (
               <div className="grid grid-cols-3 gap-4">
                 <ColorPicker />
@@ -166,7 +166,7 @@ const App = () => {
 
           {/* Step 2: 色相推薦 */}
           <section className="flex-shrink-0">
-            <h2 
+            <h3 
               className="text-lg font-medium mb-2 text-foreground cursor-pointer flex items-center justify-between"
               onClick={() => setIsColorRecommendationCollapsed(!isColorRecommendationCollapsed)}
             >
@@ -176,13 +176,13 @@ const App = () => {
               ) : (
                 <ChevronUp className="w-5 h-5" />
               )}
-            </h2>
+            </h3>
             {!isColorRecommendationCollapsed && <ColorRecommendations />}
           </section>
 
           {/* Step 3: トーン推薦 */}
           <section className="flex-shrink-0">
-            <h2 
+            <h3 
               className="text-lg font-medium mb-2 text-foreground cursor-pointer flex items-center justify-between"
               onClick={() => setIsToneRecommendationCollapsed(!isToneRecommendationCollapsed)}
             >
@@ -192,13 +192,13 @@ const App = () => {
               ) : (
                 <ChevronUp className="w-5 h-5" />
               )}
-            </h2>
+            </h3>
             {!isToneRecommendationCollapsed && <ToneRecommendations />}
           </section>
 
           {/* Step 4: 肌色推薦 */}
           <section className="flex-shrink-0">
-            <h2 
+            <h3 
               className="text-lg font-medium mb-2 text-foreground cursor-pointer flex items-center justify-between"
               onClick={() => setIsSkinColorCollapsed(!isSkinColorCollapsed)}
             >
@@ -208,7 +208,7 @@ const App = () => {
               ) : (
                 <ChevronUp className="w-5 h-5" />
               )}
-            </h2>
+            </h3>
             {!isSkinColorCollapsed && <SkinColorRecommendations />}
           </section>
         </div>

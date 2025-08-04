@@ -481,9 +481,9 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
     <Card className={`w-full h-full flex flex-col bg-background border-transparent ${className}`}>
       <CardHeader className="pb-1 pt-2">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-medium">
+          <h3 className="text-sm font-medium">
             0.キャンバス
-          </h2>
+          </h3>
           <div className="flex items-center gap-2">
             {/* 現在の描画色表示 */}
             <div 
