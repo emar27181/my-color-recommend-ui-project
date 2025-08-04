@@ -486,6 +486,16 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
             0.キャンバス
           </h2>
           <div className="flex items-center gap-2">
+            {/* 現在の描画色表示 */}
+            <div 
+              className="border-2 border-gray-300 rounded-sm hover:scale-110 transition-transform cursor-pointer"
+              style={{ 
+                backgroundColor: drawColor,
+                width: '24px',
+                height: '24px'
+              }}
+              title={`描画色: ${drawColor}`}
+            />
             {/* ペン/消しゴム/塗りつぶしモード切り替え */}
             <div className="flex gap-1">
               <Button
