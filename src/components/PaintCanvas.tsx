@@ -18,6 +18,8 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
   const [penSize, setPenSize] = useState(8);
   const [isEraserMode, setIsEraserMode] = useState(false);
   const [isFillMode, setIsFillMode] = useState(false);
+  const [isEditingPenSize, setIsEditingPenSize] = useState(false);
+  const [tempPenSize, setTempPenSize] = useState('');
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Undo/Redo履歴管理
@@ -622,6 +624,56 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     }
   }, []);
 
+  // ペンサイズ数値入力の処理
+  const handlePenSizeEdit = useCallback(() => {
+    setTempPenSize(penSize.toString());
+    setIsEditingPenSize(true);
+  }, [penSize]);
+
+  const handlePenSizeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setTempPenSize(value);
+    
+    // 空文字列の場合は何もしない（一時的に空を許可）
+    if (value === '') {
+      return;
+    }
+    
+    // 数値として有効で範囲内の場合のみ更新
+    const numValue = parseInt(value, 10);
+    if (!isNaN(numValue) && numValue >= 2 && numValue <= 200) {
+      setPenSize(numValue);
+    }
+  }, []);
+
+  const handlePenSizeBlur = useCallback(() => {
+    // 編集終了時に空文字列の場合は前の値に戻す
+    if (tempPenSize === '' || tempPenSize === '0' || tempPenSize === '1') {
+      // 無効な値の場合は最小値の2に設定
+      setPenSize(2);
+    } else {
+      const numValue = parseInt(tempPenSize, 10);
+      if (!isNaN(numValue)) {
+        // 範囲外の場合は範囲内に収める
+        const clampedValue = Math.max(2, Math.min(200, numValue));
+        setPenSize(clampedValue);
+      }
+    }
+    setIsEditingPenSize(false);
+    setTempPenSize('');
+  }, [tempPenSize]);
+
+  const handlePenSizeKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handlePenSizeBlur();
+    }
+    if (e.key === 'Escape') {
+      // Escapeの場合は変更をキャンセルして元の値に戻す
+      setIsEditingPenSize(false);
+      setTempPenSize('');
+    }
+  }, [handlePenSizeBlur]);
+
   return (
     <Card className={`w-full h-full flex flex-col bg-background border-transparent ${className}`}>
       <CardHeader className="pb-1 pt-2">
@@ -729,9 +781,29 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
               >
                 <Minus className="w-3 h-3 text-foreground" />
               </Button>
-              <span className="text-xs font-mono text-foreground min-w-[24px] text-center">
-                {penSize}
-              </span>
+              {isEditingPenSize ? (
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={tempPenSize}
+                  onChange={handlePenSizeChange}
+                  onBlur={handlePenSizeBlur}
+                  onKeyDown={handlePenSizeKeyDown}
+                  min="2"
+                  max="200"
+                  className="text-xs font-mono text-foreground min-w-[24px] text-center bg-transparent border border-border rounded px-1 h-6"
+                  autoFocus
+                />
+              ) : (
+                <span 
+                  className="text-xs font-mono text-foreground min-w-[24px] text-center cursor-pointer hover:bg-muted rounded px-1 py-1"
+                  onClick={handlePenSizeEdit}
+                  title="クリックして数値入力"
+                >
+                  {penSize}
+                </span>
+              )}
               <Button
                 onClick={increasePenSize}
                 onMouseDown={() => startLongPress(true)}
