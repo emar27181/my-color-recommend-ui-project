@@ -18,7 +18,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
   const [fillColor, setFillColor] = useState('#000000');
   const [drawColor, setDrawColor] = useState('#000000');
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   // Undo/Redo履歴管理
   const [history, setHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -33,20 +33,20 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
         // キャンバス内部解像度を超高解像度に設定（4K対応）
         canvas.width = 1920;
         canvas.height = 1440;
-        
+
         // 描画設定
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctx.strokeStyle = '#000000'; // 黒色固定
         ctx.lineWidth = 8; // 初期ペンサイズ
         ctx.globalCompositeOperation = 'source-over'; // 初期は通常描画モード
-        
+
         // 背景を白に設定
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
+
         setContext(ctx);
-        
+
         // 初期状態を履歴に保存（白い背景）
         setTimeout(() => {
           if (canvasRef.current) {
@@ -63,26 +63,26 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
   // 履歴に現在の状態を保存
   const saveToHistory = useCallback(() => {
     if (!canvasRef.current) return;
-    
+
     const canvas = canvasRef.current;
     const dataURL = canvas.toDataURL();
-    
+
     console.log('Saving to history - current index:', historyIndex);
-    
+
     setHistory(prevHistory => {
       // 現在のインデックス以降の履歴を削除（新しい操作時）
       const newHistory = prevHistory.slice(0, historyIndex + 1);
       newHistory.push(dataURL);
-      
+
       console.log('New history length:', newHistory.length);
-      
+
       // 最大サイズを超えた場合、古い履歴を削除
       if (newHistory.length > maxHistorySize) {
         newHistory.shift();
         console.log('History trimmed to max size');
         return newHistory;
       }
-      
+
       // インデックスを更新
       setHistoryIndex(newHistory.length - 1);
       console.log('New history index:', newHistory.length - 1);
@@ -93,10 +93,10 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
   // 履歴から状態を復元
   const restoreFromHistory = useCallback((dataURL: string) => {
     if (!context || !canvasRef.current) return;
-    
+
     const canvas = canvasRef.current;
     const img = new Image();
-    
+
     img.onload = () => {
       // キャンバスをクリア
       context.clearRect(0, 0, canvas.width, canvas.height);
@@ -106,7 +106,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
       // 画像を復元
       context.drawImage(img, 0, 0);
     };
-    
+
     img.src = dataURL;
   }, [context]);
 
@@ -140,10 +140,13 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
     }
   }, [context, penSize]);
 
-  // 選択色が変更された時にdrawColorを更新
+  // 選択色が変更された時にdrawColorとfillColorを更新
   useEffect(() => {
     if (selectedColor) {
+      console.log('PaintCanvas: selectedColor changed to:', selectedColor);
       setDrawColor(selectedColor);
+      setFillColor(selectedColor);
+      console.log('PaintCanvas: Updated drawColor and fillColor to:', selectedColor);
     }
   }, [selectedColor]);
 
@@ -163,52 +166,52 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
   // フラッドフィル（塗りつぶし）アルゴリズム
   const floodFill = useCallback((startX: number, startY: number, newColor: string) => {
     if (!context || !canvasRef.current) return;
-    
+
     const canvas = canvasRef.current;
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
     const pixels = imageData.data;
-    
+
     // 新しい色をRGBAに変換
     const hex = newColor.replace('#', '');
     const newR = parseInt(hex.substring(0, 2), 16);
     const newG = parseInt(hex.substring(2, 4), 16);
     const newB = parseInt(hex.substring(4, 6), 16);
     const newA = 255;
-    
+
     // 開始点の色を取得
     const startIndex = (Math.floor(startY) * canvas.width + Math.floor(startX)) * 4;
     const startR = pixels[startIndex];
     const startG = pixels[startIndex + 1];
     const startB = pixels[startIndex + 2];
     const startA = pixels[startIndex + 3];
-    
+
     // 同じ色の場合は何もしない
     if (startR === newR && startG === newG && startB === newB && startA === newA) {
       return;
     }
-    
+
     // スタックベースのフラッドフィル
     const stack: { x: number; y: number }[] = [{ x: Math.floor(startX), y: Math.floor(startY) }];
-    
+
     while (stack.length > 0) {
       const { x, y } = stack.pop()!;
-      
+
       if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) continue;
-      
+
       const index = (y * canvas.width + x) * 4;
-      
+
       // 現在のピクセルが開始色と同じかチェック
-      if (pixels[index] === startR && 
-          pixels[index + 1] === startG && 
-          pixels[index + 2] === startB && 
-          pixels[index + 3] === startA) {
-        
+      if (pixels[index] === startR &&
+        pixels[index + 1] === startG &&
+        pixels[index + 2] === startB &&
+        pixels[index + 3] === startA) {
+
         // 新しい色に塗り替え
         pixels[index] = newR;
         pixels[index + 1] = newG;
         pixels[index + 2] = newB;
         pixels[index + 3] = newA;
-        
+
         // 隣接する4方向をスタックに追加
         stack.push({ x: x + 1, y });
         stack.push({ x: x - 1, y });
@@ -216,7 +219,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
         stack.push({ x, y: y - 1 });
       }
     }
-    
+
     // 変更されたピクセルデータをキャンバスに反映
     context.putImageData(imageData, 0, 0);
   }, [context]);
@@ -260,29 +263,30 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
   // 座標計算のヘルパー関数
   const getScaledCoordinates = useCallback((clientX: number, clientY: number) => {
     if (!canvasRef.current) return { x: 0, y: 0 };
-    
+
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
-    
+
     // 表示サイズと実際のキャンバスサイズの比率を計算
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
-    
+
     // スケールを考慮した座標計算
     const x = (clientX - rect.left) * scaleX;
     const y = (clientY - rect.top) * scaleY;
-    
+
     return { x, y };
   }, []);
 
   // 描画開始
   const startDrawing = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!context || !canvasRef.current) return;
-    
+
     const { x, y } = getScaledCoordinates(e.clientX, e.clientY);
-    
+
     // 塗りつぶしモードの場合
     if (isFillMode) {
+      console.log('PaintCanvas: Starting flood fill with color:', fillColor);
       floodFill(x, y, fillColor);
       // 塗りつぶし後に履歴を保存
       setTimeout(() => {
@@ -290,9 +294,9 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
       }, 10);
       return;
     }
-    
+
     setIsDrawing(true);
-    
+
     // 描画設定を確実に適用
     context.globalCompositeOperation = 'source-over'; // 常に通常描画モード
     if (isEraserMode) {
@@ -303,7 +307,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
     context.lineWidth = penSize;
     context.lineCap = 'round';
     context.lineJoin = 'round';
-    
+
     context.beginPath();
     context.moveTo(x, y);
   }, [context, getScaledCoordinates, penSize, isEraserMode, isFillMode, fillColor, drawColor, floodFill]);
@@ -311,9 +315,9 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
   // 描画中
   const draw = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isDrawing || !context || !canvasRef.current) return;
-    
+
     const { x, y } = getScaledCoordinates(e.clientX, e.clientY);
-    
+
     // 描画設定を確実に維持
     context.globalCompositeOperation = 'source-over';
     if (isEraserMode) {
@@ -321,7 +325,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
     } else {
       context.strokeStyle = drawColor; // 選択された色
     }
-    
+
     context.lineTo(x, y);
     context.stroke();
   }, [isDrawing, context, getScaledCoordinates, isEraserMode, drawColor]);
@@ -331,7 +335,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
     if (!context) return;
     setIsDrawing(false);
     context.closePath();
-    
+
     // 描画終了時に履歴を保存
     setTimeout(() => {
       saveToHistory();
@@ -342,10 +346,10 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
   const handleTouchStart = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault();
     if (!context || !canvasRef.current) return;
-    
+
     const touch = e.touches[0];
     const { x, y } = getScaledCoordinates(touch.clientX, touch.clientY);
-    
+
     // 塗りつぶしモードの場合
     if (isFillMode) {
       floodFill(x, y, fillColor);
@@ -355,9 +359,9 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
       }, 10);
       return;
     }
-    
+
     setIsDrawing(true);
-    
+
     // 描画設定を確実に適用
     context.globalCompositeOperation = 'source-over'; // 常に通常描画モード
     if (isEraserMode) {
@@ -368,7 +372,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
     context.lineWidth = penSize;
     context.lineCap = 'round';
     context.lineJoin = 'round';
-    
+
     context.beginPath();
     context.moveTo(x, y);
   }, [context, getScaledCoordinates, penSize, isEraserMode, isFillMode, fillColor, drawColor, floodFill]);
@@ -376,10 +380,10 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
   const handleTouchMove = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault();
     if (!isDrawing || !context || !canvasRef.current) return;
-    
+
     const touch = e.touches[0];
     const { x, y } = getScaledCoordinates(touch.clientX, touch.clientY);
-    
+
     // 描画設定を確実に維持
     context.globalCompositeOperation = 'source-over';
     if (isEraserMode) {
@@ -387,7 +391,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
     } else {
       context.strokeStyle = drawColor; // 選択された色
     }
-    
+
     context.lineTo(x, y);
     context.stroke();
   }, [isDrawing, context, getScaledCoordinates, isEraserMode, drawColor]);
@@ -397,7 +401,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
     if (!context) return;
     setIsDrawing(false);
     context.closePath();
-    
+
     // 描画終了時に履歴を保存
     setTimeout(() => {
       saveToHistory();
@@ -407,21 +411,21 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
   // キャンバスをクリア
   const clearCanvas = useCallback(() => {
     if (!context || !canvasRef.current) return;
-    
+
     // 背景をクリア
     context.save();
     context.globalCompositeOperation = 'source-over';
     context.fillStyle = '#ffffff';
     context.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     context.restore();
-    
+
     // 描画設定を再設定
     context.globalCompositeOperation = 'source-over';
     context.strokeStyle = isEraserMode ? '#ffffff' : drawColor;
     context.lineWidth = penSize;
     context.lineCap = 'round';
     context.lineJoin = 'round';
-    
+
     // クリア後に履歴を保存
     setTimeout(() => {
       saveToHistory();
@@ -445,7 +449,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
     } else {
       decreasePenSize();
     }
-    
+
     // 300ms後から連続実行開始
     const timeoutId = setTimeout(() => {
       intervalRef.current = setInterval(() => {
@@ -472,10 +476,10 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
     <Card className={`w-full h-full flex flex-col bg-background border-transparent ${className}`}>
       <CardHeader className="pb-1 pt-2">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium flex items-center gap-2">
+          <h2 className="text-sm font-medium flex items-center gap-2">
             <Palette className="w-4 h-4" />
-            試し塗りキャンバス
-          </h3>
+            0.キャンバス
+          </h2>
           <div className="flex items-center gap-2">
             {/* ペン/消しゴム/塗りつぶしモード切り替え */}
             <div className="flex gap-1">
@@ -521,8 +525,11 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
                   value={fillColor}
                   onChange={(e) => setFillColor(e.target.value)}
                   className="w-8 h-8 rounded border-2 border-border cursor-pointer"
-                  title="塗りつぶし色"
+                  title={`塗りつぶし色: ${fillColor}`}
                 />
+                <span className="text-xs text-muted-foreground font-mono">
+                  {fillColor}
+                </span>
               </div>
             )}
             {/* Undo/Redoボタン */}
@@ -598,9 +605,8 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
         <div className="relative flex-1 flex flex-col">
           <canvas
             ref={canvasRef}
-            className={`border border-border rounded-md bg-white ${
-              isFillMode ? 'cursor-pointer' : 'cursor-crosshair'
-            }`}
+            className={`border border-border rounded-md bg-white ${isFillMode ? 'cursor-pointer' : 'cursor-crosshair'
+              }`}
             style={{ width: '100%', height: 'auto' }}
             onMouseDown={startDrawing}
             onMouseMove={draw}
