@@ -16,7 +16,6 @@ const App = () => {
   const [isColorRecommendationCollapsed, setIsColorRecommendationCollapsed] = useState(false);
   const [isToneRecommendationCollapsed, setIsToneRecommendationCollapsed] = useState(false);
   const [isSkinColorCollapsed, setIsSkinColorCollapsed] = useState(true);
-  const [isPaintCanvasCollapsed, setIsPaintCanvasCollapsed] = useState(false);
   const [isDebugMode, setIsDebugMode] = useState(false);
 
   useEffect(() => {

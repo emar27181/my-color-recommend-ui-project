@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CircleDashed, Palette, Plus, Minus, Eraser, Pen, PaintBucket, Undo, Redo } from 'lucide-react';
+import { CircleDashed, Plus, Minus, Eraser, Pen, PaintBucket, Undo, Redo } from 'lucide-react';
 
 interface PaintCanvasProps {
   className?: string;
