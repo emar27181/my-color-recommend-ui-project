@@ -1,17 +1,19 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CircleDashed, Plus, Minus, Eraser, Pen, PaintBucket, Undo, Redo, Palette } from 'lucide-react';
+import { CircleDashed, Plus, Minus, Eraser, Pen, PaintBucket, Undo, Redo, Palette, RefreshCw } from 'lucide-react';
 import { BORDER_PRESETS } from '@/constants/ui';
 import { useColorStore } from '@/store/colorStore';
 import chroma from 'chroma-js';
+import ColorThief from 'colorthief';
+import type { ExtractedColor } from '@/lib/colorExtractor';
 
 interface PaintCanvasProps {
   className?: string;
 }
 
 export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
-  const { selectedColor, setSelectedColor } = useColorStore();
+  const { selectedColor, setSelectedColor, setExtractedColors } = useColorStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
@@ -20,6 +22,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
   const [isFillMode, setIsFillMode] = useState(false);
   const [isEditingPenSize, setIsEditingPenSize] = useState(false);
   const [tempPenSize, setTempPenSize] = useState('');
+  const [isExtractingColors, setIsExtractingColors] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Undo/Redo履歴管理
@@ -674,6 +677,143 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     }
   }, [handlePenSizeBlur]);
 
+  // キャンバスから色を抽出する関数
+  const extractColorsFromCanvas = useCallback(async () => {
+    if (!canvasRef.current) return;
+
+    setIsExtractingColors(true);
+    
+    try {
+      const canvas = canvasRef.current;
+      
+      // キャンバスを一時的な画像として作成
+      const tempCanvas = document.createElement('canvas');
+      const tempCtx = tempCanvas.getContext('2d');
+      if (!tempCtx) return;
+
+      // 高速化のため縮小して処理
+      const maxDimension = 400;
+      let width = canvas.width;
+      let height = canvas.height;
+      
+      if (width > maxDimension || height > maxDimension) {
+        const ratio = Math.min(maxDimension / width, maxDimension / height);
+        width = Math.floor(width * ratio);
+        height = Math.floor(height * ratio);
+      }
+
+      tempCanvas.width = width;
+      tempCanvas.height = height;
+      tempCtx.drawImage(canvas, 0, 0, width, height);
+
+      // Canvas内容を画像として取得
+      const dataURL = tempCanvas.toDataURL('image/png');
+      const img = new Image();
+      
+      img.onload = () => {
+        try {
+          const colorThief = new ColorThief();
+          
+          // ドミナントカラー取得
+          const dominantRgb = colorThief.getColor(img, 20);
+          
+          // パレット取得（最大8色）
+          const palette = colorThief.getPalette(img, 8, 20) || [];
+          
+          // 色使用率を計算
+          const imageData = tempCtx.getImageData(0, 0, width, height);
+          const pixels = imageData.data;
+          const sampleRate = Math.max(1, Math.floor(Math.sqrt(width * height) / 80));
+          const totalSamples = Math.floor((width * height) / (sampleRate * sampleRate));
+          
+          const colorCounts = new Map<string, number>();
+          const tolerance = 30;
+          
+          // ピクセルサンプリングで色使用率を計算
+          for (let y = 0; y < height; y += sampleRate) {
+            for (let x = 0; x < width; x += sampleRate) {
+              const i = (y * width + x) * 4;
+              const r = pixels[i];
+              const g = pixels[i + 1];
+              const b = pixels[i + 2];
+              const a = pixels[i + 3];
+              
+              // 透明または白い背景は除外
+              if (a < 50 || (r > 240 && g > 240 && b > 240)) {
+                continue;
+              }
+              
+              const pixelColor = chroma.rgb(r, g, b);
+              
+              let closestColor = '';
+              let minDistance = Infinity;
+              
+              for (const paletteRgb of palette) {
+                const paletteColor = chroma.rgb(paletteRgb[0], paletteRgb[1], paletteRgb[2]);
+                const distance = chroma.deltaE(pixelColor, paletteColor);
+                
+                if (distance < minDistance && distance < tolerance) {
+                  minDistance = distance;
+                  closestColor = paletteColor.hex();
+                }
+              }
+              
+              if (closestColor) {
+                colorCounts.set(closestColor, (colorCounts.get(closestColor) || 0) + 1);
+              }
+            }
+          }
+          
+          // ExtractedColor形式に変換
+          const colors: ExtractedColor[] = palette.map((rgb: [number, number, number]) => {
+            const hex = chroma.rgb(rgb[0], rgb[1], rgb[2]).hex();
+            const count = colorCounts.get(hex) || 0;
+            const usage = totalSamples > 0 ? count / totalSamples : 0;
+            
+            return {
+              hex,
+              rgb,
+              usage
+            };
+          })
+          .filter(color => color.usage > 0.01) // 1%以上の色のみ
+          .sort((a, b) => b.usage - a.usage);
+
+          const dominantHex = chroma.rgb(dominantRgb[0], dominantRgb[1], dominantRgb[2]).hex();
+          const dominantUsage = colorCounts.get(dominantHex) || 0;
+          
+          const dominantColor: ExtractedColor = {
+            hex: dominantHex,
+            rgb: dominantRgb,
+            usage: totalSamples > 0 ? dominantUsage / totalSamples : 0
+          };
+
+          // ストアに保存
+          setExtractedColors(colors, dominantColor);
+          
+          console.log('Canvas colors extracted:', colors);
+          console.log('Dominant color:', dominantColor);
+          
+        } catch (error) {
+          console.error('Color extraction failed:', error);
+        } finally {
+          setIsExtractingColors(false);
+        }
+      };
+
+      img.onerror = () => {
+        console.error('Failed to load canvas image');
+        setIsExtractingColors(false);
+      };
+
+      img.src = dataURL;
+      
+    } catch (error) {
+      console.error('Canvas color extraction error:', error);
+      setIsExtractingColors(false);
+    }
+  }, [setExtractedColors]);
+
   return (
     <Card className={`w-full h-full flex flex-col bg-background border-transparent ${className}`}>
       <CardHeader className="pb-1 pt-2">
@@ -827,6 +967,17 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
               className="h-8 px-2"
             >
               <CircleDashed className="w-4 h-4 text-foreground" />
+            </Button>
+            {/* 色抽出更新ボタン */}
+            <Button
+              onClick={extractColorsFromCanvas}
+              variant="outline"
+              size="sm"
+              className="h-8 px-2"
+              disabled={isExtractingColors}
+              title="キャンバスから色を抽出"
+            >
+              <RefreshCw className={`w-4 h-4 text-foreground ${isExtractingColors ? 'animate-spin' : ''}`} />
             </Button>
           </div>
         </div>
