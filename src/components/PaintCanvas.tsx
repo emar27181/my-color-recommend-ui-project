@@ -643,13 +643,13 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
                 className={`${BORDER_PRESETS.colorBlock} flex items-center justify-center pointer-events-none`}
                 style={{
                   backgroundColor: selectedColor,
-                  width: '46px',
-                  height: '46px'
+                  width: '24px',
+                  height: '24px'
                 }}
                 title={`描画色: ${selectedColor} - クリックで変更`}
               >
                 <Palette 
-                  className="w-5 h-5" 
+                  className="w-3 h-3" 
                   style={{ color: getIconColor() }}
                 />
               </div>
