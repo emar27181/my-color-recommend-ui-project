@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CircleDashed, Plus, Minus, Eraser, Pen, PaintBucket, Undo, Redo, Palette, RefreshCw } from 'lucide-react';
+import { CircleDashed, Plus, Minus, Eraser, Pen, PaintBucket, Undo, Redo, Palette, RefreshCw, Download } from 'lucide-react';
 import { BORDER_PRESETS } from '@/constants/ui';
 import { useColorStore } from '@/store/colorStore';
 import chroma from 'chroma-js';
@@ -775,6 +775,37 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
     }
   }, [setExtractedColors]);
 
+  // キャンバスをダウンロードする関数
+  const downloadCanvas = useCallback(() => {
+    if (!canvasRef.current) return;
+
+    try {
+      const canvas = canvasRef.current;
+      
+      // 現在の日時でファイル名を生成
+      const now = new Date();
+      const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
+      const filename = `canvas-drawing-${timestamp}.png`;
+      
+      // CanvasをPNG形式のDataURLに変換
+      const dataURL = canvas.toDataURL('image/png');
+      
+      // ダウンロード用のリンクを作成
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = dataURL;
+      
+      // 一時的にDOMに追加してクリックしてから削除
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      console.log('Canvas downloaded as:', filename);
+    } catch (error) {
+      console.error('Failed to download canvas:', error);
+    }
+  }, []);
+
   return (
     <Card className={`w-full h-full flex flex-col bg-background border-transparent ${className}`}>
       <CardHeader className="pb-1 pt-2">
@@ -929,6 +960,16 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
               title="キャンバスから色を抽出"
             >
               <RefreshCw className={`w-4 h-4 text-foreground ${isExtractingColors ? 'animate-spin' : ''}`} />
+            </Button>
+            {/* ダウンロードボタン */}
+            <Button
+              onClick={downloadCanvas}
+              variant="outline"
+              size="sm"
+              className="h-8 px-2"
+              title="キャンバスをPNG画像でダウンロード"
+            >
+              <Download className="w-4 h-4 text-foreground" />
             </Button>
           </div>
         </div>
