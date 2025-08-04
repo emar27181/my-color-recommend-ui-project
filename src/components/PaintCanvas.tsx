@@ -792,7 +792,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
                   onKeyDown={handlePenSizeKeyDown}
                   min="2"
                   max="200"
-                  className="text-xs font-mono text-foreground min-w-[24px] text-center bg-transparent border border-border rounded px-1 h-6"
+                  className="text-xs font-mono text-foreground min-w-[24px] text-center bg-transparent border border-border rounded px-1 h-6 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
                   autoFocus
                 />
               ) : (
