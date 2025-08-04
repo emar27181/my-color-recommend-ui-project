@@ -29,6 +29,7 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
   const [historyIndex, setHistoryIndex] = useState(-1);
   const maxHistorySize = 50; // 最大履歴保存数
 
+
   // ベースカラーとのコントラスト比を考慮したアイコン色を取得
   const getIconColor = () => {
     try {
@@ -809,12 +810,9 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
   return (
     <Card className={`w-full h-full flex flex-col bg-background border-transparent ${className}`}>
       <CardHeader className="pb-1 pt-2">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium">
-            0.キャンバス
-          </h3>
+        <div className="flex items-center justify-end">
           <div className="flex items-center gap-2">
-            {/* 現在の描画色表示（ColorPicker風） */}
+              {/* 現在の描画色表示（ColorPicker風） */}
             <div className="relative cursor-pointer hover:scale-110 transition-all duration-200">
               <input
                 type="color"
@@ -975,8 +973,8 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
         </div>
       </CardHeader>
       <CardContent className="pt-1 pb-4 flex-1 flex flex-col">
-        <div className="relative flex-1 flex flex-col">
-          <canvas
+          <div className="relative flex-1 flex flex-col">
+            <canvas
             ref={canvasRef}
             className={`border border-border rounded-md bg-white ${isFillMode ? 'cursor-pointer' : 'cursor-crosshair'
               }`}
