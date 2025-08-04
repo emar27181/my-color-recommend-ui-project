@@ -43,41 +43,19 @@ export const ColorGrid = ({
   }
 
   return (
-    <>
-      {/* Desktop/Tablet Layout */}
-      <div className={`hidden md:block ${RESPONSIVE_GRID.colors} ${RESPONSIVE_GRID.gap} ${className}`}>
-        {colors.map((colorData, index) => (
-          <ColorItem
-            key={index}
-            color={colorData.color}
-            title={colorData.title}
-            subtitle={colorData.subtitle}
-            onClick={() => onColorClick?.(colorData.color)}
-            clickable={clickable}
-            showClickIcon={colorData.showClickIcon}
-          />
-        ))}
-      </div>
-
-      {/* Mobile 2-Column Layout */}
-      <div className="block md:hidden space-y-0">
-        {Array.from({ length: Math.ceil(colors.length / 2) }).map((_, rowIndex) => (
-          <div key={rowIndex} className="flex gap-1">
-            {colors.slice(rowIndex * 2, (rowIndex + 1) * 2).map((colorData, index) => (
-              <ColorItem
-                key={index}
-                color={colorData.color}
-                title={colorData.title}
-                subtitle={colorData.subtitle}
-                onClick={() => onColorClick?.(colorData.color)}
-                compact={true}
-                clickable={clickable}
-                showClickIcon={colorData.showClickIcon}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
-    </>
+    <div className={`grid grid-cols-4 gap-3 ${className}`}>
+      {colors.map((colorData, index) => (
+        <ColorItem
+          key={index}
+          color={colorData.color}
+          title={colorData.title}
+          subtitle={colorData.subtitle}
+          onClick={() => onColorClick?.(colorData.color)}
+          compact={true}
+          clickable={clickable}
+          showClickIcon={colorData.showClickIcon}
+        />
+      ))}
+    </div>
   );
 };

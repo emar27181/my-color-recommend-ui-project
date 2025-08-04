@@ -87,7 +87,7 @@ export const COLOR_BLOCK_SPEC = {
  */
 export const RESPONSIVE_GRID = {
   // カラム数定義
-  colors: 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5',
+  colors: 'grid-cols-4',
   schemes: 'grid-cols-2 sm:grid-cols-4 md:grid-cols-6',
   
   // ギャップ
