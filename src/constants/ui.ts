@@ -88,6 +88,7 @@ export const COLOR_BLOCK_SPEC = {
 export const RESPONSIVE_GRID = {
   // カラム数定義
   colors: 'grid-cols-4',
+  tones: 'grid-cols-4', // トーン推薦専用: 4x4の16パターン表示
   schemes: 'grid-cols-2 sm:grid-cols-4 md:grid-cols-6',
   
   // ギャップ

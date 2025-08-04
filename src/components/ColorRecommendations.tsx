@@ -172,6 +172,7 @@ export const ToneRecommendations = () => {
             }))}
             onColorClick={handleToneClick}
             clickable={true}
+            gridType="tones"
             emptyMessage={t('toneRecommendations.noTones')}
           />
         </div>

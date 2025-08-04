@@ -1,4 +1,5 @@
 import { ColorItem } from '@/components/common/ColorItem';
+import { RESPONSIVE_GRID } from '@/constants/ui';
 
 interface ColorData {
   color: string;
@@ -13,6 +14,7 @@ interface ColorGridProps {
   className?: string;
   emptyMessage?: string;
   clickable?: boolean;
+  gridType?: 'colors' | 'tones'; // グリッドタイプを指定
 }
 
 /**
@@ -24,7 +26,8 @@ export const ColorGrid = ({
   onColorClick,
   className = '',
   emptyMessage = '色が選択されていません',
-  clickable = true
+  clickable = true,
+  gridType = 'colors'
 }: ColorGridProps) => {
   if (colors.length === 0) {
     return (
@@ -41,8 +44,11 @@ export const ColorGrid = ({
     );
   }
 
+  // グリッドタイプに応じたCSSクラスを決定
+  const gridClasses = gridType === 'tones' ? RESPONSIVE_GRID.tones : RESPONSIVE_GRID.colors;
+
   return (
-    <div className={`grid grid-cols-4 gap-3 ${className}`}>
+    <div className={`grid ${gridClasses} ${RESPONSIVE_GRID.gap} ${className}`}>
       {colors.map((colorData, index) => (
         <ColorItem
           key={index}

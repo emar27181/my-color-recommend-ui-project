@@ -216,23 +216,30 @@ const filterValidTones = (colors: string[], baseColor: string): string[] => {
 export const useColorStore = create<ColorState>((set, get) => {
   // デフォルト色でトーンを事前生成
   const defaultColor = '#b51a00';
-  const defaultTones = TONE_ADJUSTMENTS.map(adjustment => {
-    try {
-      const color = chroma(defaultColor);
-      const hue = color.get('hsl.h') || 0;
-      const saturation = color.get('hsl.s');
-      const lightness = color.get('hsl.l');
-
-      const newLightness = Math.max(0, Math.min(1, lightness + adjustment.lightnessOffset));
-      const newSaturation = adjustment.saturationMultiplier
-        ? Math.max(0, Math.min(1, saturation * adjustment.saturationMultiplier))
-        : saturation;
-
-      return chroma.hsl(hue, newSaturation, newLightness).hex();
-    } catch (error) {
-      return defaultColor;
+  const color = chroma(defaultColor);
+  const hue = color.get('hsl.h') || 0;
+  
+  // 固定の16パターン（saturation 20,40,60,80 × lightness 20,40,60,80）
+  const saturations = [20, 40, 60, 80]; // %
+  const lightnesses = [20, 40, 60, 80]; // %
+  
+  const defaultTones: string[] = [];
+  
+  // 16パターンを生成（4×4の組み合わせ）
+  for (const saturation of saturations) {
+    for (const lightness of lightnesses) {
+      try {
+        const hslColor = chroma.hsl(
+          hue, 
+          saturation / 100,  // 0-1の範囲に変換
+          lightness / 100    // 0-1の範囲に変換
+        );
+        defaultTones.push(hslColor.hex());
+      } catch (error) {
+        console.error('Error generating default tone:', error);
+      }
     }
-  });
+  }
   
   // デフォルトトーンも重複色・極端な色を除外
   const filteredDefaultTones = filterValidTones(defaultTones, defaultColor);
@@ -304,18 +311,24 @@ export const useColorStore = create<ColorState>((set, get) => {
       try {
         const color = chroma(baseColor);
         const hue = color.get('hsl.h') || 0;
-        const saturation = color.get('hsl.s');
-        const lightness = color.get('hsl.l');
 
-        // TONE_ADJUSTMENTSに基づいてトーンを生成
-        const tones = TONE_ADJUSTMENTS.map(adjustment => {
-          const newLightness = Math.max(0, Math.min(1, lightness + adjustment.lightnessOffset));
-          const newSaturation = adjustment.saturationMultiplier
-            ? Math.max(0, Math.min(1, saturation * adjustment.saturationMultiplier))
-            : saturation;
-
-          return chroma.hsl(hue, newSaturation, newLightness).hex();
-        });
+        // 固定の16パターン（saturation 20,40,60,80 × lightness 20,40,60,80）
+        const saturations = [20, 40, 60, 80]; // %
+        const lightnesses = [20, 40, 60, 80]; // %
+        
+        const tones: string[] = [];
+        
+        // 16パターンを生成（4×4の組み合わせ）
+        for (const saturation of saturations) {
+          for (const lightness of lightnesses) {
+            const hslColor = chroma.hsl(
+              hue, 
+              saturation / 100,  // 0-1の範囲に変換
+              lightness / 100    // 0-1の範囲に変換
+            );
+            tones.push(hslColor.hex());
+          }
+        }
 
         // 重複色・極端な色を除外
         const filteredTones = filterValidTones(tones, baseColor);
