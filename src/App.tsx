@@ -14,6 +14,7 @@ const App = () => {
   const [isToneRecommendationCollapsed, setIsToneRecommendationCollapsed] = useState(false);
   const [isSkinColorCollapsed, setIsSkinColorCollapsed] = useState(true);
   const [isDebugMode, setIsDebugMode] = useState(false);
+  const [screenSize, setScreenSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     // 初期表示時にページの最上端を表示
@@ -21,6 +22,17 @@ const App = () => {
 
     // ダークモードをデフォルトに設定
     document.documentElement.classList.add('dark');
+
+    // 画面サイズを取得・更新する関数
+    const updateScreenSize = () => {
+      setScreenSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+
+    // 初期画面サイズ設定
+    updateScreenSize();
 
     // F5キーでデバッグモード切り替え
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -30,18 +42,39 @@ const App = () => {
       }
     };
 
+    // リサイズイベントリスナー
+    window.addEventListener('resize', updateScreenSize);
     document.addEventListener('keydown', handleKeyDown);
     
     // クリーンアップ
     return () => {
+      window.removeEventListener('resize', updateScreenSize);
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 
+  // デバイス判定（閾値800px）
+  const isMobile = screenSize.width < 800;
+  const deviceType = isMobile ? 'MOBILE/TABLET' : 'DESKTOP';
+
   return (
     <main className="flex-1 pb-2 min-h-0 flex flex-col" style={isDebugMode ? { backgroundColor: 'green' } : {}}>
+      {/* デバッグ情報表示 */}
+      {isDebugMode && (
+        <div className="fixed top-4 left-4 z-50 bg-black text-white p-2 rounded text-xs font-mono">
+          <div>画面: {screenSize.width}x{screenSize.height}</div>
+          <div>デバイス: {deviceType}</div>
+          <div>800px閾値: {screenSize.width >= 800 ? 'DESKTOP' : 'MOBILE'}</div>
+        </div>
+      )}
+
       {/* Mobile/Tablet: Single Screen Layout */}
-      <div className="hidden flex flex-col overflow-y-auto">
+      <div className={`${isMobile ? 'flex' : 'hidden'} flex-col overflow-y-auto`}>
+        {isDebugMode && (
+          <div className="bg-red-600 text-white p-2 text-center font-bold">
+            📱 MOBILE/TABLET LAYOUT (&lt;800px)
+          </div>
+        )}
         {/* Step 1: ベース色選択 - コンパクト化 */}
         <section className="flex-shrink-0 mb-1">
           <h3 
@@ -122,15 +155,22 @@ const App = () => {
             {!isSkinColorCollapsed && <SkinColorRecommendations />}
           </section>
 
-          {/* Step 5: Paint Canvas - Tablet and larger */}
-          <section className="md:block">
-            <PaintCanvas />
-          </section>
+          {/* Paint Canvas はデスクトップのみ */}
+          {isDebugMode && (
+            <div className="bg-orange-600 text-white p-2 text-center">
+              🚫 キャンバスはモバイルでは非表示
+            </div>
+          )}
         </div>
       </div>
 
       {/* Desktop: Left Canvas + Right Color Tools Layout */}
-      <div className="flex flex-1 gap-6" style={isDebugMode ? { padding: '32px', backgroundColor: 'yellow' } : { padding: '16px' }}>
+      <div className={`${isMobile ? 'hidden' : 'flex'} flex-1 gap-6`} style={isDebugMode ? { padding: '32px', backgroundColor: 'yellow' } : { padding: '16px' }}>
+        {isDebugMode && (
+          <div className="absolute top-20 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white p-2 rounded font-bold z-40">
+            🖥️ DESKTOP LAYOUT (≥800px)
+          </div>
+        )}
         {/* Left: Paint Canvas */}
         <div className="w-1/2 flex flex-col min-h-0" style={isDebugMode ? { padding: '32px', backgroundColor: 'red' } : { padding: '16px' }}>
           {isDebugMode && <h1 className="text-4xl text-black">LEFT PANEL</h1>}
