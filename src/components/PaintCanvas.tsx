@@ -177,6 +177,11 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
     const pixels = imageData.data;
 
+    // === 調整可能な定数 ===
+    const colorTolerance = 8;        // 色の許容閾値（0-255）
+    const gapBridgeDistance = 3;     // 隙間をブリッジする最大距離（px）- 大幅削減
+    const gapSearchRadius = 1;       // 隙間検索時の探索半径（px）- 最小限に
+
     // 新しい色をRGBAに変換
     const hex = newColor.replace('#', '');
     const newR = parseInt(hex.substring(0, 2), 16);
@@ -191,10 +196,87 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
     const startB = pixels[startIndex + 2];
     const startA = pixels[startIndex + 3];
 
+    // 軽量な色の差を計算する関数（平方根を避ける）
+    const colorDistance = (r1: number, g1: number, b1: number, a1: number, r2: number, g2: number, b2: number, a2: number) => {
+      return Math.abs(r1 - r2) + Math.abs(g1 - g2) + Math.abs(b1 - b2) + Math.abs(a1 - a2);
+    };
+
+    // 指定位置のピクセルが開始色と似ているかチェック
+    const isSimilarToStart = (x: number, y: number) => {
+      if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) return false;
+      const index = (y * canvas.width + x) * 4;
+      const r = pixels[index];
+      const g = pixels[index + 1];
+      const b = pixels[index + 2];
+      const a = pixels[index + 3];
+      return colorDistance(r, g, b, a, startR, startG, startB, startA) <= colorTolerance;
+    };
+
+    // 隙間を越えて同じ色の領域があるかチェック（非常に保守的）
+    const canBridgeGap = (fromX: number, fromY: number, dirX: number, dirY: number) => {
+      // 隙間の向こう側に同じ色があり、かつ隙間が十分小さい場合のみ
+      let gapPixels = 0;
+      let foundMatch = false;
+      
+      for (let dist = 1; dist <= gapBridgeDistance; dist++) {
+        const checkX = fromX + dirX * dist;
+        const checkY = fromY + dirY * dist;
+        
+        if (checkX < 0 || checkX >= canvas.width || checkY < 0 || checkY >= canvas.height) {
+          return false; // 範囲外なら失敗
+        }
+        
+        if (isSimilarToStart(checkX, checkY)) {
+          // 同じ色を見つけた
+          foundMatch = true;
+          
+          // 周辺の大部分が同じ色かチェック（より厳格に）
+          let matchCount = 0;
+          let totalCount = 0;
+          for (let dx = -gapSearchRadius; dx <= gapSearchRadius; dx++) {
+            for (let dy = -gapSearchRadius; dy <= gapSearchRadius; dy++) {
+              const nearX = checkX + dx;
+              const nearY = checkY + dy;
+              if (nearX >= 0 && nearX < canvas.width && nearY >= 0 && nearY < canvas.height) {
+                totalCount++;
+                if (isSimilarToStart(nearX, nearY)) {
+                  matchCount++;
+                }
+              }
+            }
+          }
+          
+          // 80%以上が同じ色で、隙間が2px以下の場合のみ許可
+          return matchCount >= totalCount * 0.8 && gapPixels <= 2;
+        } else {
+          gapPixels++;
+        }
+      }
+      
+      return false;
+    };
+
     // 同じ色の場合は何もしない
-    if (startR === newR && startG === newG && startB === newB && startA === newA) {
+    if (colorDistance(startR, startG, startB, startA, newR, newG, newB, newA) < colorTolerance) {
       return;
     }
+
+    // 処理済みピクセルをビットマップで管理（メモリ効率向上）
+    const visitedBitmap = new Uint8Array(Math.ceil(canvas.width * canvas.height / 8));
+    
+    const setVisited = (x: number, y: number) => {
+      const bitIndex = y * canvas.width + x;
+      const byteIndex = Math.floor(bitIndex / 8);
+      const bitOffset = bitIndex % 8;
+      visitedBitmap[byteIndex] |= (1 << bitOffset);
+    };
+    
+    const isVisited = (x: number, y: number) => {
+      const bitIndex = y * canvas.width + x;
+      const byteIndex = Math.floor(bitIndex / 8);
+      const bitOffset = bitIndex % 8;
+      return (visitedBitmap[byteIndex] & (1 << bitOffset)) !== 0;
+    };
 
     // スタックベースのフラッドフィル
     const stack: { x: number; y: number }[] = [{ x: Math.floor(startX), y: Math.floor(startY) }];
@@ -203,15 +285,21 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
       const { x, y } = stack.pop()!;
 
       if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) continue;
+      if (isVisited(x, y)) continue;
+      
+      setVisited(x, y);
 
       const index = (y * canvas.width + x) * 4;
 
-      // 現在のピクセルが開始色と同じかチェック
-      if (pixels[index] === startR &&
-        pixels[index + 1] === startG &&
-        pixels[index + 2] === startB &&
-        pixels[index + 3] === startA) {
+      // 現在のピクセルが開始色と似ているかチェック（閾値を使用）
+      const currentR = pixels[index];
+      const currentG = pixels[index + 1];
+      const currentB = pixels[index + 2];
+      const currentA = pixels[index + 3];
 
+      const isDirectMatch = colorDistance(currentR, currentG, currentB, currentA, startR, startG, startB, startA) <= colorTolerance;
+      
+      if (isDirectMatch) {
         // 新しい色に塗り替え
         pixels[index] = newR;
         pixels[index + 1] = newG;
@@ -223,6 +311,31 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '', select
         stack.push({ x: x - 1, y });
         stack.push({ x, y: y + 1 });
         stack.push({ x, y: y - 1 });
+      } else {
+        // 直接マッチしない場合、非常に限定的な隙間ブリッジのみ試行
+        // 水平・垂直方向のみチェック（斜めは除外）
+        const directions = [
+          { dx: 1, dy: 0 },   // 右
+          { dx: -1, dy: 0 },  // 左
+          { dx: 0, dy: 1 },   // 下
+          { dx: 0, dy: -1 }   // 上
+        ];
+
+        let bridgeApplied = false;
+        for (const { dx, dy } of directions) {
+          if (!bridgeApplied && canBridgeGap(x, y, dx, dy)) {
+            // 1方向のみブリッジを許可（複数方向ブリッジを防止）
+            const targetX = x + dx * gapBridgeDistance;
+            const targetY = y + dy * gapBridgeDistance;
+            
+            if (targetX >= 0 && targetX < canvas.width && targetY >= 0 && targetY < canvas.height) {
+              if (!isVisited(targetX, targetY) && isSimilarToStart(targetX, targetY)) {
+                stack.push({ x: targetX, y: targetY });
+                bridgeApplied = true;
+              }
+            }
+          }
+        }
       }
     }
 
