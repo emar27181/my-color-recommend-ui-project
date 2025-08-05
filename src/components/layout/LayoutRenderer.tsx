@@ -44,8 +44,8 @@ const ComponentMap = {
   skinColor: ({ isMobile }: any) => (
     <SkinColorRecommendations isMobile={isMobile} />
   ),
-  hueToneExtraction: ({ isMobile }: any) => (
-    <HueToneExtraction isMobile={isMobile} />
+  hueToneExtraction: () => (
+    <HueToneExtraction />
   )
 };
 

@@ -4,9 +4,7 @@ import { useTranslation } from 'react-i18next';
 import chroma from 'chroma-js';
 import { useMemo } from 'react';
 
-interface HueToneExtractionProps {
-  isMobile?: boolean;
-}
+interface HueToneExtractionProps {}
 
 // 色相環プロット用コンポーネント
 const HueWheel = ({ colors }: { colors: { hex: string; usage: number }[] }) => {
@@ -263,7 +261,7 @@ const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: num
   );
 };
 
-export const HueToneExtraction = ({ isMobile = false }: HueToneExtractionProps) => {
+export const HueToneExtraction = ({ }: HueToneExtractionProps) => {
   const { extractedColors } = useColorStore();
   const { t } = useTranslation();
 
@@ -283,7 +281,7 @@ export const HueToneExtraction = ({ isMobile = false }: HueToneExtractionProps) 
         <div data-tutorial="hue-tone-extraction" className="space-y-4">
           {/* 色相・トーンの可視化のみ表示 */}
           {extractedColors.length > 0 ? (
-            <div className={`${isMobile ? 'flex flex-col space-y-4' : 'grid grid-cols-2 gap-4'}`}>
+            <div className="flex flex-col space-y-4">
               <HueWheel colors={visualizationData} />
               <SaturationLightnessPlot colors={visualizationData} />
             </div>
