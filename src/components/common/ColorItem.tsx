@@ -69,15 +69,14 @@ export const ColorItem = ({
             className="opacity-100"
           />
         </div>
-        {/* 2行目: HEXコード + 使用割合 */}
-        <div className="text-center space-y-1">
-          <p className={`${TYPOGRAPHY.colorCode}`}>{color}</p>
-          {subtitle && (
+        {/* 2行目: 使用割合のみ */}
+        {subtitle && (
+          <div className="text-center">
             <p className={`${TYPOGRAPHY.usage}`}>
               {subtitle}
             </p>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -118,14 +117,13 @@ export const ColorItem = ({
           className="opacity-100 flex-shrink-0"
         />
       </div>
-      <div className="flex-1 min-w-0">
-        <span className="text-xs font-mono text-muted-foreground truncate block">{color}</span>
-        {subtitle && (
+      {subtitle && (
+        <div className="flex-1 min-w-0">
           <span className="text-xs text-muted-foreground">
             {subtitle}
           </span>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

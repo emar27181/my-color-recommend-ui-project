@@ -135,7 +135,7 @@ export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsP
           <ColorGrid
             colors={recommendedColors.map(color => ({
               color,
-              title: `${t('colorRecommendations.generateTones')}: ${color}`,
+              title: t('colorRecommendations.generateTones'),
               showClickIcon: true
           }))}
           onColorClick={handleGenerateTones}
@@ -176,7 +176,7 @@ export const ToneRecommendations = ({ isMobile = false }: ToneRecommendationsPro
           <ColorGrid
             colors={recommendedTones.map(tone => ({
               color: tone,
-              title: tone,
+              title: "色を選択",
               showClickIcon: false
             }))}
             onColorClick={handleToneClick}

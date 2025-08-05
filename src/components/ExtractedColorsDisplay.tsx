@@ -26,7 +26,7 @@ export const ExtractedColorsDisplay = ({ isMobile = false }: ExtractedColorsDisp
           <ColorGrid
             colors={extractedColors.map(color => ({
               color: color.hex,
-              title: `${color.hex} (タップで選択)`,
+              title: "タップで選択",
               subtitle: `${Math.round(color.usage * 100)}%`
             }))}
             onColorClick={handleColorSelect}
