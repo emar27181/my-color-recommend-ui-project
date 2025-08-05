@@ -36,7 +36,49 @@ const HueWheel = ({ colors }: { colors: { hex: string; usage: number }[] }) => {
             <stop offset="0%" stopColor="white" />
             <stop offset="100%" stopColor="transparent" />
           </radialGradient>
+          {/* 色相環の色相背景 */}
+          {Array.from({ length: 360 }, (_, degree) => {
+            const hue = degree;
+            const color = chroma.hsl(hue, 0.5, 0.5).alpha(0.3).css();
+            return (
+              <linearGradient key={`hue-${degree}`} id={`hue-gradient-${degree}`}>
+                <stop offset="0%" stopColor={color} />
+                <stop offset="100%" stopColor={color} />
+              </linearGradient>
+            );
+          })}
         </defs>
+        
+        {/* 色相環の色相セクター */}
+        {Array.from({ length: 360 }, (_, degree) => {
+          const angle1 = (degree - 90) * (Math.PI / 180);
+          const angle2 = (degree + 1 - 90) * (Math.PI / 180);
+          const innerRadius = 20;
+          const outerRadius = radius;
+          
+          const x1 = center + innerRadius * Math.cos(angle1);
+          const y1 = center + innerRadius * Math.sin(angle1);
+          const x2 = center + outerRadius * Math.cos(angle1);
+          const y2 = center + outerRadius * Math.sin(angle1);
+          const x3 = center + outerRadius * Math.cos(angle2);
+          const y3 = center + outerRadius * Math.sin(angle2);
+          const x4 = center + innerRadius * Math.cos(angle2);
+          const y4 = center + innerRadius * Math.sin(angle2);
+          
+          const pathData = `M ${x1} ${y1} L ${x2} ${y2} A ${outerRadius} ${outerRadius} 0 0 1 ${x3} ${y3} L ${x4} ${y4} A ${innerRadius} ${innerRadius} 0 0 0 ${x1} ${y1}`;
+          const hue = degree;
+          const color = chroma.hsl(hue, 0.5, 0.5).alpha(0.3).css();
+          
+          return (
+            <path
+              key={`sector-${degree}`}
+              d={pathData}
+              fill={color}
+              stroke="none"
+            />
+          );
+        })}
+        
         <circle cx={center} cy={center} r={radius} fill="none" stroke="#e5e7eb" strokeWidth="2" strokeDasharray="5,3" />
         
         {/* 15度間隔の対角線 */}
@@ -118,6 +160,31 @@ const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: num
   return (
     <div className="flex flex-col items-center">
       <svg width={width} height={height} className="border rounded">
+        {/* 彩度-明度背景グラデーション */}
+        <defs>
+          {/* 彩度-明度の背景色グリッド */}
+        </defs>
+        
+        {/* 背景色グリッドを描画 */}
+        {Array.from({ length: 20 }, (_, i) => 
+          Array.from({ length: 20 }, (_, j) => {
+            const saturation = (i + 0.5) / 20;
+            const lightness = (19.5 - j) / 20;
+            const color = chroma.hsl(0, saturation, lightness).alpha(0.3).css(); // 赤色相固定
+            return (
+              <rect
+                key={`bg-${i}-${j}`}
+                x={43.45 + (i / 20) * plotWidth}
+                y={11 + (j / 20) * plotHeight}
+                width={plotWidth / 20}
+                height={plotHeight / 20}
+                fill={color}
+                stroke="none"
+              />
+            );
+          })
+        ).flat()}
+        
         {/* プロット領域の境界 */}
         <rect x="43.45" y="11" width={plotWidth} height={plotHeight} fill="none" stroke="#e5e7eb" strokeWidth="1"/>
         
