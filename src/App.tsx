@@ -7,7 +7,7 @@ import { HueToneExtraction } from '@/components/HueToneExtraction';
 import { PaintCanvas, type PaintCanvasRef } from '@/components/PaintCanvas';
 import { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
 const App = () => {
   const { t } = useTranslation();
   const [isCanvasCollapsed, setIsCanvasCollapsed] = useState(false);
@@ -26,6 +26,23 @@ const App = () => {
   const handleImageUpload = (imageFile: File) => {
     console.log('Image uploaded, drawing to canvas:', imageFile.name);
     paintCanvasRef.current?.drawImageToCanvas(imageFile);
+  };
+
+  // キャンバスから色を抽出する処理
+  const handleExtractColorsFromCanvas = async () => {
+    try {
+      console.log('Attempting to extract colors from canvas...');
+      
+      if (!paintCanvasRef.current) {
+        console.error('PaintCanvas ref is null');
+        return;
+      }
+      
+      await paintCanvasRef.current.extractColorsFromCanvas();
+      console.log('Color extraction completed successfully');
+    } catch (error) {
+      console.error('Canvas color extraction failed:', error);
+    }
   };
 
   useEffect(() => {
@@ -113,11 +130,23 @@ const App = () => {
             onClick={() => setIsBaseColorCollapsed(!isBaseColorCollapsed)}
           >
             <span>1. {t('app.steps.baseColorSelection')}</span>
-            {isBaseColorCollapsed ? (
-              <ChevronDown className="w-4 h-4" />
-            ) : (
-              <ChevronUp className="w-4 h-4" />
-            )}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleExtractColorsFromCanvas();
+                }}
+                className="p-1 hover:bg-muted rounded transition-colors"
+                title="キャンバスから色を抽出"
+              >
+                <RefreshCw className="w-3 h-3 text-foreground" />
+              </button>
+              {isBaseColorCollapsed ? (
+                <ChevronDown className="w-4 h-4" />
+              ) : (
+                <ChevronUp className="w-4 h-4" />
+              )}
+            </div>
           </h3>
           {!isBaseColorCollapsed && (
             <div className="space-y-1">
@@ -143,11 +172,23 @@ const App = () => {
             onClick={() => setIsHueToneExtractionCollapsed(!isHueToneExtractionCollapsed)}
           >
             <span>β. {t('app.steps.hueToneExtraction')}</span>
-            {isHueToneExtractionCollapsed ? (
-              <ChevronDown className="w-4 h-4" />
-            ) : (
-              <ChevronUp className="w-4 h-4" />
-            )}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleExtractColorsFromCanvas();
+                }}
+                className="p-1 hover:bg-muted rounded transition-colors"
+                title="キャンバスから色を抽出"
+              >
+                <RefreshCw className="w-3 h-3 text-foreground" />
+              </button>
+              {isHueToneExtractionCollapsed ? (
+                <ChevronDown className="w-4 h-4" />
+              ) : (
+                <ChevronUp className="w-4 h-4" />
+              )}
+            </div>
           </h3>
           {!isHueToneExtractionCollapsed && <HueToneExtraction isMobile={isMobile} />}
         </section>
@@ -244,11 +285,23 @@ const App = () => {
               onClick={() => setIsBaseColorCollapsed(!isBaseColorCollapsed)}
             >
               <span>1. {t('app.steps.baseColorSelectionShort')}</span>
-              {isBaseColorCollapsed ? (
-                <ChevronDown className="w-5 h-5" />
-              ) : (
-                <ChevronUp className="w-5 h-5" />
-              )}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleExtractColorsFromCanvas();
+                  }}
+                  className="p-1 hover:bg-muted rounded transition-colors"
+                  title="キャンバスから色を抽出"
+                >
+                  <RefreshCw className="w-4 h-4 text-foreground" />
+                </button>
+                {isBaseColorCollapsed ? (
+                  <ChevronDown className="w-5 h-5" />
+                ) : (
+                  <ChevronUp className="w-5 h-5" />
+                )}
+              </div>
             </h3>
             {!isBaseColorCollapsed && (
               <div className="space-y-4">
@@ -270,11 +323,23 @@ const App = () => {
               onClick={() => setIsHueToneExtractionCollapsed(!isHueToneExtractionCollapsed)}
             >
               <span>β. {t('app.steps.hueToneExtraction')}</span>
-              {isHueToneExtractionCollapsed ? (
-                <ChevronDown className="w-5 h-5" />
-              ) : (
-                <ChevronUp className="w-5 h-5" />
-              )}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleExtractColorsFromCanvas();
+                  }}
+                  className="p-1 hover:bg-muted rounded transition-colors"
+                  title="キャンバスから色を抽出"
+                >
+                  <RefreshCw className="w-4 h-4 text-foreground" />
+                </button>
+                {isHueToneExtractionCollapsed ? (
+                  <ChevronDown className="w-5 h-5" />
+                ) : (
+                  <ChevronUp className="w-5 h-5" />
+                )}
+              </div>
             </h3>
             {!isHueToneExtractionCollapsed && <HueToneExtraction isMobile={isMobile} />}
           </section>
