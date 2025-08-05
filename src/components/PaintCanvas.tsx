@@ -969,7 +969,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
   };
 
   return (
-    <Card className={`w-full h-full flex flex-col bg-background border-transparent ${className}`}>
+    <Card className={`w-full flex flex-col bg-background border-transparent ${className}`} style={{ height: '600px' }}>
       <CardHeader className="pb-0 pt-1">
         <div className="flex flex-wrap items-center justify-start gap-2">
           {/* 現在の描画色表示（ColorPicker風） */}
@@ -1179,8 +1179,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
             }`}
             style={{ 
               width: '100%', 
-              height: '100%',
-              minHeight: '400px',
+              height: '450px',
               touchAction: 'none'
             }}
             onMouseDown={startDrawing}
