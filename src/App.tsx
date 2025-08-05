@@ -1,21 +1,20 @@
-import { ColorPicker } from '@/components/ColorPicker';
-import { ColorRecommendations, ToneRecommendations } from '@/components/ColorRecommendations';
-import { ImageUpload } from '@/components/ImageUpload';
-import { ExtractedColorsDisplay } from '@/components/ExtractedColorsDisplay';
-import { SkinColorRecommendations } from '@/components/SkinColorRecommendations';
-import { HueToneExtraction } from '@/components/HueToneExtraction';
-import { PaintCanvas, type PaintCanvasRef } from '@/components/PaintCanvas';
+import { type PaintCanvasRef } from '@/components/PaintCanvas';
+import { LayoutRenderer } from '@/components/layout/LayoutRenderer';
+import { LAYOUT_CONFIG } from '@/constants/layout';
 import { useEffect, useState, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
-import { ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
+
 const App = () => {
-  const { t } = useTranslation();
-  const [isCanvasCollapsed, setIsCanvasCollapsed] = useState(false);
-  const [isBaseColorCollapsed, setIsBaseColorCollapsed] = useState(false);
-  const [isColorRecommendationCollapsed, setIsColorRecommendationCollapsed] = useState(false);
-  const [isToneRecommendationCollapsed, setIsToneRecommendationCollapsed] = useState(false);
-  const [isSkinColorCollapsed, setIsSkinColorCollapsed] = useState(true);
-  const [isHueToneExtractionCollapsed, setIsHueToneExtractionCollapsed] = useState(false);
+  
+  // コラプス状態をオブジェクトで管理
+  const [collapseStates, setCollapseStates] = useState({
+    isCanvasCollapsed: false,
+    isBaseColorCollapsed: false,
+    isColorRecommendationCollapsed: false,
+    isToneRecommendationCollapsed: false,
+    isSkinColorCollapsed: true,
+    isHueToneExtractionCollapsed: false
+  });
+  
   const [isDebugMode, setIsDebugMode] = useState(false);
   const [screenSize, setScreenSize] = useState({ width: 0, height: 0 });
   
@@ -43,6 +42,11 @@ const App = () => {
     } catch (error) {
       console.error('Canvas color extraction failed:', error);
     }
+  };
+
+  // コラプス状態更新用ヘルパー
+  const setCollapseState = (key: string, value: boolean) => {
+    setCollapseStates(prev => ({ ...prev, [key]: value }));
   };
 
   useEffect(() => {
@@ -97,301 +101,37 @@ const App = () => {
         </div>
       )}
 
-      {/* Mobile/Tablet: Single Screen Layout */}
-      <div className={`${isMobile ? 'flex' : 'hidden'} flex-col overflow-y-auto`}>
+      {/* モバイル表示 */}
+      <div className={`${isMobile ? 'flex' : 'hidden'}`}>
         {isDebugMode && (
           <div className="bg-red-600 text-white p-2 text-center font-bold">
             📱 MOBILE/TABLET LAYOUT (&lt;800px)
           </div>
         )}
-        
-        {/* Step 0: Paint Canvas - モバイルでも表示 */}
-        <section className="flex-shrink-0 mb-1">
-          <h3 
-            className="text-xs font-medium text-foreground leading-tight mb-0 cursor-pointer flex items-center justify-between"
-            onClick={() => setIsCanvasCollapsed(!isCanvasCollapsed)}
-          >
-            <span>0. {t('app.steps.canvas')}</span>
-            {isCanvasCollapsed ? (
-              <ChevronDown className="w-4 h-4" />
-            ) : (
-              <ChevronUp className="w-4 h-4" />
-            )}
-          </h3>
-          {!isCanvasCollapsed && (
-            <PaintCanvas ref={paintCanvasRef} />
-          )}
-        </section>
-
-        {/* Step 1: ベース色選択 - コンパクト化 */}
-        <section className="flex-shrink-0 mb-1">
-          <h3 
-            className="text-xs font-medium text-foreground leading-tight mb-0 cursor-pointer flex items-center justify-between"
-            onClick={() => setIsBaseColorCollapsed(!isBaseColorCollapsed)}
-          >
-            <span>1. {t('app.steps.baseColorSelection')}</span>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleExtractColorsFromCanvas();
-                }}
-                className="p-1 hover:bg-muted rounded-md border border-border transition-colors bg-transparent"
-                title="キャンバスから色を抽出"
-              >
-                <RefreshCw className="w-3 h-3 text-foreground" />
-              </button>
-              {isBaseColorCollapsed ? (
-                <ChevronDown className="w-4 h-4" />
-              ) : (
-                <ChevronUp className="w-4 h-4" />
-              )}
-            </div>
-          </h3>
-          {!isBaseColorCollapsed && (
-            <div className="space-y-1">
-              {/* 1行目: カラーピッカー + 画像アップロード */}
-              <div className="flex gap-1">
-                <div className="flex-1">
-                  <ColorPicker />
-                </div>
-                <div className="flex-1">
-                  <ImageUpload onImageUpload={handleImageUpload} />
-                </div>
-              </div>
-              {/* 2行目: 抽出された色の割合表示 */}
-              <ExtractedColorsDisplay isMobile={isMobile} />
-            </div>
-          )}
-        </section>
-
-        {/* Step β: 使用色相/トーン抽出 */}
-        <section className="flex-shrink-0 mb-1">
-          <h3 
-            className="text-xs font-medium mb-0 text-foreground leading-tight cursor-pointer flex items-center justify-between"
-            onClick={() => setIsHueToneExtractionCollapsed(!isHueToneExtractionCollapsed)}
-          >
-            <span>β. {t('app.steps.hueToneExtraction')}</span>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleExtractColorsFromCanvas();
-                }}
-                className="p-1 hover:bg-muted rounded-md border border-border transition-colors bg-transparent"
-                title="キャンバスから色を抽出"
-              >
-                <RefreshCw className="w-3 h-3 text-foreground" />
-              </button>
-              {isHueToneExtractionCollapsed ? (
-                <ChevronDown className="w-4 h-4" />
-              ) : (
-                <ChevronUp className="w-4 h-4" />
-              )}
-            </div>
-          </h3>
-          {!isHueToneExtractionCollapsed && <HueToneExtraction isMobile={isMobile} />}
-        </section>
-
-        {/* Steps 2, 3 & α: 色相推薦・トーン推薦・肌色推薦 - 動的サイズ */}
-        <div className="space-y-1">
-          {/* Step 2 */}
-          <section>
-            <h3 
-              className="text-xs font-medium mb-0 text-foreground leading-tight cursor-pointer flex items-center justify-between"
-              onClick={() => setIsColorRecommendationCollapsed(!isColorRecommendationCollapsed)}
-            >
-              <span>2. {t('app.steps.colorRecommendation')}</span>
-              {isColorRecommendationCollapsed ? (
-                <ChevronDown className="w-4 h-4" />
-              ) : (
-                <ChevronUp className="w-4 h-4" />
-              )}
-            </h3>
-            {!isColorRecommendationCollapsed && <ColorRecommendations isMobile={isMobile} />}
-          </section>
-
-          {/* Step 3 */}
-          <section>
-            <h3 
-              className="text-xs font-medium mb-0 text-foreground leading-tight cursor-pointer flex items-center justify-between"
-              onClick={() => setIsToneRecommendationCollapsed(!isToneRecommendationCollapsed)}
-            >
-              <span>3. {t('app.steps.toneRecommendation')}</span>
-              {isToneRecommendationCollapsed ? (
-                <ChevronDown className="w-4 h-4" />
-              ) : (
-                <ChevronUp className="w-4 h-4" />
-              )}
-            </h3>
-            {!isToneRecommendationCollapsed && <ToneRecommendations isMobile={isMobile} />}
-          </section>
-
-          {/* Step α: 肌色推薦 */}
-          <section>
-            <h3 
-              className="text-xs font-medium mb-0 text-foreground leading-tight cursor-pointer flex items-center justify-between"
-              onClick={() => setIsSkinColorCollapsed(!isSkinColorCollapsed)}
-            >
-              <span>α. {t('app.steps.skinColorRecommendation')}</span>
-              {isSkinColorCollapsed ? (
-                <ChevronDown className="w-4 h-4" />
-              ) : (
-                <ChevronUp className="w-4 h-4" />
-              )}
-            </h3>
-            {!isSkinColorCollapsed && <SkinColorRecommendations isMobile={isMobile} />}
-          </section>
-        </div>
+        <LayoutRenderer
+          columns={LAYOUT_CONFIG.desktop.columns}
+          isMobile={true}
+          isDebugMode={isDebugMode}
+          paintCanvasRef={paintCanvasRef}
+          handleExtractColorsFromCanvas={handleExtractColorsFromCanvas}
+          handleImageUpload={handleImageUpload}
+          collapseStates={collapseStates}
+          setCollapseState={setCollapseState}
+        />
       </div>
 
-      {/* Desktop: Left Canvas + Right Color Tools Layout */}
-      <div className={`${isMobile ? 'hidden' : 'flex'} flex-1 gap-6`} style={isDebugMode ? { padding: '32px', backgroundColor: 'yellow' } : { padding: '16px' }}>
-        {isDebugMode && (
-          <div className="absolute top-20 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white p-2 rounded font-bold z-40">
-            🖥️ DESKTOP LAYOUT (≥800px)
-          </div>
-        )}
-        {/* Left: Paint Canvas */}
-        <div className="w-1/2 flex flex-col min-h-0" style={isDebugMode ? { padding: '32px', backgroundColor: 'red' } : { padding: '16px' }}>
-          {isDebugMode && <h1 className="text-4xl text-black">LEFT PANEL</h1>}
-          <section className="flex-shrink-0 flex-1 flex flex-col min-h-0">
-            <h3 
-              className="text-lg font-medium mb-2 text-foreground cursor-pointer flex items-center justify-between"
-              onClick={() => setIsCanvasCollapsed(!isCanvasCollapsed)}
-            >
-              <span>0. {t('app.steps.canvas')}</span>
-              {isCanvasCollapsed ? (
-                <ChevronDown className="w-5 h-5" />
-              ) : (
-                <ChevronUp className="w-5 h-5" />
-              )}
-            </h3>
-            {!isCanvasCollapsed && (
-              <div className="flex-1 min-h-0">
-                <PaintCanvas ref={paintCanvasRef} />
-              </div>
-            )}
-          </section>
-        </div>
-
-        {/* Right: Color Tools in Vertical Layout */}
-        <div className="w-1/2 flex flex-col space-y-4 min-h-0 overflow-y-auto" style={isDebugMode ? { padding: '32px', backgroundColor: 'blue' } : { padding: '16px' }}>
-          {isDebugMode && <h1 className="text-4xl text-black">RIGHT PANEL</h1>}
-          {/* Step 1: ベース色選択 */}
-          <section className="flex-shrink-0">
-            <h3 
-              className="text-lg font-medium mb-2 text-foreground cursor-pointer flex items-center justify-between"
-              onClick={() => setIsBaseColorCollapsed(!isBaseColorCollapsed)}
-            >
-              <span>1. {t('app.steps.baseColorSelectionShort')}</span>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleExtractColorsFromCanvas();
-                  }}
-                  className="p-1 hover:bg-muted rounded-md border border-border transition-colors bg-transparent"
-                  title="キャンバスから色を抽出"
-                >
-                  <RefreshCw className="w-4 h-4 text-foreground" />
-                </button>
-                {isBaseColorCollapsed ? (
-                  <ChevronDown className="w-5 h-5" />
-                ) : (
-                  <ChevronUp className="w-5 h-5" />
-                )}
-              </div>
-            </h3>
-            {!isBaseColorCollapsed && (
-              <div className="space-y-4">
-                {/* 1行目: カラーピッカー + 画像アップロード */}
-                <div className="grid grid-cols-2 gap-4">
-                  <ColorPicker />
-                  <ImageUpload onImageUpload={handleImageUpload} />
-                </div>
-                {/* 2行目: 抽出された色の割合表示 */}
-                <ExtractedColorsDisplay isMobile={isMobile} />
-              </div>
-            )}
-          </section>
-
-          {/* Step β: 使用色相/トーン抽出 */}
-          <section className="flex-shrink-0">
-            <h3 
-              className="text-lg font-medium mb-2 text-foreground cursor-pointer flex items-center justify-between"
-              onClick={() => setIsHueToneExtractionCollapsed(!isHueToneExtractionCollapsed)}
-            >
-              <span>β. {t('app.steps.hueToneExtraction')}</span>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleExtractColorsFromCanvas();
-                  }}
-                  className="p-1 hover:bg-muted rounded-md border border-border transition-colors bg-transparent"
-                  title="キャンバスから色を抽出"
-                >
-                  <RefreshCw className="w-4 h-4 text-foreground" />
-                </button>
-                {isHueToneExtractionCollapsed ? (
-                  <ChevronDown className="w-5 h-5" />
-                ) : (
-                  <ChevronUp className="w-5 h-5" />
-                )}
-              </div>
-            </h3>
-            {!isHueToneExtractionCollapsed && <HueToneExtraction isMobile={isMobile} />}
-          </section>
-
-          {/* Step 2: 色相推薦 */}
-          <section className="flex-shrink-0">
-            <h3 
-              className="text-lg font-medium mb-2 text-foreground cursor-pointer flex items-center justify-between"
-              onClick={() => setIsColorRecommendationCollapsed(!isColorRecommendationCollapsed)}
-            >
-              <span>2. {t('app.steps.colorRecommendationShort')}</span>
-              {isColorRecommendationCollapsed ? (
-                <ChevronDown className="w-5 h-5" />
-              ) : (
-                <ChevronUp className="w-5 h-5" />
-              )}
-            </h3>
-            {!isColorRecommendationCollapsed && <ColorRecommendations isMobile={isMobile} />}
-          </section>
-
-          {/* Step 3: トーン推薦 */}
-          <section className="flex-shrink-0">
-            <h3 
-              className="text-lg font-medium mb-2 text-foreground cursor-pointer flex items-center justify-between"
-              onClick={() => setIsToneRecommendationCollapsed(!isToneRecommendationCollapsed)}
-            >
-              <span>3. {t('app.steps.toneRecommendationShort')}</span>
-              {isToneRecommendationCollapsed ? (
-                <ChevronDown className="w-5 h-5" />
-              ) : (
-                <ChevronUp className="w-5 h-5" />
-              )}
-            </h3>
-            {!isToneRecommendationCollapsed && <ToneRecommendations isMobile={isMobile} />}
-          </section>
-
-          {/* Step α: 肌色推薦 */}
-          <section className="flex-shrink-0">
-            <h3 
-              className="text-lg font-medium mb-2 text-foreground cursor-pointer flex items-center justify-between"
-              onClick={() => setIsSkinColorCollapsed(!isSkinColorCollapsed)}
-            >
-              <span>α. {t('app.steps.skinColorRecommendation')}</span>
-              {isSkinColorCollapsed ? (
-                <ChevronDown className="w-5 h-5" />
-              ) : (
-                <ChevronUp className="w-5 h-5" />
-              )}
-            </h3>
-            {!isSkinColorCollapsed && <SkinColorRecommendations isMobile={isMobile} />}
-          </section>
-        </div>
+      {/* デスクトップ表示 */}
+      <div className={`${isMobile ? 'hidden' : 'flex'} flex-1`}>
+        <LayoutRenderer
+          columns={LAYOUT_CONFIG.desktop.columns}
+          isMobile={false}
+          isDebugMode={isDebugMode}
+          paintCanvasRef={paintCanvasRef}
+          handleExtractColorsFromCanvas={handleExtractColorsFromCanvas}
+          handleImageUpload={handleImageUpload}
+          collapseStates={collapseStates}
+          setCollapseState={setCollapseState}
+        />
       </div>
     </main>
   );
