@@ -222,7 +222,7 @@ const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: num
           <text
             key={`s-${i}`}
             x={43.45 + rightShift + (value / 100) * plotWidth}
-            y={height - 25}
+            y={height - 30}
             textAnchor="middle"
             className="text-xs fill-muted-foreground"
           >
@@ -233,7 +233,7 @@ const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: num
         {[0, 25, 50, 75, 100].map((value, i) => (
           <text
             key={`l-${i}`}
-            x={33.45 + rightShift}
+            x={28.45 + rightShift}
             y={11 + plotHeight - (value / 100) * plotHeight + 4}
             textAnchor="middle"
             className="text-xs fill-muted-foreground"
