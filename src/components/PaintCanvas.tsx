@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback, useImperativeHandle, forwardRef } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CircleDashed, Plus, Minus, Eraser, Pen, PaintBucket, Undo, Redo, Palette, RefreshCw, Download, Upload, ImageIcon } from 'lucide-react';
+import { CircleDashed, Plus, Minus, Eraser, Pen, PaintBucket, Undo, Redo, Palette, RefreshCw, Download, Upload, ImageIcon, Pipette } from 'lucide-react';
 import { BORDER_PRESETS } from '@/constants/ui';
 import { useColorStore } from '@/store/colorStore';
 import { useToastContext } from '@/contexts/ToastContext';
@@ -27,6 +27,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
   const [penSize, setPenSize] = useState(20);
   const [isEraserMode, setIsEraserMode] = useState(false);
   const [isFillMode, setIsFillMode] = useState(false);
+  const [isEyedropperMode, setIsEyedropperMode] = useState(false);
   const [isEditingPenSize, setIsEditingPenSize] = useState(false);
   const [tempPenSize, setTempPenSize] = useState('');
   const [isExtractingColors, setIsExtractingColors] = useState(false);
@@ -500,11 +501,53 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     return { x, y };
   }, []);
 
+  // キャンバスから色を取得する関数
+  const pickColorFromCanvas = useCallback((x: number, y: number) => {
+    if (!context || !canvasRef.current) return;
+
+    const canvas = canvasRef.current;
+    
+    // キャンバスの範囲内チェック
+    if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) return;
+
+    // ピクセルデータを取得
+    const imageData = context.getImageData(Math.floor(x), Math.floor(y), 1, 1);
+    const pixel = imageData.data;
+    
+    // RGB値をHEX形式に変換
+    const r = pixel[0];
+    const g = pixel[1];
+    const b = pixel[2];
+    const a = pixel[3];
+    
+    // 透明度が低い場合は取得しない
+    if (a < 50) return;
+    
+    const hexColor = chroma.rgb(r, g, b).hex();
+    
+    // 描画色として設定
+    setSelectedColor(hexColor);
+    
+    // スポイトモードを終了
+    setIsEyedropperMode(false);
+    
+    // トースト通知
+    showToast(`色を取得しました: ${hexColor}`, 'success');
+    
+    console.log('Color picked:', hexColor, `RGB(${r}, ${g}, ${b})`);
+  }, [context, setSelectedColor, showToast]);
+
   // 描画開始
   const startDrawing = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!context || !canvasRef.current) return;
 
     const { x, y } = getScaledCoordinates(e.clientX, e.clientY);
+
+    // スポイトモードの場合
+    if (isEyedropperMode) {
+      pickColorFromCanvas(x, y);
+      return;
+    }
 
     // 塗りつぶしモードの場合
     if (isFillMode) {
@@ -536,7 +579,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
 
     context.beginPath();
     context.moveTo(x, y);
-  }, [context, getScaledCoordinates, penSize, isEraserMode, isFillMode, selectedColor, floodFill, saveToHistory]);
+  }, [context, getScaledCoordinates, penSize, isEraserMode, isFillMode, isEyedropperMode, selectedColor, floodFill, saveToHistory, pickColorFromCanvas]);
 
   // 描画中
   const draw = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -571,6 +614,12 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     const touch = e.touches[0];
     const { x, y } = getScaledCoordinates(touch.clientX, touch.clientY);
 
+    // スポイトモードの場合
+    if (isEyedropperMode) {
+      pickColorFromCanvas(x, y);
+      return;
+    }
+
     // 塗りつぶしモードの場合
     if (isFillMode) {
       // 塗りつぶし前に現在の状態を履歴に保存
@@ -600,7 +649,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
 
     context.beginPath();
     context.moveTo(x, y);
-  }, [context, getScaledCoordinates, penSize, isEraserMode, isFillMode, selectedColor, floodFill, saveToHistory]);
+  }, [context, getScaledCoordinates, penSize, isEraserMode, isFillMode, isEyedropperMode, selectedColor, floodFill, saveToHistory, pickColorFromCanvas]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault();
@@ -942,14 +991,31 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
                 />
               </div>
           </div>
+          {/* スポイトボタン */}
+          <div className="flex flex-wrap gap-1 flex-shrink-0">
+              <Button
+                onClick={() => {
+                  setIsEyedropperMode(!isEyedropperMode);
+                  setIsEraserMode(false);
+                  setIsFillMode(false);
+                }}
+                variant={isEyedropperMode ? "default" : "outline"}
+                size="sm"
+                className="h-6 px-1 sm:h-8 sm:px-2"
+                title="スポイトツール - キャンバスから色を取得"
+              >
+                <Pipette className="w-4 h-4 text-foreground" />
+              </Button>
+          </div>
           {/* ペン/消しゴム/塗りつぶしモード切り替え */}
           <div className="flex flex-wrap gap-1 flex-shrink-0">
               <Button
                 onClick={() => {
                   setIsEraserMode(false);
                   setIsFillMode(false);
+                  setIsEyedropperMode(false);
                 }}
-                variant={!isEraserMode && !isFillMode ? "default" : "outline"}
+                variant={!isEraserMode && !isFillMode && !isEyedropperMode ? "default" : "outline"}
                 size="sm"
                 className="h-6 px-1 sm:h-8 sm:px-2"
               >
@@ -959,6 +1025,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
                 onClick={() => {
                   setIsEraserMode(true);
                   setIsFillMode(false);
+                  setIsEyedropperMode(false);
                 }}
                 variant={isEraserMode ? "default" : "outline"}
                 size="sm"
@@ -970,6 +1037,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
                 onClick={() => {
                   setIsEraserMode(false);
                   setIsFillMode(true);
+                  setIsEyedropperMode(false);
                 }}
                 variant={isFillMode ? "default" : "outline"}
                 size="sm"
@@ -1102,8 +1170,10 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
           <div className="relative flex-1 flex flex-col">
             <canvas
             ref={canvasRef}
-            className={`border border-border rounded-md bg-white ${isFillMode ? 'cursor-pointer' : 'cursor-crosshair'
-              }`}
+            className={`border border-border rounded-md bg-white ${
+              isEyedropperMode ? 'cursor-crosshair' : 
+              isFillMode ? 'cursor-pointer' : 'cursor-crosshair'
+            }`}
             style={{ 
               width: '100%', 
               height: 'auto',
