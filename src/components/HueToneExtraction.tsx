@@ -142,7 +142,6 @@ const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: num
   const width = 180; // 横幅は縮小維持
   const height = 214.5; // 元の縦幅に戻す
   
-  const rightShift = 0; // 右シフトは削除維持
   const points = colors.map(color => {
     try {
       const [, s, l] = chroma(color.hex).hsl();
