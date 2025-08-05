@@ -73,5 +73,9 @@
     "preparing": "準備中...",
     "error": "エラー",
     "success": "成功"
+  },
+  "hueToneExtraction": {
+    "saturation": "彩度",
+    "lightness": "明度"
   }
 }
