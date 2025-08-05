@@ -7,7 +7,7 @@ import { useMemo } from 'react';
 interface HueToneExtractionProps {}
 
 // 色相環プロット用コンポーネント
-const HueWheel = ({ colors }: { colors: { hex: string; usage: number }[] }) => {
+const HueWheel = ({ colors, onHueClick }: { colors: { hex: string; usage: number }[], onHueClick?: (hue: number) => void }) => {
   const size = 220; // 元の縦幅に戻す
   const center = size / 2;
   const radius = 72; // 元のradiusに戻す
@@ -24,9 +24,46 @@ const HueWheel = ({ colors }: { colors: { hex: string; usage: number }[] }) => {
     }
   }).filter(Boolean);
 
+  // SVGクリックハンドラ
+  const handleSvgClick = (event: React.MouseEvent<SVGSVGElement>) => {
+    if (!onHueClick) return;
+    
+    const svg = event.currentTarget;
+    const rect = svg.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    
+    // SVG座標系に変換
+    const svgX = (x / rect.width) * size;
+    const svgY = (y / rect.height) * size;
+    
+    // 中心からの相対位置
+    const centerX = center;
+    const centerY = center;
+    const deltaX = svgX - centerX;
+    const deltaY = svgY - centerY;
+    
+    // 距離チェック（色相環の範囲内かどうか）
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    if (distance < 20 || distance > radius) return; // 内側の円と外側の範囲外は無視
+    
+    // 角度計算（ラジアンから度数へ、12時方向を0度とする）
+    let angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
+    angle = (angle + 90) % 360; // 12時方向を0度に調整
+    if (angle < 0) angle += 360;
+    
+    onHueClick(angle);
+  };
+
   return (
     <div className="w-full">
-      <svg width="100%" height={size} viewBox={`0 0 ${size} ${size}`} className="border rounded">
+      <svg 
+        width="100%" 
+        height={size} 
+        viewBox={`0 0 ${size} ${size}`} 
+        className="border rounded cursor-pointer" 
+        onClick={handleSvgClick}
+      >
         {/* 色相環背景 */}
         <defs>
           <radialGradient id="hueWheel">
@@ -136,7 +173,7 @@ const HueWheel = ({ colors }: { colors: { hex: string; usage: number }[] }) => {
 };
 
 // 彩度-明度散布図用コンポーネント
-const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: number }[] }) => {
+const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick }: { colors: { hex: string; usage: number }[], onSaturationLightnessClick?: (saturation: number, lightness: number) => void }) => {
   const plotWidth = 145.8; // 元のプロット幅
   const plotHeight = 145.8; // 元のプロット高さ
   const width = 180; // 横幅は縮小維持
@@ -153,9 +190,41 @@ const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: num
     }
   }).filter(Boolean);
 
+  // SVGクリックハンドラ
+  const handleSvgClick = (event: React.MouseEvent<SVGSVGElement>) => {
+    if (!onSaturationLightnessClick) return;
+    
+    const svg = event.currentTarget;
+    const rect = svg.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    
+    // SVG座標系に変換
+    const svgX = (x / rect.width) * width;
+    const svgY = (y / rect.height) * height;
+    
+    // プロット領域内かチェック
+    if (svgX < 20 || svgX > 20 + plotWidth || svgY < 11 || svgY > 11 + plotHeight) return;
+    
+    // 彩度・明度を計算（0-1の範囲）
+    const saturation = (svgX - 20) / plotWidth;
+    const lightness = 1 - (svgY - 11) / plotHeight; // Y軸は反転
+    
+    onSaturationLightnessClick(
+      Math.max(0, Math.min(1, saturation)),
+      Math.max(0, Math.min(1, lightness))
+    );
+  };
+
   return (
     <div className="w-full">
-      <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} className="border rounded">
+      <svg 
+        width="100%" 
+        height={height} 
+        viewBox={`0 0 ${width} ${height}`} 
+        className="border rounded cursor-pointer" 
+        onClick={handleSvgClick}
+      >
         {/* 彩度-明度背景グラデーション */}
         <defs>
           {/* 彩度-明度の背景色グリッド */}
@@ -257,8 +326,34 @@ const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: num
 };
 
 export const HueToneExtraction = ({ }: HueToneExtractionProps) => {
-  const { extractedColors } = useColorStore();
+  const { extractedColors, selectedColor, setSelectedColor } = useColorStore();
   const { t } = useTranslation();
+
+  // 色相環クリック時のハンドラ
+  const handleHueClick = (hue: number) => {
+    try {
+      // 現在の描画色のS, Lを取得
+      const [, s, l] = chroma(selectedColor).hsl();
+      // 新しいHueで色を作成
+      const newColor = chroma.hsl(hue, s || 0.5, l || 0.5).hex();
+      setSelectedColor(newColor);
+    } catch (error) {
+      console.error('色相変更エラー:', error);
+    }
+  };
+
+  // トーン表クリック時のハンドラ
+  const handleSaturationLightnessClick = (saturation: number, lightness: number) => {
+    try {
+      // 現在の描画色のHueを取得
+      const [h] = chroma(selectedColor).hsl();
+      // 新しいS, Lで色を作成
+      const newColor = chroma.hsl(h || 0, saturation, lightness).hex();
+      setSelectedColor(newColor);
+    } catch (error) {
+      console.error('彩度・明度変更エラー:', error);
+    }
+  };
 
   // 可視化用のデータを準備
   const visualizationData = useMemo(() => {
@@ -277,8 +372,8 @@ export const HueToneExtraction = ({ }: HueToneExtractionProps) => {
           {/* 色相・トーンの可視化のみ表示 */}
           {extractedColors.length > 0 ? (
             <div className="flex flex-col space-y-0">
-              <HueWheel colors={visualizationData} />
-              <SaturationLightnessPlot colors={visualizationData} />
+              <HueWheel colors={visualizationData} onHueClick={handleHueClick} />
+              <SaturationLightnessPlot colors={visualizationData} onSaturationLightnessClick={handleSaturationLightnessClick} />
             </div>
           ) : (
             <div className="text-center text-muted-foreground text-sm py-8">
