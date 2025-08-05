@@ -137,7 +137,6 @@ const HueWheel = ({ colors }: { colors: { hex: string; usage: number }[] }) => {
 
 // 彩度-明度散布図用コンポーネント
 const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: number }[] }) => {
-  const { t } = useTranslation();
   const plotWidth = 145.8; // 162 * 0.9
   const plotHeight = 145.8; // 162 * 0.9
   const width = 214.5; // 固定サイズ
@@ -240,9 +239,6 @@ const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: num
           </text>
         ))}
         
-        {/* 軸ラベル */}
-        <text x={43.45 + rightShift + plotWidth/2} y={height - 8} textAnchor="middle" className="text-xs font-bold fill-foreground">{t('hueToneExtraction.saturation')}</text>
-        <text x={18.45 + rightShift} y={11 + plotHeight/2} textAnchor="middle" className="text-xs font-bold fill-foreground" transform={`rotate(-90 ${18.45 + rightShift} ${11 + plotHeight/2})`}>{t('hueToneExtraction.lightness')}</text>
         
         {/* ポイント */}
         {points.map((point, index) => point && (
