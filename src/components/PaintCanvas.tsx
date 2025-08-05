@@ -970,7 +970,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
 
   return (
     <Card className={`w-full h-full flex flex-col bg-background border-transparent ${className}`}>
-      <CardHeader className="pb-1 pt-2">
+      <CardHeader className="pb-0 pt-1">
         <div className="flex flex-wrap items-center justify-start gap-2">
           {/* 現在の描画色表示（ColorPicker風） */}
           <div className="relative cursor-pointer hover:scale-110 transition-all duration-200 flex-shrink-0">
@@ -979,14 +979,14 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
                 value={selectedColor}
                 onChange={handleColorPickerChange}
                 className="absolute inset-0 opacity-0 w-full h-full cursor-pointer z-10"
-                title={`描画色を変更: ${selectedColor}`}
+                title="描画色を変更"
               />
               <div 
                 className={`${BORDER_PRESETS.colorBlock} flex items-center justify-center pointer-events-none w-6 h-6 sm:w-8 sm:h-8`}
                 style={{
                   backgroundColor: selectedColor
                 }}
-                title={`描画色: ${selectedColor} - クリックで変更`}
+                title="描画色 - クリックで変更"
               >
                 <Palette 
                   className="w-3 h-3 sm:w-4 sm:h-4" 
@@ -1169,7 +1169,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
           className="hidden"
         />
       </CardHeader>
-      <CardContent className="pt-1 pb-4 flex-1 flex flex-col">
+      <CardContent className="pt-1 pb-1 flex-1 flex flex-col">
           <div className="relative flex-1 flex flex-col">
             <canvas
             ref={canvasRef}
@@ -1179,7 +1179,8 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
             }`}
             style={{ 
               width: '100%', 
-              height: 'auto',
+              height: '100%',
+              minHeight: '400px',
               touchAction: 'none'
             }}
             onMouseDown={startDrawing}
