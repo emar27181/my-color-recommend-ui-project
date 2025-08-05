@@ -3,6 +3,7 @@ import { ColorRecommendations, ToneRecommendations } from '@/components/ColorRec
 import { ImageUpload } from '@/components/ImageUpload';
 import { ExtractedColorsDisplay } from '@/components/ExtractedColorsDisplay';
 import { SkinColorRecommendations } from '@/components/SkinColorRecommendations';
+import { HueToneExtraction } from '@/components/HueToneExtraction';
 import { PaintCanvas, type PaintCanvasRef } from '@/components/PaintCanvas';
 import { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,7 +15,7 @@ const App = () => {
   const [isColorRecommendationCollapsed, setIsColorRecommendationCollapsed] = useState(false);
   const [isToneRecommendationCollapsed, setIsToneRecommendationCollapsed] = useState(false);
   const [isSkinColorCollapsed, setIsSkinColorCollapsed] = useState(true);
-  const [isHueToneExtractionCollapsed, setIsHueToneExtractionCollapsed] = useState(true);
+  const [isHueToneExtractionCollapsed, setIsHueToneExtractionCollapsed] = useState(false);
   const [isDebugMode, setIsDebugMode] = useState(false);
   const [screenSize, setScreenSize] = useState({ width: 0, height: 0 });
   
@@ -135,7 +136,23 @@ const App = () => {
           )}
         </section>
 
-        {/* Steps 2, 3, 4 & β: 色相推薦・トーン推薦・肌色推薦・使用色相/トーン抽出 - 動的サイズ */}
+        {/* Step β: 使用色相/トーン抽出 */}
+        <section className="flex-shrink-0 mb-1">
+          <h3 
+            className="text-xs font-medium mb-0 text-foreground leading-tight cursor-pointer flex items-center justify-between"
+            onClick={() => setIsHueToneExtractionCollapsed(!isHueToneExtractionCollapsed)}
+          >
+            <span>β. {t('app.steps.hueToneExtraction')}</span>
+            {isHueToneExtractionCollapsed ? (
+              <ChevronDown className="w-4 h-4" />
+            ) : (
+              <ChevronUp className="w-4 h-4" />
+            )}
+          </h3>
+          {!isHueToneExtractionCollapsed && <HueToneExtraction isMobile={isMobile} />}
+        </section>
+
+        {/* Steps 2, 3 & α: 色相推薦・トーン推薦・肌色推薦 - 動的サイズ */}
         <div className="space-y-1">
           {/* Step 2 */}
           <section>
@@ -169,7 +186,7 @@ const App = () => {
             {!isToneRecommendationCollapsed && <ToneRecommendations isMobile={isMobile} />}
           </section>
 
-          {/* Step 4: 肌色推薦 */}
+          {/* Step α: 肌色推薦 */}
           <section>
             <h3 
               className="text-xs font-medium mb-0 text-foreground leading-tight cursor-pointer flex items-center justify-between"
@@ -183,26 +200,6 @@ const App = () => {
               )}
             </h3>
             {!isSkinColorCollapsed && <SkinColorRecommendations isMobile={isMobile} />}
-          </section>
-
-          {/* Step β: 使用色相/トーン抽出 */}
-          <section>
-            <h3 
-              className="text-xs font-medium mb-0 text-foreground leading-tight cursor-pointer flex items-center justify-between"
-              onClick={() => setIsHueToneExtractionCollapsed(!isHueToneExtractionCollapsed)}
-            >
-              <span>β. {t('app.steps.hueToneExtraction')}</span>
-              {isHueToneExtractionCollapsed ? (
-                <ChevronDown className="w-4 h-4" />
-              ) : (
-                <ChevronUp className="w-4 h-4" />
-              )}
-            </h3>
-            {!isHueToneExtractionCollapsed && (
-              <div className="pt-2 text-center text-sm text-muted-foreground">
-{t('common.preparing')}
-              </div>
-            )}
           </section>
         </div>
       </div>
@@ -266,6 +263,22 @@ const App = () => {
             )}
           </section>
 
+          {/* Step β: 使用色相/トーン抽出 */}
+          <section className="flex-shrink-0">
+            <h3 
+              className="text-lg font-medium mb-2 text-foreground cursor-pointer flex items-center justify-between"
+              onClick={() => setIsHueToneExtractionCollapsed(!isHueToneExtractionCollapsed)}
+            >
+              <span>β. {t('app.steps.hueToneExtraction')}</span>
+              {isHueToneExtractionCollapsed ? (
+                <ChevronDown className="w-5 h-5" />
+              ) : (
+                <ChevronUp className="w-5 h-5" />
+              )}
+            </h3>
+            {!isHueToneExtractionCollapsed && <HueToneExtraction isMobile={isMobile} />}
+          </section>
+
           {/* Step 2: 色相推薦 */}
           <section className="flex-shrink-0">
             <h3 
@@ -298,7 +311,7 @@ const App = () => {
             {!isToneRecommendationCollapsed && <ToneRecommendations isMobile={isMobile} />}
           </section>
 
-          {/* Step 4: 肌色推薦 */}
+          {/* Step α: 肌色推薦 */}
           <section className="flex-shrink-0">
             <h3 
               className="text-lg font-medium mb-2 text-foreground cursor-pointer flex items-center justify-between"
@@ -312,26 +325,6 @@ const App = () => {
               )}
             </h3>
             {!isSkinColorCollapsed && <SkinColorRecommendations isMobile={isMobile} />}
-          </section>
-
-          {/* Step β: 使用色相/トーン抽出 */}
-          <section className="flex-shrink-0">
-            <h3 
-              className="text-lg font-medium mb-2 text-foreground cursor-pointer flex items-center justify-between"
-              onClick={() => setIsHueToneExtractionCollapsed(!isHueToneExtractionCollapsed)}
-            >
-              <span>β. {t('app.steps.hueToneExtraction')}</span>
-              {isHueToneExtractionCollapsed ? (
-                <ChevronDown className="w-5 h-5" />
-              ) : (
-                <ChevronUp className="w-5 h-5" />
-              )}
-            </h3>
-            {!isHueToneExtractionCollapsed && (
-              <div className="pt-4 text-center text-lg text-muted-foreground">
-{t('common.preparing')}
-              </div>
-            )}
           </section>
         </div>
       </div>
