@@ -3,8 +3,8 @@ import { ColorRecommendations, ToneRecommendations } from '@/components/ColorRec
 import { ImageUpload } from '@/components/ImageUpload';
 import { ExtractedColorsDisplay } from '@/components/ExtractedColorsDisplay';
 import { SkinColorRecommendations } from '@/components/SkinColorRecommendations';
-import { PaintCanvas } from '@/components/PaintCanvas';
-import { useEffect, useState } from 'react';
+import { PaintCanvas, type PaintCanvasRef } from '@/components/PaintCanvas';
+import { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 const App = () => {
@@ -16,6 +16,15 @@ const App = () => {
   const [isSkinColorCollapsed, setIsSkinColorCollapsed] = useState(true);
   const [isDebugMode, setIsDebugMode] = useState(false);
   const [screenSize, setScreenSize] = useState({ width: 0, height: 0 });
+  
+  // PaintCanvasへの参照
+  const paintCanvasRef = useRef<PaintCanvasRef>(null);
+
+  // 画像アップロード時の処理
+  const handleImageUpload = (imageFile: File) => {
+    console.log('Image uploaded, drawing to canvas:', imageFile.name);
+    paintCanvasRef.current?.drawImageToCanvas(imageFile);
+  };
 
   useEffect(() => {
     // 初期表示時にページの最上端を表示
@@ -91,7 +100,7 @@ const App = () => {
             )}
           </h3>
           {!isCanvasCollapsed && (
-            <PaintCanvas />
+            <PaintCanvas ref={paintCanvasRef} />
           )}
         </section>
 
@@ -116,7 +125,7 @@ const App = () => {
                   <ColorPicker />
                 </div>
                 <div className="flex-1">
-                  <ImageUpload />
+                  <ImageUpload onImageUpload={handleImageUpload} />
                 </div>
               </div>
               {/* 2行目: 抽出された色の割合表示 */}
@@ -201,7 +210,7 @@ const App = () => {
             </h3>
             {!isCanvasCollapsed && (
               <div className="flex-1 min-h-0">
-                <PaintCanvas />
+                <PaintCanvas ref={paintCanvasRef} />
               </div>
             )}
           </section>
@@ -228,7 +237,7 @@ const App = () => {
                 {/* 1行目: カラーピッカー + 画像アップロード */}
                 <div className="grid grid-cols-2 gap-4">
                   <ColorPicker />
-                  <ImageUpload />
+                  <ImageUpload onImageUpload={handleImageUpload} />
                 </div>
                 {/* 2行目: 抽出された色の割合表示 */}
                 <ExtractedColorsDisplay isMobile={isMobile} />
