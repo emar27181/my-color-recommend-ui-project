@@ -145,10 +145,11 @@ const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: num
   const width = 214.5; // 固定サイズ
   const height = 214.5; // 固定サイズ
   
+  const rightShift = width * 0.05; // 5%右に移動
   const points = colors.map(color => {
     try {
       const [, s, l] = chroma(color.hex).hsl();
-      const x = 43.45 + (s || 0) * plotWidth; // 22 + (214.5 * 0.1) = 22 + 21.45
+      const x = 43.45 + rightShift + (s || 0) * plotWidth; // 5%右に移動
       const y = 11 + plotHeight - (l || 0) * plotHeight; // 10 * 1.1
       return { x, y, color: color.hex, usage: color.usage };
     } catch {
@@ -173,7 +174,7 @@ const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: num
             return (
               <rect
                 key={`bg-${i}-${j}`}
-                x={43.45 + (i / 20) * plotWidth}
+                x={43.45 + rightShift + (i / 20) * plotWidth}
                 y={11 + (j / 20) * plotHeight}
                 width={plotWidth / 20}
                 height={plotHeight / 20}
@@ -185,16 +186,16 @@ const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: num
         ).flat()}
         
         {/* プロット領域の境界 */}
-        <rect x="43.45" y="11" width={plotWidth} height={plotHeight} fill="none" stroke="#e5e7eb" strokeWidth="1"/>
+        <rect x={43.45 + rightShift} y="11" width={plotWidth} height={plotHeight} fill="none" stroke="#e5e7eb" strokeWidth="1"/>
         
         {/* 10等分グリッド線 */}
         {/* 縦線（彩度） */}
         {Array.from({ length: 11 }, (_, i) => (
           <line
             key={`v-${i}`}
-            x1={43.45 + (i / 10) * plotWidth}
+            x1={43.45 + rightShift + (i / 10) * plotWidth}
             y1="11"
-            x2={43.45 + (i / 10) * plotWidth}
+            x2={43.45 + rightShift + (i / 10) * plotWidth}
             y2={11 + plotHeight}
             stroke="#e5e7eb"
             strokeWidth="0.5"
@@ -205,9 +206,9 @@ const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: num
         {Array.from({ length: 11 }, (_, i) => (
           <line
             key={`h-${i}`}
-            x1="43.45"
+            x1={43.45 + rightShift}
             y1={11 + (i / 10) * plotHeight}
-            x2={43.45 + plotWidth}
+            x2={43.45 + rightShift + plotWidth}
             y2={11 + (i / 10) * plotHeight}
             stroke="#e5e7eb"
             strokeWidth="0.5"
@@ -220,7 +221,7 @@ const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: num
         {[0, 25, 50, 75, 100].map((value, i) => (
           <text
             key={`s-${i}`}
-            x={43.45 + (value / 100) * plotWidth}
+            x={43.45 + rightShift + (value / 100) * plotWidth}
             y={height - 25}
             textAnchor="middle"
             className="text-xs fill-muted-foreground"
@@ -232,7 +233,7 @@ const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: num
         {[0, 25, 50, 75, 100].map((value, i) => (
           <text
             key={`l-${i}`}
-            x="33.45"
+            x={33.45 + rightShift}
             y={11 + plotHeight - (value / 100) * plotHeight + 4}
             textAnchor="middle"
             className="text-xs fill-muted-foreground"
@@ -242,8 +243,8 @@ const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: num
         ))}
         
         {/* 軸ラベル */}
-        <text x={43.45 + plotWidth/2} y={height - 8} textAnchor="middle" className="text-xs font-bold fill-foreground">{t('hueToneExtraction.saturation')}</text>
-        <text x="23.45" y={11 + plotHeight/2} textAnchor="middle" className="text-xs font-bold fill-foreground" transform={`rotate(-90 23.45 ${11 + plotHeight/2})`}>{t('hueToneExtraction.lightness')}</text>
+        <text x={43.45 + rightShift + plotWidth/2} y={height - 8} textAnchor="middle" className="text-xs font-bold fill-foreground">{t('hueToneExtraction.saturation')}</text>
+        <text x={23.45 + rightShift} y={11 + plotHeight/2} textAnchor="middle" className="text-xs font-bold fill-foreground" transform={`rotate(-90 ${23.45 + rightShift} ${11 + plotHeight/2})`}>{t('hueToneExtraction.lightness')}</text>
         
         {/* ポイント */}
         {points.map((point, index) => point && (
