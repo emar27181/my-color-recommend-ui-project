@@ -136,7 +136,7 @@ const App = () => {
                   e.stopPropagation();
                   handleExtractColorsFromCanvas();
                 }}
-                className="p-1 hover:bg-muted rounded transition-colors"
+                className="p-1 hover:bg-muted rounded-md border border-border transition-colors bg-transparent"
                 title="キャンバスから色を抽出"
               >
                 <RefreshCw className="w-3 h-3 text-foreground" />
@@ -178,7 +178,7 @@ const App = () => {
                   e.stopPropagation();
                   handleExtractColorsFromCanvas();
                 }}
-                className="p-1 hover:bg-muted rounded transition-colors"
+                className="p-1 hover:bg-muted rounded-md border border-border transition-colors bg-transparent"
                 title="キャンバスから色を抽出"
               >
                 <RefreshCw className="w-3 h-3 text-foreground" />
@@ -291,7 +291,7 @@ const App = () => {
                     e.stopPropagation();
                     handleExtractColorsFromCanvas();
                   }}
-                  className="p-1 hover:bg-muted rounded transition-colors"
+                  className="p-1 hover:bg-muted rounded-md border border-border transition-colors bg-transparent"
                   title="キャンバスから色を抽出"
                 >
                   <RefreshCw className="w-4 h-4 text-foreground" />
@@ -329,7 +329,7 @@ const App = () => {
                     e.stopPropagation();
                     handleExtractColorsFromCanvas();
                   }}
-                  className="p-1 hover:bg-muted rounded transition-colors"
+                  className="p-1 hover:bg-muted rounded-md border border-border transition-colors bg-transparent"
                   title="キャンバスから色を抽出"
                 >
                   <RefreshCw className="w-4 h-4 text-foreground" />
