@@ -8,9 +8,9 @@ interface HueToneExtractionProps {}
 
 // 色相環プロット用コンポーネント
 const HueWheel = ({ colors }: { colors: { hex: string; usage: number }[] }) => {
-  const size = 220; // 200 * 1.1
+  const size = 220; // 元の縦幅に戻す
   const center = size / 2;
-  const radius = 72; // 80 * 0.9（内側は変更しない）
+  const radius = 72; // 元のradiusに戻す
   
   const huePoints = colors.map(color => {
     try {
@@ -102,7 +102,7 @@ const HueWheel = ({ colors }: { colors: { hex: string; usage: number }[] }) => {
         {/* 角度数値ラベル（円の外側） */}
         {[0, 90, 180, 270].map((degrees, i) => {
           const angle = degrees * (Math.PI / 180);
-          const labelRadius = radius + 16.5; // 15 * 1.1
+          const labelRadius = radius + 8; // 余白を最小化
           const x = center + labelRadius * Math.cos(angle - Math.PI / 2);
           const y = center + labelRadius * Math.sin(angle - Math.PI / 2);
           return (
@@ -137,17 +137,17 @@ const HueWheel = ({ colors }: { colors: { hex: string; usage: number }[] }) => {
 
 // 彩度-明度散布図用コンポーネント
 const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: number }[] }) => {
-  const plotWidth = 145.8; // 162 * 0.9
-  const plotHeight = 145.8; // 162 * 0.9
-  const width = 214.5; // 固定サイズ
-  const height = 214.5; // 固定サイズ
+  const plotWidth = 145.8; // 元のプロット幅
+  const plotHeight = 145.8; // 元のプロット高さ
+  const width = 180; // 横幅は縮小維持
+  const height = 214.5; // 元の縦幅に戻す
   
-  const rightShift = width * 0.05; // 5%右に移動
+  const rightShift = 0; // 右シフトは削除維持
   const points = colors.map(color => {
     try {
       const [, s, l] = chroma(color.hex).hsl();
-      const x = 43.45 + rightShift + (s || 0) * plotWidth; // 5%右に移動
-      const y = 11 + plotHeight - (l || 0) * plotHeight; // 10 * 1.1
+      const x = 20 + (s || 0) * plotWidth; // 左マージン最小化維持
+      const y = 11 + plotHeight - (l || 0) * plotHeight; // 元の上マージンに戻す
       return { x, y, color: color.hex, usage: color.usage };
     } catch {
       return null;
@@ -171,7 +171,7 @@ const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: num
             return (
               <rect
                 key={`bg-${i}-${j}`}
-                x={43.45 + rightShift + (i / 20) * plotWidth}
+                x={20 + (i / 20) * plotWidth}
                 y={11 + (j / 20) * plotHeight}
                 width={plotWidth / 20}
                 height={plotHeight / 20}
@@ -183,16 +183,16 @@ const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: num
         ).flat()}
         
         {/* プロット領域の境界 */}
-        <rect x={43.45 + rightShift} y="11" width={plotWidth} height={plotHeight} fill="none" stroke="#e5e7eb" strokeWidth="1"/>
+        <rect x="20" y="11" width={plotWidth} height={plotHeight} fill="none" stroke="#e5e7eb" strokeWidth="1"/>
         
         {/* 10等分グリッド線 */}
         {/* 縦線（彩度） */}
         {Array.from({ length: 11 }, (_, i) => (
           <line
             key={`v-${i}`}
-            x1={43.45 + rightShift + (i / 10) * plotWidth}
+            x1={20 + (i / 10) * plotWidth}
             y1="11"
-            x2={43.45 + rightShift + (i / 10) * plotWidth}
+            x2={20 + (i / 10) * plotWidth}
             y2={11 + plotHeight}
             stroke="#e5e7eb"
             strokeWidth="0.5"
@@ -203,9 +203,9 @@ const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: num
         {Array.from({ length: 11 }, (_, i) => (
           <line
             key={`h-${i}`}
-            x1={43.45 + rightShift}
+            x1="20"
             y1={11 + (i / 10) * plotHeight}
-            x2={43.45 + rightShift + plotWidth}
+            x2={20 + plotWidth}
             y2={11 + (i / 10) * plotHeight}
             stroke="#e5e7eb"
             strokeWidth="0.5"
@@ -218,7 +218,7 @@ const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: num
         {[0, 25, 50, 75, 100].map((value, i) => (
           <text
             key={`s-${i}`}
-            x={43.45 + rightShift + (value / 100) * plotWidth}
+            x={20 + (value / 100) * plotWidth}
             y={height - 30}
             textAnchor="middle"
             className="text-xs fill-muted-foreground"
@@ -230,7 +230,7 @@ const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: num
         {[0, 25, 50, 75, 100].map((value, i) => (
           <text
             key={`l-${i}`}
-            x={28.45 + rightShift}
+            x="10"
             y={11 + plotHeight - (value / 100) * plotHeight + 4}
             textAnchor="middle"
             className="text-xs fill-muted-foreground"
@@ -270,14 +270,14 @@ export const HueToneExtraction = ({ }: HueToneExtractionProps) => {
   }, [extractedColors]);
 
   return (
-    <Card className="w-full flex flex-col pb-0">
-      <CardHeader className="pb-1 pt-2 flex-shrink-0">
+    <Card className="w-full flex flex-col p-0">
+      <CardHeader className="p-0 flex-shrink-0">
       </CardHeader>
-      <CardContent className="pt-0 flex-1 overflow-auto pb-0 min-h-0">
-        <div data-tutorial="hue-tone-extraction" className="space-y-4">
+      <CardContent className="p-0 flex-1 overflow-auto min-h-0">
+        <div data-tutorial="hue-tone-extraction" className="space-y-0">
           {/* 色相・トーンの可視化のみ表示 */}
           {extractedColors.length > 0 ? (
-            <div className="flex flex-col space-y-4">
+            <div className="flex flex-col space-y-0">
               <HueWheel colors={visualizationData} />
               <SaturationLightnessPlot colors={visualizationData} />
             </div>
