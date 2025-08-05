@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { ColorGrid } from '@/components/common/ColorGrid';
 import { useColorStore } from '@/store/colorStore';
 import { useTranslation } from 'react-i18next';
 import chroma from 'chroma-js';
@@ -122,7 +121,7 @@ const HueWheel = ({ colors }: { colors: { hex: string; usage: number }[] }) => {
         })}
         
         {/* 色相ポイント */}
-        {huePoints.map((point, index) => (
+        {huePoints.map((point, index) => point && (
           <circle
             key={index}
             cx={point.x}
@@ -140,9 +139,9 @@ const HueWheel = ({ colors }: { colors: { hex: string; usage: number }[] }) => {
 
 // 彩度-明度散布図用コンポーネント
 const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: number }[] }) => {
+  const { t } = useTranslation();
   const plotWidth = 145.8; // 162 * 0.9
   const plotHeight = 145.8; // 162 * 0.9
-  const margin = 33; // 30 * 1.1
   const width = 214.5; // 固定サイズ
   const height = 214.5; // 固定サイズ
   
@@ -243,11 +242,11 @@ const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: num
         ))}
         
         {/* 軸ラベル */}
-        <text x={43.45 + plotWidth/2} y={height - 8} textAnchor="middle" className="text-xs font-bold fill-foreground">彩度</text>
-        <text x="23.45" y={11 + plotHeight/2} textAnchor="middle" className="text-xs font-bold fill-foreground" transform={`rotate(-90 23.45 ${11 + plotHeight/2})`}>明度</text>
+        <text x={43.45 + plotWidth/2} y={height - 8} textAnchor="middle" className="text-xs font-bold fill-foreground">{t('hueToneExtraction.saturation')}</text>
+        <text x="23.45" y={11 + plotHeight/2} textAnchor="middle" className="text-xs font-bold fill-foreground" transform={`rotate(-90 23.45 ${11 + plotHeight/2})`}>{t('hueToneExtraction.lightness')}</text>
         
         {/* ポイント */}
-        {points.map((point, index) => (
+        {points.map((point, index) => point && (
           <circle
             key={index}
             cx={point.x}
@@ -264,12 +263,8 @@ const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: num
 };
 
 export const HueToneExtraction = ({ isMobile = false }: HueToneExtractionProps) => {
-  const { extractedColors, dominantColor, setColorFromExtracted } = useColorStore();
+  const { extractedColors } = useColorStore();
   const { t } = useTranslation();
-
-  const handleColorClick = (color: string) => {
-    setColorFromExtracted(color);
-  };
 
   // 可視化用のデータを準備
   const visualizationData = useMemo(() => {
@@ -278,27 +273,6 @@ export const HueToneExtraction = ({ isMobile = false }: HueToneExtractionProps) 
       usage: color.usage
     }));
   }, [extractedColors]);
-
-  // 抽出された色をColorGridに適した形式に変換
-  const colorItems = extractedColors.map(extractedColor => {
-    try {
-      const [h, s, l] = chroma(extractedColor.hex).hsl();
-      const hsl = `hsl(${Math.round(h || 0)}, ${Math.round((s || 0) * 100)}%, ${Math.round((l || 0) * 100)}%)`;
-      return {
-        color: extractedColor.hex,
-        title: extractedColor.hex,
-        showClickIcon: false,
-        subtitle: `${hsl} (${(extractedColor.usage * 100).toFixed(1)}%)`
-      };
-    } catch (error) {
-      return {
-        color: extractedColor.hex,
-        title: extractedColor.hex,
-        showClickIcon: false,
-        subtitle: `${(extractedColor.usage * 100).toFixed(1)}%`
-      };
-    }
-  });
 
   return (
     <Card className="w-full flex flex-col pb-0">
