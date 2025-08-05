@@ -1,9 +1,11 @@
 import React, { useRef, useEffect, useState, useCallback, useImperativeHandle, forwardRef } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CircleDashed, Plus, Minus, Eraser, Pen, PaintBucket, Undo, Redo, Palette, RefreshCw, Download } from 'lucide-react';
+import { CircleDashed, Plus, Minus, Eraser, Pen, PaintBucket, Undo, Redo, Palette, RefreshCw, Download, Upload, ImageIcon } from 'lucide-react';
 import { BORDER_PRESETS } from '@/constants/ui';
 import { useColorStore } from '@/store/colorStore';
+import { useToastContext } from '@/contexts/ToastContext';
+import { extractColorsFromImage, validateImageFile } from '@/lib/colorExtractor';
 import chroma from 'chroma-js';
 import ColorThief from 'colorthief';
 import type { ExtractedColor } from '@/lib/colorExtractor';
@@ -18,6 +20,7 @@ export interface PaintCanvasRef {
 
 const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ className = '' }, ref) => {
   const { selectedColor, setSelectedColor, setExtractedColors } = useColorStore();
+  const { showToast } = useToastContext();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
@@ -27,6 +30,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
   const [isEditingPenSize, setIsEditingPenSize] = useState(false);
   const [tempPenSize, setTempPenSize] = useState('');
   const [isExtractingColors, setIsExtractingColors] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Undo/Redo履歴管理
   const [history, setHistory] = useState<string[]>([]);
@@ -877,6 +881,41 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     }
   }, []);
 
+  // 画像アップロードボタンクリック時の処理
+  const handleImageUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  // ファイル選択時の処理
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validation = validateImageFile(file);
+    if (!validation.valid) {
+      showToast(validation.error || '無効なファイルです', 'error');
+      return;
+    }
+
+    // キャンバスに画像を描画
+    drawImageToCanvas(file);
+
+    // 色抽出処理も実行（ベースカラー選択と同期）
+    try {
+      const result = await extractColorsFromImage(file, 8);
+      setExtractedColors(result.colors, result.dominantColor);
+      showToast('画像から色を抽出しました', 'success');
+    } catch (error) {
+      console.error('Color extraction failed:', error);
+      showToast('色の抽出に失敗しました', 'error');
+    }
+
+    // input をリセット（同じファイルを再選択可能にする）
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   return (
     <Card className={`w-full h-full flex flex-col bg-background border-transparent ${className}`}>
       <CardHeader className="pb-1 pt-2">
@@ -1038,8 +1077,26 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
             >
               <Download className="w-4 h-4 text-foreground" />
             </Button>
+            {/* 画像アップロードボタン */}
+            <Button
+              onClick={handleImageUploadClick}
+              variant="outline"
+              size="sm"
+              className="h-6 px-1 sm:h-8 sm:px-2"
+              title="画像をアップロードしてキャンバスに描画"
+            >
+              <Upload className="w-4 h-4 text-foreground" />
+            </Button>
           </div>
         </div>
+        {/* 隠しファイル入力 */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileSelect}
+          className="hidden"
+        />
       </CardHeader>
       <CardContent className="pt-1 pb-4 flex-1 flex flex-col">
           <div className="relative flex-1 flex flex-col">
