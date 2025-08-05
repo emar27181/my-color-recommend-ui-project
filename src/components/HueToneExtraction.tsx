@@ -25,8 +25,8 @@ const HueWheel = ({ colors }: { colors: { hex: string; usage: number }[] }) => {
   }).filter(Boolean);
 
   return (
-    <div className="flex flex-col items-center">
-      <svg width={size} height={size} className="border rounded">
+    <div className="w-full">
+      <svg width="100%" height={size} viewBox={`0 0 ${size} ${size}`} className="border rounded">
         {/* 色相環背景 */}
         <defs>
           <radialGradient id="hueWheel">
@@ -155,8 +155,8 @@ const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: num
   }).filter(Boolean);
 
   return (
-    <div className="flex flex-col items-center">
-      <svg width={width} height={height} className="border rounded">
+    <div className="w-full">
+      <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} className="border rounded">
         {/* 彩度-明度背景グラデーション */}
         <defs>
           {/* 彩度-明度の背景色グリッド */}
