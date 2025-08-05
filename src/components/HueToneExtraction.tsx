@@ -244,7 +244,7 @@ const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: num
         
         {/* 軸ラベル */}
         <text x={43.45 + rightShift + plotWidth/2} y={height - 8} textAnchor="middle" className="text-xs font-bold fill-foreground">{t('hueToneExtraction.saturation')}</text>
-        <text x={23.45 + rightShift} y={11 + plotHeight/2} textAnchor="middle" className="text-xs font-bold fill-foreground" transform={`rotate(-90 ${23.45 + rightShift} ${11 + plotHeight/2})`}>{t('hueToneExtraction.lightness')}</text>
+        <text x={18.45 + rightShift} y={11 + plotHeight/2} textAnchor="middle" className="text-xs font-bold fill-foreground" transform={`rotate(-90 ${18.45 + rightShift} ${11 + plotHeight/2})`}>{t('hueToneExtraction.lightness')}</text>
         
         {/* ポイント */}
         {points.map((point, index) => point && (
