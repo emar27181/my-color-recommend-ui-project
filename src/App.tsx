@@ -14,6 +14,7 @@ const App = () => {
   const [isColorRecommendationCollapsed, setIsColorRecommendationCollapsed] = useState(false);
   const [isToneRecommendationCollapsed, setIsToneRecommendationCollapsed] = useState(false);
   const [isSkinColorCollapsed, setIsSkinColorCollapsed] = useState(true);
+  const [isHueToneExtractionCollapsed, setIsHueToneExtractionCollapsed] = useState(true);
   const [isDebugMode, setIsDebugMode] = useState(false);
   const [screenSize, setScreenSize] = useState({ width: 0, height: 0 });
   
@@ -134,7 +135,7 @@ const App = () => {
           )}
         </section>
 
-        {/* Steps 2, 3 & 4: 色相推薦・トーン推薦・肌色推薦 - 動的サイズ */}
+        {/* Steps 2, 3, 4 & β: 色相推薦・トーン推薦・肌色推薦・使用色相/トーン抽出 - 動的サイズ */}
         <div className="space-y-1">
           {/* Step 2 */}
           <section>
@@ -182,6 +183,26 @@ const App = () => {
               )}
             </h3>
             {!isSkinColorCollapsed && <SkinColorRecommendations isMobile={isMobile} />}
+          </section>
+
+          {/* Step β: 使用色相/トーン抽出 */}
+          <section>
+            <h3 
+              className="text-xs font-medium mb-0 text-foreground leading-tight cursor-pointer flex items-center justify-between"
+              onClick={() => setIsHueToneExtractionCollapsed(!isHueToneExtractionCollapsed)}
+            >
+              <span>β. 使用色相/トーン抽出</span>
+              {isHueToneExtractionCollapsed ? (
+                <ChevronDown className="w-4 h-4" />
+              ) : (
+                <ChevronUp className="w-4 h-4" />
+              )}
+            </h3>
+            {!isHueToneExtractionCollapsed && (
+              <div className="pt-2 text-center text-sm text-muted-foreground">
+                Preparing...
+              </div>
+            )}
           </section>
         </div>
       </div>
@@ -291,6 +312,26 @@ const App = () => {
               )}
             </h3>
             {!isSkinColorCollapsed && <SkinColorRecommendations isMobile={isMobile} />}
+          </section>
+
+          {/* Step β: 使用色相/トーン抽出 */}
+          <section className="flex-shrink-0">
+            <h3 
+              className="text-lg font-medium mb-2 text-foreground cursor-pointer flex items-center justify-between"
+              onClick={() => setIsHueToneExtractionCollapsed(!isHueToneExtractionCollapsed)}
+            >
+              <span>β. 使用色相/トーン抽出</span>
+              {isHueToneExtractionCollapsed ? (
+                <ChevronDown className="w-5 h-5" />
+              ) : (
+                <ChevronUp className="w-5 h-5" />
+              )}
+            </h3>
+            {!isHueToneExtractionCollapsed && (
+              <div className="pt-4 text-center text-lg text-muted-foreground">
+                Preparing...
+              </div>
+            )}
           </section>
         </div>
       </div>
