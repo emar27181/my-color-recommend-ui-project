@@ -59,7 +59,7 @@ const HueWheel = ({ colors }: { colors: { hex: string; usage: number }[] }) => {
 // 彩度-明度散布図用コンポーネント
 const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: number }[] }) => {
   const width = 200;
-  const height = 150;
+  const height = 200;
   
   const points = colors.map(color => {
     try {
@@ -77,15 +77,15 @@ const SaturationLightnessPlot = ({ colors }: { colors: { hex: string; usage: num
       <svg width={width} height={height} className="border rounded">
         {/* グリッド */}
         <defs>
-          <pattern id="grid" width="20" height="15" patternUnits="userSpaceOnUse">
-            <path d="M 20 0 L 0 0 0 15" fill="none" stroke="#f3f4f6" strokeWidth="1"/>
+          <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#f3f4f6" strokeWidth="1"/>
           </pattern>
         </defs>
         <rect width="100%" height="100%" fill="url(#grid)" />
         
         {/* 軸ラベル */}
-        <text x={width/2} y={height-5} textAnchor="middle" className="text-xs fill-gray-500">彩度</text>
-        <text x="10" y={height/2} textAnchor="middle" className="text-xs fill-gray-500" transform={`rotate(-90 10 ${height/2})`}>明度</text>
+        <text x={width/2} y={height-5} textAnchor="middle" className="text-xs font-bold fill-foreground">彩度</text>
+        <text x="10" y={height/2} textAnchor="middle" className="text-xs font-bold fill-foreground" transform={`rotate(-90 10 ${height/2})`}>明度</text>
         
         {/* ポイント */}
         {points.map((point, index) => (
