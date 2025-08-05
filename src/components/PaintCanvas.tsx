@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState, useCallback, useImperativeHandle, forwardRef } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CircleDashed, Plus, Minus, Eraser, Pen, PaintBucket, Undo, Redo, Palette, RefreshCw, Download } from 'lucide-react';
@@ -12,7 +12,11 @@ interface PaintCanvasProps {
   className?: string;
 }
 
-export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
+export interface PaintCanvasRef {
+  drawImageToCanvas: (imageFile: File) => void;
+}
+
+const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ className = '' }, ref) => {
   const { selectedColor, setSelectedColor, setExtractedColors } = useColorStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -41,6 +45,8 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
       return '#6b7280'; // デフォルト: gray-500
     }
   };
+
+
 
   // カラーピッカーの変更ハンドラー
   const handleColorPickerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,6 +125,70 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
       return newIndex;
     });
   }, [historyIndex]);
+
+  // キャンバスに画像を描画する関数
+  const drawImageToCanvas = useCallback((imageFile: File) => {
+    if (!context || !canvasRef.current) return;
+
+    const canvas = canvasRef.current;
+    const img = new Image();
+
+    img.onload = () => {
+      // 履歴保存
+      saveToHistory();
+
+      // キャンバスサイズを取得
+      const canvasWidth = canvas.width;
+      const canvasHeight = canvas.height;
+
+      // 画像のアスペクト比を保持してキャンバスに収まるようにリサイズ
+      const imgAspect = img.width / img.height;
+      const canvasAspect = canvasWidth / canvasHeight;
+
+      let drawWidth, drawHeight, drawX, drawY;
+
+      if (imgAspect > canvasAspect) {
+        // 画像が横長の場合、幅を基準にする
+        drawWidth = canvasWidth;
+        drawHeight = canvasWidth / imgAspect;
+        drawX = 0;
+        drawY = (canvasHeight - drawHeight) / 2;
+      } else {
+        // 画像が縦長の場合、高さを基準にする
+        drawWidth = canvasHeight * imgAspect;
+        drawHeight = canvasHeight;
+        drawX = (canvasWidth - drawWidth) / 2;
+        drawY = 0;
+      }
+
+      // 背景を白でクリア
+      context.fillStyle = '#ffffff';
+      context.fillRect(0, 0, canvasWidth, canvasHeight);
+
+      // 画像を描画
+      context.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+
+      console.log('Image drawn to canvas:', imageFile.name);
+    };
+
+    img.onerror = () => {
+      console.error('Failed to load image:', imageFile.name);
+    };
+
+    // FileからDataURLを作成
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        img.src = e.target.result as string;
+      }
+    };
+    reader.readAsDataURL(imageFile);
+  }, [context, saveToHistory]);
+
+  // 外部からアクセス可能な関数を公開
+  useImperativeHandle(ref, () => ({
+    drawImageToCanvas
+  }), [drawImageToCanvas]);
 
   // 履歴から状態を復元
   const restoreFromHistory = useCallback((dataURL: string) => {
@@ -994,4 +1064,8 @@ export const PaintCanvas: React.FC<PaintCanvasProps> = ({ className = '' }) => {
       </CardContent>
     </Card>
   );
-};
+});
+
+PaintCanvasComponent.displayName = 'PaintCanvas';
+
+export const PaintCanvas = PaintCanvasComponent;
