@@ -93,7 +93,7 @@ const App = () => {
             className="text-xs font-medium text-foreground leading-tight mb-0 cursor-pointer flex items-center justify-between"
             onClick={() => setIsCanvasCollapsed(!isCanvasCollapsed)}
           >
-            <span>0. キャンバス</span>
+            <span>0. {t('app.steps.canvas')}</span>
             {isCanvasCollapsed ? (
               <ChevronDown className="w-4 h-4" />
             ) : (
@@ -175,7 +175,7 @@ const App = () => {
               className="text-xs font-medium mb-0 text-foreground leading-tight cursor-pointer flex items-center justify-between"
               onClick={() => setIsSkinColorCollapsed(!isSkinColorCollapsed)}
             >
-              <span>α. 肌色推薦</span>
+              <span>α. {t('app.steps.skinColorRecommendation')}</span>
               {isSkinColorCollapsed ? (
                 <ChevronDown className="w-4 h-4" />
               ) : (
@@ -191,7 +191,7 @@ const App = () => {
               className="text-xs font-medium mb-0 text-foreground leading-tight cursor-pointer flex items-center justify-between"
               onClick={() => setIsHueToneExtractionCollapsed(!isHueToneExtractionCollapsed)}
             >
-              <span>β. 使用色相/トーン抽出</span>
+              <span>β. {t('app.steps.hueToneExtraction')}</span>
               {isHueToneExtractionCollapsed ? (
                 <ChevronDown className="w-4 h-4" />
               ) : (
@@ -200,7 +200,7 @@ const App = () => {
             </h3>
             {!isHueToneExtractionCollapsed && (
               <div className="pt-2 text-center text-sm text-muted-foreground">
-                Preparing...
+{t('common.preparing')}
               </div>
             )}
           </section>
@@ -222,7 +222,7 @@ const App = () => {
               className="text-lg font-medium mb-2 text-foreground cursor-pointer flex items-center justify-between"
               onClick={() => setIsCanvasCollapsed(!isCanvasCollapsed)}
             >
-              <span>0. キャンバス</span>
+              <span>0. {t('app.steps.canvas')}</span>
               {isCanvasCollapsed ? (
                 <ChevronDown className="w-5 h-5" />
               ) : (
@@ -304,7 +304,7 @@ const App = () => {
               className="text-lg font-medium mb-2 text-foreground cursor-pointer flex items-center justify-between"
               onClick={() => setIsSkinColorCollapsed(!isSkinColorCollapsed)}
             >
-              <span>α. 肌色推薦</span>
+              <span>α. {t('app.steps.skinColorRecommendation')}</span>
               {isSkinColorCollapsed ? (
                 <ChevronDown className="w-5 h-5" />
               ) : (
@@ -320,7 +320,7 @@ const App = () => {
               className="text-lg font-medium mb-2 text-foreground cursor-pointer flex items-center justify-between"
               onClick={() => setIsHueToneExtractionCollapsed(!isHueToneExtractionCollapsed)}
             >
-              <span>β. 使用色相/トーン抽出</span>
+              <span>β. {t('app.steps.hueToneExtraction')}</span>
               {isHueToneExtractionCollapsed ? (
                 <ChevronDown className="w-5 h-5" />
               ) : (
@@ -329,7 +329,7 @@ const App = () => {
             </h3>
             {!isHueToneExtractionCollapsed && (
               <div className="pt-4 text-center text-lg text-muted-foreground">
-                Preparing...
+{t('common.preparing')}
               </div>
             )}
           </section>
