@@ -147,6 +147,17 @@ const generateToneAdjustments = (): ToneAdjustment[] => {
 // 自動生成されたトーン調整値
 export const TONE_ADJUSTMENTS: ToneAdjustment[] = generateToneAdjustments();
 
+// 量子化関数
+// 色相環用: 15度間隔で量子化（0, 15, 30, 45, ...）
+export const quantizeHue = (hue: number): number => {
+  return Math.round(hue / 15) * 15;
+};
+
+// トーン表用: 10等分で量子化（0, 10, 20, 30, ..., 100）
+export const quantizeSaturationLightness = (value: number): number => {
+  return Math.round(value * 100 / 10) * 10 / 100;
+};
+
 // デバッグ用：現在のトーン設定を確認
 console.log('Current tone settings:');
 console.log('Lightness variations:', TONE_LIGHTNESS_VARIATIONS);
@@ -161,12 +172,14 @@ export interface ColorState {
   toneBaseColor: string | null;
   extractedColors: ExtractedColor[];
   dominantColor: ExtractedColor | null;
+  isQuantizationEnabled: boolean;
   setSelectedColor: (color: string) => void;
   setSelectedScheme: (schemeId: string) => void;
   setExtractedColors: (colors: ExtractedColor[], dominantColor: ExtractedColor) => void;
   setColorFromExtracted: (color: string) => void;
   generateRecommendedColors: () => void;
   generateRecommendedTones: (baseColor: string) => void;
+  toggleQuantization: () => void;
 }
 
 // カラーソート関数: 明るい→暗いでソート
@@ -252,6 +265,7 @@ export const useColorStore = create<ColorState>((set, get) => {
     toneBaseColor: defaultColor,
     extractedColors: [],
     dominantColor: null,
+    isQuantizationEnabled: true,
 
     setSelectedColor: (color: string) => {
       set({ selectedColor: color });
@@ -339,6 +353,10 @@ export const useColorStore = create<ColorState>((set, get) => {
         console.error('Failed to generate recommended tones:', error);
         set({ recommendedTones: [], toneBaseColor: null });
       }
+    },
+
+    toggleQuantization: () => {
+      set(state => ({ isQuantizationEnabled: !state.isQuantizationEnabled }));
     },
   };
 });

@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { useColorStore } from '@/store/colorStore';
+import { useColorStore, quantizeHue, quantizeSaturationLightness } from '@/store/colorStore';
 import { useTranslation } from 'react-i18next';
 import chroma from 'chroma-js';
 import { useMemo } from 'react';
@@ -7,7 +7,7 @@ import { useMemo } from 'react';
 interface HueToneExtractionProps {}
 
 // 色相環プロット用コンポーネント
-const HueWheel = ({ colors, onHueClick }: { colors: { hex: string; usage: number }[], onHueClick?: (hue: number) => void }) => {
+const HueWheel = ({ colors, onHueClick, isQuantized }: { colors: { hex: string; usage: number }[], onHueClick?: (hue: number) => void, isQuantized: boolean }) => {
   const size = 220; // 元の縦幅に戻す
   const center = size / 2;
   const radius = 72; // 元のradiusに戻す
@@ -115,45 +115,91 @@ const HueWheel = ({ colors, onHueClick }: { colors: { hex: string; usage: number
         
         <circle cx={center} cy={center} r={radius} fill="none" stroke="#e5e7eb" strokeWidth="2" strokeDasharray="5,3" />
         
-        {/* 15度間隔の対角線 */}
-        {Array.from({ length: 24 }, (_, i) => {
-          const angle = i * 15 * (Math.PI / 180);
-          const x1 = center + 10 * Math.cos(angle - Math.PI / 2);
-          const y1 = center + 10 * Math.sin(angle - Math.PI / 2);
-          const x2 = center + radius * Math.cos(angle - Math.PI / 2);
-          const y2 = center + radius * Math.sin(angle - Math.PI / 2);
-          return (
-            <line
-              key={i}
-              x1={x1}
-              y1={y1}
-              x2={x2}
-              y2={y2}
-              stroke="#e5e7eb"
-              strokeWidth="0.5"
-              opacity="0.3"
-            />
-          );
-        })}
+        {/* 15度間隔の対角線: 量子化モードで切り替え */}
+        {isQuantized ? (
+          // 量子化モード: 太い線で15度間隔を強調
+          Array.from({ length: 24 }, (_, i) => {
+            const angle = i * 15 * (Math.PI / 180);
+            const x1 = center + 10 * Math.cos(angle - Math.PI / 2);
+            const y1 = center + 10 * Math.sin(angle - Math.PI / 2);
+            const x2 = center + radius * Math.cos(angle - Math.PI / 2);
+            const y2 = center + radius * Math.sin(angle - Math.PI / 2);
+            return (
+              <line
+                key={i}
+                x1={x1}
+                y1={y1}
+                x2={x2}
+                y2={y2}
+                stroke="#000000"
+                strokeWidth="1.5"
+                opacity="0.4"
+              />
+            );
+          })
+        ) : (
+          // 通常モード: 細い線
+          Array.from({ length: 24 }, (_, i) => {
+            const angle = i * 15 * (Math.PI / 180);
+            const x1 = center + 10 * Math.cos(angle - Math.PI / 2);
+            const y1 = center + 10 * Math.sin(angle - Math.PI / 2);
+            const x2 = center + radius * Math.cos(angle - Math.PI / 2);
+            const y2 = center + radius * Math.sin(angle - Math.PI / 2);
+            return (
+              <line
+                key={i}
+                x1={x1}
+                y1={y1}
+                x2={x2}
+                y2={y2}
+                stroke="#e5e7eb"
+                strokeWidth="0.5"
+                opacity="0.3"
+              />
+            );
+          })
+        )}
         
-        {/* 角度数値ラベル（円の外側） */}
-        {[0, 90, 180, 270].map((degrees, i) => {
-          const angle = degrees * (Math.PI / 180);
-          const labelRadius = radius + 8; // 余白を最小化
-          const x = center + labelRadius * Math.cos(angle - Math.PI / 2);
-          const y = center + labelRadius * Math.sin(angle - Math.PI / 2);
-          return (
-            <text
-              key={`angle-${i}`}
-              x={x}
-              y={y + 4}
-              textAnchor="middle"
-              className="text-xs fill-muted-foreground"
-            >
-              {degrees}°
-            </text>
-          );
-        })}
+        {/* 角度数値ラベル: 量子化モードで切り替え */}
+        {isQuantized ? (
+          // 量子化モード: 15度間隔ですべて表示
+          [0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180, 195, 210, 225, 240, 255, 270, 285, 300, 315, 330, 345].map((degrees, i) => {
+            const angle = degrees * (Math.PI / 180);
+            const labelRadius = radius + 8; // 余白を最小化
+            const x = center + labelRadius * Math.cos(angle - Math.PI / 2);
+            const y = center + labelRadius * Math.sin(angle - Math.PI / 2);
+            return (
+              <text
+                key={`angle-${i}`}
+                x={x}
+                y={y + 4}
+                textAnchor="middle"
+                className="text-xs fill-foreground font-medium"
+              >
+                {degrees}°
+              </text>
+            );
+          })
+        ) : (
+          // 通常モード: 90度間隔
+          [0, 90, 180, 270].map((degrees, i) => {
+            const angle = degrees * (Math.PI / 180);
+            const labelRadius = radius + 8; // 余白を最小化
+            const x = center + labelRadius * Math.cos(angle - Math.PI / 2);
+            const y = center + labelRadius * Math.sin(angle - Math.PI / 2);
+            return (
+              <text
+                key={`angle-${i}`}
+                x={x}
+                y={y + 4}
+                textAnchor="middle"
+                className="text-xs fill-muted-foreground"
+              >
+                {degrees}°
+              </text>
+            );
+          })
+        )}
         
         {/* 色相ポイント */}
         {huePoints.map((point, index) => point && (
@@ -173,7 +219,7 @@ const HueWheel = ({ colors, onHueClick }: { colors: { hex: string; usage: number
 };
 
 // 彩度-明度散布図用コンポーネント
-const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick }: { colors: { hex: string; usage: number }[], onSaturationLightnessClick?: (saturation: number, lightness: number) => void }) => {
+const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantized }: { colors: { hex: string; usage: number }[], onSaturationLightnessClick?: (saturation: number, lightness: number) => void, isQuantized: boolean }) => {
   const plotWidth = 145.8; // 元のプロット幅
   const plotHeight = 145.8; // 元のプロット高さ
   const width = 180; // 横幅は縮小維持
@@ -253,59 +299,136 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick }: { color
         {/* プロット領域の境界 */}
         <rect x="20" y="11" width={plotWidth} height={plotHeight} fill="none" stroke="#e5e7eb" strokeWidth="1"/>
         
-        {/* 10等分グリッド線 */}
-        {/* 縦線（彩度） */}
-        {Array.from({ length: 11 }, (_, i) => (
-          <line
-            key={`v-${i}`}
-            x1={20 + (i / 10) * plotWidth}
-            y1="11"
-            x2={20 + (i / 10) * plotWidth}
-            y2={11 + plotHeight}
-            stroke="#e5e7eb"
-            strokeWidth="0.5"
-            opacity="0.4"
-          />
-        ))}
-        {/* 横線（明度） */}
-        {Array.from({ length: 11 }, (_, i) => (
-          <line
-            key={`h-${i}`}
-            x1="20"
-            y1={11 + (i / 10) * plotHeight}
-            x2={20 + plotWidth}
-            y2={11 + (i / 10) * plotHeight}
-            stroke="#e5e7eb"
-            strokeWidth="0.5"
-            opacity="0.4"
-          />
-        ))}
+        {/* グリッド線: 量子化モードで切り替え */}
+        {isQuantized ? (
+          // 量子化モード: 10%間隔の太いグリッド
+          <>
+            {/* 縦線（彩度） */}
+            {Array.from({ length: 11 }, (_, i) => (
+              <line
+                key={`v-${i}`}
+                x1={20 + (i / 10) * plotWidth}
+                y1="11"
+                x2={20 + (i / 10) * plotWidth}
+                y2={11 + plotHeight}
+                stroke="#000000"
+                strokeWidth="1"
+                opacity="0.5"
+              />
+            ))}
+          </>
+        ) : (
+          // 通常モード: 細いグリッド
+          <>
+            {/* 縦線（彩度） */}
+            {Array.from({ length: 11 }, (_, i) => (
+              <line
+                key={`v-${i}`}
+                x1={20 + (i / 10) * plotWidth}
+                y1="11"
+                x2={20 + (i / 10) * plotWidth}
+                y2={11 + plotHeight}
+                stroke="#e5e7eb"
+                strokeWidth="0.5"
+                opacity="0.4"
+              />
+            ))}
+          </>
+        )}
+        {isQuantized ? (
+          // 量子化モード: 10%間隔の太いグリッド
+          <>
+            {/* 横線（明度） */}
+            {Array.from({ length: 11 }, (_, i) => (
+              <line
+                key={`h-${i}`}
+                x1="20"
+                y1={11 + (i / 10) * plotHeight}
+                x2={20 + plotWidth}
+                y2={11 + (i / 10) * plotHeight}
+                stroke="#000000"
+                strokeWidth="1"
+                opacity="0.5"
+              />
+            ))}
+          </>
+        ) : (
+          // 通常モード: 細いグリッド
+          <>
+            {/* 横線（明度） */}
+            {Array.from({ length: 11 }, (_, i) => (
+              <line
+                key={`h-${i}`}
+                x1="20"
+                y1={11 + (i / 10) * plotHeight}
+                x2={20 + plotWidth}
+                y2={11 + (i / 10) * plotHeight}
+                stroke="#e5e7eb"
+                strokeWidth="0.5"
+                opacity="0.4"
+              />
+            ))}
+          </>
+        )}
         
-        {/* 数値ラベル（外側） */}
-        {/* 彩度の数値 (下側) */}
-        {[0, 25, 50, 75, 100].map((value, i) => (
-          <text
-            key={`s-${i}`}
-            x={20 + (value / 100) * plotWidth}
-            y={height - 30}
-            textAnchor="middle"
-            className="text-xs fill-muted-foreground"
-          >
-            {value}
-          </text>
-        ))}
-        {/* 明度の数値 (左側) */}
-        {[0, 25, 50, 75, 100].map((value, i) => (
-          <text
-            key={`l-${i}`}
-            x="10"
-            y={11 + plotHeight - (value / 100) * plotHeight + 4}
-            textAnchor="middle"
-            className="text-xs fill-muted-foreground"
-          >
-            {value}
-          </text>
-        ))}
+        {/* 数値ラベル: 量子化モードで切り替え */}
+        {isQuantized ? (
+          // 量子化モード: 10%間隔ですべて表示
+          <>
+            {/* 彩度の数値 (下側) */}
+            {[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((value, i) => (
+              <text
+                key={`s-${i}`}
+                x={20 + (value / 100) * plotWidth}
+                y={height - 30}
+                textAnchor="middle"
+                className="text-xs fill-foreground font-medium"
+              >
+                {value}
+              </text>
+            ))}
+            {/* 明度の数値 (左側) */}
+            {[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((value, i) => (
+              <text
+                key={`l-${i}`}
+                x="10"
+                y={11 + plotHeight - (value / 100) * plotHeight + 4}
+                textAnchor="middle"
+                className="text-xs fill-foreground font-medium"
+              >
+                {value}
+              </text>
+            ))}
+          </>
+        ) : (
+          // 通常モード: 25%間隔
+          <>
+            {/* 彩度の数値 (下側) */}
+            {[0, 25, 50, 75, 100].map((value, i) => (
+              <text
+                key={`s-${i}`}
+                x={20 + (value / 100) * plotWidth}
+                y={height - 30}
+                textAnchor="middle"
+                className="text-xs fill-muted-foreground"
+              >
+                {value}
+              </text>
+            ))}
+            {/* 明度の数値 (左側) */}
+            {[0, 25, 50, 75, 100].map((value, i) => (
+              <text
+                key={`l-${i}`}
+                x="10"
+                y={11 + plotHeight - (value / 100) * plotHeight + 4}
+                textAnchor="middle"
+                className="text-xs fill-muted-foreground"
+              >
+                {value}
+              </text>
+            ))}
+          </>
+        )}
         
         
         {/* ポイント */}
@@ -326,17 +449,22 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick }: { color
 };
 
 export const HueToneExtraction = ({ }: HueToneExtractionProps) => {
-  const { extractedColors, selectedColor, setSelectedColor } = useColorStore();
+  const { extractedColors, selectedColor, setSelectedColor, isQuantizationEnabled } = useColorStore();
   const { t } = useTranslation();
 
   // 色相環クリック時のハンドラ
   const handleHueClick = (hue: number) => {
     try {
+      // 量子化モードが有効ならHueを量子化
+      const finalHue = isQuantizationEnabled ? quantizeHue(hue) : hue;
+      
       // 現在の描画色のS, Lを取得
       const [, s, l] = chroma(selectedColor).hsl();
       // 新しいHueで色を作成
-      const newColor = chroma.hsl(hue, s || 0.5, l || 0.5).hex();
+      const newColor = chroma.hsl(finalHue, s || 0.5, l || 0.5).hex();
       setSelectedColor(newColor);
+      
+      console.log(`Hue click: ${hue}° -> ${finalHue}° (quantization: ${isQuantizationEnabled ? 'ON' : 'OFF'})`);
     } catch (error) {
       console.error('色相変更エラー:', error);
     }
@@ -345,11 +473,17 @@ export const HueToneExtraction = ({ }: HueToneExtractionProps) => {
   // トーン表クリック時のハンドラ
   const handleSaturationLightnessClick = (saturation: number, lightness: number) => {
     try {
+      // 量子化モードが有効ならS, Lを量子化
+      const finalSaturation = isQuantizationEnabled ? quantizeSaturationLightness(saturation) : saturation;
+      const finalLightness = isQuantizationEnabled ? quantizeSaturationLightness(lightness) : lightness;
+      
       // 現在の描画色のHueを取得
       const [h] = chroma(selectedColor).hsl();
       // 新しいS, Lで色を作成
-      const newColor = chroma.hsl(h || 0, saturation, lightness).hex();
+      const newColor = chroma.hsl(h || 0, finalSaturation, finalLightness).hex();
       setSelectedColor(newColor);
+      
+      console.log(`S/L click: S ${saturation.toFixed(2)} -> ${finalSaturation.toFixed(2)}, L ${lightness.toFixed(2)} -> ${finalLightness.toFixed(2)} (quantization: ${isQuantizationEnabled ? 'ON' : 'OFF'})`);
     } catch (error) {
       console.error('彩度・明度変更エラー:', error);
     }
@@ -369,14 +503,14 @@ export const HueToneExtraction = ({ }: HueToneExtractionProps) => {
       </CardHeader>
       <CardContent className="p-0 flex-1 overflow-auto min-h-0">
         <div data-tutorial="hue-tone-extraction" className="space-y-0">
-          {/* 色相・トーンの可視化のみ表示 */}
-          {extractedColors.length > 0 ? (
-            <div className="flex flex-col space-y-0">
-              <HueWheel colors={visualizationData} onHueClick={handleHueClick} />
-              <SaturationLightnessPlot colors={visualizationData} onSaturationLightnessClick={handleSaturationLightnessClick} />
-            </div>
-          ) : (
-            <div className="text-center text-muted-foreground text-sm py-8">
+          {/* 色相・トーンの可視化を常に表示 */}
+          <div className="flex flex-col space-y-0">
+            <HueWheel colors={visualizationData} onHueClick={handleHueClick} isQuantized={isQuantizationEnabled} />
+            <SaturationLightnessPlot colors={visualizationData} onSaturationLightnessClick={handleSaturationLightnessClick} isQuantized={isQuantizationEnabled} />
+          </div>
+          {/* 抽出色がない場合のメッセージは下部に小さく表示 */}
+          {extractedColors.length === 0 && (
+            <div className="text-center text-muted-foreground text-xs py-2 opacity-50">
               {t('extractedColors.noColors')}
             </div>
           )}
