@@ -1257,7 +1257,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
                 title="レイヤー1（上）"
               >
                 <Layers className="w-4 h-4 text-foreground" />
-                <span className="ml-1 text-xs">1</span>
+                <span className="ml-1 text-xs text-foreground">1</span>
               </Button>
               <Button
                 onClick={() => setCurrentLayer(2)}
@@ -1267,7 +1267,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
                 title="レイヤー2（下）"
               >
                 <Layers className="w-4 h-4 text-foreground" />
-                <span className="ml-1 text-xs">2</span>
+                <span className="ml-1 text-xs text-foreground">2</span>
               </Button>
           </div>
           {/* Undo/Redoボタン */}
