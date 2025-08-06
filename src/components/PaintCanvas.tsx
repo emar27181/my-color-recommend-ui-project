@@ -130,10 +130,16 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
         // 初期状態を履歴に保存
         setTimeout(() => {
           updateCompositeCanvas();
-          if (canvasRef.current) {
-            const dataURL = canvasRef.current.toDataURL();
-            setHistory([dataURL]);
+          if (layer1CanvasRef.current && layer2CanvasRef.current) {
+            const layer1DataURL = layer1CanvasRef.current.toDataURL();
+            const layer2DataURL = layer2CanvasRef.current.toDataURL();
+            const initialHistoryData = JSON.stringify({
+              layer1: layer1DataURL,
+              layer2: layer2DataURL
+            });
+            setHistory([initialHistoryData]);
             setHistoryIndex(0);
+            console.log('Initial layer history saved');
           }
         }, 50); // 初期化時間短縮
       }
@@ -151,19 +157,28 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     };
   }, []);
 
-  // 履歴に現在の状態を保存
+  // 履歴に現在のレイヤー状態を保存
   const saveToHistory = useCallback(() => {
-    if (!canvasRef.current) return;
+    if (!layer1CanvasRef.current || !layer2CanvasRef.current) return;
 
-    const canvas = canvasRef.current;
-    const dataURL = canvas.toDataURL();
+    const layer1Canvas = layer1CanvasRef.current;
+    const layer2Canvas = layer2CanvasRef.current;
+    
+    // 両レイヤーの状態を保存
+    const layer1DataURL = layer1Canvas.toDataURL();
+    const layer2DataURL = layer2Canvas.toDataURL();
+    
+    const historyData = JSON.stringify({
+      layer1: layer1DataURL,
+      layer2: layer2DataURL
+    });
 
-    console.log('Saving to history - current index:', historyIndex);
+    console.log('Saving layers to history - current index:', historyIndex);
 
     setHistory(prevHistory => {
       // 現在のインデックス以降の履歴を削除（新しい操作時）
       const newHistory = prevHistory.slice(0, historyIndex + 1);
-      newHistory.push(dataURL);
+      newHistory.push(historyData);
 
       console.log('New history length:', newHistory.length);
 
@@ -520,25 +535,51 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     extractColorsFromCanvas
   }), [drawImageToCanvas, extractColorsFromCanvas]);
 
-  // 履歴から状態を復元
-  const restoreFromHistory = useCallback((dataURL: string) => {
-    if (!context || !canvasRef.current) return;
+  // 履歴からレイヤー状態を復元
+  const restoreFromHistory = useCallback((historyData: string) => {
+    if (!layer1Context || !layer2Context || !layer1CanvasRef.current || !layer2CanvasRef.current) return;
 
-    const canvas = canvasRef.current;
-    const img: HTMLImageElement = document.createElement('img');
+    try {
+      const parsedData = JSON.parse(historyData);
+      const { layer1: layer1DataURL, layer2: layer2DataURL } = parsedData;
 
-    img.onload = () => {
-      // キャンバスをクリア
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      // 背景を白に設定
-      context.fillStyle = '#ffffff';
-      context.fillRect(0, 0, canvas.width, canvas.height);
-      // 画像を復元
-      context.drawImage(img, 0, 0);
-    };
+      // レイヤー1を復元
+      const img1: HTMLImageElement = document.createElement('img');
+      img1.onload = () => {
+        if (!layer1Context || !layer1CanvasRef.current) return;
+        layer1Context.clearRect(0, 0, layer1CanvasRef.current.width, layer1CanvasRef.current.height);
+        layer1Context.drawImage(img1, 0, 0);
+        
+        // 合成キャンバスを更新
+        updateCompositeCanvas();
+      };
+      img1.src = layer1DataURL;
 
-    img.src = dataURL;
-  }, [context]);
+      // レイヤー2を復元
+      const img2: HTMLImageElement = document.createElement('img');
+      img2.onload = () => {
+        if (!layer2Context || !layer2CanvasRef.current) return;
+        layer2Context.clearRect(0, 0, layer2CanvasRef.current.width, layer2CanvasRef.current.height);
+        layer2Context.drawImage(img2, 0, 0);
+        
+        // 合成キャンバスを更新
+        updateCompositeCanvas();
+      };
+      img2.src = layer2DataURL;
+
+    } catch (error) {
+      console.error('Failed to restore from history:', error);
+      // 古い形式の単一画像データの場合の互換性処理
+      if (!context || !canvasRef.current) return;
+      const img: HTMLImageElement = document.createElement('img');
+      img.onload = () => {
+        if (!context || !canvasRef.current) return;
+        context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+        context.drawImage(img, 0, 0);
+      };
+      img.src = historyData;
+    }
+  }, [layer1Context, layer2Context, updateCompositeCanvas, context]);
 
   // Undo機能
   const undo = useCallback(() => {
@@ -587,11 +628,13 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
   // フラッドフィル（塗りつぶし）アルゴリズム
   const floodFill = useCallback((startX: number, startY: number, newColor: string) => {
     const layerContext = getCurrentLayerContext();
-    if (!layerContext || !canvasRef.current) return;
+    if (!layerContext) return;
 
     // 現在のレイヤーキャンバスを取得
     const currentLayerCanvas = currentLayer === 1 ? layer1CanvasRef.current : layer2CanvasRef.current;
     if (!currentLayerCanvas) return;
+    
+    console.log('FloodFill: Using layer', currentLayer, 'canvas size:', currentLayerCanvas.width, 'x', currentLayerCanvas.height);
     
     const imageData = layerContext.getImageData(0, 0, currentLayerCanvas.width, currentLayerCanvas.height);
     const pixels = imageData.data;
@@ -833,7 +876,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     return { x, y };
   }, []);
 
-  // キャンバスから色を取得する関数
+  // キャンバスから色を取得する関数（合成表示から）
   const pickColorFromCanvas = useCallback((x: number, y: number) => {
     if (!context || !canvasRef.current) return;
 
@@ -842,7 +885,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     // キャンバスの範囲内チェック
     if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) return;
 
-    // ピクセルデータを取得
+    // 合成表示キャンバスからピクセルデータを取得
     const imageData = context.getImageData(Math.floor(x), Math.floor(y), 1, 1);
     const pixel = imageData.data;
     
@@ -866,7 +909,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     // トースト通知
     showToast(`色を取得しました: ${hexColor}`, 'success');
     
-    console.log('Color picked:', hexColor, `RGB(${r}, ${g}, ${b})`);
+    console.log('Color picked from composite:', hexColor, `RGB(${r}, ${g}, ${b})`);
   }, [context, setSelectedColor, showToast]);
 
   // 描画開始
