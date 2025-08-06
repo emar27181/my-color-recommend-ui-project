@@ -440,15 +440,13 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     }
   }, [setExtractedColors]);
 
-  // テンプレート画像をキャンバスに読み込む
+  // テンプレート画像をレイヤー1に読み込む
   const loadTemplateImage = useCallback(async () => {
-    console.log('loadTemplateImage called');
-    console.log('context:', context);
-    console.log('canvasRef.current:', canvasRef.current);
+    console.log('loadTemplateImage called - loading to layer 1');
     
-    if (!context || !canvasRef.current) {
-      console.log('Context or canvas ref is null');
-      showToast('キャンバスが初期化されていません', 'error');
+    if (!layer1Context || !layer1CanvasRef.current) {
+      console.log('Layer 1 context or canvas ref is null');
+      showToast('レイヤー1が初期化されていません', 'error');
       return;
     }
 
@@ -459,40 +457,46 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
       const img: HTMLImageElement = document.createElement('img');
       
       img.onload = () => {
-        console.log('Template image loaded successfully');
-        if (!context || !canvasRef.current) {
-          console.log('Context or canvas lost during image load');
+        console.log('Template image loaded successfully to layer 1');
+        if (!layer1Context || !layer1CanvasRef.current) {
+          console.log('Layer 1 context or canvas lost during image load');
           return;
         }
         
-        // キャンバスをクリア
-        context.fillStyle = '#ffffff';
-        context.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+        // レイヤー1をクリア（透明に）
+        layer1Context.clearRect(0, 0, layer1CanvasRef.current.width, layer1CanvasRef.current.height);
         
-        // 画像をキャンバスサイズに合わせて描画
-        const canvas = canvasRef.current;
+        // 画像をレイヤー1のキャンバスサイズに合わせて描画
+        const layer1Canvas = layer1CanvasRef.current;
         const aspectRatio = img.width / img.height;
-        const canvasAspectRatio = canvas.width / canvas.height;
+        const canvasAspectRatio = layer1Canvas.width / layer1Canvas.height;
         
         let drawWidth, drawHeight, drawX, drawY;
         
         if (aspectRatio > canvasAspectRatio) {
           // 画像が横長の場合、幅をキャンバス幅に合わせる
-          drawWidth = canvas.width;
-          drawHeight = canvas.width / aspectRatio;
+          drawWidth = layer1Canvas.width;
+          drawHeight = layer1Canvas.width / aspectRatio;
           drawX = 0;
-          drawY = (canvas.height - drawHeight) / 2;
+          drawY = (layer1Canvas.height - drawHeight) / 2;
         } else {
           // 画像が縦長の場合、高さをキャンバス高さに合わせる
-          drawHeight = canvas.height;
-          drawWidth = canvas.height * aspectRatio;
-          drawX = (canvas.width - drawWidth) / 2;
+          drawHeight = layer1Canvas.height;
+          drawWidth = layer1Canvas.height * aspectRatio;
+          drawX = (layer1Canvas.width - drawWidth) / 2;
           drawY = 0;
         }
         
-        context.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+        // レイヤー1に線画を描画
+        layer1Context.drawImage(img, drawX, drawY, drawWidth, drawHeight);
         
-        showToast('テンプレート画像を読み込みました', 'success');
+        // 描画レイヤーをレイヤー2に自動切り替え
+        setCurrentLayer(2);
+        
+        // 合成キャンバスを更新
+        updateCompositeCanvas();
+        
+        showToast('線画をレイヤー1に読み込みました（描画はレイヤー2）', 'success');
       };
       
       img.onerror = (error: string | Event) => {
@@ -501,14 +505,14 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
       };
       
       // publicディレクトリからテンプレート画像を読み込み
-      console.log('Setting image source to:', '/magotsuki_senga.jpg');
-      img.src = '/magotsuki_senga.jpg';
+      console.log('Setting image source to:', '/line-art-template.png');
+      img.src = '/line-art-template.png';
       
     } catch (error) {
       console.error('Template image load error:', error);
       showToast('テンプレート画像の読み込みに失敗しました', 'error');
     }
-  }, [context, saveToHistory, showToast]);
+  }, [layer1Context, saveToHistory, showToast, updateCompositeCanvas]);
 
   // 外部からアクセス可能な関数を公開
   useImperativeHandle(ref, () => ({
