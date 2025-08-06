@@ -625,16 +625,38 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     }
   }, [context, isEraserMode, selectedColor]);
 
+  // デバッグ用：状態変更を監視
+  useEffect(() => {
+    console.log('Mode state changed:', { isFillMode, isEraserMode, isEyedropperMode });
+  }, [isFillMode, isEraserMode, isEyedropperMode]);
+
   // フラッドフィル（塗りつぶし）アルゴリズム
   const floodFill = useCallback((startX: number, startY: number, newColor: string) => {
+    console.log('FloodFill called with:', { startX, startY, newColor, currentLayer });
+    
     const layerContext = getCurrentLayerContext();
-    if (!layerContext) return;
+    if (!layerContext) {
+      console.error('FloodFill: No layer context available');
+      return;
+    }
 
     // 現在のレイヤーキャンバスを取得
     const currentLayerCanvas = currentLayer === 1 ? layer1CanvasRef.current : layer2CanvasRef.current;
-    if (!currentLayerCanvas) return;
+    if (!currentLayerCanvas) {
+      console.error('FloodFill: No current layer canvas available');
+      return;
+    }
     
     console.log('FloodFill: Using layer', currentLayer, 'canvas size:', currentLayerCanvas.width, 'x', currentLayerCanvas.height);
+    console.log('FloodFill: Start coordinates:', Math.floor(startX), Math.floor(startY));
+    
+    try {
+      const imageData = layerContext.getImageData(0, 0, currentLayerCanvas.width, currentLayerCanvas.height);
+      console.log('FloodFill: Successfully got imageData, length:', imageData.data.length);
+    } catch (error) {
+      console.error('FloodFill: Failed to get imageData:', error);
+      return;
+    }
     
     const imageData = layerContext.getImageData(0, 0, currentLayerCanvas.width, currentLayerCanvas.height);
     const pixels = imageData.data;
@@ -652,7 +674,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     const newA = 255;
 
     // 開始点の色を取得
-    const startIndex = (Math.floor(startY) * canvas.width + Math.floor(startX)) * 4;
+    const startIndex = (Math.floor(startY) * currentLayerCanvas.width + Math.floor(startX)) * 4;
     const startR = pixels[startIndex];
     const startG = pixels[startIndex + 1];
     const startB = pixels[startIndex + 2];
@@ -801,9 +823,11 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
 
     // 変更されたピクセルデータを現在のレイヤーキャンバスに反映
     layerContext.putImageData(imageData, 0, 0);
+    console.log('FloodFill: Successfully applied pixel changes to layer', currentLayer);
     
     // 塗りつぶし後は即座に合成更新
     updateCompositeCanvas();
+    console.log('FloodFill: Composite canvas updated');
   }, [getCurrentLayerContext, currentLayer, updateCompositeCanvas]);
 
   // キーボードショートカット
@@ -914,20 +938,35 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
 
   // 描画開始
   const startDrawing = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    console.log('startDrawing called - Current modes:', { 
+      isFillMode, 
+      isEraserMode, 
+      isEyedropperMode,
+      currentLayer 
+    });
+    
     const layerContext = getCurrentLayerContext();
     if (!layerContext || !canvasRef.current) return;
 
     const { x, y } = getScaledCoordinates(e.clientX, e.clientY);
+    console.log('Scaled coordinates:', { x, y });
 
     // スポイトモードの場合
     if (isEyedropperMode) {
+      console.log('Eyedropper mode detected');
       pickColorFromCanvas(x, y);
       return;
     }
 
     // 塗りつぶしモードの場合
     if (isFillMode) {
-      console.log('PaintCanvas: Starting flood fill with color:', selectedColor);
+      console.log('PaintCanvas: Starting flood fill at coordinates:', { x, y }, 'with color:', selectedColor, 'on layer:', currentLayer);
+      
+      // レイヤーコンテキストの状態確認
+      const layerContext = getCurrentLayerContext();
+      console.log('Layer context available:', !!layerContext);
+      console.log('Current layer canvas:', currentLayer === 1 ? !!layer1CanvasRef.current : !!layer2CanvasRef.current);
+      
       // 塗りつぶし前に現在の状態を履歴に保存
       saveToHistory();
       // 少し待ってから塗りつぶし実行
@@ -996,6 +1035,13 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
 
     // 塗りつぶしモードの場合
     if (isFillMode) {
+      console.log('PaintCanvas (Touch): Starting flood fill at coordinates:', { x, y }, 'with color:', selectedColor, 'on layer:', currentLayer);
+      
+      // レイヤーコンテキストの状態確認
+      const layerContext = getCurrentLayerContext();
+      console.log('Touch - Layer context available:', !!layerContext);
+      console.log('Touch - Current layer canvas:', currentLayer === 1 ? !!layer1CanvasRef.current : !!layer2CanvasRef.current);
+      
       // 塗りつぶし前に現在の状態を履歴に保存
       saveToHistory();
       // 少し待ってから塗りつぶし実行
@@ -1283,13 +1329,16 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
               </Button>
               <Button
                 onClick={() => {
+                  console.log('Fill button clicked - setting fill mode');
                   setIsEraserMode(false);
                   setIsFillMode(true);
                   setIsEyedropperMode(false);
+                  console.log('Fill mode state should now be true');
                 }}
                 variant={isFillMode ? "default" : "outline"}
                 size="sm"
                 className="h-6 px-1 sm:h-8 sm:px-2"
+                title="塗りつぶしツール"
               >
                 <PaintBucket className="w-4 h-4 text-foreground" />
               </Button>
@@ -1476,12 +1525,18 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
               isEyedropperMode ? 'cursor-crosshair' : 
               isFillMode ? 'cursor-pointer' : 'cursor-crosshair'
             }`}
+            data-fill-mode={isFillMode}
+            data-eraser-mode={isEraserMode}
+            data-eyedropper-mode={isEyedropperMode}
             style={{ 
               width: '100%', 
               height: '450px',
               touchAction: 'none'
             }}
-            onMouseDown={startDrawing}
+            onMouseDown={(e) => {
+              console.log('Mouse down event fired');
+              startDrawing(e);
+            }}
             onMouseMove={draw}
             onMouseUp={stopDrawing}
             onMouseLeave={stopDrawing}
