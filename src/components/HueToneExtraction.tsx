@@ -115,11 +115,11 @@ const HueWheel = ({ colors, onHueClick, isQuantized }: { colors: { hex: string; 
         
         <circle cx={center} cy={center} r={radius} fill="none" stroke="#e5e7eb" strokeWidth="2" strokeDasharray="5,3" />
         
-        {/* 15度間隔の対角線: 量子化モードで切り替え */}
+        {/* 30度間隔の対角線: 量子化モードで切り替え */}
         {isQuantized ? (
-          // 量子化モード: 太い線で15度間隔を強調
-          Array.from({ length: 24 }, (_, i) => {
-            const angle = i * 15 * (Math.PI / 180);
+          // 量子化モード: 太い線で30度間隔を強調
+          Array.from({ length: 12 }, (_, i) => {
+            const angle = i * 30 * (Math.PI / 180);
             const x1 = center + 10 * Math.cos(angle - Math.PI / 2);
             const y1 = center + 10 * Math.sin(angle - Math.PI / 2);
             const x2 = center + radius * Math.cos(angle - Math.PI / 2);
@@ -139,8 +139,8 @@ const HueWheel = ({ colors, onHueClick, isQuantized }: { colors: { hex: string; 
           })
         ) : (
           // 通常モード: 細い線
-          Array.from({ length: 24 }, (_, i) => {
-            const angle = i * 15 * (Math.PI / 180);
+          Array.from({ length: 12 }, (_, i) => {
+            const angle = i * 30 * (Math.PI / 180);
             const x1 = center + 10 * Math.cos(angle - Math.PI / 2);
             const y1 = center + 10 * Math.sin(angle - Math.PI / 2);
             const x2 = center + radius * Math.cos(angle - Math.PI / 2);
@@ -162,8 +162,8 @@ const HueWheel = ({ colors, onHueClick, isQuantized }: { colors: { hex: string; 
         
         {/* 角度数値ラベル: 量子化モードで切り替え */}
         {isQuantized ? (
-          // 量子化モード: 15度間隔ですべて表示
-          [0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180, 195, 210, 225, 240, 255, 270, 285, 300, 315, 330, 345].map((degrees, i) => {
+          // 量子化モード: 30度間隔ですべて表示
+          [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((degrees, i) => {
             const angle = degrees * (Math.PI / 180);
             const labelRadius = radius + 8; // 余白を最小化
             const x = center + labelRadius * Math.cos(angle - Math.PI / 2);
@@ -373,10 +373,10 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
         
         {/* 数値ラベル: 量子化モードで切り替え */}
         {isQuantized ? (
-          // 量子化モード: 10%間隔ですべて表示
+          // 量子化モード: 20%間隔ですべて表示
           <>
             {/* 彩度の数値 (下側) */}
-            {[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((value, i) => (
+            {[0, 20, 40, 60, 80, 100].map((value, i) => (
               <text
                 key={`s-${i}`}
                 x={20 + (value / 100) * plotWidth}
@@ -388,7 +388,7 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
               </text>
             ))}
             {/* 明度の数値 (左側) */}
-            {[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((value, i) => (
+            {[0, 20, 40, 60, 80, 100].map((value, i) => (
               <text
                 key={`l-${i}`}
                 x="10"
