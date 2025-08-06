@@ -635,31 +635,49 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     console.log('FloodFill called with:', { startX, startY, newColor, currentLayer });
     
     const layerContext = getCurrentLayerContext();
-    if (!layerContext) {
-      console.error('FloodFill: No layer context available');
+    if (!layerContext || !canvasRef.current) {
+      console.error('FloodFill: No layer context or composite canvas available');
       return;
     }
 
-    // 現在のレイヤーキャンバスを取得
+    // 現在のレイヤーキャンバスを取得（塗りつぶし結果の適用用）
     const currentLayerCanvas = currentLayer === 1 ? layer1CanvasRef.current : layer2CanvasRef.current;
     if (!currentLayerCanvas) {
       console.error('FloodFill: No current layer canvas available');
       return;
     }
+
+    // 境界検出用に合成されたキャンバス（全レイヤー）のピクセルデータを使用
+    const compositeContext = canvasRef.current.getContext('2d');
+    if (!compositeContext) {
+      console.error('FloodFill: No composite context available');
+      return;
+    }
     
-    console.log('FloodFill: Using layer', currentLayer, 'canvas size:', currentLayerCanvas.width, 'x', currentLayerCanvas.height);
+    console.log('FloodFill: Using composite canvas for boundary detection, layer', currentLayer, 'for filling');
+    console.log('FloodFill: Canvas size:', canvasRef.current.width, 'x', canvasRef.current.height);
     console.log('FloodFill: Start coordinates:', Math.floor(startX), Math.floor(startY));
     
     try {
-      const imageData = layerContext.getImageData(0, 0, currentLayerCanvas.width, currentLayerCanvas.height);
-      console.log('FloodFill: Successfully got imageData, length:', imageData.data.length);
+      // 境界検出用：合成キャンバス全体のピクセルデータ
+      const compositeImageData = compositeContext.getImageData(0, 0, canvasRef.current.width, canvasRef.current.height);
+      console.log('FloodFill: Successfully got composite imageData, length:', compositeImageData.data.length);
+      
+      // 塗りつぶし結果適用用：現在のレイヤーのピクセルデータ
+      const layerImageData = layerContext.getImageData(0, 0, currentLayerCanvas.width, currentLayerCanvas.height);
+      console.log('FloodFill: Successfully got layer imageData, length:', layerImageData.data.length);
     } catch (error) {
       console.error('FloodFill: Failed to get imageData:', error);
       return;
     }
     
-    const imageData = layerContext.getImageData(0, 0, currentLayerCanvas.width, currentLayerCanvas.height);
-    const pixels = imageData.data;
+    // 境界検出用：合成キャンバス全体のピクセルデータ
+    const compositeImageData = compositeContext.getImageData(0, 0, canvasRef.current.width, canvasRef.current.height);
+    const compositePixels = compositeImageData.data;
+    
+    // 塗りつぶし結果適用用：現在のレイヤーのピクセルデータ
+    const layerImageData = layerContext.getImageData(0, 0, currentLayerCanvas.width, currentLayerCanvas.height);
+    const layerPixels = layerImageData.data;
 
     // === 調整可能な定数 ===
     const colorTolerance = 8;        // 色の許容閾値（0-255）
@@ -673,26 +691,26 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     const newB = parseInt(hex.substring(4, 6), 16);
     const newA = 255;
 
-    // 開始点の色を取得
-    const startIndex = (Math.floor(startY) * currentLayerCanvas.width + Math.floor(startX)) * 4;
-    const startR = pixels[startIndex];
-    const startG = pixels[startIndex + 1];
-    const startB = pixels[startIndex + 2];
-    const startA = pixels[startIndex + 3];
+    // 開始点の色を取得（境界検出用は合成ピクセルデータを使用）
+    const startIndex = (Math.floor(startY) * canvasRef.current.width + Math.floor(startX)) * 4;
+    const startR = compositePixels[startIndex];
+    const startG = compositePixels[startIndex + 1];
+    const startB = compositePixels[startIndex + 2];
+    const startA = compositePixels[startIndex + 3];
 
     // 軽量な色の差を計算する関数（平方根を避ける）
     const colorDistance = (r1: number, g1: number, b1: number, a1: number, r2: number, g2: number, b2: number, a2: number) => {
       return Math.abs(r1 - r2) + Math.abs(g1 - g2) + Math.abs(b1 - b2) + Math.abs(a1 - a2);
     };
 
-    // 指定位置のピクセルが開始色と似ているかチェック
+    // 指定位置のピクセルが開始色と似ているかチェック（境界検出は合成ピクセルデータを使用）
     const isSimilarToStart = (x: number, y: number) => {
-      if (x < 0 || x >= currentLayerCanvas.width || y < 0 || y >= currentLayerCanvas.height) return false;
-      const index = (y * currentLayerCanvas.width + x) * 4;
-      const r = pixels[index];
-      const g = pixels[index + 1];
-      const b = pixels[index + 2];
-      const a = pixels[index + 3];
+      if (x < 0 || x >= canvasRef.current.width || y < 0 || y >= canvasRef.current.height) return false;
+      const index = (y * canvasRef.current.width + x) * 4;
+      const r = compositePixels[index];
+      const g = compositePixels[index + 1];
+      const b = compositePixels[index + 2];
+      const a = compositePixels[index + 3];
       return colorDistance(r, g, b, a, startR, startG, startB, startA) <= colorTolerance;
     };
 
@@ -705,7 +723,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
         const checkX = fromX + dirX * dist;
         const checkY = fromY + dirY * dist;
         
-        if (checkX < 0 || checkX >= currentLayerCanvas.width || checkY < 0 || checkY >= currentLayerCanvas.height) {
+        if (checkX < 0 || checkX >= canvasRef.current.width || checkY < 0 || checkY >= canvasRef.current.height) {
           return false; // 範囲外なら失敗
         }
         
@@ -719,7 +737,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
             for (let dy = -gapSearchRadius; dy <= gapSearchRadius; dy++) {
               const nearX = checkX + dx;
               const nearY = checkY + dy;
-              if (nearX >= 0 && nearX < currentLayerCanvas.width && nearY >= 0 && nearY < currentLayerCanvas.height) {
+              if (nearX >= 0 && nearX < canvasRef.current.width && nearY >= 0 && nearY < canvasRef.current.height) {
                 totalCount++;
                 if (isSimilarToStart(nearX, nearY)) {
                   matchCount++;
@@ -744,17 +762,17 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     }
 
     // 処理済みピクセルをビットマップで管理（メモリ効率向上）
-    const visitedBitmap = new Uint8Array(Math.ceil(currentLayerCanvas.width * currentLayerCanvas.height / 8));
+    const visitedBitmap = new Uint8Array(Math.ceil(canvasRef.current.width * canvasRef.current.height / 8));
     
     const setVisited = (x: number, y: number) => {
-      const bitIndex = y * currentLayerCanvas.width + x;
+      const bitIndex = y * canvasRef.current.width + x;
       const byteIndex = Math.floor(bitIndex / 8);
       const bitOffset = bitIndex % 8;
       visitedBitmap[byteIndex] |= (1 << bitOffset);
     };
     
     const isVisited = (x: number, y: number) => {
-      const bitIndex = y * currentLayerCanvas.width + x;
+      const bitIndex = y * canvasRef.current.width + x;
       const byteIndex = Math.floor(bitIndex / 8);
       const bitOffset = bitIndex % 8;
       return (visitedBitmap[byteIndex] & (1 << bitOffset)) !== 0;
@@ -766,27 +784,30 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     while (stack.length > 0) {
       const { x, y } = stack.pop()!;
 
-      if (x < 0 || x >= currentLayerCanvas.width || y < 0 || y >= currentLayerCanvas.height) continue;
+      if (x < 0 || x >= canvasRef.current.width || y < 0 || y >= canvasRef.current.height) continue;
       if (isVisited(x, y)) continue;
       
       setVisited(x, y);
 
-      const index = (y * currentLayerCanvas.width + x) * 4;
+      // 境界検出用のインデックス（合成キャンバス基準）
+      const compositeIndex = (y * canvasRef.current.width + x) * 4;
+      // 塗りつぶし用のインデックス（レイヤーキャンバス基準）
+      const layerIndex = (y * currentLayerCanvas.width + x) * 4;
 
-      // 現在のピクセルが開始色と似ているかチェック（閾値を使用）
-      const currentR = pixels[index];
-      const currentG = pixels[index + 1];
-      const currentB = pixels[index + 2];
-      const currentA = pixels[index + 3];
+      // 現在のピクセルが開始色と似ているかチェック（境界検出は合成ピクセルを使用）
+      const currentR = compositePixels[compositeIndex];
+      const currentG = compositePixels[compositeIndex + 1];
+      const currentB = compositePixels[compositeIndex + 2];
+      const currentA = compositePixels[compositeIndex + 3];
 
       const isDirectMatch = colorDistance(currentR, currentG, currentB, currentA, startR, startG, startB, startA) <= colorTolerance;
       
       if (isDirectMatch) {
-        // 新しい色に塗り替え
-        pixels[index] = newR;
-        pixels[index + 1] = newG;
-        pixels[index + 2] = newB;
-        pixels[index + 3] = newA;
+        // 新しい色に塗り替え（レイヤーピクセルデータを更新）
+        layerPixels[layerIndex] = newR;
+        layerPixels[layerIndex + 1] = newG;
+        layerPixels[layerIndex + 2] = newB;
+        layerPixels[layerIndex + 3] = newA;
 
         // 隣接する4方向をスタックに追加
         stack.push({ x: x + 1, y });
@@ -810,7 +831,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
             const targetX = x + dx * gapBridgeDistance;
             const targetY = y + dy * gapBridgeDistance;
             
-            if (targetX >= 0 && targetX < currentLayerCanvas.width && targetY >= 0 && targetY < currentLayerCanvas.height) {
+            if (targetX >= 0 && targetX < canvasRef.current.width && targetY >= 0 && targetY < canvasRef.current.height) {
               if (!isVisited(targetX, targetY) && isSimilarToStart(targetX, targetY)) {
                 stack.push({ x: targetX, y: targetY });
                 bridgeApplied = true;
@@ -822,7 +843,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     }
 
     // 変更されたピクセルデータを現在のレイヤーキャンバスに反映
-    layerContext.putImageData(imageData, 0, 0);
+    layerContext.putImageData(layerImageData, 0, 0);
     console.log('FloodFill: Successfully applied pixel changes to layer', currentLayer);
     
     // 塗りつぶし後は即座に合成更新
