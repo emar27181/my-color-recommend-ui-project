@@ -34,63 +34,6 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
   const [isExtractingColors, setIsExtractingColors] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // テンプレート画像をキャンバスに読み込む
-  const loadTemplateImage = useCallback(async () => {
-    if (!context || !canvasRef.current) return;
-
-    try {
-      // 現在の状態を履歴に保存
-      saveToHistory();
-
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      
-      img.onload = () => {
-        if (!context || !canvasRef.current) return;
-        
-        // キャンバスをクリア
-        context.fillStyle = '#ffffff';
-        context.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-        
-        // 画像をキャンバスサイズに合わせて描画
-        const canvas = canvasRef.current;
-        const aspectRatio = img.width / img.height;
-        const canvasAspectRatio = canvas.width / canvas.height;
-        
-        let drawWidth, drawHeight, drawX, drawY;
-        
-        if (aspectRatio > canvasAspectRatio) {
-          // 画像が横長の場合、幅をキャンバス幅に合わせる
-          drawWidth = canvas.width;
-          drawHeight = canvas.width / aspectRatio;
-          drawX = 0;
-          drawY = (canvas.height - drawHeight) / 2;
-        } else {
-          // 画像が縦長の場合、高さをキャンバス高さに合わせる
-          drawHeight = canvas.height;
-          drawWidth = canvas.height * aspectRatio;
-          drawX = (canvas.width - drawWidth) / 2;
-          drawY = 0;
-        }
-        
-        context.drawImage(img, drawX, drawY, drawWidth, drawHeight);
-        
-        showToast('テンプレート画像を読み込みました', 'success');
-      };
-      
-      img.onerror = () => {
-        showToast('テンプレート画像の読み込みに失敗しました', 'error');
-      };
-      
-      // publicディレクトリからテンプレート画像を読み込み
-      img.src = '/magotsuki_senga.jpg';
-      
-    } catch (error) {
-      console.error('Template image load error:', error);
-      showToast('テンプレート画像の読み込みに失敗しました', 'error');
-    }
-  }, [context, saveToHistory, showToast]);
-
   // Undo/Redo履歴管理
   const [history, setHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -194,7 +137,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     if (!context || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
-    const img = new Image();
+    const img: HTMLImageElement = document.createElement('img');
 
     img.onload = () => {
       // 履歴保存
@@ -279,7 +222,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
 
       // Canvas内容を画像として取得
       const dataURL = tempCanvas.toDataURL('image/png');
-      const img = new Image();
+      const img: HTMLImageElement = document.createElement('img');
       
       img.onload = () => {
         try {
@@ -385,6 +328,76 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     }
   }, [setExtractedColors]);
 
+  // テンプレート画像をキャンバスに読み込む
+  const loadTemplateImage = useCallback(async () => {
+    console.log('loadTemplateImage called');
+    console.log('context:', context);
+    console.log('canvasRef.current:', canvasRef.current);
+    
+    if (!context || !canvasRef.current) {
+      console.log('Context or canvas ref is null');
+      showToast('キャンバスが初期化されていません', 'error');
+      return;
+    }
+
+    try {
+      // 現在の状態を履歴に保存
+      saveToHistory();
+
+      const img: HTMLImageElement = document.createElement('img');
+      
+      img.onload = () => {
+        console.log('Template image loaded successfully');
+        if (!context || !canvasRef.current) {
+          console.log('Context or canvas lost during image load');
+          return;
+        }
+        
+        // キャンバスをクリア
+        context.fillStyle = '#ffffff';
+        context.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+        
+        // 画像をキャンバスサイズに合わせて描画
+        const canvas = canvasRef.current;
+        const aspectRatio = img.width / img.height;
+        const canvasAspectRatio = canvas.width / canvas.height;
+        
+        let drawWidth, drawHeight, drawX, drawY;
+        
+        if (aspectRatio > canvasAspectRatio) {
+          // 画像が横長の場合、幅をキャンバス幅に合わせる
+          drawWidth = canvas.width;
+          drawHeight = canvas.width / aspectRatio;
+          drawX = 0;
+          drawY = (canvas.height - drawHeight) / 2;
+        } else {
+          // 画像が縦長の場合、高さをキャンバス高さに合わせる
+          drawHeight = canvas.height;
+          drawWidth = canvas.height * aspectRatio;
+          drawX = (canvas.width - drawWidth) / 2;
+          drawY = 0;
+        }
+        
+        context.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+        
+        showToast('テンプレート画像を読み込みました', 'success');
+      };
+      
+      img.onerror = (error: string | Event) => {
+        console.log('Template image load error:', error);
+        showToast('テンプレート画像の読み込みに失敗しました', 'error');
+      };
+      
+      // publicディレクトリからテンプレート画像を読み込み
+      console.log('Setting image source to:', '/magotsuki_senga.jpg');
+      img.src = '/magotsuki_senga.jpg';
+      
+    } catch (error) {
+      console.error('Template image load error:', error);
+      showToast('テンプレート画像の読み込みに失敗しました', 'error');
+    }
+  }, [context, saveToHistory, showToast]);
+
   // 外部からアクセス可能な関数を公開
   useImperativeHandle(ref, () => ({
     drawImageToCanvas,
@@ -396,7 +409,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     if (!context || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
-    const img = new Image();
+    const img: HTMLImageElement = document.createElement('img');
 
     img.onload = () => {
       // キャンバスをクリア
@@ -1217,7 +1230,10 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
             </Button>
             {/* テンプレート画像読み込みボタン */}
             <Button
-              onClick={loadTemplateImage}
+              onClick={() => {
+                console.log('Template button clicked');
+                loadTemplateImage();
+              }}
               variant="outline"
               size="sm"
               className="h-6 px-1 sm:h-8 sm:px-2"
