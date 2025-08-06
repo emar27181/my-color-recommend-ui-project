@@ -136,7 +136,7 @@ export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsP
             colors={recommendedColors.map(color => ({
               color,
               title: t('colorRecommendations.generateTones'),
-              showClickIcon: true
+              showClickIcon: false
           }))}
           onColorClick={handleGenerateTones}
           isMobile={isMobile}
