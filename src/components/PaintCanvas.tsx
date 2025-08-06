@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback, useImperativeHandle, forwardRef } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CircleDashed, Plus, Minus, Eraser, Pen, PaintBucket, Undo, Redo, Palette, RefreshCw, Download, Upload, Pipette } from 'lucide-react';
+import { CircleDashed, Plus, Minus, Eraser, Pen, PaintBucket, Undo, Redo, Palette, RefreshCw, Download, Upload, Pipette, Image } from 'lucide-react';
 import { BORDER_PRESETS } from '@/constants/ui';
 import { useColorStore } from '@/store/colorStore';
 import { useToastContext } from '@/contexts/ToastContext';
@@ -33,6 +33,63 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
   const [tempPenSize, setTempPenSize] = useState('');
   const [isExtractingColors, setIsExtractingColors] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // テンプレート画像をキャンバスに読み込む
+  const loadTemplateImage = useCallback(async () => {
+    if (!context || !canvasRef.current) return;
+
+    try {
+      // 現在の状態を履歴に保存
+      saveToHistory();
+
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      
+      img.onload = () => {
+        if (!context || !canvasRef.current) return;
+        
+        // キャンバスをクリア
+        context.fillStyle = '#ffffff';
+        context.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+        
+        // 画像をキャンバスサイズに合わせて描画
+        const canvas = canvasRef.current;
+        const aspectRatio = img.width / img.height;
+        const canvasAspectRatio = canvas.width / canvas.height;
+        
+        let drawWidth, drawHeight, drawX, drawY;
+        
+        if (aspectRatio > canvasAspectRatio) {
+          // 画像が横長の場合、幅をキャンバス幅に合わせる
+          drawWidth = canvas.width;
+          drawHeight = canvas.width / aspectRatio;
+          drawX = 0;
+          drawY = (canvas.height - drawHeight) / 2;
+        } else {
+          // 画像が縦長の場合、高さをキャンバス高さに合わせる
+          drawHeight = canvas.height;
+          drawWidth = canvas.height * aspectRatio;
+          drawX = (canvas.width - drawWidth) / 2;
+          drawY = 0;
+        }
+        
+        context.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+        
+        showToast('テンプレート画像を読み込みました', 'success');
+      };
+      
+      img.onerror = () => {
+        showToast('テンプレート画像の読み込みに失敗しました', 'error');
+      };
+      
+      // publicディレクトリからテンプレート画像を読み込み
+      img.src = '/magotsuki_senga.jpg';
+      
+    } catch (error) {
+      console.error('Template image load error:', error);
+      showToast('テンプレート画像の読み込みに失敗しました', 'error');
+    }
+  }, [context, saveToHistory, showToast]);
 
   // Undo/Redo履歴管理
   const [history, setHistory] = useState<string[]>([]);
@@ -1158,6 +1215,16 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
             >
               <Upload className="w-4 h-4 text-foreground" />
             </Button>
+            {/* テンプレート画像読み込みボタン */}
+            <Button
+              onClick={loadTemplateImage}
+              variant="outline"
+              size="sm"
+              className="h-6 px-1 sm:h-8 sm:px-2"
+              title="テンプレート画像を読み込み（線画：Wacom提供）"
+            >
+              <Image className="w-4 h-4 text-foreground" />
+            </Button>
           </div>
         </div>
         {/* 隠しファイル入力 */}
@@ -1190,6 +1257,20 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
           />
+        </div>
+        {/* Wacomクレジット */}
+        <div className="mt-2 text-center">
+          <p className="text-xs text-muted-foreground">
+            テンプレート線画：
+            <a 
+              href="https://tablet.wacom.co.jp/article/painting-with-wacom" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-primary hover:underline ml-1"
+            >
+              Wacom提供
+            </a>
+          </p>
         </div>
       </CardContent>
     </Card>
