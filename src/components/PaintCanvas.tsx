@@ -683,6 +683,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     const colorTolerance = 8;        // 色の許容閾値（0-255）
     const gapBridgeDistance = 3;     // 隙間をブリッジする最大距離（px）- 大幅削減
     const gapSearchRadius = 1;       // 隙間検索時の探索半径（px）- 最小限に
+    const expansionRadius = 3;       // モルフォロジー膨張半径（px）- 塗りつぶし領域を外側に拡張
 
     // 新しい色をRGBAに変換
     const hex = newColor.replace('#', '');
@@ -778,7 +779,8 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
       return (visitedBitmap[byteIndex] & (1 << bitOffset)) !== 0;
     };
 
-    // スタックベースのフラッドフィル
+    // スタックベースのフラッドフィル（通常の境界検出）
+    const filledPixels = new Set<string>(); // 塗りつぶし対象のピクセル座標を記録
     const stack: { x: number; y: number }[] = [{ x: Math.floor(startX), y: Math.floor(startY) }];
 
     while (stack.length > 0) {
@@ -803,11 +805,8 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
       const isDirectMatch = colorDistance(currentR, currentG, currentB, currentA, startR, startG, startB, startA) <= colorTolerance;
       
       if (isDirectMatch) {
-        // 新しい色に塗り替え（レイヤーピクセルデータを更新）
-        layerPixels[layerIndex] = newR;
-        layerPixels[layerIndex + 1] = newG;
-        layerPixels[layerIndex + 2] = newB;
-        layerPixels[layerIndex + 3] = newA;
+        // このピクセルを塗りつぶし対象として記録
+        filledPixels.add(`${x},${y}`);
 
         // 隣接する4方向をスタックに追加
         stack.push({ x: x + 1, y });
@@ -841,6 +840,56 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
         }
       }
     }
+
+    console.log('FloodFill: Detected', filledPixels.size, 'pixels for filling');
+
+    // === モルフォロジー膨張処理 ===
+    // 検出された領域を expansionRadius ピクセル分外側に拡張
+    const expandedPixels = new Set<string>();
+    
+    // 元の領域はすべて含める
+    for (const pixel of filledPixels) {
+      expandedPixels.add(pixel);
+    }
+    
+    // 各ピクセルの周囲 expansionRadius 範囲に膨張
+    for (const pixel of filledPixels) {
+      const [centerX, centerY] = pixel.split(',').map(Number);
+      
+      // 正方形の膨張カーネル（expansionRadius x expansionRadius）
+      for (let dy = -expansionRadius; dy <= expansionRadius; dy++) {
+        for (let dx = -expansionRadius; dx <= expansionRadius; dx++) {
+          const expandX = centerX + dx;
+          const expandY = centerY + dy;
+          
+          // キャンバス範囲内かチェック
+          if (expandX >= 0 && expandX < canvasRef.current.width && 
+              expandY >= 0 && expandY < canvasRef.current.height) {
+            expandedPixels.add(`${expandX},${expandY}`);
+          }
+        }
+      }
+    }
+
+    console.log('FloodFill: Expanded to', expandedPixels.size, 'pixels with', expansionRadius, 'px radius');
+
+    // === 拡張された領域を実際に塗りつぶし ===
+    let paintedCount = 0;
+    for (const pixel of expandedPixels) {
+      const [x, y] = pixel.split(',').map(Number);
+      const layerIndex = (y * currentLayerCanvas.width + x) * 4;
+      
+      // レイヤーピクセルデータの範囲内かチェック
+      if (layerIndex >= 0 && layerIndex < layerPixels.length - 3) {
+        layerPixels[layerIndex] = newR;
+        layerPixels[layerIndex + 1] = newG;
+        layerPixels[layerIndex + 2] = newB;
+        layerPixels[layerIndex + 3] = newA;
+        paintedCount++;
+      }
+    }
+
+    console.log('FloodFill: Actually painted', paintedCount, 'pixels');
 
     // 変更されたピクセルデータを現在のレイヤーキャンバスに反映
     layerContext.putImageData(layerImageData, 0, 0);
