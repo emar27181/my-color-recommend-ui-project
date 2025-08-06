@@ -56,8 +56,12 @@ export const ColorGrid = ({
     gridClasses = gridType === 'tones' ? RESPONSIVE_GRID.tones : RESPONSIVE_GRID.colors;
   }
 
+  // classNameでgrid-cols-*が指定されている場合は、デフォルトのgridClassesを上書き
+  const hasCustomGridCols = className.includes('grid-cols-');
+  const finalGridClasses = hasCustomGridCols ? '' : gridClasses;
+
   return (
-    <div className={`grid ${gridClasses} ${RESPONSIVE_GRID.gap} ${className}`}>
+    <div className={`grid ${finalGridClasses} ${RESPONSIVE_GRID.gap} ${className}`}>
       {colors.map((colorData, index) => (
         <ColorItem
           key={index}

@@ -47,6 +47,7 @@ export const SkinColorRecommendations = ({ className = '', isMobile = false }: S
           isMobile={isMobile}
           emptyMessage="肌色が読み込まれていません"
           clickable={true}
+          className="grid-cols-4" // 肌色推薦専用: 4列表示
         />
       </CardContent>
     </Card>
