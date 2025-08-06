@@ -113,7 +113,7 @@ const HueWheel = ({ colors, onHueClick, isQuantized }: { colors: { hex: string; 
           );
         })}
         
-        <circle cx={center} cy={center} r={radius} fill="none" stroke="#e5e7eb" strokeWidth="2" strokeDasharray="5,3" />
+        <circle cx={center} cy={center} r={radius} fill="none" stroke="#e5e7eb" strokeWidth="2" strokeDasharray="5,3" opacity="0.3" />
         
         {/* 30度間隔の対角線: 量子化モードで切り替え */}
         {isQuantized ? (
@@ -175,6 +175,7 @@ const HueWheel = ({ colors, onHueClick, isQuantized }: { colors: { hex: string; 
                 y={y + 4}
                 textAnchor="middle"
                 className="text-xs fill-foreground font-medium"
+                opacity="0.3"
               >
                 {degrees}°
               </text>
@@ -194,6 +195,7 @@ const HueWheel = ({ colors, onHueClick, isQuantized }: { colors: { hex: string; 
                 y={y + 4}
                 textAnchor="middle"
                 className="text-xs fill-muted-foreground"
+                opacity="0.3"
               >
                 {degrees}°
               </text>
@@ -383,6 +385,7 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
                 y={height - 30}
                 textAnchor="middle"
                 className="text-xs fill-foreground font-medium"
+                opacity="0.3"
               >
                 {value}
               </text>
@@ -395,6 +398,7 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
                 y={11 + plotHeight - (value / 100) * plotHeight + 4}
                 textAnchor="middle"
                 className="text-xs fill-foreground font-medium"
+                opacity="0.3"
               >
                 {value}
               </text>
@@ -411,6 +415,7 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
                 y={height - 30}
                 textAnchor="middle"
                 className="text-xs fill-muted-foreground"
+                opacity="0.3"
               >
                 {value}
               </text>
@@ -423,6 +428,7 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
                 y={11 + plotHeight - (value / 100) * plotHeight + 4}
                 textAnchor="middle"
                 className="text-xs fill-muted-foreground"
+                opacity="0.3"
               >
                 {value}
               </text>
