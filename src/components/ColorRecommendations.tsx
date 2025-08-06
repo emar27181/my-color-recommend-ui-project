@@ -48,7 +48,7 @@ export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsP
 
 
   return (
-    <Card className="w-full flex flex-col pb-0" style={{ height: '120px', minWidth: '0' }}>
+    <Card className="w-full flex flex-col pb-0" style={{ height: '108px', minWidth: '0' }}>
       <CardHeader className="pb-1 pt-2 flex-shrink-0">
         <div className="mt-0">
           <div className="relative">
