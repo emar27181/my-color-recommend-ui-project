@@ -111,7 +111,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
         ctx2.lineWidth = 20;
         ctx2.globalCompositeOperation = 'source-over';
 
-        // レイヤー2は白い背景（下のレイヤー）
+        // レイヤー2は常に白い背景（下のレイヤー）
         ctx2.fillStyle = '#ffffff';
         ctx2.fillRect(0, 0, layer2Canvas.width, layer2Canvas.height);
         setLayer2Context(ctx2);
@@ -126,6 +126,10 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
         canvas.width = 1920;
         canvas.height = 1440;
         setContext(ctx);
+
+        // 表示用キャンバスも白い背景で初期化
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // 初期状態を履歴に保存
         setTimeout(() => {
@@ -210,8 +214,9 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     const layer1Canvas = layer1CanvasRef.current;
     const layer2Canvas = layer2CanvasRef.current;
 
-    // 合成キャンバスをクリア
-    context.clearRect(0, 0, compositeCanvas.width, compositeCanvas.height);
+    // 合成キャンバスを白い背景でクリア
+    context.fillStyle = '#ffffff';
+    context.fillRect(0, 0, compositeCanvas.width, compositeCanvas.height);
     
     // レイヤー2（下）を描画
     context.drawImage(layer2Canvas, 0, 0);
@@ -294,7 +299,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
         drawY = 0;
       }
 
-      // 背景を白でクリア
+      // 背景を白でクリア（テーマに関係なく）
       context.fillStyle = '#ffffff';
       context.fillRect(0, 0, canvasWidth, canvasHeight);
 
@@ -1183,7 +1188,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
         // レイヤー1は透明にクリア
         layerContext.clearRect(0, 0, currentLayerCanvas.width, currentLayerCanvas.height);
       } else {
-        // レイヤー2は白色でクリア
+        // レイヤー2は常に白色でクリア（テーマに関係なく）
         layerContext.fillStyle = '#ffffff';
         layerContext.fillRect(0, 0, currentLayerCanvas.width, currentLayerCanvas.height);
       }
