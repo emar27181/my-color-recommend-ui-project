@@ -27,7 +27,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
   const [penSize, setPenSize] = useState(20);
   const [isEraserMode, setIsEraserMode] = useState(false);
-  const [isFillMode, setIsFillMode] = useState(false);
+  const [isFillMode, setIsFillMode] = useState(true);
   const [isEyedropperMode, setIsEyedropperMode] = useState(false);
   const [isEditingPenSize, setIsEditingPenSize] = useState(false);
   const [tempPenSize, setTempPenSize] = useState('');
@@ -227,6 +227,31 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
       window.removeEventListener('resize', updateContainerWidth);
     };
   }, []);
+
+  // 初期化時に線画テンプレートを自動読み込み
+  useEffect(() => {
+    // レイヤーコンテキストとキャンバス参照が完全に初期化された後に線画を読み込み
+    console.log('Checking initialization status:', {
+      layer1Context: !!layer1Context,
+      layer2Context: !!layer2Context,
+      layer1Canvas: !!layer1CanvasRef.current,
+      layer2Canvas: !!layer2CanvasRef.current,
+      isExtractingColors
+    });
+    
+    if (layer1Context && layer2Context && 
+        layer1CanvasRef.current && layer2CanvasRef.current && 
+        !isExtractingColors) {
+      const timer = setTimeout(() => {
+        console.log('Auto-loading template image on initialization');
+        loadTemplateImage().catch(error => {
+          console.error('Failed to auto-load template:', error);
+        });
+      }, 500); // より長い遅延で確実性を向上
+      
+      return () => clearTimeout(timer);
+    }
+  }, [layer1Context, layer2Context, isExtractingColors]); // loadTemplateImage依存を除去
 
   // クリーンアップ：コンポーネントアンマウント時の処理
   useEffect(() => {
@@ -558,9 +583,13 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
       const img: HTMLImageElement = document.createElement('img');
 
       img.onload = () => {
-        console.log('Template image loaded successfully to layer 1');
+        console.log('Template image loaded successfully to layer 1', { 
+          width: img.width, 
+          height: img.height 
+        });
 
         // テンプレート画像サイズに合わせてキャンバスをリサイズ
+        console.log('Resizing canvas to image dimensions');
         resizeCanvas(img.width, img.height);
 
         // リサイズ後、少し待ってから描画
@@ -568,19 +597,29 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
           const currentLayer1Context = layer1CanvasRef.current?.getContext('2d');
           const currentLayer2Context = layer2CanvasRef.current?.getContext('2d');
 
+          console.log('Drawing template image after resize delay', {
+            currentLayer1Context: !!currentLayer1Context,
+            currentLayer2Context: !!currentLayer2Context,
+            layer1Canvas: !!layer1CanvasRef.current,
+            layer2Canvas: !!layer2CanvasRef.current,
+            canvasSize: { 
+              width: layer1CanvasRef.current?.width, 
+              height: layer1CanvasRef.current?.height 
+            }
+          });
+
           if (!currentLayer1Context || !currentLayer2Context || !layer1CanvasRef.current || !layer2CanvasRef.current) {
-            console.log('Layer contexts lost during image load');
+            console.error('Layer contexts lost during image load');
             return;
           }
 
-          // レイヤー1をクリア（透明に）
-          currentLayer1Context.clearRect(0, 0, layer1CanvasRef.current.width, layer1CanvasRef.current.height);
-
           // レイヤー2を白背景で初期化
+          console.log('Initializing layer 2 background');
           currentLayer2Context.fillStyle = '#ffffff';
           currentLayer2Context.fillRect(0, 0, layer2CanvasRef.current.width, layer2CanvasRef.current.height);
 
           // 画像をレイヤー1に等倍で描画（キャンバスサイズに合わせて調整済み）
+          console.log('Drawing image to layer 1');
           currentLayer1Context.drawImage(img, 0, 0, layer1CanvasRef.current.width, layer1CanvasRef.current.height);
 
           // 描画レイヤーをレイヤー2に自動切り替え
@@ -597,12 +636,14 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
       };
 
       img.onerror = (error: string | Event) => {
-        console.log('Template image load error:', error);
+        console.error('Template image load error:', error);
+        console.error('Failed to load from path:', '/line-art-template.png');
         showToast('テンプレート画像の読み込みに失敗しました', 'error');
       };
 
       // publicディレクトリからテンプレート画像を読み込み
       console.log('Setting image source to:', '/line-art-template.png');
+      console.log('Current base URL:', window.location.origin);
       img.src = '/line-art-template.png';
 
     } catch (error) {
