@@ -228,22 +228,25 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     };
   }, []);
 
-  // 初期化時に線画テンプレートを自動読み込み
+  // 初期化時に線画テンプレートを自動読み込み（一度のみ実行）
+  const [hasAutoLoaded, setHasAutoLoaded] = useState(false);
+
   useEffect(() => {
-    // レイヤーコンテキストとキャンバス参照が完全に初期化された後に線画を読み込み
+    // レイヤーコンテキストとキャンバス参照が完全に初期化された後に線画を読み込み（初回のみ）
     console.log('Checking initialization status:', {
       layer1Context: !!layer1Context,
       layer2Context: !!layer2Context,
       layer1Canvas: !!layer1CanvasRef.current,
       layer2Canvas: !!layer2CanvasRef.current,
-      isExtractingColors
+      hasAutoLoaded
     });
     
     if (layer1Context && layer2Context && 
         layer1CanvasRef.current && layer2CanvasRef.current && 
-        !isExtractingColors) {
+        !hasAutoLoaded) {
       const timer = setTimeout(() => {
-        console.log('Auto-loading template image on initialization');
+        console.log('Auto-loading template image on initialization (one time only)');
+        setHasAutoLoaded(true); // フラグを設定して再実行を防止
         loadTemplateImage().catch(error => {
           console.error('Failed to auto-load template:', error);
         });
@@ -251,7 +254,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
       
       return () => clearTimeout(timer);
     }
-  }, [layer1Context, layer2Context, isExtractingColors]); // loadTemplateImage依存を除去
+  }, [layer1Context, layer2Context, hasAutoLoaded]); // isExtractingColorsを削除
 
   // クリーンアップ：コンポーネントアンマウント時の処理
   useEffect(() => {
@@ -431,22 +434,27 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
 
   // キャンバスから色を抽出する関数（先に定義）
   const extractColorsFromCanvas = useCallback(async () => {
-    if (!canvasRef.current) return;
+    if (!layer1CanvasRef.current || !layer2CanvasRef.current) return;
 
     setIsExtractingColors(true);
 
     try {
-      const canvas = canvasRef.current;
-
-      // キャンバスを一時的な画像として作成
+      // レイヤーキャンバスから直接合成して色抽出用の一時キャンバスを作成
+      const layer1Canvas = layer1CanvasRef.current;
+      const layer2Canvas = layer2CanvasRef.current;
+      
+      // 色抽出専用の一時キャンバスを作成（表示用キャンバスとは完全に分離）
       const tempCanvas = document.createElement('canvas');
       const tempCtx = tempCanvas.getContext('2d');
-      if (!tempCtx) return;
+      if (!tempCtx) {
+        setIsExtractingColors(false);
+        return;
+      }
 
       // 高速化のため縮小して処理
       const maxDimension = 400;
-      let width = canvas.width;
-      let height = canvas.height;
+      let width = layer1Canvas.width;
+      let height = layer1Canvas.height;
 
       if (width > maxDimension || height > maxDimension) {
         const ratio = Math.min(maxDimension / width, maxDimension / height);
@@ -456,7 +464,16 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
 
       tempCanvas.width = width;
       tempCanvas.height = height;
-      tempCtx.drawImage(canvas, 0, 0, width, height);
+      
+      // レイヤーを合成して一時キャンバスに描画（表示用キャンバスには一切触れない）
+      tempCtx.fillStyle = '#ffffff';
+      tempCtx.fillRect(0, 0, width, height);
+      
+      // レイヤー2（下）を描画
+      tempCtx.drawImage(layer2Canvas, 0, 0, width, height);
+      
+      // レイヤー1（上）を描画  
+      tempCtx.drawImage(layer1Canvas, 0, 0, width, height);
 
       // Canvas内容を画像として取得
       const dataURL = tempCanvas.toDataURL('image/png');
@@ -545,6 +562,9 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
 
           console.log('Canvas colors extracted:', colors);
           console.log('Dominant color:', dominantColor);
+
+          // 色抽出処理は完全に読み取り専用なので、表示用キャンバスの更新は不要
+          console.log('Color extraction completed without touching display canvas');
 
         } catch (error) {
           console.error('Color extraction failed:', error);
