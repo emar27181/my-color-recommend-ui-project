@@ -891,27 +891,6 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
       return isSimilarToStart(x, y);
     };
 
-    // 拡張エリアかどうかを判定（隙間エリア検出に使用）
-    const isExpansionArea = (x: number, y: number) => {
-      // 現在位置が塗りつぶし対象の場合は拡張対象外
-      if (isSimilarToStart(x, y)) return false;
-
-      // 周辺に塗りつぶし対象があるかチェック（隙間検出）
-      for (let dx = -expansionRadius; dx <= expansionRadius; dx++) {
-        for (let dy = -expansionRadius; dy <= expansionRadius; dy++) {
-          if (dx === 0 && dy === 0) continue;
-          const checkX = x + dx;
-          const checkY = y + dy;
-          if (canvasRef.current && checkX >= 0 && checkX < canvasRef.current.width &&
-            checkY >= 0 && checkY < canvasRef.current.height) {
-            if (isSimilarToStart(checkX, checkY)) {
-              return true; // 周辺に塗りつぶし対象があれば拡張エリア
-            }
-          }
-        }
-      }
-      return false;
-    };
 
     // 隙間を越えて同じ色の領域があるかチェック（隙間ブリッジ機能）
     const canBridgeGap = (fromX: number, fromY: number, dirX: number, dirY: number) => {
