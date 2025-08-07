@@ -831,10 +831,10 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     const layerPixels = layerImageData.data;
 
     // === 調整可能な定数 ===
-    const colorTolerance = 8;        // 色の許容閾値（0-255）- 適度な設定に戻す
-    const gapBridgeDistance = 0;     // 隙間をブリッジする最大距離（px）- 無効化
-    const gapSearchRadius = 0;       // 隙間検索時の探索半径（px）- 無効化  
-    const expansionRadius = 0;       // 正方形拡張半径（px）- 膨張処理オフ
+    const colorTolerance = 5;        // 色の許容閾値（0-255）- より厳格な境界検出
+    const gapBridgeDistance = 1;     // 隙間をブリッジする最大距離（px）- 最小限のブリッジ
+    const gapSearchRadius = 1;       // 隙間検索時の探索半径（px）- 最小限に  
+    const expansionRadius = 1;       // 正方形拡張半径（px）- 検出領域から1px拡大
 
     // 新しい色をRGBAに変換
     const hex = newColor.replace('#', '');
@@ -925,8 +925,8 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
             }
           }
 
-          // 60%以上が同じ色で、隙間が3px以下の場合は許可（緩和した条件）
-          return matchCount >= totalCount * 0.6 && gapPixels <= 3;
+          // 90%以上が同じ色で、隙間が1px以下の場合のみ許可（非常に厳格）
+          return matchCount >= totalCount * 0.9 && gapPixels <= 1;
         } else {
           gapPixels++;
         }
@@ -986,8 +986,41 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
         stack.push({ x: x - 1, y });
         stack.push({ x, y: y + 1 });
         stack.push({ x, y: y - 1 });
+      } else if (gapBridgeDistance > 0) {
+        // 隙間ブリッジ機能を使用して、隙間を越えた塗りつぶしを実行
+        const directions = [
+          { dx: 1, dy: 0 },   // 右
+          { dx: -1, dy: 0 },  // 左  
+          { dx: 0, dy: 1 },   // 下
+          { dx: 0, dy: -1 }   // 上
+        ];
+
+        // 各方向に隙間ブリッジを試行
+        for (const { dx, dy } of directions) {
+          if (canBridgeGap(x, y, dx, dy)) {
+            // 隙間の向こう側に同色領域があることが確認できた場合
+            // ブリッジパスを辿って塗りつぶしを続行
+            for (let dist = 1; dist <= gapBridgeDistance; dist++) {
+              const bridgeX = x + dx * dist;
+              const bridgeY = y + dy * dist;
+
+              if (bridgeX >= 0 && bridgeX < canvasRef.current.width &&
+                bridgeY >= 0 && bridgeY < canvasRef.current.height &&
+                !isVisited(bridgeX, bridgeY)) {
+
+                // 隙間部分も塗りつぶし対象に追加（隙間を埋める）
+                filledPixels.add(`${bridgeX},${bridgeY}`);
+                setVisited(bridgeX, bridgeY);
+
+                // さらに先の領域も探索対象に追加
+                if (shouldFill(bridgeX, bridgeY)) {
+                  stack.push({ x: bridgeX, y: bridgeY });
+                }
+              }
+            }
+          }
+        }
       }
-      // 隙間ブリッジ処理は無効化 - シンプルな基本フラッドフィルのみ
     }
 
     // Morphological Dilation（形態学的膨張処理）- 成功版アルゴリズム完全復元
