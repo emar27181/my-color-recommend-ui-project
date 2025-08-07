@@ -1840,7 +1840,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
           className="hidden"
         />
       </CardHeader>
-      <CardContent className="pt-1 pb-1 flex-1 flex flex-col">
+      <CardContent className="pt-1 pb-0 flex-1 flex flex-col">
         <div className="relative flex-1 flex flex-col">
           {/* 隠しレイヤーキャンバス */}
           <canvas
@@ -1889,8 +1889,8 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
           />
         </div>
         {/* Wacomクレジット */}
-        <div className="mt-2 text-center">
-          <p className="text-xs text-muted-foreground">
+        <div className="text-center">
+          <p className="text-xs text-muted-foreground leading-tight m-0">
             テンプレート線画：
             <a
               href="https://tablet.wacom.co.jp/article/painting-with-wacom"

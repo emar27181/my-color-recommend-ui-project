@@ -68,7 +68,7 @@ const SectionHeader = ({
   
   return (
     <h3 
-      className={`${isMobile ? 'text-xs' : 'text-lg'} font-medium mb-2 text-foreground cursor-pointer flex items-center justify-between leading-tight`}
+      className={`${isMobile ? 'text-xs' : 'text-lg'} font-medium ${componentKey === 'canvas' ? 'mb-1' : 'mb-2'} text-foreground cursor-pointer flex items-center justify-between leading-tight`}
       onClick={onToggle}
     >
       <span>{config.step}. {t(config.titleKey)}</span>
@@ -188,7 +188,9 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
           style={isDebugMode ? { 
             padding: '32px', 
             backgroundColor: columnIndex === 0 ? 'red' : columnIndex === 1 ? 'blue' : 'green' 
-          } : { padding: '16px' }}
+          } : { 
+            padding: column.id === 'canvas' ? '8px' : '16px' 
+          }}
         >
           {isDebugMode && (
             <h1 className="text-4xl text-black">
