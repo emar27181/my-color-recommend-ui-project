@@ -37,7 +37,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
   // キャンバスサイズ管理
   const [canvasSize, setCanvasSize] = useState({ width: 1920, height: 1440 });
   const [canvasAspectRatio, setCanvasAspectRatio] = useState(1920 / 1440);
-  const [forceUpdate, setForceUpdate] = useState(0); // 強制再レンダリング用
+  // const [forceUpdate, setForceUpdate] = useState(0); // 強制再レンダリング用 - 未使用のためコメントアウト
   const [containerWidth, setContainerWidth] = useState(800); // コンテナ幅管理
 
   // レイヤーシステム
@@ -46,7 +46,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
   const layer2CanvasRef = useRef<HTMLCanvasElement>(null);
   const [layer1Context, setLayer1Context] = useState<CanvasRenderingContext2D | null>(null);
   const [layer2Context, setLayer2Context] = useState<CanvasRenderingContext2D | null>(null);
-  
+
   // パフォーマンス最適化用
   const compositeUpdateRef = useRef<number | null>(null);
   const needsCompositeUpdate = useRef<boolean>(false);
@@ -73,19 +73,19 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
   const resizeCanvas = useCallback((newWidth: number, newHeight: number) => {
     const maxWidth = 2560;  // 最大幅制限
     const maxHeight = 1920; // 最大高さ制限
-    
+
     // 最大サイズに収まるようにスケール調整
     const scale = Math.min(1, Math.min(maxWidth / newWidth, maxHeight / newHeight));
     const finalWidth = Math.floor(newWidth * scale);
     const finalHeight = Math.floor(newHeight * scale);
-    
+
     setCanvasSize({ width: finalWidth, height: finalHeight });
     const newRatio = finalWidth / finalHeight;
     setCanvasAspectRatio(newRatio);
-    
+
     console.log(`Canvas aspect ratio updated: ${newRatio.toFixed(3)} (${finalWidth}x${finalHeight})`);
     console.log(`Calculated canvas height: ${Math.min(450, Math.floor(containerWidth / newRatio))}px`);
-    
+
     // 全キャンバスのサイズを更新
     if (canvasRef.current) {
       canvasRef.current.width = finalWidth;
@@ -99,10 +99,10 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
       layer2CanvasRef.current.width = finalWidth;
       layer2CanvasRef.current.height = finalHeight;
     }
-    
+
     // コンテキストは呼び出し元で再取得・設定するためここでは触らない
-    
-    console.log(`Canvas resized to: ${finalWidth}x${finalHeight} (aspect: ${(finalWidth/finalHeight).toFixed(2)})`);
+
+    console.log(`Canvas resized to: ${finalWidth}x${finalHeight} (aspect: ${(finalWidth / finalHeight).toFixed(2)})`);
   }, []);
 
 
@@ -195,7 +195,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
   // キャンバスアスペクト比の変更を監視して強制更新
   useEffect(() => {
     console.log(`Aspect ratio state updated: ${canvasAspectRatio.toFixed(3)}`);
-    
+
     // アスペクト比が変更されたら、キャンバス要素のスタイルも強制更新
     const updateCanvasStyles = () => {
       [canvasRef, layer1CanvasRef, layer2CanvasRef].forEach(ref => {
@@ -205,7 +205,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
         }
       });
     };
-    
+
     // 少し遅延させてDOM更新を確実にする
     const timeoutId = setTimeout(updateCanvasStyles, 50);
     return () => clearTimeout(timeoutId);
@@ -219,10 +219,10 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
         setContainerWidth(Math.min(window.innerWidth * 0.9, 800));
       }
     };
-    
+
     updateContainerWidth();
     window.addEventListener('resize', updateContainerWidth);
-    
+
     return () => {
       window.removeEventListener('resize', updateContainerWidth);
     };
@@ -245,11 +245,11 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
 
     const layer1Canvas = layer1CanvasRef.current;
     const layer2Canvas = layer2CanvasRef.current;
-    
+
     // 両レイヤーの状態を保存
     const layer1DataURL = layer1Canvas.toDataURL();
     const layer2DataURL = layer2Canvas.toDataURL();
-    
+
     const historyData = JSON.stringify({
       layer1: layer1DataURL,
       layer2: layer2DataURL
@@ -295,10 +295,10 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     // 合成キャンバスを白い背景でクリア
     context.fillStyle = '#ffffff';
     context.fillRect(0, 0, compositeCanvas.width, compositeCanvas.height);
-    
+
     // レイヤー2（下）を描画
     context.drawImage(layer2Canvas, 0, 0);
-    
+
     // レイヤー1（上）を描画
     context.drawImage(layer1Canvas, 0, 0);
   }, [context]);
@@ -306,7 +306,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
   // 遅延合成更新（パフォーマンス最適化）
   const scheduleCompositeUpdate = useCallback(() => {
     needsCompositeUpdate.current = true;
-    
+
     if (compositeUpdateRef.current === null) {
       compositeUpdateRef.current = requestAnimationFrame(() => {
         if (needsCompositeUpdate.current) {
@@ -328,7 +328,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     layerContext.lineWidth = penSize;
     layerContext.lineCap = 'round';
     layerContext.lineJoin = 'round';
-    
+
     if (isEraserMode) {
       if (currentLayer === 1) {
         layerContext.globalCompositeOperation = 'destination-out';
@@ -346,21 +346,21 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
   const drawImageToCanvas = useCallback((imageFile: File) => {
     if (!context || !canvasRef.current) return;
 
-    const canvas = canvasRef.current;
+    // const canvas = canvasRef.current; // 未使用のため削除
     const img: HTMLImageElement = document.createElement('img');
 
     img.onload = () => {
       // 履歴保存
       saveToHistory();
-      
+
       // 画像サイズに合わせてキャンバスをリサイズ
       resizeCanvas(img.width, img.height);
-      
+
       // リサイズ後、少し待ってから描画（コンテキスト更新を待つ）
       setTimeout(() => {
         const currentContext = canvasRef.current?.getContext('2d');
         const currentLayer2Context = layer2CanvasRef.current?.getContext('2d');
-        
+
         if (!currentContext || !currentLayer2Context || !canvasRef.current || !layer2CanvasRef.current) {
           console.error('Context lost after resize');
           return;
@@ -384,9 +384,9 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
         }
 
         console.log('Image drawn to canvas:', imageFile.name);
-        
-        // 強制再レンダリングで縦横比変更を反映
-        setForceUpdate(prev => prev + 1);
+
+        // 強制再レンダリングで縦横比変更を反映 (未使用のためコメント化)
+        // setForceUpdate(prev => prev + 1);
       }, 100); // リサイズ処理完了を待つ
     };
 
@@ -409,10 +409,10 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     if (!canvasRef.current) return;
 
     setIsExtractingColors(true);
-    
+
     try {
       const canvas = canvasRef.current;
-      
+
       // キャンバスを一時的な画像として作成
       const tempCanvas = document.createElement('canvas');
       const tempCtx = tempCanvas.getContext('2d');
@@ -422,7 +422,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
       const maxDimension = 400;
       let width = canvas.width;
       let height = canvas.height;
-      
+
       if (width > maxDimension || height > maxDimension) {
         const ratio = Math.min(maxDimension / width, maxDimension / height);
         width = Math.floor(width * ratio);
@@ -436,26 +436,26 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
       // Canvas内容を画像として取得
       const dataURL = tempCanvas.toDataURL('image/png');
       const img: HTMLImageElement = document.createElement('img');
-      
+
       img.onload = () => {
         try {
           const colorThief = new ColorThief();
-          
+
           // ドミナントカラー取得
           const dominantRgb = colorThief.getColor(img, 20);
-          
+
           // パレット取得（最大8色）
           const palette = colorThief.getPalette(img, 8, 20) || [];
-          
+
           // 色使用率を計算
           const imageData = tempCtx.getImageData(0, 0, width, height);
           const pixels = imageData.data;
           const sampleRate = Math.max(1, Math.floor(Math.sqrt(width * height) / 80));
           const totalSamples = Math.floor((width * height) / (sampleRate * sampleRate));
-          
+
           const colorCounts = new Map<string, number>();
           const tolerance = 30;
-          
+
           // ピクセルサンプリングで色使用率を計算
           for (let y = 0; y < height; y += sampleRate) {
             for (let x = 0; x < width; x += sampleRate) {
@@ -464,51 +464,51 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
               const g = pixels[i + 1];
               const b = pixels[i + 2];
               const a = pixels[i + 3];
-              
+
               // 透明または白い背景は除外
               if (a < 50 || (r > 240 && g > 240 && b > 240)) {
                 continue;
               }
-              
+
               const pixelColor = chroma.rgb(r, g, b);
-              
+
               let closestColor = '';
               let minDistance = Infinity;
-              
+
               for (const paletteRgb of palette) {
                 const paletteColor = chroma.rgb(paletteRgb[0], paletteRgb[1], paletteRgb[2]);
                 const distance = chroma.deltaE(pixelColor, paletteColor);
-                
+
                 if (distance < minDistance && distance < tolerance) {
                   minDistance = distance;
                   closestColor = paletteColor.hex();
                 }
               }
-              
+
               if (closestColor) {
                 colorCounts.set(closestColor, (colorCounts.get(closestColor) || 0) + 1);
               }
             }
           }
-          
+
           // ExtractedColor形式に変換
           const colors: ExtractedColor[] = palette.map((rgb: [number, number, number]) => {
             const hex = chroma.rgb(rgb[0], rgb[1], rgb[2]).hex();
             const count = colorCounts.get(hex) || 0;
             const usage = totalSamples > 0 ? count / totalSamples : 0;
-            
+
             return {
               hex,
               rgb,
               usage
             };
           })
-          .filter(color => color.usage > 0.01) // 1%以上の色のみ
-          .sort((a, b) => b.usage - a.usage);
+            .filter(color => color.usage > 0.01) // 1%以上の色のみ
+            .sort((a, b) => b.usage - a.usage);
 
           const dominantHex = chroma.rgb(dominantRgb[0], dominantRgb[1], dominantRgb[2]).hex();
           const dominantUsage = colorCounts.get(dominantHex) || 0;
-          
+
           const dominantColor: ExtractedColor = {
             hex: dominantHex,
             rgb: dominantRgb,
@@ -517,10 +517,10 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
 
           // ストアに保存
           setExtractedColors(colors, dominantColor);
-          
+
           console.log('Canvas colors extracted:', colors);
           console.log('Dominant color:', dominantColor);
-          
+
         } catch (error) {
           console.error('Color extraction failed:', error);
         } finally {
@@ -534,7 +534,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
       };
 
       img.src = dataURL;
-      
+
     } catch (error) {
       console.error('Canvas color extraction error:', error);
       setIsExtractingColors(false);
@@ -544,7 +544,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
   // テンプレート画像をレイヤー1に読み込む
   const loadTemplateImage = useCallback(async () => {
     console.log('loadTemplateImage called - loading to layer 1');
-    
+
     if (!layer1Context || !layer1CanvasRef.current) {
       console.log('Layer 1 context or canvas ref is null');
       showToast('レイヤー1が初期化されていません', 'error');
@@ -556,55 +556,55 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
       saveToHistory();
 
       const img: HTMLImageElement = document.createElement('img');
-      
+
       img.onload = () => {
         console.log('Template image loaded successfully to layer 1');
-        
+
         // テンプレート画像サイズに合わせてキャンバスをリサイズ
         resizeCanvas(img.width, img.height);
-        
+
         // リサイズ後、少し待ってから描画
         setTimeout(() => {
           const currentLayer1Context = layer1CanvasRef.current?.getContext('2d');
           const currentLayer2Context = layer2CanvasRef.current?.getContext('2d');
-          
+
           if (!currentLayer1Context || !currentLayer2Context || !layer1CanvasRef.current || !layer2CanvasRef.current) {
             console.log('Layer contexts lost during image load');
             return;
           }
-          
+
           // レイヤー1をクリア（透明に）
           currentLayer1Context.clearRect(0, 0, layer1CanvasRef.current.width, layer1CanvasRef.current.height);
-          
+
           // レイヤー2を白背景で初期化
           currentLayer2Context.fillStyle = '#ffffff';
           currentLayer2Context.fillRect(0, 0, layer2CanvasRef.current.width, layer2CanvasRef.current.height);
-          
+
           // 画像をレイヤー1に等倍で描画（キャンバスサイズに合わせて調整済み）
           currentLayer1Context.drawImage(img, 0, 0, layer1CanvasRef.current.width, layer1CanvasRef.current.height);
-          
+
           // 描画レイヤーをレイヤー2に自動切り替え
           setCurrentLayer(2);
-          
+
           // 合成キャンバスを更新
           updateCompositeCanvas();
-          
+
           showToast('線画をレイヤー1に読み込みました（描画はレイヤー2）', 'success');
-          
-          // 強制再レンダリングで縦横比変更を反映
-          setForceUpdate(prev => prev + 1);
+
+          // 強制再レンダリングで縦横比変更を反映 (未使用のためコメント化)
+          // setForceUpdate(prev => prev + 1);
         }, 100);
       };
-      
+
       img.onerror = (error: string | Event) => {
         console.log('Template image load error:', error);
         showToast('テンプレート画像の読み込みに失敗しました', 'error');
       };
-      
+
       // publicディレクトリからテンプレート画像を読み込み
       console.log('Setting image source to:', '/line-art-template.png');
       img.src = '/line-art-template.png';
-      
+
     } catch (error) {
       console.error('Template image load error:', error);
       showToast('テンプレート画像の読み込みに失敗しました', 'error');
@@ -631,7 +631,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
         if (!layer1Context || !layer1CanvasRef.current) return;
         layer1Context.clearRect(0, 0, layer1CanvasRef.current.width, layer1CanvasRef.current.height);
         layer1Context.drawImage(img1, 0, 0);
-        
+
         // 合成キャンバスを更新
         updateCompositeCanvas();
       };
@@ -643,7 +643,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
         if (!layer2Context || !layer2CanvasRef.current) return;
         layer2Context.clearRect(0, 0, layer2CanvasRef.current.width, layer2CanvasRef.current.height);
         layer2Context.drawImage(img2, 0, 0);
-        
+
         // 合成キャンバスを更新
         updateCompositeCanvas();
       };
@@ -715,10 +715,26 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
   // フラッドフィル（塗りつぶし）アルゴリズム
   const floodFill = useCallback((startX: number, startY: number, newColor: string) => {
     console.log('FloodFill called with:', { startX, startY, newColor, currentLayer });
-    
+
+    // 塗りつぶし中は中間更新を完全に無効化
+    if (compositeUpdateRef.current) {
+      cancelAnimationFrame(compositeUpdateRef.current);
+      compositeUpdateRef.current = null;
+    }
+    needsCompositeUpdate.current = false;
+
+    // 処理中カーソルを設定
+    if (canvasRef.current) {
+      canvasRef.current.style.cursor = 'wait';
+    }
+
     const layerContext = getCurrentLayerContext();
     if (!layerContext || !canvasRef.current) {
       console.error('FloodFill: No layer context or composite canvas available');
+      // エラー時もカーソルを元に戻す
+      if (canvasRef.current) {
+        canvasRef.current.style.cursor = isFillMode ? 'pointer' : 'crosshair';
+      }
       return;
     }
 
@@ -726,6 +742,10 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     const currentLayerCanvas = currentLayer === 1 ? layer1CanvasRef.current : layer2CanvasRef.current;
     if (!currentLayerCanvas) {
       console.error('FloodFill: No current layer canvas available');
+      // エラー時もカーソルを元に戻す
+      if (canvasRef.current) {
+        canvasRef.current.style.cursor = isFillMode ? 'pointer' : 'crosshair';
+      }
       return;
     }
 
@@ -733,39 +753,47 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     const compositeContext = canvasRef.current.getContext('2d');
     if (!compositeContext) {
       console.error('FloodFill: No composite context available');
+      // エラー時もカーソルを元に戻す
+      if (canvasRef.current) {
+        canvasRef.current.style.cursor = isFillMode ? 'pointer' : 'crosshair';
+      }
       return;
     }
-    
+
     console.log('FloodFill: Using composite canvas for boundary detection, layer', currentLayer, 'for filling');
     console.log('FloodFill: Canvas size:', canvasRef.current.width, 'x', canvasRef.current.height);
     console.log('FloodFill: Start coordinates:', Math.floor(startX), Math.floor(startY));
-    
+
     try {
       // 境界検出用：合成キャンバス全体のピクセルデータ
       const compositeImageData = compositeContext.getImageData(0, 0, canvasRef.current.width, canvasRef.current.height);
       console.log('FloodFill: Successfully got composite imageData, length:', compositeImageData.data.length);
-      
+
       // 塗りつぶし結果適用用：現在のレイヤーのピクセルデータ
       const layerImageData = layerContext.getImageData(0, 0, currentLayerCanvas.width, currentLayerCanvas.height);
       console.log('FloodFill: Successfully got layer imageData, length:', layerImageData.data.length);
     } catch (error) {
       console.error('FloodFill: Failed to get imageData:', error);
+      // エラー時もカーソルを元に戻す
+      if (canvasRef.current) {
+        canvasRef.current.style.cursor = isFillMode ? 'pointer' : 'crosshair';
+      }
       return;
     }
-    
+
     // 境界検出用：合成キャンバス全体のピクセルデータ
     const compositeImageData = compositeContext.getImageData(0, 0, canvasRef.current.width, canvasRef.current.height);
     const compositePixels = compositeImageData.data;
-    
+
     // 塗りつぶし結果適用用：現在のレイヤーのピクセルデータ
     const layerImageData = layerContext.getImageData(0, 0, currentLayerCanvas.width, currentLayerCanvas.height);
     const layerPixels = layerImageData.data;
 
     // === 調整可能な定数 ===
-    const colorTolerance = 8;        // 色の許容閾値（0-255）
-    const gapBridgeDistance = 3;     // 隙間をブリッジする最大距離（px）- 大幅削減
-    const gapSearchRadius = 1;       // 隙間検索時の探索半径（px）- 最小限に
-    const expansionRadius = 3;       // モルフォロジー膨張半径（px）- 塗りつぶし領域を外側に拡張
+    const colorTolerance = 8;        // 色の許容閾値（0-255）- 適度な設定に戻す
+    const gapBridgeDistance = 3;     // 隙間をブリッジする最大距離（px）- 有効化
+    const gapSearchRadius = 2;       // 隙間検索時の探索半径（px）- 有効化  
+    const expansionRadius = 0;       // 正方形拡張半径（px）- シンプルな拡張
 
     // 新しい色をRGBAに変換
     const hex = newColor.replace('#', '');
@@ -788,7 +816,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
 
     // 指定位置のピクセルが開始色と似ているかチェック（境界検出は合成ピクセルデータを使用）
     const isSimilarToStart = (x: number, y: number) => {
-      if (x < 0 || x >= canvasRef.current.width || y < 0 || y >= canvasRef.current.height) return false;
+      if (!canvasRef.current || x < 0 || x >= canvasRef.current.width || y < 0 || y >= canvasRef.current.height) return false;
       const index = (y * canvasRef.current.width + x) * 4;
       const r = compositePixels[index];
       const g = compositePixels[index + 1];
@@ -802,19 +830,19 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
       return isSimilarToStart(x, y);
     };
 
-    // 拡張エリアかどうかを判定
+    // 拡張エリアかどうかを判定（隙間エリア検出に使用）
     const isExpansionArea = (x: number, y: number) => {
-      // 現在位置が塗りつぶし対象でない場合のみ拡張を検討
+      // 現在位置が塗りつぶし対象の場合は拡張対象外
       if (isSimilarToStart(x, y)) return false;
-      
-      // 周辺に塗りつぶし対象があるかチェック
+
+      // 周辺に塗りつぶし対象があるかチェック（隙間検出）
       for (let dx = -expansionRadius; dx <= expansionRadius; dx++) {
         for (let dy = -expansionRadius; dy <= expansionRadius; dy++) {
           if (dx === 0 && dy === 0) continue;
           const checkX = x + dx;
           const checkY = y + dy;
-          if (checkX >= 0 && checkX < canvasRef.current.width && 
-              checkY >= 0 && checkY < canvasRef.current.height) {
+          if (canvasRef.current && checkX >= 0 && checkX < canvasRef.current.width &&
+            checkY >= 0 && checkY < canvasRef.current.height) {
             if (isSimilarToStart(checkX, checkY)) {
               return true; // 周辺に塗りつぶし対象があれば拡張エリア
             }
@@ -824,30 +852,30 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
       return false;
     };
 
-    // 隙間を越えて同じ色の領域があるかチェック（非常に保守的）
+    // 隙間を越えて同じ色の領域があるかチェック（隙間ブリッジ機能）
     const canBridgeGap = (fromX: number, fromY: number, dirX: number, dirY: number) => {
       // 隙間の向こう側に同じ色があり、かつ隙間が十分小さい場合のみ
       let gapPixels = 0;
-      
+
       for (let dist = 1; dist <= gapBridgeDistance; dist++) {
         const checkX = fromX + dirX * dist;
         const checkY = fromY + dirY * dist;
-        
-        if (checkX < 0 || checkX >= canvasRef.current.width || checkY < 0 || checkY >= canvasRef.current.height) {
+
+        if (!canvasRef.current || checkX < 0 || checkX >= canvasRef.current.width || checkY < 0 || checkY >= canvasRef.current.height) {
           return false; // 範囲外なら失敗
         }
-        
+
         if (isSimilarToStart(checkX, checkY)) {
           // 同じ色を見つけた
-          
-          // 周辺の大部分が同じ色かチェック（より厳格に）
+
+          // 周辺の色一致度をチェック（緩和した条件）
           let matchCount = 0;
           let totalCount = 0;
           for (let dx = -gapSearchRadius; dx <= gapSearchRadius; dx++) {
             for (let dy = -gapSearchRadius; dy <= gapSearchRadius; dy++) {
               const nearX = checkX + dx;
               const nearY = checkY + dy;
-              if (nearX >= 0 && nearX < canvasRef.current.width && nearY >= 0 && nearY < canvasRef.current.height) {
+              if (canvasRef.current && nearX >= 0 && nearX < canvasRef.current.width && nearY >= 0 && nearY < canvasRef.current.height) {
                 totalCount++;
                 if (isSimilarToStart(nearX, nearY)) {
                   matchCount++;
@@ -855,33 +883,39 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
               }
             }
           }
-          
-          // 80%以上が同じ色で、隙間が2px以下の場合のみ許可
-          return matchCount >= totalCount * 0.8 && gapPixels <= 2;
+
+          // 60%以上が同じ色で、隙間が3px以下の場合は許可（緩和した条件）
+          return matchCount >= totalCount * 0.6 && gapPixels <= 3;
         } else {
           gapPixels++;
         }
       }
-      
+
       return false;
     };
 
     // 同じ色の場合は何もしない
     if (colorDistance(startR, startG, startB, startA, newR, newG, newB, newA) < colorTolerance) {
+      // カーソルを元に戻す
+      if (canvasRef.current) {
+        canvasRef.current.style.cursor = isFillMode ? 'pointer' : 'crosshair';
+      }
       return;
     }
 
     // 処理済みピクセルをビットマップで管理（メモリ効率向上）
     const visitedBitmap = new Uint8Array(Math.ceil(canvasRef.current.width * canvasRef.current.height / 8));
-    
+
     const setVisited = (x: number, y: number) => {
+      if (!canvasRef.current) return;
       const bitIndex = y * canvasRef.current.width + x;
       const byteIndex = Math.floor(bitIndex / 8);
       const bitOffset = bitIndex % 8;
       visitedBitmap[byteIndex] |= (1 << bitOffset);
     };
-    
+
     const isVisited = (x: number, y: number) => {
+      if (!canvasRef.current) return false;
       const bitIndex = y * canvasRef.current.width + x;
       const byteIndex = Math.floor(bitIndex / 8);
       const bitOffset = bitIndex % 8;
@@ -898,7 +932,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
 
       if (x < 0 || x >= canvasRef.current.width || y < 0 || y >= canvasRef.current.height) continue;
       if (isVisited(x, y)) continue;
-      
+
       setVisited(x, y);
 
       // 基本塗りつぶし判定
@@ -913,24 +947,36 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
         stack.push({ x, y: y + 1 });
         stack.push({ x, y: y - 1 });
       } else {
-        // 隙間ブリッジのみ試行
+        // 隙間ブリッジ機能を使用して、隙間を越えた塗りつぶしを実行
         const directions = [
           { dx: 1, dy: 0 },   // 右
-          { dx: -1, dy: 0 },  // 左
+          { dx: -1, dy: 0 },  // 左  
           { dx: 0, dy: 1 },   // 下
           { dx: 0, dy: -1 }   // 上
         ];
 
-        let bridgeApplied = false;
+        // 各方向に隙間ブリッジを試行
         for (const { dx, dy } of directions) {
-          if (!bridgeApplied && canBridgeGap(x, y, dx, dy)) {
-            const targetX = x + dx * gapBridgeDistance;
-            const targetY = y + dy * gapBridgeDistance;
-            
-            if (targetX >= 0 && targetX < canvasRef.current.width && targetY >= 0 && targetY < canvasRef.current.height) {
-              if (!isVisited(targetX, targetY) && shouldFill(targetX, targetY)) {
-                stack.push({ x: targetX, y: targetY });
-                bridgeApplied = true;
+          if (canBridgeGap(x, y, dx, dy)) {
+            // 隙間の向こう側に同色領域があることが確認できた場合
+            // ブリッジパスを辿って塗りつぶしを続行
+            for (let dist = 1; dist <= gapBridgeDistance; dist++) {
+              const bridgeX = x + dx * dist;
+              const bridgeY = y + dy * dist;
+
+              if (bridgeX >= 0 && bridgeX < canvasRef.current.width &&
+                bridgeY >= 0 && bridgeY < canvasRef.current.height &&
+                !isVisited(bridgeX, bridgeY)) {
+
+                // 隙間部分も塗りつぶし対象に追加（隙間を埋める）
+                const bridgePixelIndex = bridgeY * canvasRef.current.width + bridgeX;
+                filledPixels.push(bridgePixelIndex);
+                setVisited(bridgeX, bridgeY);
+
+                // さらに先の領域も探索対象に追加
+                if (shouldFill(bridgeX, bridgeY)) {
+                  stack.push({ x: bridgeX, y: bridgeY });
+                }
               }
             }
           }
@@ -939,46 +985,69 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     }
 
     // 基本領域周辺の拡張領域を検出
-    const visitedExpansion = new Uint8Array(Math.ceil(canvasRef.current.width * canvasRef.current.height / 8));
-    
-    for (const pixelIndex of filledPixels) {
-      const centerX = pixelIndex % canvasRef.current.width;
-      const centerY = Math.floor(pixelIndex / canvasRef.current.width);
-      
-      // 周辺3px範囲をチェック
-      for (let dy = -expansionRadius; dy <= expansionRadius; dy++) {
-        for (let dx = -expansionRadius; dx <= expansionRadius; dx++) {
-          const expandX = centerX + dx;
-          const expandY = centerY + dy;
-          
-          if (expandX >= 0 && expandX < canvasRef.current.width && 
+    // expansionPixels 配列は上部で既に宣言済み
+
+    if (expansionRadius > 0) {
+      // 拡張処理を実行（expansionRadius > 0の場合のみ）
+      const visitedExpansion = new Uint8Array(Math.ceil(canvasRef.current.width * canvasRef.current.height / 8));
+
+      for (const pixelIndex of filledPixels) {
+        const centerX = pixelIndex % canvasRef.current.width;
+        const centerY = Math.floor(pixelIndex / canvasRef.current.width);
+
+        // シンプルな正方形拡張（以前の成功例）
+        for (let dy = -expansionRadius; dy <= expansionRadius; dy++) {
+          for (let dx = -expansionRadius; dx <= expansionRadius; dx++) {
+            const expandX = centerX + dx;
+            const expandY = centerY + dy;
+
+            if (expandX >= 0 && expandX < canvasRef.current.width &&
               expandY >= 0 && expandY < canvasRef.current.height) {
-            const expandIndex = expandY * canvasRef.current.width + expandX;
-            const expandBitIndex = expandIndex;
-            const expandByteIndex = Math.floor(expandBitIndex / 8);
-            const expandBitOffset = expandBitIndex % 8;
-            
-            // まだ拡張領域として記録していない場合
-            if ((visitedExpansion[expandByteIndex] & (1 << expandBitOffset)) === 0) {
-              visitedExpansion[expandByteIndex] |= (1 << expandBitOffset);
-              expansionPixels.push(expandIndex);
+              const expandIndex = expandY * canvasRef.current.width + expandX;
+              const expandBitIndex = expandIndex;
+              const expandByteIndex = Math.floor(expandBitIndex / 8);
+              const expandBitOffset = expandBitIndex % 8;
+
+              // まだ拡張領域として記録していない場合
+              if ((visitedExpansion[expandByteIndex] & (1 << expandBitOffset)) === 0) {
+                visitedExpansion[expandByteIndex] |= (1 << expandBitOffset);
+
+                // 基本領域に含まれていない場合のみ拡張領域として追加
+                const isInBaseFilled = (visitedBitmap[expandBitIndex >> 3] & (1 << (expandBitIndex & 7))) !== 0;
+                if (!isInBaseFilled) {
+                  // 通常の拡張領域、または隙間エリアの場合は拡張対象に追加
+                  if (shouldFill(expandX, expandY) || isExpansionArea(expandX, expandY)) {
+                    expansionPixels.push(expandIndex);
+                  }
+                }
+              }
             }
           }
         }
       }
+    } else {
+      // 拡張なし - 基本領域のみ塗りつぶし
+      console.log('No expansion - filling only detected base region');
     }
 
-    console.log('FloodFill: Detected', filledPixels.length, 'base pixels +', expansionPixels.length, 'expansion pixels');
+    console.log('FloodFill: Detected', filledPixels.length, 'base pixels +', expansionPixels.length, 'expansion/gap pixels');
+    console.log('FloodFill parameters:', {
+      colorTolerance,
+      gapBridgeDistance,
+      gapSearchRadius,
+      expansionRadius
+    });
 
     // === 基本領域+拡張領域を塗りつぶし ===
     let paintedCount = 0;
-    
+
     // 基本領域を塗りつぶし
     for (const pixelIndex of filledPixels) {
-      const x = pixelIndex % canvasRef.current.width;
-      const y = Math.floor(pixelIndex / canvasRef.current.width);
+      if (!canvasRef.current) continue;
+      const x: number = pixelIndex % canvasRef.current.width;
+      const y: number = Math.floor(pixelIndex / canvasRef.current.width);
       const layerIndex = (y * currentLayerCanvas.width + x) * 4;
-      
+
       if (layerIndex >= 0 && layerIndex < layerPixels.length - 3) {
         layerPixels[layerIndex] = newR;
         layerPixels[layerIndex + 1] = newG;
@@ -987,13 +1056,14 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
         paintedCount++;
       }
     }
-    
+
     // 拡張領域を塗りつぶし
     for (const pixelIndex of expansionPixels) {
-      const x = pixelIndex % canvasRef.current.width;
-      const y = Math.floor(pixelIndex / canvasRef.current.width);
+      if (!canvasRef.current) continue;
+      const x: number = pixelIndex % canvasRef.current.width;
+      const y: number = Math.floor(pixelIndex / canvasRef.current.width);
       const layerIndex = (y * currentLayerCanvas.width + x) * 4;
-      
+
       if (layerIndex >= 0 && layerIndex < layerPixels.length - 3) {
         layerPixels[layerIndex] = newR;
         layerPixels[layerIndex + 1] = newG;
@@ -1008,10 +1078,17 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     // 変更されたピクセルデータを現在のレイヤーキャンバスに反映
     layerContext.putImageData(layerImageData, 0, 0);
     console.log('FloodFill: Successfully applied pixel changes to layer', currentLayer);
-    
-    // 塗りつぶし後は即座に合成更新
-    updateCompositeCanvas();
-    console.log('FloodFill: Composite canvas updated');
+
+    // 塗りつぶし完了後、一度だけ合成更新を実行（視覚的なちらつきを防止）
+    requestAnimationFrame(() => {
+      updateCompositeCanvas();
+      console.log('FloodFill: Composite canvas updated (single batch update)');
+
+      // カーソルを元に戻す
+      if (canvasRef.current) {
+        canvasRef.current.style.cursor = isFillMode ? 'pointer' : 'crosshair';
+      }
+    });
   }, [getCurrentLayerContext, currentLayer, updateCompositeCanvas]);
 
   // キーボードショートカット
@@ -1116,46 +1193,46 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     if (!context || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
-    
+
     // キャンバスの範囲内チェック
     if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) return;
 
     // 合成表示キャンバスからピクセルデータを取得
     const imageData = context.getImageData(Math.floor(x), Math.floor(y), 1, 1);
     const pixel = imageData.data;
-    
+
     // RGB値をHEX形式に変換
     const r = pixel[0];
     const g = pixel[1];
     const b = pixel[2];
     const a = pixel[3];
-    
+
     // 透明度が低い場合は取得しない
     if (a < 50) return;
-    
+
     const hexColor = chroma.rgb(r, g, b).hex();
-    
+
     // 描画色として設定
     setSelectedColor(hexColor);
-    
+
     // スポイトモードを終了
     setIsEyedropperMode(false);
-    
+
     // トースト通知
     showToast(`色を取得しました: ${hexColor}`, 'success');
-    
+
     console.log('Color picked from composite:', hexColor, `RGB(${r}, ${g}, ${b})`);
   }, [context, setSelectedColor, showToast]);
 
   // 描画開始
   const startDrawing = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
-    console.log('startDrawing called - Current modes:', { 
-      isFillMode, 
-      isEraserMode, 
+    console.log('startDrawing called - Current modes:', {
+      isFillMode,
+      isEraserMode,
       isEyedropperMode,
-      currentLayer 
+      currentLayer
     });
-    
+
     const layerContext = getCurrentLayerContext();
     if (!layerContext || !canvasRef.current) return;
 
@@ -1172,24 +1249,30 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     // 塗りつぶしモードの場合
     if (isFillMode) {
       console.log('PaintCanvas: Starting flood fill at coordinates:', { x, y }, 'with color:', selectedColor, 'on layer:', currentLayer);
-      
+
       // レイヤーコンテキストの状態確認
       const layerContext = getCurrentLayerContext();
       console.log('Layer context available:', !!layerContext);
       console.log('Current layer canvas:', currentLayer === 1 ? !!layer1CanvasRef.current : !!layer2CanvasRef.current);
-      
+
       // 塗りつぶし前に現在の状態を履歴に保存
       saveToHistory();
-      // 少し待ってから塗りつぶし実行
-      setTimeout(() => {
-        floodFill(x, y, selectedColor);
-      }, 10);
+
+      // 塗りつぶし中の中間更新を無効化
+      if (compositeUpdateRef.current) {
+        cancelAnimationFrame(compositeUpdateRef.current);
+        compositeUpdateRef.current = null;
+      }
+      needsCompositeUpdate.current = false;
+
+      // 塗りつぶし実行（同期的に実行）
+      floodFill(x, y, selectedColor);
       return;
     }
 
     // 描画開始前に現在の状態を履歴に保存
     saveToHistory();
-    
+
     setIsDrawing(true);
 
     // 最適化された描画設定を適用
@@ -1209,7 +1292,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     // 描画中は設定済みなので座標のみ更新
     layerContext.lineTo(x, y);
     layerContext.stroke();
-    
+
     // 描画中は遅延更新でパフォーマンス向上
     scheduleCompositeUpdate();
   }, [isDrawing, getCurrentLayerContext, getScaledCoordinates, scheduleCompositeUpdate]);
@@ -1220,7 +1303,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     if (!layerContext) return;
     setIsDrawing(false);
     layerContext.closePath();
-    
+
     // 描画終了時は即座に合成更新
     if (compositeUpdateRef.current) {
       cancelAnimationFrame(compositeUpdateRef.current);
@@ -1247,24 +1330,30 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     // 塗りつぶしモードの場合
     if (isFillMode) {
       console.log('PaintCanvas (Touch): Starting flood fill at coordinates:', { x, y }, 'with color:', selectedColor, 'on layer:', currentLayer);
-      
+
       // レイヤーコンテキストの状態確認
       const layerContext = getCurrentLayerContext();
       console.log('Touch - Layer context available:', !!layerContext);
       console.log('Touch - Current layer canvas:', currentLayer === 1 ? !!layer1CanvasRef.current : !!layer2CanvasRef.current);
-      
+
       // 塗りつぶし前に現在の状態を履歴に保存
       saveToHistory();
-      // 少し待ってから塗りつぶし実行
-      setTimeout(() => {
-        floodFill(x, y, selectedColor);
-      }, 10);
+
+      // 塗りつぶし中の中間更新を無効化
+      if (compositeUpdateRef.current) {
+        cancelAnimationFrame(compositeUpdateRef.current);
+        compositeUpdateRef.current = null;
+      }
+      needsCompositeUpdate.current = false;
+
+      // 塗りつぶし実行（同期的に実行）
+      floodFill(x, y, selectedColor);
       return;
     }
 
     // 描画開始前に現在の状態を履歴に保存
     saveToHistory();
-    
+
     setIsDrawing(true);
 
     // 最適化された描画設定を適用
@@ -1285,7 +1374,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     // 描画中は設定済みなので座標のみ更新
     layerContext.lineTo(x, y);
     layerContext.stroke();
-    
+
     // 描画中は遅延更新でパフォーマンス向上
     scheduleCompositeUpdate();
   }, [isDrawing, getCurrentLayerContext, getScaledCoordinates, scheduleCompositeUpdate]);
@@ -1296,7 +1385,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     if (!layerContext) return;
     setIsDrawing(false);
     layerContext.closePath();
-    
+
     // 描画終了時は即座に合成更新
     if (compositeUpdateRef.current) {
       cancelAnimationFrame(compositeUpdateRef.current);
@@ -1319,7 +1408,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
       // 現在のレイヤーをクリア
       layerContext.save();
       layerContext.globalCompositeOperation = 'source-over';
-      
+
       if (currentLayer === 1) {
         // レイヤー1は透明にクリア
         layerContext.clearRect(0, 0, currentLayerCanvas.width, currentLayerCanvas.height);
@@ -1328,7 +1417,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
         layerContext.fillStyle = '#ffffff';
         layerContext.fillRect(0, 0, currentLayerCanvas.width, currentLayerCanvas.height);
       }
-      
+
       layerContext.restore();
 
       // 描画設定を再設定
@@ -1337,7 +1426,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
       layerContext.lineWidth = penSize;
       layerContext.lineCap = 'round';
       layerContext.lineJoin = 'round';
-      
+
       // クリア後は即座に合成更新
       updateCompositeCanvas();
     }, 10);
@@ -1362,12 +1451,12 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
   const handlePenSizeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setTempPenSize(value);
-    
+
     // 空文字列の場合は何もしない（一時的に空を許可）
     if (value === '') {
       return;
     }
-    
+
     // 数値として有効で範囲内の場合のみ更新
     const numValue = parseInt(value, 10);
     if (!isNaN(numValue) && numValue >= 2 && numValue <= 200) {
@@ -1410,25 +1499,25 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
 
     try {
       const canvas = canvasRef.current;
-      
+
       // 現在の日時でファイル名を生成
       const now = new Date();
       const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
       const filename = `canvas-drawing-${timestamp}.png`;
-      
+
       // CanvasをPNG形式のDataURLに変換
       const dataURL = canvas.toDataURL('image/png');
-      
+
       // ダウンロード用のリンクを作成
       const link = document.createElement('a');
       link.download = filename;
       link.href = dataURL;
-      
+
       // 一時的にDOMに追加してクリックしてから削除
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
       console.log('Canvas downloaded as:', filename);
     } catch (error) {
       console.error('Failed to download canvas:', error);
@@ -1476,173 +1565,173 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
         <div className="flex flex-wrap items-center justify-start gap-2">
           {/* 現在の描画色表示（ColorPicker風） */}
           <div className="relative cursor-pointer hover:scale-110 transition-all duration-200 flex-shrink-0">
-              <input
-                type="color"
-                value={selectedColor}
-                onChange={handleColorPickerChange}
-                className="absolute inset-0 opacity-0 w-full h-full cursor-pointer z-10"
-                title="描画色を変更"
+            <input
+              type="color"
+              value={selectedColor}
+              onChange={handleColorPickerChange}
+              className="absolute inset-0 opacity-0 w-full h-full cursor-pointer z-10"
+              title="描画色を変更"
+            />
+            <div
+              className={`${BORDER_PRESETS.colorBlock} flex items-center justify-center pointer-events-none w-6 h-6 sm:w-8 sm:h-8`}
+              style={{
+                backgroundColor: selectedColor
+              }}
+              title="描画色 - クリックで変更"
+            >
+              <Palette
+                className="w-3 h-3 sm:w-4 sm:h-4"
+                style={{ color: getIconColor() }}
               />
-              <div 
-                className={`${BORDER_PRESETS.colorBlock} flex items-center justify-center pointer-events-none w-6 h-6 sm:w-8 sm:h-8`}
-                style={{
-                  backgroundColor: selectedColor
-                }}
-                title="描画色 - クリックで変更"
-              >
-                <Palette 
-                  className="w-3 h-3 sm:w-4 sm:h-4" 
-                  style={{ color: getIconColor() }}
-                />
-              </div>
+            </div>
           </div>
           {/* スポイトボタン */}
           <div className="flex flex-wrap gap-1 flex-shrink-0">
-              <Button
-                onClick={() => {
-                  setIsEyedropperMode(!isEyedropperMode);
-                  setIsEraserMode(false);
-                  setIsFillMode(false);
-                }}
-                variant={isEyedropperMode ? "default" : "outline"}
-                size="sm"
-                className="h-6 px-1 sm:h-8 sm:px-2"
-                title="スポイトツール - キャンバスから色を取得"
-              >
-                <Pipette className="w-4 h-4 text-foreground" />
-              </Button>
+            <Button
+              onClick={() => {
+                setIsEyedropperMode(!isEyedropperMode);
+                setIsEraserMode(false);
+                setIsFillMode(false);
+              }}
+              variant={isEyedropperMode ? "default" : "outline"}
+              size="sm"
+              className="h-6 px-1 sm:h-8 sm:px-2"
+              title="スポイトツール - キャンバスから色を取得"
+            >
+              <Pipette className="w-4 h-4 text-foreground" />
+            </Button>
           </div>
           {/* ペン/消しゴム/塗りつぶしモード切り替え */}
           <div className="flex flex-wrap gap-1 flex-shrink-0">
-              <Button
-                onClick={() => {
-                  setIsEraserMode(false);
-                  setIsFillMode(false);
-                  setIsEyedropperMode(false);
-                }}
-                variant={!isEraserMode && !isFillMode && !isEyedropperMode ? "default" : "outline"}
-                size="sm"
-                className="h-6 px-1 sm:h-8 sm:px-2"
-              >
-                <Pen className="w-4 h-4 text-foreground" />
-              </Button>
-              <Button
-                onClick={() => {
-                  setIsEraserMode(true);
-                  setIsFillMode(false);
-                  setIsEyedropperMode(false);
-                }}
-                variant={isEraserMode ? "default" : "outline"}
-                size="sm"
-                className="h-6 px-1 sm:h-8 sm:px-2"
-              >
-                <Eraser className="w-4 h-4 text-foreground" />
-              </Button>
-              <Button
-                onClick={() => {
-                  console.log('Fill button clicked - setting fill mode');
-                  setIsEraserMode(false);
-                  setIsFillMode(true);
-                  setIsEyedropperMode(false);
-                  console.log('Fill mode state should now be true');
-                }}
-                variant={isFillMode ? "default" : "outline"}
-                size="sm"
-                className="h-6 px-1 sm:h-8 sm:px-2"
-                title="塗りつぶしツール"
-              >
-                <PaintBucket className="w-4 h-4 text-foreground" />
-              </Button>
+            <Button
+              onClick={() => {
+                setIsEraserMode(false);
+                setIsFillMode(false);
+                setIsEyedropperMode(false);
+              }}
+              variant={!isEraserMode && !isFillMode && !isEyedropperMode ? "default" : "outline"}
+              size="sm"
+              className="h-6 px-1 sm:h-8 sm:px-2"
+            >
+              <Pen className="w-4 h-4 text-foreground" />
+            </Button>
+            <Button
+              onClick={() => {
+                setIsEraserMode(true);
+                setIsFillMode(false);
+                setIsEyedropperMode(false);
+              }}
+              variant={isEraserMode ? "default" : "outline"}
+              size="sm"
+              className="h-6 px-1 sm:h-8 sm:px-2"
+            >
+              <Eraser className="w-4 h-4 text-foreground" />
+            </Button>
+            <Button
+              onClick={() => {
+                console.log('Fill button clicked - setting fill mode');
+                setIsEraserMode(false);
+                setIsFillMode(true);
+                setIsEyedropperMode(false);
+                console.log('Fill mode state should now be true');
+              }}
+              variant={isFillMode ? "default" : "outline"}
+              size="sm"
+              className="h-6 px-1 sm:h-8 sm:px-2"
+              title="塗りつぶしツール"
+            >
+              <PaintBucket className="w-4 h-4 text-foreground" />
+            </Button>
           </div>
           {/* レイヤー切り替えボタン */}
           <div className="flex flex-wrap gap-1 flex-shrink-0">
-              <Button
-                onClick={() => setCurrentLayer(1)}
-                variant={currentLayer === 1 ? "default" : "outline"}
-                size="sm"
-                className="h-6 px-1 sm:h-8 sm:px-2"
-                title="レイヤー1（上）"
-              >
-                <Layers className="w-4 h-4 text-foreground" />
-                <span className="ml-1 text-xs text-foreground">1</span>
-              </Button>
-              <Button
-                onClick={() => setCurrentLayer(2)}
-                variant={currentLayer === 2 ? "default" : "outline"}
-                size="sm"
-                className="h-6 px-1 sm:h-8 sm:px-2"
-                title="レイヤー2（下）"
-              >
-                <Layers className="w-4 h-4 text-foreground" />
-                <span className="ml-1 text-xs text-foreground">2</span>
-              </Button>
+            <Button
+              onClick={() => setCurrentLayer(1)}
+              variant={currentLayer === 1 ? "default" : "outline"}
+              size="sm"
+              className="h-6 px-1 sm:h-8 sm:px-2"
+              title="レイヤー1（上）"
+            >
+              <Layers className="w-4 h-4 text-foreground" />
+              <span className="ml-1 text-xs text-foreground">1</span>
+            </Button>
+            <Button
+              onClick={() => setCurrentLayer(2)}
+              variant={currentLayer === 2 ? "default" : "outline"}
+              size="sm"
+              className="h-6 px-1 sm:h-8 sm:px-2"
+              title="レイヤー2（下）"
+            >
+              <Layers className="w-4 h-4 text-foreground" />
+              <span className="ml-1 text-xs text-foreground">2</span>
+            </Button>
           </div>
           {/* Undo/Redoボタン */}
           <div className="flex flex-wrap gap-1 flex-shrink-0">
-              <Button
-                onClick={undo}
-                variant="outline"
-                size="sm"
-                className="h-6 px-1 sm:h-8 sm:px-2"
-                disabled={historyIndex <= 0}
-                title="元に戻す (Ctrl+Z)"
-              >
-                <Undo className="w-4 h-4 text-foreground" />
-              </Button>
-              <Button
-                onClick={redo}
-                variant="outline"
-                size="sm"
-                className="h-6 px-1 sm:h-8 sm:px-2"
-                disabled={historyIndex >= history.length - 1}
-                title="やり直し (Ctrl+Y)"
-              >
-                <Redo className="w-4 h-4 text-foreground" />
-              </Button>
+            <Button
+              onClick={undo}
+              variant="outline"
+              size="sm"
+              className="h-6 px-1 sm:h-8 sm:px-2"
+              disabled={historyIndex <= 0}
+              title="元に戻す (Ctrl+Z)"
+            >
+              <Undo className="w-4 h-4 text-foreground" />
+            </Button>
+            <Button
+              onClick={redo}
+              variant="outline"
+              size="sm"
+              className="h-6 px-1 sm:h-8 sm:px-2"
+              disabled={historyIndex >= history.length - 1}
+              title="やり直し (Ctrl+Y)"
+            >
+              <Redo className="w-4 h-4 text-foreground" />
+            </Button>
           </div>
           {/* ペンサイズ調整 */}
           <div className="flex flex-wrap items-center gap-1 flex-shrink-0">
-              <Button
-                onClick={decreasePenSize}
-                variant="outline"
-                size="sm"
-                className="h-6 w-6 p-0 sm:h-8 sm:w-8"
-                disabled={penSize <= 2}
+            <Button
+              onClick={decreasePenSize}
+              variant="outline"
+              size="sm"
+              className="h-6 w-6 p-0 sm:h-8 sm:w-8"
+              disabled={penSize <= 2}
+            >
+              <Minus className="w-3 h-3 text-foreground" />
+            </Button>
+            {isEditingPenSize ? (
+              <input
+                type="number"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={tempPenSize}
+                onChange={handlePenSizeChange}
+                onBlur={handlePenSizeBlur}
+                onKeyDown={handlePenSizeKeyDown}
+                min="2"
+                max="200"
+                className="text-xs font-mono text-foreground min-w-[20px] sm:min-w-[24px] text-center bg-transparent border border-border rounded px-0.5 sm:px-1 h-5 sm:h-6 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+                autoFocus
+              />
+            ) : (
+              <span
+                className="text-xs font-mono text-foreground min-w-[20px] sm:min-w-[24px] text-center cursor-pointer hover:bg-muted rounded px-0.5 sm:px-1 py-0.5 sm:py-1"
+                onClick={handlePenSizeEdit}
+                title="クリックして数値入力"
               >
-                <Minus className="w-3 h-3 text-foreground" />
-              </Button>
-              {isEditingPenSize ? (
-                <input
-                  type="number"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  value={tempPenSize}
-                  onChange={handlePenSizeChange}
-                  onBlur={handlePenSizeBlur}
-                  onKeyDown={handlePenSizeKeyDown}
-                  min="2"
-                  max="200"
-                  className="text-xs font-mono text-foreground min-w-[20px] sm:min-w-[24px] text-center bg-transparent border border-border rounded px-0.5 sm:px-1 h-5 sm:h-6 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
-                  autoFocus
-                />
-              ) : (
-                <span 
-                  className="text-xs font-mono text-foreground min-w-[20px] sm:min-w-[24px] text-center cursor-pointer hover:bg-muted rounded px-0.5 sm:px-1 py-0.5 sm:py-1"
-                  onClick={handlePenSizeEdit}
-                  title="クリックして数値入力"
-                >
-                  {penSize}
-                </span>
-              )}
-              <Button
-                onClick={increasePenSize}
-                variant="outline"
-                size="sm"
-                className="h-6 w-6 p-0 sm:h-8 sm:w-8"
-                disabled={penSize >= 200}
-              >
-                <Plus className="w-3 h-3 text-foreground" />
-              </Button>
+                {penSize}
+              </span>
+            )}
+            <Button
+              onClick={increasePenSize}
+              variant="outline"
+              size="sm"
+              className="h-6 w-6 p-0 sm:h-8 sm:w-8"
+              disabled={penSize >= 200}
+            >
+              <Plus className="w-3 h-3 text-foreground" />
+            </Button>
           </div>
           {/* その他のボタングループ - リセット、色抽出、ダウンロード */}
           <div className="flex flex-wrap gap-1 flex-shrink-0">
@@ -1711,38 +1800,37 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
         />
       </CardHeader>
       <CardContent className="pt-1 pb-1 flex-1 flex flex-col">
-          <div className="relative flex-1 flex flex-col">
-            {/* 隠しレイヤーキャンバス */}
-            <canvas
-              ref={layer1CanvasRef}
-              className="absolute inset-0 pointer-events-none opacity-0"
-              style={{ 
-                width: '100%', 
-                height: `${Math.min(450, Math.floor(containerWidth / canvasAspectRatio))}px`,
-                objectFit: 'contain'
-              }}
-            />
-            <canvas
-              ref={layer2CanvasRef}
-              className="absolute inset-0 pointer-events-none opacity-0"
-              style={{ 
-                width: '100%', 
-                height: `${Math.min(450, Math.floor(containerWidth / canvasAspectRatio))}px`,
-                objectFit: 'contain'
-              }}
-            />
-            {/* 表示用合成キャンバス */}
-            <canvas
+        <div className="relative flex-1 flex flex-col">
+          {/* 隠しレイヤーキャンバス */}
+          <canvas
+            ref={layer1CanvasRef}
+            className="absolute inset-0 pointer-events-none opacity-0"
+            style={{
+              width: '100%',
+              height: `${Math.min(450, Math.floor(containerWidth / canvasAspectRatio))}px`,
+              objectFit: 'contain'
+            }}
+          />
+          <canvas
+            ref={layer2CanvasRef}
+            className="absolute inset-0 pointer-events-none opacity-0"
+            style={{
+              width: '100%',
+              height: `${Math.min(450, Math.floor(containerWidth / canvasAspectRatio))}px`,
+              objectFit: 'contain'
+            }}
+          />
+          {/* 表示用合成キャンバス */}
+          <canvas
             ref={canvasRef}
-            className={`border border-border rounded-md bg-white ${
-              isEyedropperMode ? 'cursor-crosshair' : 
+            className={`border border-border rounded-md bg-white ${isEyedropperMode ? 'cursor-crosshair' :
               isFillMode ? 'cursor-pointer' : 'cursor-crosshair'
-            }`}
+              }`}
             data-fill-mode={isFillMode}
             data-eraser-mode={isEraserMode}
             data-eyedropper-mode={isEyedropperMode}
-            style={{ 
-              width: '100%', 
+            style={{
+              width: '100%',
               height: `${Math.min(450, Math.floor(containerWidth / canvasAspectRatio))}px`,
               objectFit: 'contain',
               touchAction: 'none'
@@ -1763,9 +1851,9 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
         <div className="mt-2 text-center">
           <p className="text-xs text-muted-foreground">
             テンプレート線画：
-            <a 
-              href="https://tablet.wacom.co.jp/article/painting-with-wacom" 
-              target="_blank" 
+            <a
+              href="https://tablet.wacom.co.jp/article/painting-with-wacom"
+              target="_blank"
               rel="noopener noreferrer"
               className="text-primary hover:underline ml-1"
             >
