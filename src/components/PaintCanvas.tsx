@@ -720,6 +720,33 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
       return colorDistance(r, g, b, a, startR, startG, startB, startA) <= colorTolerance;
     };
 
+    // 元の塗りつぶし判定（拡張なし）
+    const shouldFill = (x: number, y: number) => {
+      return isSimilarToStart(x, y);
+    };
+
+    // 拡張エリアかどうかを判定
+    const isExpansionArea = (x: number, y: number) => {
+      // 現在位置が塗りつぶし対象でない場合のみ拡張を検討
+      if (isSimilarToStart(x, y)) return false;
+      
+      // 周辺に塗りつぶし対象があるかチェック
+      for (let dx = -expansionRadius; dx <= expansionRadius; dx++) {
+        for (let dy = -expansionRadius; dy <= expansionRadius; dy++) {
+          if (dx === 0 && dy === 0) continue;
+          const checkX = x + dx;
+          const checkY = y + dy;
+          if (checkX >= 0 && checkX < canvasRef.current.width && 
+              checkY >= 0 && checkY < canvasRef.current.height) {
+            if (isSimilarToStart(checkX, checkY)) {
+              return true; // 周辺に塗りつぶし対象があれば拡張エリア
+            }
+          }
+        }
+      }
+      return false;
+    };
+
     // 隙間を越えて同じ色の領域があるかチェック（非常に保守的）
     const canBridgeGap = (fromX: number, fromY: number, dirX: number, dirY: number) => {
       // 隙間の向こう側に同じ色があり、かつ隙間が十分小さい場合のみ
@@ -784,8 +811,9 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
       return (visitedBitmap[byteIndex] & (1 << bitOffset)) !== 0;
     };
 
-    // スタックベースのフラッドフィル（通常の境界検出）
-    const filledPixels = new Set<string>(); // 塗りつぶし対象のピクセル座標を記録
+    // スタックベースのフラッドフィル（基本領域検出）
+    const filledPixels: number[] = []; // 基本塗りつぶし領域
+    const expansionPixels: number[] = []; // 拡張領域
     const stack: { x: number; y: number }[] = [{ x: Math.floor(startX), y: Math.floor(startY) }];
 
     while (stack.length > 0) {
@@ -796,22 +824,11 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
       
       setVisited(x, y);
 
-      // 境界検出用のインデックス（合成キャンバス基準）
-      const compositeIndex = (y * canvasRef.current.width + x) * 4;
-      // 塗りつぶし用のインデックス（レイヤーキャンバス基準）
-      const layerIndex = (y * currentLayerCanvas.width + x) * 4;
-
-      // 現在のピクセルが開始色と似ているかチェック（境界検出は合成ピクセルを使用）
-      const currentR = compositePixels[compositeIndex];
-      const currentG = compositePixels[compositeIndex + 1];
-      const currentB = compositePixels[compositeIndex + 2];
-      const currentA = compositePixels[compositeIndex + 3];
-
-      const isDirectMatch = colorDistance(currentR, currentG, currentB, currentA, startR, startG, startB, startA) <= colorTolerance;
-      
-      if (isDirectMatch) {
-        // このピクセルを塗りつぶし対象として記録
-        filledPixels.add(`${x},${y}`);
+      // 基本塗りつぶし判定
+      if (shouldFill(x, y)) {
+        // 基本領域として記録
+        const pixelIndex = y * canvasRef.current.width + x;
+        filledPixels.push(pixelIndex);
 
         // 隣接する4方向をスタックに追加
         stack.push({ x: x + 1, y });
@@ -819,8 +836,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
         stack.push({ x, y: y + 1 });
         stack.push({ x, y: y - 1 });
       } else {
-        // 直接マッチしない場合、非常に限定的な隙間ブリッジのみ試行
-        // 水平・垂直方向のみチェック（斜めは除外）
+        // 隙間ブリッジのみ試行
         const directions = [
           { dx: 1, dy: 0 },   // 右
           { dx: -1, dy: 0 },  // 左
@@ -831,12 +847,11 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
         let bridgeApplied = false;
         for (const { dx, dy } of directions) {
           if (!bridgeApplied && canBridgeGap(x, y, dx, dy)) {
-            // 1方向のみブリッジを許可（複数方向ブリッジを防止）
             const targetX = x + dx * gapBridgeDistance;
             const targetY = y + dy * gapBridgeDistance;
             
             if (targetX >= 0 && targetX < canvasRef.current.width && targetY >= 0 && targetY < canvasRef.current.height) {
-              if (!isVisited(targetX, targetY) && isSimilarToStart(targetX, targetY)) {
+              if (!isVisited(targetX, targetY) && shouldFill(targetX, targetY)) {
                 stack.push({ x: targetX, y: targetY });
                 bridgeApplied = true;
               }
@@ -846,45 +861,62 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
       }
     }
 
-    console.log('FloodFill: Detected', filledPixels.size, 'pixels for filling');
-
-    // === モルフォロジー膨張処理 ===
-    // 検出された領域を expansionRadius ピクセル分外側に拡張
-    const expandedPixels = new Set<string>();
+    // 基本領域周辺の拡張領域を検出
+    const visitedExpansion = new Uint8Array(Math.ceil(canvasRef.current.width * canvasRef.current.height / 8));
     
-    // 元の領域はすべて含める
-    for (const pixel of filledPixels) {
-      expandedPixels.add(pixel);
-    }
-    
-    // 各ピクセルの周囲 expansionRadius 範囲に膨張
-    for (const pixel of filledPixels) {
-      const [centerX, centerY] = pixel.split(',').map(Number);
+    for (const pixelIndex of filledPixels) {
+      const centerX = pixelIndex % canvasRef.current.width;
+      const centerY = Math.floor(pixelIndex / canvasRef.current.width);
       
-      // 正方形の膨張カーネル（expansionRadius x expansionRadius）
+      // 周辺3px範囲をチェック
       for (let dy = -expansionRadius; dy <= expansionRadius; dy++) {
         for (let dx = -expansionRadius; dx <= expansionRadius; dx++) {
           const expandX = centerX + dx;
           const expandY = centerY + dy;
           
-          // キャンバス範囲内かチェック
           if (expandX >= 0 && expandX < canvasRef.current.width && 
               expandY >= 0 && expandY < canvasRef.current.height) {
-            expandedPixels.add(`${expandX},${expandY}`);
+            const expandIndex = expandY * canvasRef.current.width + expandX;
+            const expandBitIndex = expandIndex;
+            const expandByteIndex = Math.floor(expandBitIndex / 8);
+            const expandBitOffset = expandBitIndex % 8;
+            
+            // まだ拡張領域として記録していない場合
+            if ((visitedExpansion[expandByteIndex] & (1 << expandBitOffset)) === 0) {
+              visitedExpansion[expandByteIndex] |= (1 << expandBitOffset);
+              expansionPixels.push(expandIndex);
+            }
           }
         }
       }
     }
 
-    console.log('FloodFill: Expanded to', expandedPixels.size, 'pixels with', expansionRadius, 'px radius');
+    console.log('FloodFill: Detected', filledPixels.length, 'base pixels +', expansionPixels.length, 'expansion pixels');
 
-    // === 拡張された領域を実際に塗りつぶし ===
+    // === 基本領域+拡張領域を塗りつぶし ===
     let paintedCount = 0;
-    for (const pixel of expandedPixels) {
-      const [x, y] = pixel.split(',').map(Number);
+    
+    // 基本領域を塗りつぶし
+    for (const pixelIndex of filledPixels) {
+      const x = pixelIndex % canvasRef.current.width;
+      const y = Math.floor(pixelIndex / canvasRef.current.width);
       const layerIndex = (y * currentLayerCanvas.width + x) * 4;
       
-      // レイヤーピクセルデータの範囲内かチェック
+      if (layerIndex >= 0 && layerIndex < layerPixels.length - 3) {
+        layerPixels[layerIndex] = newR;
+        layerPixels[layerIndex + 1] = newG;
+        layerPixels[layerIndex + 2] = newB;
+        layerPixels[layerIndex + 3] = newA;
+        paintedCount++;
+      }
+    }
+    
+    // 拡張領域を塗りつぶし
+    for (const pixelIndex of expansionPixels) {
+      const x = pixelIndex % canvasRef.current.width;
+      const y = Math.floor(pixelIndex / canvasRef.current.width);
+      const layerIndex = (y * currentLayerCanvas.width + x) * 4;
+      
       if (layerIndex >= 0 && layerIndex < layerPixels.length - 3) {
         layerPixels[layerIndex] = newR;
         layerPixels[layerIndex + 1] = newG;
@@ -894,7 +926,7 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
       }
     }
 
-    console.log('FloodFill: Actually painted', paintedCount, 'pixels');
+    console.log('FloodFill: Actually painted', paintedCount, 'pixels (base + expansion regions)');
 
     // 変更されたピクセルデータを現在のレイヤーキャンバスに反映
     layerContext.putImageData(layerImageData, 0, 0);
