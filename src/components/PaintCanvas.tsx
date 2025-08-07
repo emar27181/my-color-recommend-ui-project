@@ -34,6 +34,12 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
   const [isExtractingColors, setIsExtractingColors] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // キャンバスサイズ管理
+  const [canvasSize, setCanvasSize] = useState({ width: 1920, height: 1440 });
+  const [canvasAspectRatio, setCanvasAspectRatio] = useState(1920 / 1440);
+  const [forceUpdate, setForceUpdate] = useState(0); // 強制再レンダリング用
+  const [containerWidth, setContainerWidth] = useState(800); // コンテナ幅管理
+
   // レイヤーシステム
   const [currentLayer, setCurrentLayer] = useState<1 | 2>(1);
   const layer1CanvasRef = useRef<HTMLCanvasElement>(null);
@@ -63,6 +69,42 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     }
   };
 
+  // キャンバスサイズを動的に調整する関数
+  const resizeCanvas = useCallback((newWidth: number, newHeight: number) => {
+    const maxWidth = 2560;  // 最大幅制限
+    const maxHeight = 1920; // 最大高さ制限
+    
+    // 最大サイズに収まるようにスケール調整
+    const scale = Math.min(1, Math.min(maxWidth / newWidth, maxHeight / newHeight));
+    const finalWidth = Math.floor(newWidth * scale);
+    const finalHeight = Math.floor(newHeight * scale);
+    
+    setCanvasSize({ width: finalWidth, height: finalHeight });
+    const newRatio = finalWidth / finalHeight;
+    setCanvasAspectRatio(newRatio);
+    
+    console.log(`Canvas aspect ratio updated: ${newRatio.toFixed(3)} (${finalWidth}x${finalHeight})`);
+    console.log(`Calculated canvas height: ${Math.min(450, Math.floor(containerWidth / newRatio))}px`);
+    
+    // 全キャンバスのサイズを更新
+    if (canvasRef.current) {
+      canvasRef.current.width = finalWidth;
+      canvasRef.current.height = finalHeight;
+    }
+    if (layer1CanvasRef.current) {
+      layer1CanvasRef.current.width = finalWidth;
+      layer1CanvasRef.current.height = finalHeight;
+    }
+    if (layer2CanvasRef.current) {
+      layer2CanvasRef.current.width = finalWidth;
+      layer2CanvasRef.current.height = finalHeight;
+    }
+    
+    // コンテキストは呼び出し元で再取得・設定するためここでは触らない
+    
+    console.log(`Canvas resized to: ${finalWidth}x${finalHeight} (aspect: ${(finalWidth/finalHeight).toFixed(2)})`);
+  }, []);
+
 
 
   // カラーピッカーの変更ハンドラー
@@ -79,8 +121,8 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
       const ctx1 = layer1Canvas.getContext('2d');
       if (ctx1) {
         // キャンバス内部解像度を設定
-        layer1Canvas.width = 1920;
-        layer1Canvas.height = 1440;
+        layer1Canvas.width = canvasSize.width;
+        layer1Canvas.height = canvasSize.height;
 
         // 描画設定
         ctx1.lineCap = 'round';
@@ -101,8 +143,8 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
       const ctx2 = layer2Canvas.getContext('2d');
       if (ctx2) {
         // キャンバス内部解像度を設定
-        layer2Canvas.width = 1920;
-        layer2Canvas.height = 1440;
+        layer2Canvas.width = canvasSize.width;
+        layer2Canvas.height = canvasSize.height;
 
         // 描画設定
         ctx2.lineCap = 'round';
@@ -123,8 +165,8 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     if (canvas) {
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        canvas.width = 1920;
-        canvas.height = 1440;
+        canvas.width = canvasSize.width;
+        canvas.height = canvasSize.height;
         setContext(ctx);
 
         // 表示用キャンバスも白い背景で初期化
@@ -148,6 +190,42 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
         }, 50); // 初期化時間短縮
       }
     }
+  }, [canvasSize]);
+
+  // キャンバスアスペクト比の変更を監視して強制更新
+  useEffect(() => {
+    console.log(`Aspect ratio state updated: ${canvasAspectRatio.toFixed(3)}`);
+    
+    // アスペクト比が変更されたら、キャンバス要素のスタイルも強制更新
+    const updateCanvasStyles = () => {
+      [canvasRef, layer1CanvasRef, layer2CanvasRef].forEach(ref => {
+        if (ref.current) {
+          ref.current.style.aspectRatio = canvasAspectRatio.toString();
+          console.log(`Updated canvas style aspect-ratio: ${canvasAspectRatio.toString()}`);
+        }
+      });
+    };
+    
+    // 少し遅延させてDOM更新を確実にする
+    const timeoutId = setTimeout(updateCanvasStyles, 50);
+    return () => clearTimeout(timeoutId);
+  }, [canvasAspectRatio]);
+
+  // コンテナ幅の監視
+  useEffect(() => {
+    const updateContainerWidth = () => {
+      if (typeof window !== 'undefined') {
+        // キャンバスカードの実際の幅を取得（最大90%で制限）
+        setContainerWidth(Math.min(window.innerWidth * 0.9, 800));
+      }
+    };
+    
+    updateContainerWidth();
+    window.addEventListener('resize', updateContainerWidth);
+    
+    return () => {
+      window.removeEventListener('resize', updateContainerWidth);
+    };
   }, []);
 
   // クリーンアップ：コンポーネントアンマウント時の処理
@@ -274,39 +352,42 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
     img.onload = () => {
       // 履歴保存
       saveToHistory();
+      
+      // 画像サイズに合わせてキャンバスをリサイズ
+      resizeCanvas(img.width, img.height);
+      
+      // リサイズ後、少し待ってから描画（コンテキスト更新を待つ）
+      setTimeout(() => {
+        const currentContext = canvasRef.current?.getContext('2d');
+        const currentLayer2Context = layer2CanvasRef.current?.getContext('2d');
+        
+        if (!currentContext || !currentLayer2Context || !canvasRef.current || !layer2CanvasRef.current) {
+          console.error('Context lost after resize');
+          return;
+        }
 
-      // キャンバスサイズを取得
-      const canvasWidth = canvas.width;
-      const canvasHeight = canvas.height;
+        // リサイズ後のキャンバスサイズを取得
+        const canvasWidth = canvasRef.current.width;
+        const canvasHeight = canvasRef.current.height;
 
-      // 画像のアスペクト比を保持してキャンバスに収まるようにリサイズ
-      const imgAspect = img.width / img.height;
-      const canvasAspect = canvasWidth / canvasHeight;
+        // レイヤー2（背景）に画像を描画
+        currentLayer2Context.fillStyle = '#ffffff';
+        currentLayer2Context.fillRect(0, 0, canvasWidth, canvasHeight);
+        currentLayer2Context.drawImage(img, 0, 0, canvasWidth, canvasHeight);
 
-      let drawWidth, drawHeight, drawX, drawY;
+        // 表示用キャンバスに合成結果を描画
+        currentContext.fillStyle = '#ffffff';
+        currentContext.fillRect(0, 0, canvasWidth, canvasHeight);
+        currentContext.drawImage(layer2CanvasRef.current, 0, 0);
+        if (layer1CanvasRef.current) {
+          currentContext.drawImage(layer1CanvasRef.current, 0, 0);
+        }
 
-      if (imgAspect > canvasAspect) {
-        // 画像が横長の場合、幅を基準にする
-        drawWidth = canvasWidth;
-        drawHeight = canvasWidth / imgAspect;
-        drawX = 0;
-        drawY = (canvasHeight - drawHeight) / 2;
-      } else {
-        // 画像が縦長の場合、高さを基準にする
-        drawWidth = canvasHeight * imgAspect;
-        drawHeight = canvasHeight;
-        drawX = (canvasWidth - drawWidth) / 2;
-        drawY = 0;
-      }
-
-      // 背景を白でクリア（テーマに関係なく）
-      context.fillStyle = '#ffffff';
-      context.fillRect(0, 0, canvasWidth, canvasHeight);
-
-      // 画像を描画
-      context.drawImage(img, drawX, drawY, drawWidth, drawHeight);
-
-      console.log('Image drawn to canvas:', imageFile.name);
+        console.log('Image drawn to canvas:', imageFile.name);
+        
+        // 強制再レンダリングで縦横比変更を反映
+        setForceUpdate(prev => prev + 1);
+      }, 100); // リサイズ処理完了を待つ
     };
 
     img.onerror = () => {
@@ -478,45 +559,41 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
       
       img.onload = () => {
         console.log('Template image loaded successfully to layer 1');
-        if (!layer1Context || !layer1CanvasRef.current) {
-          console.log('Layer 1 context or canvas lost during image load');
-          return;
-        }
         
-        // レイヤー1をクリア（透明に）
-        layer1Context.clearRect(0, 0, layer1CanvasRef.current.width, layer1CanvasRef.current.height);
+        // テンプレート画像サイズに合わせてキャンバスをリサイズ
+        resizeCanvas(img.width, img.height);
         
-        // 画像をレイヤー1のキャンバスサイズに合わせて描画
-        const layer1Canvas = layer1CanvasRef.current;
-        const aspectRatio = img.width / img.height;
-        const canvasAspectRatio = layer1Canvas.width / layer1Canvas.height;
-        
-        let drawWidth, drawHeight, drawX, drawY;
-        
-        if (aspectRatio > canvasAspectRatio) {
-          // 画像が横長の場合、幅をキャンバス幅に合わせる
-          drawWidth = layer1Canvas.width;
-          drawHeight = layer1Canvas.width / aspectRatio;
-          drawX = 0;
-          drawY = (layer1Canvas.height - drawHeight) / 2;
-        } else {
-          // 画像が縦長の場合、高さをキャンバス高さに合わせる
-          drawHeight = layer1Canvas.height;
-          drawWidth = layer1Canvas.height * aspectRatio;
-          drawX = (layer1Canvas.width - drawWidth) / 2;
-          drawY = 0;
-        }
-        
-        // レイヤー1に線画を描画
-        layer1Context.drawImage(img, drawX, drawY, drawWidth, drawHeight);
-        
-        // 描画レイヤーをレイヤー2に自動切り替え
-        setCurrentLayer(2);
-        
-        // 合成キャンバスを更新
-        updateCompositeCanvas();
-        
-        showToast('線画をレイヤー1に読み込みました（描画はレイヤー2）', 'success');
+        // リサイズ後、少し待ってから描画
+        setTimeout(() => {
+          const currentLayer1Context = layer1CanvasRef.current?.getContext('2d');
+          const currentLayer2Context = layer2CanvasRef.current?.getContext('2d');
+          
+          if (!currentLayer1Context || !currentLayer2Context || !layer1CanvasRef.current || !layer2CanvasRef.current) {
+            console.log('Layer contexts lost during image load');
+            return;
+          }
+          
+          // レイヤー1をクリア（透明に）
+          currentLayer1Context.clearRect(0, 0, layer1CanvasRef.current.width, layer1CanvasRef.current.height);
+          
+          // レイヤー2を白背景で初期化
+          currentLayer2Context.fillStyle = '#ffffff';
+          currentLayer2Context.fillRect(0, 0, layer2CanvasRef.current.width, layer2CanvasRef.current.height);
+          
+          // 画像をレイヤー1に等倍で描画（キャンバスサイズに合わせて調整済み）
+          currentLayer1Context.drawImage(img, 0, 0, layer1CanvasRef.current.width, layer1CanvasRef.current.height);
+          
+          // 描画レイヤーをレイヤー2に自動切り替え
+          setCurrentLayer(2);
+          
+          // 合成キャンバスを更新
+          updateCompositeCanvas();
+          
+          showToast('線画をレイヤー1に読み込みました（描画はレイヤー2）', 'success');
+          
+          // 強制再レンダリングで縦横比変更を反映
+          setForceUpdate(prev => prev + 1);
+        }, 100);
       };
       
       img.onerror = (error: string | Event) => {
@@ -989,22 +1066,49 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
   }, []);
 
 
-  // 座標計算のヘルパー関数
+  // 座標計算のヘルパー関数（objectFit: contain対応）
   const getScaledCoordinates = useCallback((clientX: number, clientY: number) => {
     if (!canvasRef.current) return { x: 0, y: 0 };
 
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
 
-    // 表示サイズと実際のキャンバスサイズの比率を計算
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
+    console.log('Canvas rect:', rect);
+    console.log('Canvas internal size:', canvas.width, 'x', canvas.height);
+    console.log('Click position:', clientX, clientY);
 
-    // スケールを考慮した座標計算
-    const x = (clientX - rect.left) * scaleX;
-    const y = (clientY - rect.top) * scaleY;
+    // objectFit: containによる実際の描画エリアを計算
+    const displayAspect = rect.width / rect.height;
+    const canvasAspect = canvas.width / canvas.height;
 
-    return { x, y };
+    let drawWidth, drawHeight, offsetX, offsetY;
+
+    if (canvasAspect > displayAspect) {
+      // キャンバスが表示エリアより横長：幅基準
+      drawWidth = rect.width;
+      drawHeight = rect.width / canvasAspect;
+      offsetX = 0;
+      offsetY = (rect.height - drawHeight) / 2;
+    } else {
+      // キャンバスが表示エリアより縦長：高さ基準
+      drawWidth = rect.height * canvasAspect;
+      drawHeight = rect.height;
+      offsetX = (rect.width - drawWidth) / 2;
+      offsetY = 0;
+    }
+
+    // クリック座標を描画エリア内の相対座標に変換
+    const relativeX = (clientX - rect.left - offsetX) / drawWidth;
+    const relativeY = (clientY - rect.top - offsetY) / drawHeight;
+
+    // キャンバス内部座標に変換
+    const x = relativeX * canvas.width;
+    const y = relativeY * canvas.height;
+
+    console.log('Calculated coordinates:', x, y);
+    console.log('Draw area:', drawWidth, 'x', drawHeight, 'offset:', offsetX, offsetY);
+
+    return { x: Math.max(0, Math.min(canvas.width - 1, x)), y: Math.max(0, Math.min(canvas.height - 1, y)) };
   }, []);
 
   // キャンバスから色を取得する関数（合成表示から）
@@ -1614,7 +1718,8 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
               className="absolute inset-0 pointer-events-none opacity-0"
               style={{ 
                 width: '100%', 
-                height: '450px'
+                height: `${Math.min(450, Math.floor(containerWidth / canvasAspectRatio))}px`,
+                objectFit: 'contain'
               }}
             />
             <canvas
@@ -1622,7 +1727,8 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
               className="absolute inset-0 pointer-events-none opacity-0"
               style={{ 
                 width: '100%', 
-                height: '450px'
+                height: `${Math.min(450, Math.floor(containerWidth / canvasAspectRatio))}px`,
+                objectFit: 'contain'
               }}
             />
             {/* 表示用合成キャンバス */}
@@ -1637,7 +1743,8 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
             data-eyedropper-mode={isEyedropperMode}
             style={{ 
               width: '100%', 
-              height: '450px',
+              height: `${Math.min(450, Math.floor(containerWidth / canvasAspectRatio))}px`,
+              objectFit: 'contain',
               touchAction: 'none'
             }}
             onMouseDown={(e) => {
