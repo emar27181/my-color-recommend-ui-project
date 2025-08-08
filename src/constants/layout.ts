@@ -7,7 +7,7 @@ export const LAYOUT_CONFIG = {
       {
         id: 'canvas',
         width: 'w-7/12', // 7/12幅（約58.3%）に拡大
-        components: ['canvas']
+        components: ['canvas', 'canvasColorRecommendation']
       },
       {
         id: 'main-tools', 
@@ -25,7 +25,7 @@ export const LAYOUT_CONFIG = {
   
   // モバイルレイアウト設定（縦積み）
   mobile: {
-    order: ['canvas', 'baseColor', 'colorRecommendation', 'toneRecommendation', 'skinColor', 'hueToneExtraction']
+    order: ['canvas', 'canvasColorRecommendation', 'baseColor', 'colorRecommendation', 'toneRecommendation', 'skinColor', 'hueToneExtraction']
   }
 } as const;
 
@@ -72,6 +72,13 @@ export const COMPONENT_CONFIG = {
     titleKey: 'app.steps.hueToneExtraction',
     collapseState: 'isHueToneExtractionCollapsed',
     hasUpdateButton: true
+  },
+  canvasColorRecommendation: {
+    key: 'canvasColorRecommendation',
+    step: "0'",
+    titleKey: 'app.steps.canvasColorRecommendation',
+    collapseState: 'isCanvasColorRecommendationCollapsed',
+    hasUpdateButton: false
   }
 } as const;
 

@@ -8,6 +8,7 @@ import { ExtractedColorsDisplay } from '@/components/ExtractedColorsDisplay';
 import { SkinColorRecommendations } from '@/components/SkinColorRecommendations';
 import { HueToneExtraction } from '@/components/HueToneExtraction';
 import { PaintCanvas, type PaintCanvasRef } from '@/components/PaintCanvas';
+import { CanvasColorRecommendations } from '@/components/CanvasColorRecommendations';
 import { COMPONENT_CONFIG, LAYOUT_CONFIG, type ComponentKey, type LayoutColumn } from '@/constants/layout';
 
 interface LayoutRendererProps {
@@ -46,6 +47,9 @@ const ComponentMap = {
   ),
   hueToneExtraction: () => (
     <HueToneExtraction />
+  ),
+  canvasColorRecommendation: () => (
+    <CanvasColorRecommendations />
   )
 };
 
@@ -125,6 +129,12 @@ const Section = ({
       {!isCollapsed && (
         <div className={componentKey === 'canvas' && !isMobile ? "flex-1 min-h-0 h-full" : ""}>
           <Component {...props} />
+          {/* canvasセクションの下部余白をデバッグ表示 */}
+          {componentKey === 'canvas' && (
+            <div style={{ backgroundColor: 'red', height: '10px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ fontSize: '10px', fontWeight: 'bold', color: 'white' }}>DEBUG: セクション下部余白</span>
+            </div>
+          )}
         </div>
       )}
     </section>
