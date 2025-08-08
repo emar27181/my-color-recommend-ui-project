@@ -18,7 +18,39 @@ export interface ToneAdjustment {
   saturationMultiplier?: number;
 }
 
-// 配色技法のデータ定義（anglesの数で昇順ソート済み）
+// 配色技法の推薦優先度を取得する関数
+const getSchemeRecommendationOrder = (currentScheme: string): string[] => {
+  const schemes = {
+    // ドミナント配色優先グループ
+    'identity': ['identity', 'dominant_1', 'dominant_2', 'analogous_1', 'analogous_2', 'complementary'],
+    'dominant_1': ['dominant_1', 'dominant_2', 'analogous_1', 'identity', 'analogous_2', 'complementary'],
+    'dominant_2': ['dominant_2', 'dominant_1', 'analogous_1', 'analogous_2', 'identity', 'complementary'],
+    
+    // アナロジー配色優先グループ
+    'analogous_1': ['analogous_1', 'analogous_2', 'dominant_1', 'dominant_2', 'intermediate_1', 'complementary'],
+    'analogous_2': ['analogous_2', 'analogous_1', 'intermediate_2', 'dominant_2', 'intermediate_1', 'complementary'],
+    
+    // 補色配色優先グループ
+    'complementary': ['complementary', 'split_complementary', 'tetradic', 'triadic', 'analogous_1', 'dominant_1'],
+    'opponent': ['opponent', 'complementary', 'split_complementary', 'tetradic', 'triadic', 'analogous_1'],
+    
+    // 三角・四角配色優先グループ
+    'triadic': ['triadic', 'split_complementary', 'tetradic', 'complementary', 'analogous_1', 'dominant_1'],
+    'tetradic': ['tetradic', 'triadic', 'complementary', 'split_complementary', 'analogous_2', 'dominant_2'],
+    
+    // その他の配色技法
+    'intermediate_1': ['intermediate_1', 'analogous_1', 'analogous_2', 'dominant_1', 'complementary', 'triadic'],
+    'intermediate_2': ['intermediate_2', 'analogous_2', 'analogous_1', 'dominant_2', 'complementary', 'triadic'],
+    'split_complementary': ['split_complementary', 'complementary', 'triadic', 'tetradic', 'analogous_1', 'dominant_1'],
+    'pentad': ['pentad', 'triadic', 'tetradic', 'hexad', 'split_complementary', 'complementary'],
+    'hexad': ['hexad', 'pentad', 'tetradic', 'triadic', 'split_complementary', 'complementary']
+  };
+  
+  return schemes[currentScheme as keyof typeof schemes] || 
+         ['complementary', 'analogous_1', 'dominant_1', 'triadic', 'tetradic', 'split_complementary'];
+};
+
+// 配色技法のデータ定義（推薦優先度で動的ソート）
 export const COLOR_SCHEMES: ColorScheme[] = [
   {
     id: 'identity',
@@ -166,6 +198,7 @@ console.log('Generated adjustments:', TONE_ADJUSTMENTS.length, 'patterns');
 
 export interface ColorState {
   selectedColor: string;
+  paintColor: string; // 描画色（キャンバス用）
   recommendedColors: string[];
   recommendedTones: string[];
   selectedScheme: string;
@@ -174,6 +207,7 @@ export interface ColorState {
   dominantColor: ExtractedColor | null;
   isQuantizationEnabled: boolean;
   setSelectedColor: (color: string) => void;
+  setPaintColor: (color: string) => void;
   setSelectedScheme: (schemeId: string) => void;
   setExtractedColors: (colors: ExtractedColor[], dominantColor: ExtractedColor) => void;
   setColorFromExtracted: (color: string) => void;
@@ -224,6 +258,113 @@ const filterValidTones = (colors: string[], baseColor: string): string[] => {
   }
   
   return validColors;
+};
+
+// 配色技法を推定する関数
+const detectColorScheme = (colors: ExtractedColor[], baseColor: string): string => {
+  if (colors.length < 2) {
+    return 'identity'; // 色が少ない場合は単色配色
+  }
+
+  try {
+    // ベースカラーの色相を取得
+    const baseHue = chroma(baseColor).get('hsl.h') || 0;
+    
+    // 抽出された色の色相を計算し、ベースカラーとの角度差を求める
+    const hueAngles: number[] = [];
+    const hueThreshold = 20; // 色相の許容範囲（度）
+    
+    for (const colorData of colors) {
+      const hue = chroma(colorData.hex).get('hsl.h') || 0;
+      const angleDiff = Math.abs(((hue - baseHue + 540) % 360) - 180);
+      const normalizedAngle = angleDiff > 180 ? 360 - angleDiff : angleDiff;
+      
+      // 使用率が高い色（5%以上）のみ考慮
+      if (colorData.usage > 0.05) {
+        hueAngles.push(normalizedAngle);
+      }
+    }
+    
+    // 角度差を分析して配色技法を推定
+    const sortedAngles = hueAngles.sort((a, b) => a - b);
+    console.log('Color scheme detection:', { baseHue, hueAngles: sortedAngles, colorCount: colors.length });
+    
+    // 優先度順に配色技法を判定
+    
+    // 1. ドミナント配色（同系色、角度差が15度以内）- 最優先
+    const veryCloseColors = sortedAngles.filter(angle => angle <= 15);
+    if (veryCloseColors.length >= 1) {
+      console.log('Detected: Dominant color scheme (very close hues)');
+      return 'dominant_1';
+    }
+    
+    // 2. ドミナント配色（角度差が30度以内）
+    const dominantColors = sortedAngles.filter(angle => angle <= 30);
+    if (dominantColors.length >= 1) {
+      console.log('Detected: Dominant color scheme');
+      return 'dominant_2';
+    }
+    
+    // 3. アナロジー配色（隣接色相、30-60度）
+    const analogousColors = sortedAngles.filter(angle => angle > 25 && angle <= 60);
+    if (analogousColors.length >= 1) {
+      // より近い角度はanalogous_1、遠い角度はanalogous_2
+      const closeAnalogous = analogousColors.filter(angle => angle <= 45);
+      if (closeAnalogous.length >= 1) {
+        console.log('Detected: Close analogous color scheme');
+        return 'analogous_1';
+      } else {
+        console.log('Detected: Wide analogous color scheme');  
+        return 'analogous_2';
+      }
+    }
+    
+    // 4. スプリットコンプリメンタリー（150度前後と210度前後）
+    const splitComp1 = sortedAngles.filter(angle => angle >= 140 && angle <= 160);
+    const splitComp2 = sortedAngles.filter(angle => angle >= 200 && angle <= 220);
+    if (splitComp1.length >= 1 && splitComp2.length >= 1) {
+      console.log('Detected: Split complementary color scheme');
+      return 'split_complementary';
+    }
+    
+    // 5. 補色配色（170-190度）
+    const complementaryColors = sortedAngles.filter(angle => angle >= 170 && angle <= 190);
+    if (complementaryColors.length >= 1) {
+      console.log('Detected: Complementary color scheme');
+      return 'complementary';
+    }
+    
+    // 6. トライアド配色（115-125度、235-245度）
+    const triadic1 = sortedAngles.filter(angle => angle >= 115 && angle <= 125);
+    const triadic2 = sortedAngles.filter(angle => angle >= 235 && angle <= 245);
+    if (triadic1.length >= 1 || triadic2.length >= 1) {
+      console.log('Detected: Triadic color scheme');
+      return 'triadic';
+    }
+    
+    // 7. テトラード配色（85-95度、175-185度、265-275度）
+    const tetradic1 = sortedAngles.filter(angle => angle >= 85 && angle <= 95);
+    const tetradic2 = sortedAngles.filter(angle => angle >= 175 && angle <= 185);
+    if (tetradic1.length >= 1 && tetradic2.length >= 1) {
+      console.log('Detected: Tetradic color scheme');
+      return 'tetradic';
+    }
+    
+    // 8. 60度配色 (インターミディエート)
+    const intermediate = sortedAngles.filter(angle => angle >= 55 && angle <= 65);
+    if (intermediate.length >= 1) {
+      console.log('Detected: Intermediate color scheme');
+      return 'intermediate_1';
+    }
+    
+    // デフォルトは補色配色
+    console.log('Default: Complementary color scheme');
+    return 'complementary';
+    
+  } catch (error) {
+    console.error('Error in color scheme detection:', error);
+    return 'complementary';
+  }
 };
 
 export const useColorStore = create<ColorState>((set, get) => {
@@ -281,6 +422,12 @@ export const useColorStore = create<ColorState>((set, get) => {
 
     setExtractedColors: (colors: ExtractedColor[], dominantColor: ExtractedColor) => {
       set({ extractedColors: colors, dominantColor });
+      
+      // 推定された配色技法を自動的に設定
+      const detectedScheme = detectColorScheme(colors, dominantColor.hex);
+      console.log('Auto-detected color scheme:', detectedScheme);
+      set({ selectedScheme: detectedScheme });
+      
       // ドミナントカラーを自動的に選択色として設定
       get().setSelectedColor(dominantColor.hex);
     },
