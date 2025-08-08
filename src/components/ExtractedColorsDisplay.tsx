@@ -31,8 +31,8 @@ export const ExtractedColorsDisplay = ({ isMobile = false }: ExtractedColorsDisp
             }))}
             onColorClick={handleColorSelect}
             isMobile={isMobile}
+            gridType="baseColors" // ベース色選択専用: モバイル2列、PC4列
             emptyMessage="画像から色が抽出されていません"
-            className="grid-cols-2" // ベース色選択専用: 2列表示
           />
         </CardContent>
       </Card>

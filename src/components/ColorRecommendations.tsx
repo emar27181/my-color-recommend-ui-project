@@ -138,6 +138,7 @@ export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsP
               showClickIcon: false
           }))}
           onColorClick={handleGenerateTones}
+          gridType="colors" // 2セクション（色推薦）: モバイル4列、PC4列
           isMobile={isMobile}
           emptyMessage={t('colorRecommendations.noRecommendations')}
         />

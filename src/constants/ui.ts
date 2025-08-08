@@ -88,9 +88,10 @@ export const COLOR_BLOCK_SPEC = {
 export const RESPONSIVE_GRID = {
   // カラム数定義
   colors: 'grid-cols-4', // PCでは4列表示に変更
-  colorsMobile: 'grid-cols-2', // スマホ専用: 2列表示
+  colorsMobile: 'grid-cols-4', // スマホ専用: 4列表示（2・3セクション用）
+  baseColorsMobile: 'grid-cols-2', // スマホ専用: 2列表示（1セクション用）
   tones: 'grid-cols-4', // トーン推薦専用: 4x4の16パターン表示
-  tonesMobile: 'grid-cols-2', // スマホ専用トーン: 2列表示
+  tonesMobile: 'grid-cols-4', // スマホ専用トーン: 4列表示
   schemes: 'grid-cols-2 sm:grid-cols-4 md:grid-cols-6',
   
   // ギャップ
