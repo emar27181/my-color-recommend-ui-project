@@ -1867,20 +1867,6 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
             onTouchEnd={handleTouchEnd}
           />
         </div>
-        {/* Wacomクレジット */}
-        <div className="text-center">
-          <p className="text-xs text-muted-foreground leading-tight m-0">
-            テンプレート線画：
-            <a
-              href="https://tablet.wacom.co.jp/article/painting-with-wacom"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:underline ml-1"
-            >
-              Wacom提供
-            </a>
-          </p>
-        </div>
       </CardContent>
     </Card>
   );
