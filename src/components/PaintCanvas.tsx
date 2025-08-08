@@ -1580,294 +1580,51 @@ const PaintCanvasComponent = forwardRef<PaintCanvasRef, PaintCanvasProps>(({ cla
   };
 
   return (
-    <Card className={`w-full flex flex-col bg-background border-transparent ${className}`} style={{ height: '600px' }}>
-      <CardHeader className="pb-0 pt-1">
-        <div className="flex flex-wrap items-center justify-start gap-2">
-          {/* 現在の描画色表示（ColorPicker風） */}
-          <div className="relative cursor-pointer hover:scale-110 transition-all duration-200 flex-shrink-0">
-            <input
-              type="color"
-              value={selectedColor}
-              onChange={handleColorPickerChange}
-              className="absolute inset-0 opacity-0 w-full h-full cursor-pointer z-10"
-              title="描画色を変更"
-            />
-            <div
-              className={`${BORDER_PRESETS.colorBlock} flex items-center justify-center pointer-events-none w-6 h-6 sm:w-8 sm:h-8`}
-              style={{
-                backgroundColor: selectedColor
-              }}
-              title="描画色 - クリックで変更"
-            >
-              <Palette
-                className="w-3 h-3 sm:w-4 sm:h-4"
-                style={{ color: getIconColor() }}
-              />
-            </div>
-          </div>
-          {/* スポイトボタン */}
-          <div className="flex flex-wrap gap-1 flex-shrink-0">
-            <Button
-              onClick={() => {
-                setIsEyedropperMode(!isEyedropperMode);
-                setIsEraserMode(false);
-                setIsFillMode(false);
-              }}
-              variant={isEyedropperMode ? "default" : "outline"}
-              size="sm"
-              className="h-6 px-1 sm:h-8 sm:px-2"
-              title="スポイトツール - キャンバスから色を取得"
-            >
-              <Pipette className="w-4 h-4 text-foreground" />
-            </Button>
-          </div>
-          {/* ペン/消しゴム/塗りつぶしモード切り替え */}
-          <div className="flex flex-wrap gap-1 flex-shrink-0">
-            <Button
-              onClick={() => {
-                setIsEraserMode(false);
-                setIsFillMode(false);
-                setIsEyedropperMode(false);
-              }}
-              variant={!isEraserMode && !isFillMode && !isEyedropperMode ? "default" : "outline"}
-              size="sm"
-              className="h-6 px-1 sm:h-8 sm:px-2"
-            >
-              <Pen className="w-4 h-4 text-foreground" />
-            </Button>
-            <Button
-              onClick={() => {
-                setIsEraserMode(true);
-                setIsFillMode(false);
-                setIsEyedropperMode(false);
-              }}
-              variant={isEraserMode ? "default" : "outline"}
-              size="sm"
-              className="h-6 px-1 sm:h-8 sm:px-2"
-            >
-              <Eraser className="w-4 h-4 text-foreground" />
-            </Button>
-            <Button
-              onClick={() => {
-                console.log('Fill button clicked - setting fill mode');
-                setIsEraserMode(false);
-                setIsFillMode(true);
-                setIsEyedropperMode(false);
-                console.log('Fill mode state should now be true');
-              }}
-              variant={isFillMode ? "default" : "outline"}
-              size="sm"
-              className="h-6 px-1 sm:h-8 sm:px-2"
-              title="塗りつぶしツール"
-            >
-              <PaintBucket className="w-4 h-4 text-foreground" />
-            </Button>
-          </div>
-          {/* レイヤー切り替えボタン */}
-          <div className="flex flex-wrap gap-1 flex-shrink-0">
-            <Button
-              onClick={() => setCurrentLayer(1)}
-              variant={currentLayer === 1 ? "default" : "outline"}
-              size="sm"
-              className="h-6 px-1 sm:h-8 sm:px-2"
-              title="レイヤー1（上）"
-            >
-              <Layers className="w-4 h-4 text-foreground" />
-              <span className="ml-1 text-xs text-foreground">1</span>
-            </Button>
-            <Button
-              onClick={() => setCurrentLayer(2)}
-              variant={currentLayer === 2 ? "default" : "outline"}
-              size="sm"
-              className="h-6 px-1 sm:h-8 sm:px-2"
-              title="レイヤー2（下）"
-            >
-              <Layers className="w-4 h-4 text-foreground" />
-              <span className="ml-1 text-xs text-foreground">2</span>
-            </Button>
-          </div>
-          {/* Undo/Redoボタン */}
-          <div className="flex flex-wrap gap-1 flex-shrink-0">
-            <Button
-              onClick={undo}
-              variant="outline"
-              size="sm"
-              className="h-6 px-1 sm:h-8 sm:px-2"
-              disabled={historyIndex <= 0}
-              title="元に戻す (Ctrl+Z)"
-            >
-              <Undo className="w-4 h-4 text-foreground" />
-            </Button>
-            <Button
-              onClick={redo}
-              variant="outline"
-              size="sm"
-              className="h-6 px-1 sm:h-8 sm:px-2"
-              disabled={historyIndex >= history.length - 1}
-              title="やり直し (Ctrl+Y)"
-            >
-              <Redo className="w-4 h-4 text-foreground" />
-            </Button>
-          </div>
-          {/* ペンサイズ調整 */}
-          <div className="flex flex-wrap items-center gap-1 flex-shrink-0">
-            <Button
-              onClick={decreasePenSize}
-              variant="outline"
-              size="sm"
-              className="h-6 w-6 p-0 sm:h-8 sm:w-8"
-              disabled={penSize <= 2}
-            >
-              <Minus className="w-3 h-3 text-foreground" />
-            </Button>
-            {isEditingPenSize ? (
-              <input
-                type="number"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                value={tempPenSize}
-                onChange={handlePenSizeChange}
-                onBlur={handlePenSizeBlur}
-                onKeyDown={handlePenSizeKeyDown}
-                min="2"
-                max="200"
-                className="text-xs font-mono text-foreground min-w-[20px] sm:min-w-[24px] text-center bg-transparent border border-border rounded px-0.5 sm:px-1 h-5 sm:h-6 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
-                autoFocus
-              />
-            ) : (
-              <span
-                className="text-xs font-mono text-foreground min-w-[20px] sm:min-w-[24px] text-center cursor-pointer hover:bg-muted rounded px-0.5 sm:px-1 py-0.5 sm:py-1"
-                onClick={handlePenSizeEdit}
-                title="クリックして数値入力"
-              >
-                {penSize}
-              </span>
-            )}
-            <Button
-              onClick={increasePenSize}
-              variant="outline"
-              size="sm"
-              className="h-6 w-6 p-0 sm:h-8 sm:w-8"
-              disabled={penSize >= 200}
-            >
-              <Plus className="w-3 h-3 text-foreground" />
-            </Button>
-          </div>
-          {/* その他のボタングループ - リセット、色抽出、ダウンロード */}
-          <div className="flex flex-wrap gap-1 flex-shrink-0">
-            {/* リセットボタン */}
-            <Button
-              onClick={clearCanvas}
-              variant="outline"
-              size="sm"
-              className="h-6 px-1 sm:h-8 sm:px-2"
-            >
-              <CircleDashed className="w-4 h-4 text-foreground" />
-            </Button>
-            {/* 色抽出更新ボタン */}
-            <Button
-              onClick={extractColorsFromCanvas}
-              variant="outline"
-              size="sm"
-              className="h-6 px-1 sm:h-8 sm:px-2"
-              disabled={isExtractingColors}
-              title="キャンバスから色を抽出"
-            >
-              <RefreshCw className={`w-4 h-4 text-foreground ${isExtractingColors ? 'animate-spin' : ''}`} />
-            </Button>
-            {/* ダウンロードボタン */}
-            <Button
-              onClick={downloadCanvas}
-              variant="outline"
-              size="sm"
-              className="h-6 px-1 sm:h-8 sm:px-2"
-              title="キャンバスをPNG画像でダウンロード"
-            >
-              <Download className="w-4 h-4 text-foreground" />
-            </Button>
-            {/* 画像アップロードボタン */}
-            <Button
-              onClick={handleImageUploadClick}
-              variant="outline"
-              size="sm"
-              className="h-6 px-1 sm:h-8 sm:px-2"
-              title="画像をアップロードしてキャンバスに描画"
-            >
-              <Upload className="w-4 h-4 text-foreground" />
-            </Button>
-            {/* テンプレート画像読み込みボタン */}
-            <Button
-              onClick={() => {
-                console.log('Template button clicked');
-                loadTemplateImage();
-              }}
-              variant="outline"
-              size="sm"
-              className="h-6 px-1 sm:h-8 sm:px-2"
-              title="テンプレート画像を読み込み（線画：Wacom提供）"
-            >
-              <Image className="w-4 h-4 text-foreground" />
-            </Button>
-          </div>
-        </div>
-        {/* 隠しファイル入力 */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          onChange={handleFileSelect}
-          className="hidden"
-        />
+    <Card className={`w-full flex flex-col bg-background border-transparent ${className}`} style={{ height: '600px', border: '3px solid red', padding: '0' }}>
+      <CardHeader className="pb-0 pt-1" style={{ display: 'none' }}>
+        {/* ツールバー全体を非表示化 */}
       </CardHeader>
-      <CardContent className="pt-1 pb-0 flex-1 flex flex-col">
-        <div className="relative flex-1 flex flex-col">
-          {/* 隠しレイヤーキャンバス */}
-          <canvas
-            ref={layer1CanvasRef}
-            className="absolute inset-0 pointer-events-none opacity-0"
-            style={{
-              width: '100%',
-              height: `${Math.min(450, Math.floor(containerWidth / canvasAspectRatio))}px`,
-              objectFit: 'contain'
-            }}
-          />
-          <canvas
-            ref={layer2CanvasRef}
-            className="absolute inset-0 pointer-events-none opacity-0"
-            style={{
-              width: '100%',
-              height: `${Math.min(450, Math.floor(containerWidth / canvasAspectRatio))}px`,
-              objectFit: 'contain'
-            }}
-          />
-          {/* 表示用合成キャンバス */}
-          <canvas
-            ref={canvasRef}
-            className={`border border-border rounded-md bg-white ${isEyedropperMode ? 'cursor-crosshair' :
-              isFillMode ? 'cursor-pointer' : 'cursor-crosshair'
-              }`}
-            data-fill-mode={isFillMode}
-            data-eraser-mode={isEraserMode}
-            data-eyedropper-mode={isEyedropperMode}
-            style={{
-              width: '100%',
-              height: `${Math.min(450, Math.floor(containerWidth / canvasAspectRatio))}px`,
-              objectFit: 'contain',
-              touchAction: 'none'
-            }}
-            onMouseDown={(e) => {
-              console.log('Mouse down event fired');
-              startDrawing(e);
-            }}
-            onMouseMove={draw}
-            onMouseUp={stopDrawing}
-            onMouseLeave={stopDrawing}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-          />
-        </div>
+      <CardContent className="pt-1 pb-0 flex-1 flex flex-col" style={{ paddingBottom: '0 !important', marginBottom: '0 !important', border: '2px dashed blue', display: 'none' }}>
+        {/* キャンバスシステム全体を非表示化 */}
       </CardContent>
+      {/* デバッグ: CardContent直後の余白（ここが問題の余白）を可視化 */}
+      <div style={{ 
+        position: 'relative',
+        height: '0px', 
+        width: '100%',
+        backgroundColor: 'transparent'
+      }}>
+        <div style={{
+          position: 'absolute',
+          top: '0',
+          left: '0',
+          right: '0',
+          height: '20px',
+          backgroundColor: 'rgba(255, 0, 255, 0.8)',
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '10px',
+          color: 'white',
+          fontWeight: 'bold',
+          border: '2px solid black'
+        }}>
+          FOUND: CardContent終了後の実際の余白
+        </div>
+      </div>
+      {/* デバッグ: CardContent終了直後の余白を可視化 */}
+      <div style={{ backgroundColor: 'magenta', height: '8px', width: '100%', margin: '0', padding: '0' }}>
+        <span style={{ fontSize: '10px', color: 'white', fontWeight: 'bold' }}>CardContent直後の余白</span>
+      </div>
+      {/* デバッグ: CardとCardContentの間の余白を可視化 */}
+      <div style={{ backgroundColor: 'cyan', height: '5px', width: '100%', margin: '0', padding: '0' }}>
+        <span style={{ fontSize: '8px', color: 'black' }}>Card内部余白</span>
+      </div>
+      {/* デバッグ: Card下部の余白を可視化 */}
+      <div style={{ backgroundColor: 'orange', height: '5px', width: '100%' }}>
+        <span style={{ fontSize: '8px', color: 'black' }}>Card下部</span>
+      </div>
     </Card>
   );
 });
