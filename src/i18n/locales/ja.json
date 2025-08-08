@@ -10,7 +10,8 @@
       "toneRecommendation": "トーン(明度・彩度)推薦",
       "toneRecommendationShort": "トーン推薦",
       "skinColorRecommendation": "肌色推薦",
-      "hueToneExtraction": "使用色相/トーン抽出"
+      "hueToneExtraction": "使用色相/トーン抽出",
+      "canvasColorRecommendation": "キャンバス"
     }
   },
   "colorPicker": {

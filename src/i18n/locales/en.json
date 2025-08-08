@@ -10,7 +10,8 @@
       "toneRecommendation": "Tone (Brightness & Saturation) Recommendation", 
       "toneRecommendationShort": "Tone Recommendation",
       "skinColorRecommendation": "Skin Color Recommendation",
-      "hueToneExtraction": "Hue/Tone Extraction"
+      "hueToneExtraction": "Hue/Tone Extraction",
+      "canvasColorRecommendation": "Canvas"
     }
   },
   "colorPicker": {
