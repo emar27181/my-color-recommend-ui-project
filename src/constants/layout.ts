@@ -25,7 +25,7 @@ export const LAYOUT_CONFIG = {
   
   // モバイルレイアウト設定（縦積み）
   mobile: {
-    order: ['canvas', 'baseColor', 'hueToneExtraction', 'colorRecommendation', 'toneRecommendation', 'skinColor']
+    order: ['canvas', 'baseColor', 'colorRecommendation', 'toneRecommendation', 'skinColor', 'hueToneExtraction']
   }
 } as const;
 

@@ -8,7 +8,7 @@ import { ExtractedColorsDisplay } from '@/components/ExtractedColorsDisplay';
 import { SkinColorRecommendations } from '@/components/SkinColorRecommendations';
 import { HueToneExtraction } from '@/components/HueToneExtraction';
 import { PaintCanvas, type PaintCanvasRef } from '@/components/PaintCanvas';
-import { COMPONENT_CONFIG, type ComponentKey, type LayoutColumn } from '@/constants/layout';
+import { COMPONENT_CONFIG, LAYOUT_CONFIG, type ComponentKey, type LayoutColumn } from '@/constants/layout';
 
 interface LayoutRendererProps {
   columns: readonly LayoutColumn[];
@@ -150,8 +150,8 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
   };
 
   if (isMobile) {
-    // モバイル: 縦積みレイアウト
-    const allComponents: ComponentKey[] = ['canvas', 'baseColor', 'hueToneExtraction', 'colorRecommendation', 'toneRecommendation', 'skinColor'];
+    // モバイル: 縦積みレイアウト（LAYOUT_CONFIGの順序を使用）
+    const allComponents: ComponentKey[] = LAYOUT_CONFIG.mobile.order as ComponentKey[];
     
     return (
       <div className="flex flex-col overflow-y-auto">
