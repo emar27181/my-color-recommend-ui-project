@@ -5,18 +5,21 @@ import { useEffect, useState, useRef } from 'react';
 
 const App = () => {
   
-  // コラプス状態をオブジェクトで管理
+  const [isDebugMode, setIsDebugMode] = useState(false);
+  const [screenSize, setScreenSize] = useState({ width: 0, height: 0 });
+  
+  // デバイス判定（閾値800px）
+  const isMobile = screenSize.width < 800;
+  
+  // コラプス状態をオブジェクトで管理（モバイルではβセクションを閉じる）
   const [collapseStates, setCollapseStates] = useState({
     isCanvasCollapsed: false,
     isBaseColorCollapsed: false,
     isColorRecommendationCollapsed: false,
     isToneRecommendationCollapsed: false,
     isSkinColorCollapsed: true,
-    isHueToneExtractionCollapsed: false
+    isHueToneExtractionCollapsed: isMobile // モバイルでは閉じる、デスクトップでは開く
   });
-  
-  const [isDebugMode, setIsDebugMode] = useState(false);
-  const [screenSize, setScreenSize] = useState({ width: 0, height: 0 });
   
   // PaintCanvasへの参照
   const paintCanvasRef = useRef<PaintCanvasRef>(null);
@@ -86,8 +89,15 @@ const App = () => {
     };
   }, []);
 
-  // デバイス判定（閾値800px）
-  const isMobile = screenSize.width < 800;
+  // 画面サイズ変更時にβセクションの状態を調整
+  useEffect(() => {
+    const newIsMobile = screenSize.width < 800;
+    setCollapseStates(prev => ({
+      ...prev,
+      isHueToneExtractionCollapsed: newIsMobile
+    }));
+  }, [screenSize.width]);
+
   const deviceType = isMobile ? 'MOBILE/TABLET' : 'DESKTOP';
 
   return (
