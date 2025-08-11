@@ -410,7 +410,6 @@ export const useColorStore = create<ColorState>((set, get) => {
 
     setSelectedColor: (color: string) => {
       set({ selectedColor: color });
-      get().generateRecommendedColors();
       // デフォルトでトーン推薦も生成
       get().generateRecommendedTones(color);
     },
@@ -423,10 +422,10 @@ export const useColorStore = create<ColorState>((set, get) => {
     setExtractedColors: (colors: ExtractedColor[], dominantColor: ExtractedColor) => {
       set({ extractedColors: colors, dominantColor });
       
-      // 推定された配色技法を自動的に設定
-      const detectedScheme = detectColorScheme(colors, dominantColor.hex);
-      console.log('Auto-detected color scheme:', detectedScheme);
-      set({ selectedScheme: detectedScheme });
+      // 配色技法の自動検出・設定を停止 - ユーザーが手動で変更するまで固定
+      // const detectedScheme = detectColorScheme(colors, dominantColor.hex);
+      // console.log('Auto-detected color scheme:', detectedScheme);
+      // set({ selectedScheme: detectedScheme });
       
       // ドミナントカラーを自動的に選択色として設定
       get().setSelectedColor(dominantColor.hex);
