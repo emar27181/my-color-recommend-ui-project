@@ -5,7 +5,7 @@ import { CircleDashed, Plus, Minus, Eraser, Pen, PaintBucket, Undo, Redo, Palett
 import { BORDER_PRESETS } from '@/constants/ui';
 import { useColorStore } from '@/store/colorStore';
 import { useToastContext } from '@/contexts/ToastContext';
-import { extractColorsFromImage, validateImageFile } from '@/lib/colorExtractor';
+import { validateImageFile } from '@/lib/colorExtractor';
 import chroma from 'chroma-js';
 import ColorThief from 'colorthief';
 import type { ExtractedColor } from '@/lib/colorExtractor';

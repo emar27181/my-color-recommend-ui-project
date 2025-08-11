@@ -7,7 +7,7 @@ import { ImageUpload } from '@/components/ImageUpload';
 import { ExtractedColorsDisplay } from '@/components/ExtractedColorsDisplay';
 import { SkinColorRecommendations } from '@/components/SkinColorRecommendations';
 import { HueToneExtraction } from '@/components/HueToneExtraction';
-import { PaintCanvas, type PaintCanvasRef } from '@/components/PaintCanvas';
+// import { PaintCanvas, type PaintCanvasRef } from '@/components/PaintCanvas';
 import { CanvasColorRecommendations, type CanvasColorRecommendationsRef } from '@/components/CanvasColorRecommendations';
 import { COMPONENT_CONFIG, LAYOUT_CONFIG, type ComponentKey, type LayoutColumn } from '@/constants/layout';
 
@@ -24,8 +24,8 @@ interface LayoutRendererProps {
 
 // コンポーネントマッピング
 const ComponentMap = {
-  canvas: ({ paintCanvasRef }: any) => (
-    <PaintCanvas ref={paintCanvasRef} />
+  canvas: () => (
+    <div>Canvas component disabled</div>
   ),
   baseColor: ({ handleImageUpload, isMobile }: any) => (
     <div className={isMobile ? "space-y-1" : "space-y-4"}>
@@ -161,7 +161,7 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
 
   if (isMobile) {
     // モバイル: 縦積みレイアウト（LAYOUT_CONFIGの順序を使用）
-    const allComponents: ComponentKey[] = LAYOUT_CONFIG.mobile.order as ComponentKey[];
+    const allComponents: ComponentKey[] = LAYOUT_CONFIG.mobile.order as unknown as ComponentKey[];
     
     return (
       <div className="flex flex-col overflow-y-auto">

@@ -18,7 +18,8 @@ export interface ToneAdjustment {
   saturationMultiplier?: number;
 }
 
-// 配色技法の推薦優先度を取得する関数
+// 配色技法の推薦優先度を取得する関数（未使用）
+/*
 const getSchemeRecommendationOrder = (currentScheme: string): string[] => {
   const schemes = {
     // ドミナント配色優先グループ
@@ -49,6 +50,7 @@ const getSchemeRecommendationOrder = (currentScheme: string): string[] => {
   return schemes[currentScheme as keyof typeof schemes] || 
          ['complementary', 'analogous_1', 'dominant_1', 'triadic', 'tetradic', 'split_complementary'];
 };
+*/
 
 // 配色技法のデータ定義（推薦優先度で動的ソート）
 export const COLOR_SCHEMES: ColorScheme[] = [
@@ -260,7 +262,8 @@ const filterValidTones = (colors: string[], baseColor: string): string[] => {
   return validColors;
 };
 
-// 配色技法を推定する関数
+// 配色技法を推定する関数（未使用）
+/*
 const detectColorScheme = (colors: ExtractedColor[], baseColor: string): string => {
   if (colors.length < 2) {
     return 'identity'; // 色が少ない場合は単色配色
@@ -366,6 +369,7 @@ const detectColorScheme = (colors: ExtractedColor[], baseColor: string): string 
     return 'complementary';
   }
 };
+*/
 
 export const useColorStore = create<ColorState>((set, get) => {
   // デフォルト色でトーンを事前生成
@@ -400,6 +404,7 @@ export const useColorStore = create<ColorState>((set, get) => {
 
   return {
     selectedColor: defaultColor,
+    paintColor: defaultColor,
     recommendedColors: [],
     recommendedTones: sortColorsByLightness(filteredDefaultTones),
     selectedScheme: 'complementary',
@@ -412,6 +417,10 @@ export const useColorStore = create<ColorState>((set, get) => {
       set({ selectedColor: color });
       // デフォルトでトーン推薦も生成
       get().generateRecommendedTones(color);
+    },
+
+    setPaintColor: (color: string) => {
+      set({ paintColor: color });
     },
 
     setSelectedScheme: (schemeId: string) => {
