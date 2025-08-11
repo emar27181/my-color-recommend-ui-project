@@ -1326,6 +1326,27 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     };
   }, [undo, redo]);
 
+  // キャンバスをダウンロード
+  const handleDownload = useCallback(() => {
+    if (!canvasRef.current) {
+      showToast('キャンバスが見つかりません。', 'error');
+      return;
+    }
+
+    // 表示用の合成キャンバスから画像データを取得
+    const imageURL = canvasRef.current.toDataURL('image/png');
+
+    // ダウンロード用のリンクを作成してクリック
+    const link = document.createElement('a');
+    link.href = imageURL;
+    link.download = 'canvas-artwork.png';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    showToast('画像をダウンロードしました。', 'success');
+  }, [showToast]);
+
   // キャンバスをクリア
   const clearCanvas = useCallback(() => {
     const layerContext = getCurrentLayerContext();
@@ -1573,6 +1594,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
               <RefreshCw className={`w-4 h-4 text-foreground ${isExtractingColors ? 'animate-spin' : ''}`} />
             </Button>
             <Button
+              onClick={handleDownload}
               variant="outline"
               size="sm"
               className="h-6 px-1 sm:h-8 sm:px-2"
