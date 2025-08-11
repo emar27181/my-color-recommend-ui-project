@@ -7,7 +7,7 @@ export const LAYOUT_CONFIG = {
       {
         id: 'canvas',
         width: 'w-7/12', // 7/12幅（約58.3%）に拡大
-        components: ['canvas', 'canvasColorRecommendation']
+        components: ['canvasColorRecommendation']
       },
       {
         id: 'main-tools', 
@@ -25,7 +25,7 @@ export const LAYOUT_CONFIG = {
   
   // モバイルレイアウト設定（縦積み）
   mobile: {
-    order: ['canvas', 'canvasColorRecommendation', 'baseColor', 'colorRecommendation', 'toneRecommendation', 'skinColor', 'hueToneExtraction']
+    order: ['canvasColorRecommendation', 'baseColor', 'colorRecommendation', 'toneRecommendation', 'skinColor', 'hueToneExtraction']
   }
 } as const;
 
