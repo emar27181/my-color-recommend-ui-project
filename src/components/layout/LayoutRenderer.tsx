@@ -8,14 +8,14 @@ import { ExtractedColorsDisplay } from '@/components/ExtractedColorsDisplay';
 import { SkinColorRecommendations } from '@/components/SkinColorRecommendations';
 import { HueToneExtraction } from '@/components/HueToneExtraction';
 import { PaintCanvas, type PaintCanvasRef } from '@/components/PaintCanvas';
-import { CanvasColorRecommendations } from '@/components/CanvasColorRecommendations';
+import { CanvasColorRecommendations, type CanvasColorRecommendationsRef } from '@/components/CanvasColorRecommendations';
 import { COMPONENT_CONFIG, LAYOUT_CONFIG, type ComponentKey, type LayoutColumn } from '@/constants/layout';
 
 interface LayoutRendererProps {
   columns: readonly LayoutColumn[];
   isMobile: boolean;
   isDebugMode: boolean;
-  paintCanvasRef: React.RefObject<PaintCanvasRef | null>;
+  paintCanvasRef: React.RefObject<CanvasColorRecommendationsRef | null>;
   handleExtractColorsFromCanvas: () => void;
   handleImageUpload: (file: File) => void;
   collapseStates: Record<string, boolean>;
@@ -48,8 +48,8 @@ const ComponentMap = {
   hueToneExtraction: () => (
     <HueToneExtraction />
   ),
-  canvasColorRecommendation: () => (
-    <CanvasColorRecommendations />
+  canvasColorRecommendation: ({ paintCanvasRef }: any) => (
+    <CanvasColorRecommendations ref={paintCanvasRef} />
   )
 };
 

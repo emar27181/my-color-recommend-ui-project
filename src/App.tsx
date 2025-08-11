@@ -1,4 +1,4 @@
-import { type PaintCanvasRef } from '@/components/PaintCanvas';
+import { type CanvasColorRecommendationsRef } from '@/components/CanvasColorRecommendations';
 import { LayoutRenderer } from '@/components/layout/LayoutRenderer';
 import { LAYOUT_CONFIG } from '@/constants/layout';
 import { useEffect, useState, useRef } from 'react';
@@ -21,13 +21,13 @@ const App = () => {
     isHueToneExtractionCollapsed: isMobile // モバイルでは閉じる、デスクトップでは開く
   });
   
-  // PaintCanvasへの参照
-  const paintCanvasRef = useRef<PaintCanvasRef>(null);
+  // CanvasColorRecommendationsへの参照
+  const canvasColorRecommendationsRef = useRef<CanvasColorRecommendationsRef>(null);
 
   // 画像アップロード時の処理
   const handleImageUpload = (imageFile: File) => {
     console.log('Image uploaded, drawing to canvas:', imageFile.name);
-    paintCanvasRef.current?.drawImageToCanvas(imageFile);
+    canvasColorRecommendationsRef.current?.drawImageToCanvas(imageFile);
   };
 
   // キャンバスから色を抽出する処理
@@ -35,12 +35,12 @@ const App = () => {
     try {
       console.log('Attempting to extract colors from canvas...');
       
-      if (!paintCanvasRef.current) {
-        console.error('PaintCanvas ref is null');
+      if (!canvasColorRecommendationsRef.current) {
+        console.error('CanvasColorRecommendations ref is null');
         return;
       }
       
-      await paintCanvasRef.current.extractColorsFromCanvas();
+      await canvasColorRecommendationsRef.current.extractColorsFromCanvas();
       console.log('Color extraction completed successfully');
     } catch (error) {
       console.error('Canvas color extraction failed:', error);
@@ -122,7 +122,7 @@ const App = () => {
           columns={LAYOUT_CONFIG.desktop.columns}
           isMobile={true}
           isDebugMode={isDebugMode}
-          paintCanvasRef={paintCanvasRef}
+          paintCanvasRef={canvasColorRecommendationsRef}
           handleExtractColorsFromCanvas={handleExtractColorsFromCanvas}
           handleImageUpload={handleImageUpload}
           collapseStates={collapseStates}
@@ -136,7 +136,7 @@ const App = () => {
           columns={LAYOUT_CONFIG.desktop.columns}
           isMobile={false}
           isDebugMode={isDebugMode}
-          paintCanvasRef={paintCanvasRef}
+          paintCanvasRef={canvasColorRecommendationsRef}
           handleExtractColorsFromCanvas={handleExtractColorsFromCanvas}
           handleImageUpload={handleImageUpload}
           collapseStates={collapseStates}
