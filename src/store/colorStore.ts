@@ -436,8 +436,8 @@ export const useColorStore = create<ColorState>((set, get) => {
       // console.log('Auto-detected color scheme:', detectedScheme);
       // set({ selectedScheme: detectedScheme });
       
-      // ドミナントカラーを自動的に選択色として設定
-      get().setSelectedColor(dominantColor.hex);
+      // ドミナントカラーを選択色に自動設定するのを停止（ユーザーの描画色を維持）
+      // get().setSelectedColor(dominantColor.hex);
     },
 
     setColorFromExtracted: (color: string) => {

@@ -1150,8 +1150,12 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
       if (canvasRef.current) {
         canvasRef.current.style.cursor = isFillMode ? 'pointer' : 'crosshair';
       }
+      // 塗りつぶし後に色を抽出
+      extractColorsFromCanvas().catch(error => {
+        console.error('Color extraction failed after flood fill:', error);
+      });
     });
-  }, [getCurrentLayerContext, currentLayer, updateCompositeCanvas]);
+  }, [getCurrentLayerContext, currentLayer, updateCompositeCanvas, extractColorsFromCanvas]);
 
   // 描画開始
   const startDrawing = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
