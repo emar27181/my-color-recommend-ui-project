@@ -36,6 +36,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
   const [isEditingPenSize, setIsEditingPenSize] = useState(false);
   const [tempPenSize, setTempPenSize] = useState('');
   const [isExtractingColors, setIsExtractingColors] = useState(false);
+  const [isTemplateDisplayed, setIsTemplateDisplayed] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // キャンバスサイズ管理
@@ -433,6 +434,9 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
           updateCompositeCanvas();
 
           showToast('線画をレイヤー1に読み込みました（描画はレイヤー2）', 'success');
+          
+          // テンプレート表示状態を更新
+          setIsTemplateDisplayed(true);
 
         }, 100);
       };
@@ -1340,6 +1344,8 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
       if (currentLayer === 1) {
         // レイヤー1は透明にクリア
         layerContext.clearRect(0, 0, currentLayerCanvas.width, currentLayerCanvas.height);
+        // レイヤー1（線画レイヤー）がクリアされた場合、テンプレート表示状態をfalseに
+        setIsTemplateDisplayed(false);
       } else {
         // レイヤー2は常に白色でクリア（テーマに関係なく）
         layerContext.fillStyle = '#ffffff';
@@ -1586,7 +1592,12 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
             <Button
               onClick={() => {
                 console.log('Template button clicked');
-                loadTemplateImage();
+                loadTemplateImage().then(() => {
+                  // 手動読み込みの場合もテンプレート表示状態を更新
+                  setIsTemplateDisplayed(true);
+                }).catch(error => {
+                  console.error('Manual template load failed:', error);
+                });
               }}
               variant="outline"
               size="sm"
@@ -1651,6 +1662,23 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
             onTouchEnd={handleTouchEnd}
           />
         </div>
+        
+        {/* Wacomクレジット - 線画テンプレートが表示されている場合のみ表示 */}
+        {isTemplateDisplayed && (
+          <div className="text-center mt-2">
+            <p className="text-xs text-muted-foreground leading-tight m-0">
+              テンプレート線画：
+              <a
+                href="https://tablet.wacom.co.jp/article/painting-with-wacom"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline ml-1"
+              >
+                Wacom提供
+              </a>
+            </p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
