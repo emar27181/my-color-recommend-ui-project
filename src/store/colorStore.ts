@@ -417,6 +417,8 @@ export const useColorStore = create<ColorState>((set, get) => {
       set({ selectedColor: color });
       // デフォルトでトーン推薦も生成
       get().generateRecommendedTones(color);
+      // 描画色も同時に更新（統一性保持）
+      set({ paintColor: color });
     },
 
     setPaintColor: (color: string) => {
@@ -442,6 +444,7 @@ export const useColorStore = create<ColorState>((set, get) => {
 
     setColorFromExtracted: (color: string) => {
       get().setSelectedColor(color);
+      get().setPaintColor(color); // 描画色も同時に更新
     },
 
     generateRecommendedColors: () => {
