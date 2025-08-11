@@ -13,6 +13,7 @@ interface ColorItemProps {
   compact?: boolean;
   clickable?: boolean;
   showClickIcon?: boolean;
+  isHighlighted?: boolean; // 描画色に最も近い色のハイライト
 }
 
 /**
@@ -27,7 +28,8 @@ export const ColorItem = ({
   subtitle,
   compact = false,
   clickable = true,
-  showClickIcon = false
+  showClickIcon = false,
+  isHighlighted = false
 }: ColorItemProps) => {
   const handleClick = () => {
     if (clickable && onClick) {
@@ -62,6 +64,7 @@ export const ColorItem = ({
             color={color}
             title={title || color}
             showClickIcon={showClickIcon}
+            isHighlighted={isHighlighted}
           />
           <CopyColorButton
             color={color}
@@ -94,7 +97,7 @@ export const ColorItem = ({
         height: '32px'
       }}>
         <div
-          className={`${BORDER_PRESETS.colorBlock} cursor-pointer hover:scale-110 transition-all duration-200 flex items-center justify-center`}
+          className={`${isHighlighted ? 'border-2 border-foreground rounded-md' : BORDER_PRESETS.colorBlock} cursor-pointer hover:scale-110 transition-all duration-200 flex items-center justify-center`}
           style={{
             backgroundColor: color,
             width: '24px',

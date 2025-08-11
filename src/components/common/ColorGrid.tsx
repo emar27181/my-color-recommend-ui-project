@@ -6,6 +6,7 @@ interface ColorData {
   title?: string;
   subtitle?: string;
   showClickIcon?: boolean;
+  isHighlighted?: boolean;
 }
 
 interface ColorGridProps {
@@ -84,6 +85,7 @@ export const ColorGrid = ({
           compact={true}
           clickable={clickable}
           showClickIcon={colorData.showClickIcon}
+          isHighlighted={colorData.isHighlighted}
         />
       ))}
     </div>

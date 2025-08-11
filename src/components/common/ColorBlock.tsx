@@ -9,6 +9,7 @@ interface ColorBlockProps {
   className?: string;
   showPicker?: boolean;
   showClickIcon?: boolean;
+  isHighlighted?: boolean;
 }
 
 /**
@@ -20,7 +21,8 @@ export const ColorBlock = ({
   title,
   className = '',
   showPicker = false,
-  showClickIcon = false
+  showClickIcon = false,
+  isHighlighted = false
 }: ColorBlockProps) => {
   
   // ベースカラーとのコントラスト比を考慮したアイコン色を取得
@@ -40,7 +42,7 @@ export const ColorBlock = ({
       height: `${COLOR_BLOCK_SPEC.height}px`
     }}>
       <div 
-        className={`${COLOR_BLOCK_SPEC.className} ${className} ${showClickIcon ? 'cursor-pointer hover:scale-110 transition-all duration-200' : ''} flex items-center justify-center`}
+        className={`${isHighlighted ? 'border-2 border-foreground rounded-md' : COLOR_BLOCK_SPEC.className} ${className} ${showClickIcon ? 'cursor-pointer hover:scale-110 transition-all duration-200' : ''} flex items-center justify-center`}
         style={{ 
           width: `${COLOR_BLOCK_SPEC.colorWidth}px`,
           height: `${COLOR_BLOCK_SPEC.colorHeight}px`,
