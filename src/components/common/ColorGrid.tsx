@@ -58,8 +58,14 @@ export const ColorGrid = ({
       gridClasses = RESPONSIVE_GRID.colorsMobile; // 2セクション（色推薦）: 4列
     }
   } else {
-    // デスクトップ: 4列表示
-    gridClasses = gridType === 'tones' ? RESPONSIVE_GRID.tones : RESPONSIVE_GRID.colors;
+    // デスクトップ: グリッドタイプに応じて列数を決定
+    if (gridType === 'baseColors') {
+      gridClasses = RESPONSIVE_GRID.baseColors; // ベース色選択: 2列
+    } else if (gridType === 'tones') {
+      gridClasses = RESPONSIVE_GRID.tones; // トーン推薦: 4列
+    } else {
+      gridClasses = RESPONSIVE_GRID.colors; // 色推薦: 4列
+    }
   }
 
   // classNameでgrid-cols-*が指定されている場合は、デフォルトのgridClassesを上書き

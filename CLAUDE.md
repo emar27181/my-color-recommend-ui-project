@@ -573,7 +573,10 @@ main (h-full flex flex-col)
 #### 定義済みグリッドパターン（constants/ui.ts）
 ```typescript
 RESPONSIVE_GRID = {
-  colors: 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5',
+  colors: 'grid-cols-4', // 色推薦: PC・モバイル共に4列
+  baseColors: 'grid-cols-2', // ベース色選択: PC・モバイル共に2列
+  baseColorsMobile: 'grid-cols-2', // ベース色選択モバイル: 2列
+  tones: 'grid-cols-4', // トーン推薦: PC・モバイル共に4列
   schemes: 'grid-cols-2 sm:grid-cols-4 md:grid-cols-6',
   gap: 'gap-3',
   padding: 'p-4'
