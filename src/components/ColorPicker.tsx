@@ -14,7 +14,7 @@ export const ColorPicker = () => {
 
   const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const color = e.target.value;
-    setSelectedColor(color);
+    setSelectedColor(color); // setSelectedColorが内部でpaintColorも更新
     // チュートリアルの自動進行をトリガー
     onUserAction('click', '[data-tutorial="color-picker"]');
   };
