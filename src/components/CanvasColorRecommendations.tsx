@@ -29,6 +29,10 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
   const [isEraserMode, setIsEraserMode] = useState(false);
   const [isFillMode, setIsFillMode] = useState(true);
   const [isEyedropperMode, setIsEyedropperMode] = useState(false);
+  const [previousTool, setPreviousTool] = useState<{
+    isFillMode: boolean;
+    isEraserMode: boolean;
+  }>({ isFillMode: true, isEraserMode: false });
   const [isEditingPenSize, setIsEditingPenSize] = useState(false);
   const [tempPenSize, setTempPenSize] = useState('');
   const [isExtractingColors, setIsExtractingColors] = useState(false);
@@ -847,14 +851,16 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     // 描画色として設定
     setSelectedColor(hexColor);
 
-    // スポイトモードを終了
+    // スポイトモードを終了し、前回のツール状態を復元
     setIsEyedropperMode(false);
+    setIsFillMode(previousTool.isFillMode);
+    setIsEraserMode(previousTool.isEraserMode);
 
     // トースト通知
     showToast(`色を取得しました: ${hexColor}`, 'success');
 
     console.log('Color picked from composite:', hexColor, `RGB(${r}, ${g}, ${b})`);
-  }, [context, setSelectedColor, showToast]);
+  }, [context, setSelectedColor, showToast, previousTool]);
 
   // 塗りつぶし機能（完全実装版）
   const floodFill = useCallback((startX: number, startY: number, newColor: string) => {
@@ -1384,9 +1390,22 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
           <div className="flex flex-wrap gap-1 flex-shrink-0">
             <Button
               onClick={() => {
+                if (!isEyedropperMode) {
+                  // スポイトモードに入る前に現在のツール状態を保存
+                  setPreviousTool({
+                    isFillMode,
+                    isEraserMode
+                  });
+                }
                 setIsEyedropperMode(!isEyedropperMode);
-                setIsEraserMode(false);
-                setIsFillMode(false);
+                if (!isEyedropperMode) {
+                  setIsEraserMode(false);
+                  setIsFillMode(false);
+                } else {
+                  // スポイトモードを手動で終了する場合も前回のツール状態を復元
+                  setIsFillMode(previousTool.isFillMode);
+                  setIsEraserMode(previousTool.isEraserMode);
+                }
               }}
               variant={isEyedropperMode ? "default" : "outline"}
               size="sm"
