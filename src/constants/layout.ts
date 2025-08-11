@@ -33,7 +33,7 @@ export const LAYOUT_CONFIG = {
 export const COMPONENT_CONFIG = {
   canvas: {
     key: 'canvas',
-    step: '0',
+    step: '0-before',
     titleKey: 'app.steps.canvas',
     collapseState: 'isCanvasCollapsed',
     hasUpdateButton: false
@@ -75,7 +75,7 @@ export const COMPONENT_CONFIG = {
   },
   canvasColorRecommendation: {
     key: 'canvasColorRecommendation',
-    step: "0'",
+    step: '0',
     titleKey: 'app.steps.canvasColorRecommendation',
     collapseState: 'isCanvasColorRecommendationCollapsed',
     hasUpdateButton: false
