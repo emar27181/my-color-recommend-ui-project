@@ -14,14 +14,14 @@ interface ColorRecommendationsProps {
 }
 
 export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsProps) => {
-  const { recommendedColors, selectedScheme, setSelectedScheme, generateRecommendedTones, selectedColor, setSelectedColor } = useColorStore();
+  const { recommendedColors, selectedScheme, setSelectedScheme, generateRecommendedTones, selectedColor, setSelectedColor, paintColor } = useColorStore();
   const { onUserAction } = useTutorial();
   const { t } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
 
   const handleGenerateTones = (color: string) => {
     // クリックされた色を描画色として設定
-    setSelectedColor(color);
+    setSelectedColor(color); // setSelectedColorが内部でpaintColorも更新
     generateRecommendedTones(color);
     // チュートリアルの自動進行をトリガー
     onUserAction('click', '[data-tutorial="recommended-colors"]');
@@ -45,6 +45,35 @@ export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsP
       return 0;
     }
   };
+
+  // 色の距離を計算する関数（deltaE 2000使用）
+  const calculateColorDistance = (color1: string, color2: string): number => {
+    try {
+      return chroma.deltaE(color1, color2);
+    } catch {
+      return Infinity;
+    }
+  };
+
+  // 描画色に最も近い推薦色を見つける
+  const findClosestColorIndex = (colors: string[], drawingColor: string): number => {
+    if (!drawingColor || colors.length === 0) return -1;
+    
+    let closestIndex = -1;
+    let minDistance = Infinity;
+    
+    colors.forEach((color, index) => {
+      const distance = calculateColorDistance(color, drawingColor);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestIndex = index;
+      }
+    });
+    
+    return closestIndex;
+  };
+
+  const closestColorIndex = findClosestColorIndex(recommendedColors, paintColor);
 
 
   return (
@@ -132,10 +161,11 @@ export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsP
       <CardContent className="pt-0 flex-1 overflow-auto pb-0 min-h-0">
         <div data-tutorial="recommended-colors">
           <ColorGrid
-            colors={recommendedColors.map(color => ({
+            colors={recommendedColors.map((color, index) => ({
               color,
               title: t('colorRecommendations.generateTones'),
-              showClickIcon: false
+              showClickIcon: false,
+              isHighlighted: index === closestColorIndex
           }))}
           onColorClick={handleGenerateTones}
           gridType="colors" // 2セクション（色推薦）: モバイル4列、PC4列
@@ -153,7 +183,7 @@ interface ToneRecommendationsProps {
 }
 
 export const ToneRecommendations = ({ isMobile = false }: ToneRecommendationsProps) => {
-  const { recommendedTones, selectedColor, generateRecommendedTones, setSelectedColor } = useColorStore();
+  const { recommendedTones, selectedColor, generateRecommendedTones, setSelectedColor, paintColor } = useColorStore();
   const { t } = useTranslation();
 
   React.useEffect(() => {
@@ -164,8 +194,37 @@ export const ToneRecommendations = ({ isMobile = false }: ToneRecommendationsPro
 
   const handleToneClick = (color: string) => {
     // クリックされた色を描画色として設定
-    setSelectedColor(color);
+    setSelectedColor(color); // setSelectedColorが内部でpaintColorも更新
   };
+
+  // 色の距離を計算する関数（deltaE 2000使用）
+  const calculateColorDistance = (color1: string, color2: string): number => {
+    try {
+      return chroma.deltaE(color1, color2);
+    } catch {
+      return Infinity;
+    }
+  };
+
+  // 描画色に最も近いトーン色を見つける
+  const findClosestToneIndex = (tones: string[], drawingColor: string): number => {
+    if (!drawingColor || tones.length === 0) return -1;
+    
+    let closestIndex = -1;
+    let minDistance = Infinity;
+    
+    tones.forEach((tone, index) => {
+      const distance = calculateColorDistance(tone, drawingColor);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestIndex = index;
+      }
+    });
+    
+    return closestIndex;
+  };
+
+  const closestToneIndex = findClosestToneIndex(recommendedTones, paintColor);
 
   return (
     <Card className="w-full flex flex-col pb-0">
@@ -174,10 +233,11 @@ export const ToneRecommendations = ({ isMobile = false }: ToneRecommendationsPro
       <CardContent className="pt-0 flex-1 overflow-auto pb-0 min-h-0">
         <div data-tutorial="tone-variations">
           <ColorGrid
-            colors={recommendedTones.map(tone => ({
+            colors={recommendedTones.map((tone, index) => ({
               color: tone,
               title: "色を選択",
-              showClickIcon: false
+              showClickIcon: false,
+              isHighlighted: index === closestToneIndex
             }))}
             onColorClick={handleToneClick}
             clickable={true}
