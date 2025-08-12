@@ -4,10 +4,8 @@ import { useTranslation } from 'react-i18next';
 import chroma from 'chroma-js';
 import { useMemo } from 'react';
 
-interface HueToneExtractionProps {}
-
 // 色相環プロット用コンポーネント
-const HueWheel = ({ colors, onHueClick, isQuantized }: { colors: { hex: string; usage: number }[], onHueClick?: (hue: number) => void, isQuantized: boolean }) => {
+const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor }: { colors: { hex: string; usage: number }[], onHueClick?: (hue: number) => void, isQuantized: boolean, selectedColor?: string }) => {
   const size = 220; // 元の縦幅に戻す
   const center = size / 2;
   const radius = 72; // 元のradiusに戻す
@@ -23,6 +21,19 @@ const HueWheel = ({ colors, onHueClick, isQuantized }: { colors: { hex: string; 
       return null;
     }
   }).filter(Boolean);
+
+  // 選択中の色の色相を計算
+  const selectedHuePoint = selectedColor ? (() => {
+    try {
+      const [h] = chroma(selectedColor).hsl();
+      const angle = (h || 0) * (Math.PI / 180);
+      const x = center + radius * Math.cos(angle - Math.PI / 2);
+      const y = center + radius * Math.sin(angle - Math.PI / 2);
+      return { x, y, color: selectedColor };
+    } catch {
+      return null;
+    }
+  })() : null;
 
   // SVGクリックハンドラ
   const handleSvgClick = (event: React.MouseEvent<SVGSVGElement>) => {
@@ -215,13 +226,26 @@ const HueWheel = ({ colors, onHueClick, isQuantized }: { colors: { hex: string; 
             strokeWidth="1"
           />
         ))}
+        
+        {/* 選択中の色の強調表示 */}
+        {selectedHuePoint && (
+          <circle
+            cx={selectedHuePoint.x}
+            cy={selectedHuePoint.y}
+            r="6"
+            fill={selectedHuePoint.color}
+            stroke="white"
+            strokeWidth="3"
+            opacity="1"
+          />
+        )}
       </svg>
     </div>
   );
 };
 
 // 彩度-明度散布図用コンポーネント
-const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantized }: { colors: { hex: string; usage: number }[], onSaturationLightnessClick?: (saturation: number, lightness: number) => void, isQuantized: boolean }) => {
+const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantized, selectedColor }: { colors: { hex: string; usage: number }[], onSaturationLightnessClick?: (saturation: number, lightness: number) => void, isQuantized: boolean, selectedColor?: string }) => {
   const plotWidth = 145.8; // 元のプロット幅
   const plotHeight = 145.8; // 元のプロット高さ
   const width = 180; // 横幅は縮小維持
@@ -237,6 +261,18 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
       return null;
     }
   }).filter(Boolean);
+
+  // 選択中の色の彩度・明度を計算
+  const selectedSLPoint = selectedColor ? (() => {
+    try {
+      const [, s, l] = chroma(selectedColor).hsl();
+      const x = 20 + (s || 0) * plotWidth;
+      const y = 11 + plotHeight - (l || 0) * plotHeight;
+      return { x, y, color: selectedColor };
+    } catch {
+      return null;
+    }
+  })() : null;
 
   // SVGクリックハンドラ
   const handleSvgClick = (event: React.MouseEvent<SVGSVGElement>) => {
@@ -449,12 +485,25 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
             strokeWidth="1"
           />
         ))}
+        
+        {/* 選択中の色の強調表示 */}
+        {selectedSLPoint && (
+          <circle
+            cx={selectedSLPoint.x}
+            cy={selectedSLPoint.y}
+            r="6"
+            fill={selectedSLPoint.color}
+            stroke="white"
+            strokeWidth="3"
+            opacity="1"
+          />
+        )}
       </svg>
     </div>
   );
 };
 
-export const HueToneExtraction = ({ }: HueToneExtractionProps) => {
+export const HueToneExtraction = () => {
   const { extractedColors, selectedColor, setSelectedColor, isQuantizationEnabled } = useColorStore();
   const { t } = useTranslation();
 
@@ -511,8 +560,8 @@ export const HueToneExtraction = ({ }: HueToneExtractionProps) => {
         <div data-tutorial="hue-tone-extraction" className="space-y-0">
           {/* 色相・トーンの可視化を常に表示 */}
           <div className="flex flex-col space-y-0">
-            <HueWheel colors={visualizationData} onHueClick={handleHueClick} isQuantized={isQuantizationEnabled} />
-            <SaturationLightnessPlot colors={visualizationData} onSaturationLightnessClick={handleSaturationLightnessClick} isQuantized={isQuantizationEnabled} />
+            <HueWheel colors={visualizationData} onHueClick={handleHueClick} isQuantized={isQuantizationEnabled} selectedColor={selectedColor} />
+            <SaturationLightnessPlot colors={visualizationData} onSaturationLightnessClick={handleSaturationLightnessClick} isQuantized={isQuantizationEnabled} selectedColor={selectedColor} />
           </div>
           {/* 抽出色がない場合のメッセージは下部に小さく表示 */}
           {extractedColors.length === 0 && (
