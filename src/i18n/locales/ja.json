@@ -75,7 +75,7 @@
     "preparing": "準備中...",
     "error": "エラー",
     "success": "成功",
-    "madeWithClaudeCode": "Claude Codeと共同制作しました"
+    "madeWithClaudeCode": "このサイトはClaude Codeと共同制作しました"
   },
   "hueToneExtraction": {
     "saturation": "彩度",

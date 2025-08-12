@@ -75,7 +75,7 @@
     "preparing": "Preparing...",
     "error": "Error",
     "success": "Success",
-    "madeWithClaudeCode": "Co-created with Claude Code"
+    "madeWithClaudeCode": "This site was co-created with Claude Code"
   },
   "hueToneExtraction": {
     "saturation": "Saturation",
