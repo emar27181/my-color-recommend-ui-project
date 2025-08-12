@@ -100,13 +100,19 @@ export const COLOR_SCHEMES: ColorScheme[] = [
     id: 'dominant_1',
     name: 'ドミナント配色(3色): 同系色の微細なバリエーション',
     description: '同系色の微細なバリエーション',
-    angles: [0, 15, -15],
+    angles: [0, 30, -30],
   },
   {
     id: 'dominant_2',
     name: 'ドミナント配色(3色): 同系色の微細なバリエーション',
     description: '同系色の微細なバリエーション',
-    angles: [0, 30, -30],
+    angles: [0, 30, 60],
+  },
+  {
+    id: 'dominant_3',
+    name: 'ドミナント配色(3色): 同系色の微細なバリエーション',
+    description: '同系色の微細なバリエーション',
+    angles: [0, -30, -60],
   },
   {
     id: 'triadic',
@@ -236,29 +242,29 @@ const sortColorsByLightness = (colors: string[]): string[] => {
 const filterValidTones = (colors: string[], baseColor: string): string[] => {
   const seen = new Set<string>();
   const validColors: string[] = [];
-  
+
   for (const color of colors) {
     const upperColor = color.toUpperCase();
-    
+
     // 重複チェック
     if (seen.has(upperColor)) {
       continue;
     }
-    
+
     // 極端な色（完全な黒・白）を除外
     if (upperColor === '#000000' || upperColor === '#FFFFFF') {
       continue;
     }
-    
+
     // ベースカラーとの重複チェック
     if (upperColor === baseColor.toUpperCase()) {
       continue;
     }
-    
+
     seen.add(upperColor);
     validColors.push(color);
   }
-  
+
   return validColors;
 };
 
@@ -376,19 +382,19 @@ export const useColorStore = create<ColorState>((set, get) => {
   const defaultColor = '#b51a00';
   const color = chroma(defaultColor);
   const hue = color.get('hsl.h') || 0;
-  
+
   // 固定の16パターン（saturation 20,40,60,80 × lightness 20,40,60,80）
   const saturations = [20, 40, 60, 80]; // %
   const lightnesses = [20, 40, 60, 80]; // %
-  
+
   const defaultTones: string[] = [];
-  
+
   // 16パターンを生成（4×4の組み合わせ）
   for (const saturation of saturations) {
     for (const lightness of lightnesses) {
       try {
         const hslColor = chroma.hsl(
-          hue, 
+          hue,
           saturation / 100,  // 0-1の範囲に変換
           lightness / 100    // 0-1の範囲に変換
         );
@@ -398,7 +404,7 @@ export const useColorStore = create<ColorState>((set, get) => {
       }
     }
   }
-  
+
   // デフォルトトーンも重複色・極端な色を除外
   const filteredDefaultTones = filterValidTones(defaultTones, defaultColor);
 
@@ -432,12 +438,12 @@ export const useColorStore = create<ColorState>((set, get) => {
 
     setExtractedColors: (colors: ExtractedColor[], dominantColor: ExtractedColor) => {
       set({ extractedColors: colors, dominantColor });
-      
+
       // 配色技法の自動検出・設定を停止 - ユーザーが手動で変更するまで固定
       // const detectedScheme = detectColorScheme(colors, dominantColor.hex);
       // console.log('Auto-detected color scheme:', detectedScheme);
       // set({ selectedScheme: detectedScheme });
-      
+
       // ドミナントカラーを選択色に自動設定するのを停止（ユーザーの描画色を維持）
       // get().setSelectedColor(dominantColor.hex);
     },
@@ -487,15 +493,15 @@ export const useColorStore = create<ColorState>((set, get) => {
         // 固定の16パターン（saturation 20,40,60,80 × lightness 80,60,40,20）
         const saturations = [20, 40, 60, 80]; // % (左から右へ：薄い→鮮やか)
         const lightnesses = [80, 60, 40, 20]; // % (上から下へ：明るい→暗い)
-        
+
         const tones: string[] = [];
-        
+
         // 16パターンを固定順序で生成（4×4の組み合わせ）
         // 各明度ごとに彩度20,40,60,80の順序で配置（上=明るい、下=暗い、左=薄い、右=鮮やか）
         for (const lightness of lightnesses) {
           for (const saturation of saturations) {
             const hslColor = chroma.hsl(
-              hue, 
+              hue,
               saturation / 100,  // 0-1の範囲に変換
               lightness / 100    // 0-1の範囲に変換
             );
@@ -504,7 +510,7 @@ export const useColorStore = create<ColorState>((set, get) => {
         }
 
         // 配置を固定するため、ソートせずにそのまま使用
-        console.log('Generated tones order (first 4 = lightness80% with sat 20,40,60,80):', 
+        console.log('Generated tones order (first 4 = lightness80% with sat 20,40,60,80):',
           tones.slice(0, 4).map((tone, i) => `${i}: ${tone} (S:${saturations[i]}%)`));
         set({ recommendedTones: tones, toneBaseColor: baseColor });
       } catch (error) {
