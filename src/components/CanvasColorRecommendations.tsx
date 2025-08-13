@@ -944,8 +944,8 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     // 塗りつぶし結果適用用：現在のレイヤーのピクセルデータ
     const layerImageData = layerContext.getImageData(0, 0, currentLayerCanvas.width, currentLayerCanvas.height);
     const layerPixels = layerImageData.data;
-    // === 調整可能な定数 (設定セットD: 境界安全版) ===
-    const colorTolerance = 128;      // 色の許容閾値（0-255）- 業界標準のアンチエイリアシング対応
+    // === 調整可能な定数 (設定セットD: 白系色強化版) ===
+    const baseColorTolerance = 128;  // 基本色の許容閾値（0-255）- 業界標準
     const gapBridgeDistance = 3;     // 隙間をブリッジする最大距離（px）- 3px幅まで（境界安全）
     const gapSearchRadius = 2;       // 隙間検索時の探索半径（px）- 2px半径で探索（境界安全）
     const expansionRadius = 1;       // 正方形拡張半径（px）- 1px拡大（はみ出し防止）
@@ -961,11 +961,35 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     const startG = compositePixels[startIndex + 1];
     const startB = compositePixels[startIndex + 2];
     const startA = compositePixels[startIndex + 3];
-    // 軽量な色の差を計算する関数（平方根を避ける）
+
+    // 白系色判定と動的tolerance調整
+    const startBrightness = (startR + startG + startB) / 3;
+    const isStartWhitish = startBrightness > 200;
+    const colorTolerance = isStartWhitish ? baseColorTolerance * 1.5 : baseColorTolerance; // 白系色は1.5倍寛容に
+    // 改良された色の差計算関数（白系色対応＋デバッグ）
     const colorDistance = (r1: number, g1: number, b1: number, a1: number, r2: number, g2: number, b2: number, a2: number) => {
-      return Math.abs(r1 - r2) + Math.abs(g1 - g2) + Math.abs(b1 - b2) + Math.abs(a1 - a2);
+      // 基本的なマンハッタン距離
+      const distance = Math.abs(r1 - r2) + Math.abs(g1 - g2) + Math.abs(b1 - b2) + Math.abs(a1 - a2);
+
+      // 白系色の特別処理：明度が高い色同士の場合はより寛容に
+      const brightness1 = (r1 + g1 + b1) / 3;
+      const brightness2 = (r2 + g2 + b2) / 3;
+      const isWhitish = brightness1 > 200 && brightness2 > 200;
+
+      // 白系色の場合は距離を0.5倍して寛容にする
+      return isWhitish ? distance * 0.5 : distance;
     };
-    // 指定位置のピクセルが開始色と似ているかチェック（境界検出は合成ピクセルデータを使用）
+
+    // デバッグ用：開始点の情報をログ出力
+    console.log('FloodFill Debug: Start color', {
+      position: { x: Math.floor(startX), y: Math.floor(startY) },
+      rgba: { r: startR, g: startG, b: startB, a: startA },
+      brightness: (startR + startG + startB) / 3,
+      isWhitish: (startR + startG + startB) / 3 > 200,
+      colorTolerance
+    });
+
+    // 指定位置のピクセルが開始色と似ているかチェック（改良版）
     const isSimilarToStart = (x: number, y: number) => {
       if (!canvasRef.current || x < 0 || x >= canvasRef.current.width || y < 0 || y >= canvasRef.current.height) return false;
       const index = (y * canvasRef.current.width + x) * 4;
@@ -973,7 +997,23 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
       const g = compositePixels[index + 1];
       const b = compositePixels[index + 2];
       const a = compositePixels[index + 3];
-      return colorDistance(r, g, b, a, startR, startG, startB, startA) <= colorTolerance;
+      const distance = colorDistance(r, g, b, a, startR, startG, startB, startA);
+      const isSimilar = distance <= colorTolerance;
+
+      // デバッグ：最初の数ピクセルの判定結果をログ出力
+      if (Math.random() < 0.001) { // 0.1%の確率でログ出力
+        console.log('FloodFill Pixel Check:', {
+          position: { x, y },
+          currentRgba: { r, g, b, a },
+          startRgba: { r: startR, g: startG, b: startB, a: startA },
+          distance,
+          tolerance: colorTolerance,
+          isSimilar,
+          brightness: (r + g + b) / 3
+        });
+      }
+
+      return isSimilar;
     };
     // 元の塗りつぶし判定（拡張なし）
     const shouldFill = (x: number, y: number) => {
@@ -1738,7 +1778,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
         {/* Claude Codeクレジット */}
         <div className="text-center mt-2">
           <p className="text-xs text-muted-foreground leading-tight m-0">
-            このサイトはClaude Codeと共同制作しました
+            このサイトはClaude Codeを用いて作られました
           </p>
         </div>
       </CardContent>
