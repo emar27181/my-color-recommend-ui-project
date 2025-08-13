@@ -36,7 +36,6 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
   const [isEditingPenSize, setIsEditingPenSize] = useState(false);
   const [tempPenSize, setTempPenSize] = useState('');
   const [isExtractingColors, setIsExtractingColors] = useState(false);
-  const [isTemplateDisplayed, setIsTemplateDisplayed] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // キャンバスサイズ管理
@@ -436,7 +435,6 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
           showToast('線画をレイヤー1に読み込みました（描画はレイヤー2）', 'success');
 
           // テンプレート表示状態を更新
-          setIsTemplateDisplayed(true);
 
         }, 100);
       };
@@ -668,7 +666,6 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
         console.log('Image drawn to layer 1:', imageFile.name);
 
         // テンプレート表示状態を更新
-        setIsTemplateDisplayed(true);
       }, 100); // リサイズ処理完了を待つ
     };
 
@@ -944,8 +941,8 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     // 塗りつぶし結果適用用：現在のレイヤーのピクセルデータ
     const layerImageData = layerContext.getImageData(0, 0, currentLayerCanvas.width, currentLayerCanvas.height);
     const layerPixels = layerImageData.data;
-    // === 調整可能な定数 (設定セットD: 白系色強化版) ===
-    const baseColorTolerance = 128;  // 基本色の許容閾値（0-255）- 業界標準
+    // === 調整可能な定数 (設定セットE: 境界線ベース版) ===
+    const baseColorTolerance = 128;  // 基本色の許容閾値（0-255）- 境界線ベースでは低め
     const gapBridgeDistance = 3;     // 隙間をブリッジする最大距離（px）- 3px幅まで（境界安全）
     const gapSearchRadius = 2;       // 隙間検索時の探索半径（px）- 2px半径で探索（境界安全）
     const expansionRadius = 1;       // 正方形拡張半径（px）- 1px拡大（はみ出し防止）
@@ -962,31 +959,63 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     const startB = compositePixels[startIndex + 2];
     const startA = compositePixels[startIndex + 3];
 
-    // 白系色判定と動的tolerance調整
+    // 肌色・白系色判定と動的tolerance調整
     const startBrightness = (startR + startG + startB) / 3;
     const isStartWhitish = startBrightness > 200;
-    const colorTolerance = isStartWhitish ? baseColorTolerance * 1.5 : baseColorTolerance; // 白系色は1.5倍寛容に
-    // 改良された色の差計算関数（白系色対応＋デバッグ）
+    
+    // 肌色判定（RGBの特徴的なパターン）
+    const isSkinColor = (r: number, g: number, b: number) => {
+      const brightness = (r + g + b) / 3;
+      // 肌色の特徴: R > G > B かつ 明るい色 かつ 彩度がそれなりにある
+      const isRGBPattern = r > g && g > b && r - b > 30; // R-B差が30以上
+      const isBrightEnough = brightness > 180 && brightness < 250; // 適度な明度
+      const hasWarmTone = r > 200 || (r > g + 20 && r > b + 40); // 暖色系
+      
+      return (isRGBPattern || hasWarmTone) && isBrightEnough;
+    };
+    
+    const isStartSkinColor = isSkinColor(startR, startG, startB);
+    
+    // tolerance調整: 肌色は特に寛容に、白系色も寛容に
+    let colorTolerance = baseColorTolerance;
+    if (isStartSkinColor) {
+      colorTolerance = baseColorTolerance * 2.0; // 肌色は2倍寛容
+    } else if (isStartWhitish) {
+      colorTolerance = baseColorTolerance * 1.5; // 白系色は1.5倍寛容
+    }
+    // 改良された色の差計算関数（肌色・白系色対応）
     const colorDistance = (r1: number, g1: number, b1: number, a1: number, r2: number, g2: number, b2: number, a2: number) => {
       // 基本的なマンハッタン距離
       const distance = Math.abs(r1 - r2) + Math.abs(g1 - g2) + Math.abs(b1 - b2) + Math.abs(a1 - a2);
 
-      // 白系色の特別処理：明度が高い色同士の場合はより寛容に
+      // 肌色同士の場合は特に寛容に
+      const isSkinColor1 = isSkinColor(r1, g1, b1);
+      const isSkinColor2 = isSkinColor(r2, g2, b2);
+      if (isSkinColor1 && isSkinColor2) {
+        return distance * 0.3; // 肌色同士は0.3倍で非常に寛容
+      }
+
+      // 白系色の特別処理
       const brightness1 = (r1 + g1 + b1) / 3;
       const brightness2 = (r2 + g2 + b2) / 3;
       const isWhitish = brightness1 > 200 && brightness2 > 200;
+      if (isWhitish) {
+        return distance * 0.5; // 白系色は0.5倍で寛容
+      }
 
-      // 白系色の場合は距離を0.5倍して寛容にする
-      return isWhitish ? distance * 0.5 : distance;
+      return distance;
     };
 
-    // デバッグ用：開始点の情報をログ出力
-    console.log('FloodFill Debug: Start color', {
+    // デバッグ用：開始点の情報をログ出力（境界線ベース版）
+    const clickBrightness = (startR + startG + startB) / 3;
+    const isClickOnLine = (clickBrightness < 100 && startA > 150) || (clickBrightness < 50);
+    console.log('FloodFill Debug: Boundary-based fill', {
       position: { x: Math.floor(startX), y: Math.floor(startY) },
       rgba: { r: startR, g: startG, b: startB, a: startA },
-      brightness: (startR + startG + startB) / 3,
-      isWhitish: (startR + startG + startB) / 3 > 200,
-      colorTolerance
+      brightness: clickBrightness,
+      isClickOnLine,
+      fillColor: { r: newR, g: newG, b: newB, a: newA },
+      algorithm: 'boundary-based (avoid dark lines)'
     });
 
     // 指定位置のピクセルが開始色と似ているかチェック（改良版）
@@ -1015,48 +1044,38 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
 
       return isSimilar;
     };
-    // 元の塗りつぶし判定（拡張なし）
+    // 境界線ベースの塗りつぶし判定（シンプル版）
     const shouldFill = (x: number, y: number) => {
-      return isSimilarToStart(x, y);
+      if (!canvasRef.current || x < 0 || x >= canvasRef.current.width || y < 0 || y >= canvasRef.current.height) return false;
+      
+      const index = (y * canvasRef.current.width + x) * 4;
+      const r = compositePixels[index];
+      const g = compositePixels[index + 1];
+      const b = compositePixels[index + 2];
+      const a = compositePixels[index + 3];
+      
+      // 既に塗られた部分（新しい色）はスキップ
+      const isAlreadyNewColor = colorDistance(r, g, b, a, newR, newG, newB, newA) < 10;
+      if (isAlreadyNewColor) return false;
+      
+      // 境界線判定：明らかに暗い線、または高い不透明度の色を境界とする
+      const brightness = (r + g + b) / 3;
+      const isLine = (brightness < 100 && a > 150) || (brightness < 50); // 暗い線
+      
+      // 境界線でなければ塗りつぶし対象
+      return !isLine;
     };
-    // 隙間を越えて同じ色の領域があるかチェック（隙間ブリッジ機能）
-    const canBridgeGap = (fromX: number, fromY: number, dirX: number, dirY: number) => {
-      // 隙間の向こう側に同じ色があり、かつ隙間が十分小さい場合のみ
-      let gapPixels = 0;
-      for (let dist = 1; dist <= gapBridgeDistance; dist++) {
-        const checkX = fromX + dirX * dist;
-        const checkY = fromY + dirY * dist;
-        if (!canvasRef.current || checkX < 0 || checkX >= canvasRef.current.width || checkY < 0 || checkY >= canvasRef.current.height) {
-          return false; // 範囲外なら失敗
-        }
-        if (isSimilarToStart(checkX, checkY)) {
-          // 同じ色を見つけた
-          // 周辺の色一致度をチェック（緩和した条件）
-          let matchCount = 0;
-          let totalCount = 0;
-          for (let dx = -gapSearchRadius; dx <= gapSearchRadius; dx++) {
-            for (let dy = -gapSearchRadius; dy <= gapSearchRadius; dy++) {
-              const nearX = checkX + dx;
-              const nearY = checkY + dy;
-              if (canvasRef.current && nearX >= 0 && nearX < canvasRef.current.width && nearY >= 0 && nearY < canvasRef.current.height) {
-                totalCount++;
-                if (isSimilarToStart(nearX, nearY)) {
-                  matchCount++;
-                }
-              }
-            }
-          }
-          // 70%以上が同じ色で、隙間が2px以下の場合のみ許可（境界安全）
-          return matchCount >= totalCount * 0.7 && gapPixels <= 2;
-        } else {
-          gapPixels++;
-        }
-      }
-      return false;
-    };
-    // 同じ色の場合は何もしない
-    if (colorDistance(startR, startG, startB, startA, newR, newG, newB, newA) < colorTolerance) {
+    // 新しい色と同じ色の場合は何もしない（境界線ベースでは緩い条件）
+    if (colorDistance(startR, startG, startB, startA, newR, newG, newB, newA) < 10) {
       // カーソルを元に戻す
+      if (canvasRef.current) {
+        canvasRef.current.style.cursor = isFillMode ? 'pointer' : 'crosshair';
+      }
+      return;
+    }
+    
+    // クリック位置が境界線（暗い線）の場合も何もしない
+    if (isClickOnLine) {
       if (canvasRef.current) {
         canvasRef.current.style.cursor = isFillMode ? 'pointer' : 'crosshair';
       }
@@ -1456,7 +1475,6 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
         // レイヤー1は透明にクリア
         layerContext.clearRect(0, 0, currentLayerCanvas.width, currentLayerCanvas.height);
         // レイヤー1（線画レイヤー）がクリアされた場合、テンプレート表示状態をfalseに
-        setIsTemplateDisplayed(false);
       } else {
         // レイヤー2は常に白色でクリア（テーマに関係なく）
         layerContext.fillStyle = '#ffffff';
@@ -1706,8 +1724,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
                 console.log('Template button clicked');
                 loadTemplateImage().then(() => {
                   // 手動読み込みの場合もテンプレート表示状態を更新
-                  setIsTemplateDisplayed(true);
-                }).catch(error => {
+                        }).catch(error => {
                   console.error('Manual template load failed:', error);
                 });
               }}

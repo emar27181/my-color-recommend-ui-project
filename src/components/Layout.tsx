@@ -5,7 +5,6 @@ import { NavigationMenu } from '@/components/NavigationMenu';
 import { LanguageToggle } from '@/components/LanguageToggle';
 import { ToastContainer } from '@/components/ToastContainer';
 import { TutorialOverlay } from '@/components/tutorial/TutorialOverlay';
-import { useTranslation } from 'react-i18next';
 
 interface LayoutProps {
   children: ReactNode;
@@ -13,7 +12,6 @@ interface LayoutProps {
 }
 
 export const Layout = ({ children, showHeader = true }: LayoutProps) => {
-  const { t } = useTranslation();
 
   return (
     <div className="bg-background text-foreground h-screen flex flex-col">
