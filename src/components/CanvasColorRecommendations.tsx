@@ -944,11 +944,11 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     // 塗りつぶし結果適用用：現在のレイヤーのピクセルデータ
     const layerImageData = layerContext.getImageData(0, 0, currentLayerCanvas.width, currentLayerCanvas.height);
     const layerPixels = layerImageData.data;
-    // === 調整可能な定数 (設定セットA: バランス型) ===
-    const colorTolerance = 15;       // 色の許容閾値（0-255）- 微妙な色差を許容
-    const gapBridgeDistance = 3;     // 隙間をブリッジする最大距離（px）- 3px幅まで
-    const gapSearchRadius = 2;       // 隙間検索時の探索半径（px）- 2px半径で探索
-    const expansionRadius = 2;       // 正方形拡張半径（px）- 検出領域から2px拡大
+    // === 調整可能な定数 (設定セットD: 業界標準) ===
+    const colorTolerance = 128;      // 色の許容閾値（0-255）- 業界標準のアンチエイリアシング対応
+    const gapBridgeDistance = 5;     // 隙間をブリッジする最大距離（px）- 5px幅まで
+    const gapSearchRadius = 3;       // 隙間検索時の探索半径（px）- 3px半径で探索
+    const expansionRadius = 3;       // 正方形拡張半径（px）- 検出領域から3px拡大
     // 新しい色をRGBAに変換
     const hex = newColor.replace('#', '');
     const newR = parseInt(hex.substring(0, 2), 16);
@@ -1006,8 +1006,8 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
               }
             }
           }
-          // 75%以上が同じ色で、隙間が2px以下の場合のみ許可（バランス型）
-          return matchCount >= totalCount * 0.75 && gapPixels <= 2;
+          // 60%以上が同じ色で、隙間が3px以下の場合のみ許可（業界標準）
+          return matchCount >= totalCount * 0.6 && gapPixels <= 3;
         } else {
           gapPixels++;
         }
