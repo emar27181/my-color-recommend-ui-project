@@ -944,11 +944,11 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     // 塗りつぶし結果適用用：現在のレイヤーのピクセルデータ
     const layerImageData = layerContext.getImageData(0, 0, currentLayerCanvas.width, currentLayerCanvas.height);
     const layerPixels = layerImageData.data;
-    // === 調整可能な定数 (設定セットD: 業界標準) ===
+    // === 調整可能な定数 (設定セットD: 境界安全版) ===
     const colorTolerance = 128;      // 色の許容閾値（0-255）- 業界標準のアンチエイリアシング対応
-    const gapBridgeDistance = 5;     // 隙間をブリッジする最大距離（px）- 5px幅まで
-    const gapSearchRadius = 3;       // 隙間検索時の探索半径（px）- 3px半径で探索
-    const expansionRadius = 3;       // 正方形拡張半径（px）- 検出領域から3px拡大
+    const gapBridgeDistance = 3;     // 隙間をブリッジする最大距離（px）- 3px幅まで（境界安全）
+    const gapSearchRadius = 2;       // 隙間検索時の探索半径（px）- 2px半径で探索（境界安全）
+    const expansionRadius = 1;       // 正方形拡張半径（px）- 1px拡大（はみ出し防止）
     // 新しい色をRGBAに変換
     const hex = newColor.replace('#', '');
     const newR = parseInt(hex.substring(0, 2), 16);
@@ -1006,8 +1006,8 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
               }
             }
           }
-          // 60%以上が同じ色で、隙間が3px以下の場合のみ許可（業界標準）
-          return matchCount >= totalCount * 0.6 && gapPixels <= 3;
+          // 70%以上が同じ色で、隙間が2px以下の場合のみ許可（境界安全）
+          return matchCount >= totalCount * 0.7 && gapPixels <= 2;
         } else {
           gapPixels++;
         }
@@ -1064,22 +1064,56 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
         if (y + 1 < height) stack.push(index + width);      // 下
         if (y - 1 >= 0) stack.push(index - width);          // 上
       } else if (gapBridgeDistance > 0) {
-        // 簡略化された隙間ブリッジ（同じ効果、高速化）
-        const directions = [1, -1, width, -width]; // 右、左、下、上
-        for (const dir of directions) {
+        // 境界安全な隙間ブリッジ（行境界越え防止）
+        const currentRow = Math.floor(index / width);
+        const currentCol = index % width;
+        
+        // 4方向の移動方向を個別に処理
+        const directions = [
+          { dir: 1, isHorizontal: true, name: 'right' },      // 右
+          { dir: -1, isHorizontal: true, name: 'left' },      // 左  
+          { dir: width, isHorizontal: false, name: 'down' },  // 下
+          { dir: -width, isHorizontal: false, name: 'up' }    // 上
+        ];
+        
+        for (const { dir, isHorizontal } of directions) {
           for (let dist = 1; dist <= gapBridgeDistance; dist++) {
             const bridgeIndex = index + dir * dist;
             const bridgeX = bridgeIndex % width;
             const bridgeY = Math.floor(bridgeIndex / width);
             
-            if (bridgeX >= 0 && bridgeX < width && bridgeY >= 0 && bridgeY < height && 
-                !isVisited(bridgeX, bridgeY) && shouldFill(bridgeX, bridgeY)) {
+            // 厳格な境界チェック
+            let isValidMove = true;
+            if (isHorizontal) {
+              // 水平移動：同じ行内でかつ有効な列範囲
+              const targetCol = currentCol + (dir > 0 ? dist : -dist);
+              isValidMove = (Math.floor(bridgeIndex / width) === currentRow) && 
+                          (targetCol >= 0 && targetCol < width);
+            } else {
+              // 垂直移動：有効な行範囲
+              isValidMove = (bridgeY >= 0 && bridgeY < height) && 
+                          (bridgeX >= 0 && bridgeX < width);
+            }
+            
+            if (isValidMove && !isVisited(bridgeX, bridgeY) && shouldFill(bridgeX, bridgeY)) {
               // 隙間ブリッジ成功
               for (let d = 1; d <= dist; d++) {
                 const fillIndex = index + dir * d;
                 const fillX = fillIndex % width;
                 const fillY = Math.floor(fillIndex / width);
-                if (fillX >= 0 && fillX < width && fillY >= 0 && fillY < height) {
+                
+                // 各塗りつぶしポイントも境界チェック
+                let validFill = true;
+                if (isHorizontal) {
+                  const fillCol = currentCol + (dir > 0 ? d : -d);
+                  validFill = (Math.floor(fillIndex / width) === currentRow) && 
+                            (fillCol >= 0 && fillCol < width);
+                } else {
+                  validFill = (fillY >= 0 && fillY < height) && 
+                            (fillX >= 0 && fillX < width);
+                }
+                
+                if (validFill) {
                   filledPixels.add(fillIndex);
                   setVisited(fillX, fillY);
                 }
