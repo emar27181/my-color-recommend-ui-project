@@ -1701,22 +1701,12 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
           />
         </div>
         
-        {/* Wacomクレジット - 線画テンプレートが表示されている場合のみ表示 */}
-        {isTemplateDisplayed && (
-          <div className="text-center mt-2">
-            <p className="text-xs text-muted-foreground leading-tight m-0">
-              テンプレート線画：
-              <a
-                href="https://tablet.wacom.co.jp/article/painting-with-wacom"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:underline ml-1"
-              >
-                Wacom提供
-              </a>
-            </p>
-          </div>
-        )}
+        {/* Claude Codeクレジット */}
+        <div className="text-center mt-2">
+          <p className="text-xs text-muted-foreground leading-tight m-0">
+            このサイトはClaude Codeと共同制作しました
+          </p>
+        </div>
       </CardContent>
     </Card>
   );
