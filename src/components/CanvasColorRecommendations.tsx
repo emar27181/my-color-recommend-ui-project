@@ -648,15 +648,27 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
         const canvasWidth = canvasRef.current.width;
         const canvasHeight = canvasRef.current.height;
 
-        // レイヤー2（背景）に画像を描画
+        // レイヤー1の前の画像を削除してから新しい画像を描画
+        const currentLayer1Context = layer1CanvasRef.current?.getContext('2d');
+        if (currentLayer1Context && layer1CanvasRef.current) {
+          currentLayer1Context.clearRect(0, 0, canvasWidth, canvasHeight);
+          currentLayer1Context.drawImage(img, 0, 0, canvasWidth, canvasHeight);
+        }
+
+        // レイヤー2（背景）を白で初期化
         currentLayer2Context.fillStyle = '#ffffff';
         currentLayer2Context.fillRect(0, 0, canvasWidth, canvasHeight);
-        currentLayer2Context.drawImage(img, 0, 0, canvasWidth, canvasHeight);
+
+        // 描画レイヤーをレイヤー2に設定（画像の上に描画できるように）
+        setCurrentLayer(2);
 
         // 表示用キャンバスに合成結果を描画
         updateCompositeCanvas();
 
-        console.log('Image drawn to canvas:', imageFile.name);
+        console.log('Image drawn to layer 1:', imageFile.name);
+        
+        // テンプレート表示状態を更新
+        setIsTemplateDisplayed(true);
       }, 100); // リサイズ処理完了を待つ
     };
 
