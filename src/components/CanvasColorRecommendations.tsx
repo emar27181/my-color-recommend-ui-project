@@ -241,10 +241,10 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
       layer2Canvas: !!layer2CanvasRef.current,
       hasAutoLoaded
     });
-    
-    if (layer1Context && layer2Context && 
-        layer1CanvasRef.current && layer2CanvasRef.current && 
-        !hasAutoLoaded) {
+
+    if (layer1Context && layer2Context &&
+      layer1CanvasRef.current && layer2CanvasRef.current &&
+      !hasAutoLoaded) {
       const timer = setTimeout(() => {
         console.log('Auto-loading template image on initialization (one time only)');
         setHasAutoLoaded(true); // フラグを設定して再実行を防止
@@ -252,7 +252,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
           console.error('Failed to auto-load template:', error);
         });
       }, 500); // より長い遅延で確実性を向上
-      
+
       return () => clearTimeout(timer);
     }
   }, [layer1Context, layer2Context, hasAutoLoaded]);
@@ -388,9 +388,9 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
       const img: HTMLImageElement = document.createElement('img');
 
       img.onload = () => {
-        console.log('Template image loaded successfully to layer 1', { 
-          width: img.width, 
-          height: img.height 
+        console.log('Template image loaded successfully to layer 1', {
+          width: img.width,
+          height: img.height
         });
 
         // テンプレート画像サイズに合わせてキャンバスをリサイズ
@@ -407,9 +407,9 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
             currentLayer2Context: !!currentLayer2Context,
             layer1Canvas: !!layer1CanvasRef.current,
             layer2Canvas: !!layer2CanvasRef.current,
-            canvasSize: { 
-              width: layer1CanvasRef.current?.width, 
-              height: layer1CanvasRef.current?.height 
+            canvasSize: {
+              width: layer1CanvasRef.current?.width,
+              height: layer1CanvasRef.current?.height
             }
           });
 
@@ -434,7 +434,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
           updateCompositeCanvas();
 
           showToast('線画をレイヤー1に読み込みました（描画はレイヤー2）', 'success');
-          
+
           // テンプレート表示状態を更新
           setIsTemplateDisplayed(true);
 
@@ -504,7 +504,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
       // レイヤーキャンバスから直接合成して色抽出用の一時キャンバスを作成
       const layer1Canvas = layer1CanvasRef.current;
       const layer2Canvas = layer2CanvasRef.current;
-      
+
       // 色抽出専用の一時キャンバスを作成（表示用キャンバスとは完全に分離）
       const tempCanvas = document.createElement('canvas');
       const tempCtx = tempCanvas.getContext('2d');
@@ -523,14 +523,14 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
       }
       tempCanvas.width = width;
       tempCanvas.height = height;
-      
+
       // レイヤーを合成して一時キャンバスに描画（表示用キャンバスには一切触れない）
       tempCtx.fillStyle = '#ffffff';
       tempCtx.fillRect(0, 0, width, height);
-      
+
       // レイヤー2（下）を描画
       tempCtx.drawImage(layer2Canvas, 0, 0, width, height);
-      
+
       // レイヤー1（上）を描画  
       tempCtx.drawImage(layer1Canvas, 0, 0, width, height);
       // Canvas内容を画像として取得
@@ -666,7 +666,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
         updateCompositeCanvas();
 
         console.log('Image drawn to layer 1:', imageFile.name);
-        
+
         // テンプレート表示状態を更新
         setIsTemplateDisplayed(true);
       }, 100); // リサイズ処理完了を待つ
@@ -782,7 +782,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     try {
       const parsedData = JSON.parse(historyData);
       const { layer1: layer1DataURL, layer2: layer2DataURL } = parsedData;
-      
+
       // レイヤー1を復元
       const img1: HTMLImageElement = document.createElement('img');
       img1.onload = () => {
@@ -793,7 +793,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
         updateCompositeCanvas();
       };
       img1.src = layer1DataURL;
-      
+
       // レイヤー2を復元
       const img2: HTMLImageElement = document.createElement('img');
       img2.onload = () => {
@@ -1044,16 +1044,16 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     const stack: number[] = [Math.floor(startY) * canvasRef.current.width + Math.floor(startX)];
     const width = canvasRef.current.width;
     const height = canvasRef.current.height;
-    
+
     while (stack.length > 0) {
       const index = stack.pop()!;
       const x = index % width;
       const y = Math.floor(index / width);
-      
+
       if (x < 0 || x >= width || y < 0 || y >= height) continue;
       if (isVisited(x, y)) continue;
       setVisited(x, y);
-      
+
       // 基本塗りつぶし判定
       if (shouldFill(x, y)) {
         // 基本領域として記録（数値インデックス管理）
@@ -1067,7 +1067,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
         // 境界安全な隙間ブリッジ（行境界越え防止）
         const currentRow = Math.floor(index / width);
         const currentCol = index % width;
-        
+
         // 4方向の移動方向を個別に処理
         const directions = [
           { dir: 1, isHorizontal: true, name: 'right' },      // 右
@@ -1075,44 +1075,44 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
           { dir: width, isHorizontal: false, name: 'down' },  // 下
           { dir: -width, isHorizontal: false, name: 'up' }    // 上
         ];
-        
+
         for (const { dir, isHorizontal } of directions) {
           for (let dist = 1; dist <= gapBridgeDistance; dist++) {
             const bridgeIndex = index + dir * dist;
             const bridgeX = bridgeIndex % width;
             const bridgeY = Math.floor(bridgeIndex / width);
-            
+
             // 厳格な境界チェック
             let isValidMove = true;
             if (isHorizontal) {
               // 水平移動：同じ行内でかつ有効な列範囲
               const targetCol = currentCol + (dir > 0 ? dist : -dist);
-              isValidMove = (Math.floor(bridgeIndex / width) === currentRow) && 
-                          (targetCol >= 0 && targetCol < width);
+              isValidMove = (Math.floor(bridgeIndex / width) === currentRow) &&
+                (targetCol >= 0 && targetCol < width);
             } else {
               // 垂直移動：有効な行範囲
-              isValidMove = (bridgeY >= 0 && bridgeY < height) && 
-                          (bridgeX >= 0 && bridgeX < width);
+              isValidMove = (bridgeY >= 0 && bridgeY < height) &&
+                (bridgeX >= 0 && bridgeX < width);
             }
-            
+
             if (isValidMove && !isVisited(bridgeX, bridgeY) && shouldFill(bridgeX, bridgeY)) {
               // 隙間ブリッジ成功
               for (let d = 1; d <= dist; d++) {
                 const fillIndex = index + dir * d;
                 const fillX = fillIndex % width;
                 const fillY = Math.floor(fillIndex / width);
-                
+
                 // 各塗りつぶしポイントも境界チェック
                 let validFill = true;
                 if (isHorizontal) {
                   const fillCol = currentCol + (dir > 0 ? d : -d);
-                  validFill = (Math.floor(fillIndex / width) === currentRow) && 
-                            (fillCol >= 0 && fillCol < width);
+                  validFill = (Math.floor(fillIndex / width) === currentRow) &&
+                    (fillCol >= 0 && fillCol < width);
                 } else {
-                  validFill = (fillY >= 0 && fillY < height) && 
-                            (fillX >= 0 && fillX < width);
+                  validFill = (fillY >= 0 && fillY < height) &&
+                    (fillX >= 0 && fillX < width);
                 }
-                
+
                 if (validFill) {
                   filledPixels.add(fillIndex);
                   setVisited(fillX, fillY);
@@ -1128,22 +1128,22 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     // 軽量化された形態学的膨張処理
     if (expansionRadius > 0) {
       console.log('FloodFill: Applying optimized morphological dilation with radius', expansionRadius);
-      
+
       // 数値インデックスベース膨張処理（高速化）
       for (const pixelIndex of filledPixels) {
         const centerX = pixelIndex % width;
         const centerY = Math.floor(pixelIndex / width);
-        
+
         // 正方形カーネルによる膨張
         for (let dy = -expansionRadius; dy <= expansionRadius; dy++) {
           for (let dx = -expansionRadius; dx <= expansionRadius; dx++) {
             const expandX = centerX + dx;
             const expandY = centerY + dy;
-            
+
             // 境界チェック
             if (expandX >= 0 && expandX < width && expandY >= 0 && expandY < height) {
               const expandIndex = expandY * width + expandX;
-              
+
               // 基本領域に含まれていない場合のみ拡張領域に追加
               if (!filledPixels.has(expandIndex)) {
                 expandedPixels.add(expandIndex);
@@ -1734,7 +1734,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
             onTouchEnd={handleTouchEnd}
           />
         </div>
-        
+
         {/* Claude Codeクレジット */}
         <div className="text-center mt-2">
           <p className="text-xs text-muted-foreground leading-tight m-0">
