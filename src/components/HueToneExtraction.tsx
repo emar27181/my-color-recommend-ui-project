@@ -269,8 +269,8 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
                 y1={center}
                 x2={point.x}
                 y2={point.y}
-                stroke={point.isBase ? "#ff6b6b" : "#4ecdc4"}
-                strokeWidth={point.isBase ? "4" : "3"}
+                stroke="#ffffff"
+                strokeWidth="1"
                 strokeDasharray={point.isBase ? "none" : "6,3"}
                 opacity="1"
               />
@@ -285,8 +285,8 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
                   cy={point.y}
                   r={point.isBase ? "9" : "7"}
                   fill="white"
-                  stroke={point.isBase ? "#ff6b6b" : "#4ecdc4"}
-                  strokeWidth="3"
+                  stroke="#ffffff"
+                  strokeWidth="1"
                   opacity="1"
                 />
                 {/* 配色技法点の内側 */}
@@ -323,7 +323,7 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
             r="6"
             fill={selectedHuePoint.color}
             stroke="white"
-            strokeWidth="3"
+            strokeWidth="1"
             opacity="1"
           />
         )}
