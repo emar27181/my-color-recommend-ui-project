@@ -45,7 +45,7 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
       
       const baseHue = chroma(selectedColor).get('hsl.h') || 0;
       
-      return scheme.angles.map((angle, index) => {
+      return scheme.angles.map((angle) => {
         const actualHue = (baseHue + angle) % 360;
         const radian = actualHue * (Math.PI / 180);
         const x = center + radius * Math.cos(radian - Math.PI / 2);
