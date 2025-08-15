@@ -269,7 +269,7 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
                 y1={center}
                 x2={point.x}
                 y2={point.y}
-                stroke="#ff8c00"
+                stroke="#ff0000"
                 strokeWidth="1"
                 strokeDasharray={point.isBase ? "none" : "6,3"}
                 opacity="0.5"
@@ -285,7 +285,7 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
                   cy={point.y}
                   r={point.isBase ? "6" : "4"}
                   fill={point.color}
-                  stroke="#ff8c00"
+                  stroke="#ff0000"
                   strokeWidth="1"
                   opacity="0.5"
                 />
@@ -314,7 +314,7 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
             cy={selectedHuePoint.y}
             r="6"
             fill={selectedHuePoint.color}
-            stroke="#ff8c00"
+            stroke="#ff0000"
             strokeWidth="1"
             opacity="0.5"
           />
