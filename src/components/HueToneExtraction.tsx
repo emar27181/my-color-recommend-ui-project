@@ -1,11 +1,11 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { useColorStore, quantizeHue, quantizeSaturationLightness } from '@/store/colorStore';
+import { useColorStore, quantizeHue, quantizeSaturationLightness, COLOR_SCHEMES } from '@/store/colorStore';
 import { useTranslation } from 'react-i18next';
 import chroma from 'chroma-js';
 import { useMemo } from 'react';
 
 // 色相環プロット用コンポーネント
-const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor }: { colors: { hex: string; usage: number }[], onHueClick?: (hue: number) => void, isQuantized: boolean, selectedColor?: string }) => {
+const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedScheme }: { colors: { hex: string; usage: number }[], onHueClick?: (hue: number) => void, isQuantized: boolean, selectedColor?: string, selectedScheme?: string }) => {
   const size = 220; // 元の縦幅に戻す
   const center = size / 2;
   const radius = 72; // 元のradiusに戻す
@@ -29,11 +29,42 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor }: { colors: 
       const angle = (h || 0) * (Math.PI / 180);
       const x = center + radius * Math.cos(angle - Math.PI / 2);
       const y = center + radius * Math.sin(angle - Math.PI / 2);
-      return { x, y, color: selectedColor };
+      return { x, y, color: selectedColor, hue: h || 0 };
     } catch {
       return null;
     }
   })() : null;
+
+  // 配色技法のプロット点を計算
+  const colorSchemePoints = useMemo(() => {
+    if (!selectedScheme || !selectedColor) return [];
+    
+    try {
+      const scheme = COLOR_SCHEMES.find(s => s.id === selectedScheme);
+      if (!scheme) return [];
+      
+      const baseHue = chroma(selectedColor).get('hsl.h') || 0;
+      
+      return scheme.angles.map((angle, index) => {
+        const actualHue = (baseHue + angle) % 360;
+        const radian = actualHue * (Math.PI / 180);
+        const x = center + radius * Math.cos(radian - Math.PI / 2);
+        const y = center + radius * Math.sin(radian - Math.PI / 2);
+        
+        return {
+          x,
+          y,
+          angle,
+          actualHue,
+          isBase: angle === 0,
+          color: chroma.hsl(actualHue, 0.7, 0.5).hex()
+        };
+      });
+    } catch (error) {
+      console.error('Error calculating color scheme points:', error);
+      return [];
+    }
+  }, [selectedScheme, selectedColor, center, radius]);
 
   // SVGクリックハンドラ
   const handleSvgClick = (event: React.MouseEvent<SVGSVGElement>) => {
@@ -227,6 +258,63 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor }: { colors: 
           />
         ))}
         
+        {/* 配色技法のプロット（選択中の色がある場合のみ） */}
+        {selectedColor && colorSchemePoints.length > 0 && (
+          <g>
+            {/* 中心から各プロット点への関係線 */}
+            {colorSchemePoints.map((point, index) => (
+              <line
+                key={`scheme-line-${index}`}
+                x1={center}
+                y1={center}
+                x2={point.x}
+                y2={point.y}
+                stroke={point.isBase ? "#ff6b6b" : "#4ecdc4"}
+                strokeWidth={point.isBase ? "4" : "3"}
+                strokeDasharray={point.isBase ? "none" : "6,3"}
+                opacity="1"
+              />
+            ))}
+            
+            {/* 配色技法のプロット点 */}
+            {colorSchemePoints.map((point, index) => (
+              <g key={`scheme-point-${index}`}>
+                {/* 配色技法点の外枠 */}
+                <circle
+                  cx={point.x}
+                  cy={point.y}
+                  r={point.isBase ? "9" : "7"}
+                  fill="white"
+                  stroke={point.isBase ? "#ff6b6b" : "#4ecdc4"}
+                  strokeWidth="3"
+                  opacity="1"
+                />
+                {/* 配色技法点の内側 */}
+                <circle
+                  cx={point.x}
+                  cy={point.y}
+                  r={point.isBase ? "6" : "4"}
+                  fill={point.color}
+                  opacity="1"
+                />
+                
+                {/* 角度ラベル（ベース色以外） */}
+                {!point.isBase && (
+                  <text
+                    x={point.x + (point.x > center ? 12 : -12)}
+                    y={point.y + 4}
+                    textAnchor={point.x > center ? "start" : "end"}
+                    className="text-xs fill-foreground font-medium"
+                    opacity="0.7"
+                  >
+                    {point.angle > 0 ? `+${point.angle}°` : `${point.angle}°`}
+                  </text>
+                )}
+              </g>
+            ))}
+          </g>
+        )}
+
         {/* 選択中の色の強調表示 */}
         {selectedHuePoint && (
           <circle
@@ -504,7 +592,7 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
 };
 
 export const HueToneExtraction = () => {
-  const { extractedColors, selectedColor, setSelectedColor, isQuantizationEnabled } = useColorStore();
+  const { extractedColors, selectedColor, setSelectedColor, isQuantizationEnabled, selectedScheme } = useColorStore();
   const { t } = useTranslation();
 
   // 色相環クリック時のハンドラ
@@ -558,9 +646,18 @@ export const HueToneExtraction = () => {
       </CardHeader>
       <CardContent className="p-0 flex-1 overflow-auto min-h-0">
         <div data-tutorial="hue-tone-extraction" className="space-y-0">
+          {/* 配色技法の表示 */}
+          {selectedScheme && selectedColor && (
+            <div className="px-2 py-1 text-center">
+              <div className="text-xs text-muted-foreground opacity-80">
+                {COLOR_SCHEMES.find(s => s.id === selectedScheme)?.name.split(':')[0] || '配色技法'}
+              </div>
+            </div>
+          )}
+          
           {/* 色相・トーンの可視化を常に表示 */}
           <div className="flex flex-col space-y-0">
-            <HueWheel colors={visualizationData} onHueClick={handleHueClick} isQuantized={isQuantizationEnabled} selectedColor={selectedColor} />
+            <HueWheel colors={visualizationData} onHueClick={handleHueClick} isQuantized={isQuantizationEnabled} selectedColor={selectedColor} selectedScheme={selectedScheme} />
             <SaturationLightnessPlot colors={visualizationData} onSaturationLightnessClick={handleSaturationLightnessClick} isQuantized={isQuantizationEnabled} selectedColor={selectedColor} />
           </div>
           {/* 抽出色がない場合のメッセージは下部に小さく表示 */}
