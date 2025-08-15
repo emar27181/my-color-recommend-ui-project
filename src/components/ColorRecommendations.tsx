@@ -1,5 +1,5 @@
 import React from 'react';
-import { useColorStore, COLOR_SCHEMES } from '@/store/colorStore';
+import { useColorStore, COLOR_SCHEMES, sortSchemesByCompatibility } from '@/store/colorStore';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ColorGrid } from '@/components/common/ColorGrid';
 import { ColorWheelMini } from '@/components/common/ColorWheelMini';
@@ -14,10 +14,15 @@ interface ColorRecommendationsProps {
 }
 
 export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsProps) => {
-  const { recommendedColors, selectedScheme, setSelectedScheme, generateRecommendedTones, selectedColor, setSelectedColor, paintColor } = useColorStore();
+  const { recommendedColors, selectedScheme, setSelectedScheme, generateRecommendedTones, selectedColor, setSelectedColor, paintColor, extractedColors } = useColorStore();
   const { onUserAction } = useTutorial();
   const { t } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+
+  // 抽出色に基づいて配色技法を適合度順にソート
+  const sortedSchemes = React.useMemo(() => {
+    return sortSchemesByCompatibility(extractedColors, selectedColor, COLOR_SCHEMES);
+  }, [extractedColors, selectedColor]);
 
   const handleGenerateTones = (color: string) => {
     // クリックされた色を描画色として設定
@@ -114,7 +119,7 @@ export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsP
               >
                 <div className="p-3 min-w-0">
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full">
-                    {COLOR_SCHEMES.map((scheme) => (
+                    {sortedSchemes.map((scheme) => (
                       <button
                         key={scheme.id}
                         onClick={() => handleSchemeSelect(scheme.id)}

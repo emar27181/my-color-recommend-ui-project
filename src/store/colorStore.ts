@@ -525,6 +525,102 @@ export const useColorStore = create<ColorState>((set, get) => {
   };
 });
 
+// 抽出された色の色相を分析する関数
+export const analyzeExtractedHues = (extractedColors: ExtractedColor[]): number[] => {
+  const hues: number[] = [];
+  
+  extractedColors.forEach(color => {
+    try {
+      const hue = chroma(color.hex).get('hsl.h');
+      if (typeof hue === 'number' && !isNaN(hue)) {
+        hues.push(hue);
+      }
+    } catch (error) {
+      console.error('Error analyzing hue for color:', color.hex, error);
+    }
+  });
+  
+  return hues;
+};
+
+// 配色技法の適合度を計算する関数
+export const calculateSchemeCompatibility = (
+  extractedColors: ExtractedColor[], 
+  selectedColor: string, 
+  scheme: ColorScheme
+): number => {
+  if (extractedColors.length === 0) return 0;
+  
+  try {
+    const baseHue = chroma(selectedColor).get('hsl.h') || 0;
+    const extractedHues = analyzeExtractedHues(extractedColors);
+    
+    if (extractedHues.length === 0) return 0;
+    
+    // 配色技法の期待色相を計算
+    const expectedHues = scheme.angles.map(angle => (baseHue + angle) % 360);
+    
+    let compatibilityScore = 0;
+    let totalWeight = 0;
+    
+    // 抽出された色相と期待色相の適合度を計算
+    extractedColors.forEach((extractedColor, index) => {
+      if (index >= extractedHues.length) return;
+      
+      const extractedHue = extractedHues[index];
+      const weight = extractedColor.usage; // 使用率を重みとして使用
+      
+      // 最も近い期待色相との距離を計算
+      let minDistance = Infinity;
+      expectedHues.forEach(expectedHue => {
+        const distance = Math.min(
+          Math.abs(extractedHue - expectedHue),
+          360 - Math.abs(extractedHue - expectedHue)
+        );
+        minDistance = Math.min(minDistance, distance);
+      });
+      
+      // 距離が小さいほど適合度が高い（最大30度の許容範囲）
+      const similarity = Math.max(0, 1 - minDistance / 30);
+      compatibilityScore += similarity * weight;
+      totalWeight += weight;
+    });
+    
+    return totalWeight > 0 ? compatibilityScore / totalWeight : 0;
+  } catch (error) {
+    console.error('Error calculating scheme compatibility:', error);
+    return 0;
+  }
+};
+
+// 配色技法を適合度順にソートする関数
+export const sortSchemesByCompatibility = (
+  extractedColors: ExtractedColor[],
+  selectedColor: string,
+  schemes: ColorScheme[] = COLOR_SCHEMES
+): ColorScheme[] => {
+  if (extractedColors.length === 0) {
+    // 抽出色がない場合はデフォルト順序
+    return [...schemes];
+  }
+  
+  // 各配色技法の適合度を計算
+  const schemesWithScores = schemes.map(scheme => ({
+    scheme,
+    compatibility: calculateSchemeCompatibility(extractedColors, selectedColor, scheme)
+  }));
+  
+  // 適合度順にソート（降順）
+  schemesWithScores.sort((a, b) => b.compatibility - a.compatibility);
+  
+  console.log('Scheme compatibility scores:', schemesWithScores.map(s => ({
+    name: s.scheme.name.split(':')[0],
+    score: s.compatibility.toFixed(3)
+  })));
+  
+  return schemesWithScores.map(s => s.scheme);
+};
+
 // 初期化時にデフォルトの推薦色とトーン推薦を生成
 const initialState = useColorStore.getState();
 initialState.generateRecommendedColors();
