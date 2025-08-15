@@ -1018,32 +1018,6 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
       algorithm: 'boundary-based (avoid dark lines)'
     });
 
-    // 指定位置のピクセルが開始色と似ているかチェック（改良版）
-    const isSimilarToStart = (x: number, y: number) => {
-      if (!canvasRef.current || x < 0 || x >= canvasRef.current.width || y < 0 || y >= canvasRef.current.height) return false;
-      const index = (y * canvasRef.current.width + x) * 4;
-      const r = compositePixels[index];
-      const g = compositePixels[index + 1];
-      const b = compositePixels[index + 2];
-      const a = compositePixels[index + 3];
-      const distance = colorDistance(r, g, b, a, startR, startG, startB, startA);
-      const isSimilar = distance <= colorTolerance;
-
-      // デバッグ：最初の数ピクセルの判定結果をログ出力
-      if (Math.random() < 0.001) { // 0.1%の確率でログ出力
-        console.log('FloodFill Pixel Check:', {
-          position: { x, y },
-          currentRgba: { r, g, b, a },
-          startRgba: { r: startR, g: startG, b: startB, a: startA },
-          distance,
-          tolerance: colorTolerance,
-          isSimilar,
-          brightness: (r + g + b) / 3
-        });
-      }
-
-      return isSimilar;
-    };
     // 境界線ベースの塗りつぶし判定（シンプル版）
     const shouldFill = (x: number, y: number) => {
       if (!canvasRef.current || x < 0 || x >= canvasRef.current.width || y < 0 || y >= canvasRef.current.height) return false;
