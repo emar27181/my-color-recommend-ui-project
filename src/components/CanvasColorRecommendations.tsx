@@ -945,7 +945,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     const baseColorTolerance = 128;  // 基本色の許容閾値（0-255）- 境界線ベースでは低め
     const gapBridgeDistance = 3;     // 隙間をブリッジする最大距離（px）- 3px幅まで（境界安全）
     const gapSearchRadius = 2;       // 隙間検索時の探索半径（px）- 2px半径で探索（境界安全）
-    const expansionRadius = 1;       // 正方形拡張半径（px）- 1px拡大（はみ出し防止）
+    const expansionRadius = 0;       // 正方形拡張半径（px）- 1px拡大（はみ出し防止）
     // 新しい色をRGBAに変換
     const hex = newColor.replace('#', '');
     const newR = parseInt(hex.substring(0, 2), 16);
@@ -962,7 +962,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     // 肌色・白系色判定と動的tolerance調整
     const startBrightness = (startR + startG + startB) / 3;
     const isStartWhitish = startBrightness > 200;
-    
+
     // 肌色判定（RGBの特徴的なパターン）
     const isSkinColor = (r: number, g: number, b: number) => {
       const brightness = (r + g + b) / 3;
@@ -970,12 +970,12 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
       const isRGBPattern = r > g && g > b && r - b > 30; // R-B差が30以上
       const isBrightEnough = brightness > 180 && brightness < 250; // 適度な明度
       const hasWarmTone = r > 200 || (r > g + 20 && r > b + 40); // 暖色系
-      
+
       return (isRGBPattern || hasWarmTone) && isBrightEnough;
     };
-    
+
     const isStartSkinColor = isSkinColor(startR, startG, startB);
-    
+
     // tolerance調整: 肌色は特に寛容に、白系色も寛容に
     let colorTolerance = baseColorTolerance;
     if (isStartSkinColor) {
@@ -1021,21 +1021,21 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     // 境界線ベースの塗りつぶし判定（シンプル版）
     const shouldFill = (x: number, y: number) => {
       if (!canvasRef.current || x < 0 || x >= canvasRef.current.width || y < 0 || y >= canvasRef.current.height) return false;
-      
+
       const index = (y * canvasRef.current.width + x) * 4;
       const r = compositePixels[index];
       const g = compositePixels[index + 1];
       const b = compositePixels[index + 2];
       const a = compositePixels[index + 3];
-      
+
       // 既に塗られた部分（新しい色）はスキップ
       const isAlreadyNewColor = colorDistance(r, g, b, a, newR, newG, newB, newA) < 10;
       if (isAlreadyNewColor) return false;
-      
+
       // 境界線判定：明らかに暗い線、または高い不透明度の色を境界とする
       const brightness = (r + g + b) / 3;
       const isLine = (brightness < 100 && a > 150) || (brightness < 50); // 暗い線
-      
+
       // 境界線でなければ塗りつぶし対象
       return !isLine;
     };
@@ -1047,7 +1047,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
       }
       return;
     }
-    
+
     // クリック位置が境界線（暗い線）の場合も何もしない
     if (isClickOnLine) {
       if (canvasRef.current) {
@@ -1698,7 +1698,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
                 console.log('Template button clicked');
                 loadTemplateImage().then(() => {
                   // 手動読み込みの場合もテンプレート表示状態を更新
-                        }).catch(error => {
+                }).catch(error => {
                   console.error('Manual template load failed:', error);
                 });
               }}
