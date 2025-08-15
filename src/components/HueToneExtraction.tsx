@@ -103,7 +103,7 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
         width="100%" 
         height={size} 
         viewBox={`0 0 ${size} ${size}`} 
-        className="border rounded cursor-pointer" 
+        className="border-0 rounded cursor-pointer" 
         onClick={handleSvgClick}
       >
         {/* 色相環背景 */}
@@ -155,7 +155,7 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
           );
         })}
         
-        <circle cx={center} cy={center} r={radius} fill="none" stroke="#e5e7eb" strokeWidth="2" strokeDasharray="5,3" opacity="0.3" />
+        <circle cx={center} cy={center} r={radius} fill="none" stroke="#e5e7eb" strokeWidth="1" strokeDasharray="5,3" opacity="0.3" />
         
         {/* 30度間隔の対角線: 量子化モードで切り替え */}
         {isQuantized ? (
@@ -174,7 +174,7 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
                 x2={x2}
                 y2={y2}
                 stroke="#000000"
-                strokeWidth="1.5"
+                strokeWidth="1"
                 opacity="0.4"
               />
             );
@@ -195,7 +195,7 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
                 x2={x2}
                 y2={y2}
                 stroke="#e5e7eb"
-                strokeWidth="0.5"
+                strokeWidth="1"
                 opacity="0.3"
               />
             );
@@ -272,7 +272,7 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
                 stroke="#ffffff"
                 strokeWidth="1"
                 strokeDasharray={point.isBase ? "none" : "6,3"}
-                opacity="1"
+                opacity="0.5"
               />
             ))}
             
@@ -283,11 +283,11 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
                 <circle
                   cx={point.x}
                   cy={point.y}
-                  r={point.isBase ? "9" : "7"}
+                  r={point.isBase ? "7" : "5"}
                   fill="white"
                   stroke="#ffffff"
                   strokeWidth="1"
-                  opacity="1"
+                  opacity="0.5"
                 />
                 {/* 配色技法点の内側 */}
                 <circle
@@ -295,7 +295,7 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
                   cy={point.y}
                   r={point.isBase ? "6" : "4"}
                   fill={point.color}
-                  opacity="1"
+                  opacity="0.5"
                 />
                 
                 {/* 角度ラベル（ベース色以外） */}
@@ -324,7 +324,7 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
             fill={selectedHuePoint.color}
             stroke="white"
             strokeWidth="1"
-            opacity="1"
+            opacity="0.5"
           />
         )}
       </svg>
@@ -394,7 +394,7 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
         width="100%" 
         height={height} 
         viewBox={`0 0 ${width} ${height}`} 
-        className="border rounded cursor-pointer" 
+        className="border-0 rounded cursor-pointer" 
         onClick={handleSvgClick}
       >
         {/* 彩度-明度背景グラデーション */}
@@ -455,7 +455,7 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
                 x2={20 + (i / 10) * plotWidth}
                 y2={11 + plotHeight}
                 stroke="#e5e7eb"
-                strokeWidth="0.5"
+                strokeWidth="1"
                 opacity="0.4"
               />
             ))}
@@ -490,7 +490,7 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
                 x2={20 + plotWidth}
                 y2={11 + (i / 10) * plotHeight}
                 stroke="#e5e7eb"
-                strokeWidth="0.5"
+                strokeWidth="1"
                 opacity="0.4"
               />
             ))}
@@ -582,7 +582,7 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
             r="6"
             fill={selectedSLPoint.color}
             stroke="white"
-            strokeWidth="3"
+            strokeWidth="1"
             opacity="1"
           />
         )}
