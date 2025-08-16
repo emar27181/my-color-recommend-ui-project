@@ -942,7 +942,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     const layerImageData = layerContext.getImageData(0, 0, currentLayerCanvas.width, currentLayerCanvas.height);
     const layerPixels = layerImageData.data;
     // === 調整可能な定数 (設定セットE: 境界線ベース版) ===
-    const baseColorTolerance = 128;  // 基本色の許容閾値（0-255）- 境界線ベースでは低め
+    const baseColorTolerance = 200;  // 基本色の許容閾値（0-255）- 肌色グラデーション対応でさらに増加
     const gapBridgeDistance = 3;     // 隙間をブリッジする最大距離（px）- 3px幅まで（境界安全）
     const gapSearchRadius = 2;       // 隙間検索時の探索半径（px）- 2px半径で探索（境界安全）
     const expansionRadius = 0;       // 正方形拡張半径（px）- 1px拡大（はみ出し防止）
@@ -966,12 +966,14 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     // 肌色判定（RGBの特徴的なパターン）
     const isSkinColor = (r: number, g: number, b: number) => {
       const brightness = (r + g + b) / 3;
-      // 肌色の特徴: R > G > B かつ 明るい色 かつ 彩度がそれなりにある
-      const isRGBPattern = r > g && g > b && r - b > 30; // R-B差が30以上
-      const isBrightEnough = brightness > 180 && brightness < 250; // 適度な明度
-      const hasWarmTone = r > 200 || (r > g + 20 && r > b + 40); // 暖色系
+      // 肌色の特徴: より広範囲の肌色を認識（緩和版）
+      const isRGBPattern = r > g && g >= b && r - b > 15; // R-B差を緩和（30→15）
+      const isBrightEnough = brightness > 120 && brightness < 250; // 明度範囲拡大（180→120）
+      const hasWarmTone = r > 160 || (r > g + 10 && r > b + 20); // 暖色系判定緩和
+      const isSkinTone = (r > 200 && g > 150 && b > 100) || // 明るい肌色
+                         (r > 140 && g > 100 && b > 60);      // 暗い肌色追加
 
-      return (isRGBPattern || hasWarmTone) && isBrightEnough;
+      return (isRGBPattern || hasWarmTone || isSkinTone) && isBrightEnough;
     };
 
     const isStartSkinColor = isSkinColor(startR, startG, startB);
