@@ -70,8 +70,8 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     }
   };
 
-  // キャンバス表示高さを動的計算
-  const displayHeight = Math.min(450, Math.floor(containerWidth / canvasAspectRatio));
+  // キャンバス表示高さを動的計算（1:1の場合は大きめに表示）
+  const displayHeight = Math.min(550, Math.floor(containerWidth / canvasAspectRatio));
 
   // キャンバスサイズを動的に調整する関数
   const resizeCanvas = useCallback((newWidth: number, newHeight: number) => {
@@ -88,7 +88,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     setCanvasAspectRatio(newRatio);
 
     console.log(`Canvas aspect ratio updated: ${newRatio.toFixed(3)} (${finalWidth}x${finalHeight})`);
-    console.log(`Calculated canvas height: ${Math.min(450, Math.floor(containerWidth / newRatio))}px`);
+    console.log(`Calculated canvas height: ${Math.min(550, Math.floor(containerWidth / newRatio))}px`);
 
     // 全キャンバスのサイズを更新
     if (canvasRef.current) {
