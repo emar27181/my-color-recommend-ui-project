@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import chroma from 'chroma-js';
 
 export const ColorPicker = () => {
-  const { selectedColor, setColorFromBase } = useColorStore();
+  const { baseColor, setColorFromBase } = useColorStore();
   const { onUserAction } = useTutorial();
   const { t } = useTranslation();
 
@@ -23,7 +23,7 @@ export const ColorPicker = () => {
   // ベースカラーとのコントラスト比を考慮したアイコン色を取得
   const getIconColor = () => {
     try {
-      const color = chroma(selectedColor);
+      const color = chroma(baseColor);
       const lightness = color.get('hsl.l');
       // 明るい色には暗いアイコン、暗い色には明るいアイコン
       return lightness > 0.5 ? '#374151' : '#f9fafb'; // gray-700 or gray-50
@@ -45,7 +45,7 @@ export const ColorPicker = () => {
                 <div className="relative cursor-pointer hover:scale-110 transition-all duration-200">
                   <input
                     type="color"
-                    value={selectedColor}
+                    value={baseColor}
                     onChange={handleColorChange}
                     className="absolute inset-0 opacity-0 w-full h-full cursor-pointer z-10"
                     title={t('colorPicker.clickToSelect')}
@@ -53,11 +53,11 @@ export const ColorPicker = () => {
                   <div 
                     className={`${BORDER_PRESETS.colorBlock} flex items-center justify-center pointer-events-none`}
                     style={{
-                      backgroundColor: selectedColor,
+                      backgroundColor: baseColor,
                       width: '46px',
                       height: '46px'
                     }}
-                    title={`${t('colorPicker.selectedColor')}: ${selectedColor} - ${t('colorPicker.clickToChange')}`}
+                    title={`${t('colorPicker.selectedColor')}: ${baseColor} - ${t('colorPicker.clickToChange')}`}
                   >
                     <Palette 
                       className="w-5 h-5" 
@@ -67,10 +67,10 @@ export const ColorPicker = () => {
                 </div>
               </div>
               <div className="flex-1 min-w-0">
-                <p className={`${TYPOGRAPHY.colorCode} truncate`}>{selectedColor}</p>
+                <p className={`${TYPOGRAPHY.colorCode} truncate`}>{baseColor}</p>
               </div>
               <CopyColorButton
-                color={selectedColor}
+                color={baseColor}
                 variant="minimal"
                 className="opacity-100"
               />
@@ -85,7 +85,7 @@ export const ColorPicker = () => {
               <div className="relative cursor-pointer hover:scale-110 transition-all duration-200">
                 <input
                   type="color"
-                  value={selectedColor}
+                  value={baseColor}
                   onChange={handleColorChange}
                   className="absolute inset-0 opacity-0 w-full h-full cursor-pointer z-10"
                   title={t('colorPicker.clickToSelect')}
@@ -93,11 +93,11 @@ export const ColorPicker = () => {
                 <div 
                   className={`${BORDER_PRESETS.colorBlock} flex items-center justify-center pointer-events-none`}
                   style={{
-                    backgroundColor: selectedColor,
+                    backgroundColor: baseColor,
                     width: '24px',
                     height: '24px'
                   }}
-                  title={`${t('colorPicker.selectedColor')}: ${selectedColor} - ${t('colorPicker.tapToChange')}`}
+                  title={`${t('colorPicker.selectedColor')}: ${baseColor} - ${t('colorPicker.tapToChange')}`}
                 >
                   <Palette 
                     className="w-3 h-3" 
@@ -107,12 +107,12 @@ export const ColorPicker = () => {
               </div>
             </div>
             <CopyColorButton
-              color={selectedColor}
+              color={baseColor}
               variant="minimal"
               className="opacity-100 flex-shrink-0"
             />
             <div className="flex-1 min-w-0">
-              <span className="text-xs font-mono text-muted-foreground truncate block">{selectedColor}</span>
+              <span className="text-xs font-mono text-muted-foreground truncate block">{baseColor}</span>
             </div>
           </div>
         </div>
