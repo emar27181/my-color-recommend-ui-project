@@ -480,6 +480,56 @@ radius: {
 
 ---
 
+## 🔄 レイアウト変更履歴・復元方法
+
+### 現在のレイアウト（2025-08-21変更）
+- **デスクトップ**: 2列レイアウト [キャンバス 2/3幅, メインツール 1/3幅]
+- **βセクション配置**: αセクション（skinColor）の下に配置
+- **βセクション表示**: 横並び（色相環 + 彩度明度プロット）
+
+### 変更前のレイアウト（復元用設定）
+変更前の3列レイアウトに戻す場合は、`/src/constants/layout.ts` を以下に変更：
+
+```typescript
+// デスクトップレイアウト設定
+desktop: {
+  // 3列レイアウト: [キャンバス, メインツール, 分析ツール]
+  columns: [
+    {
+      id: 'canvas',
+      width: 'w-7/12', // 7/12幅（約58.3%）
+      components: ['canvasColorRecommendation']
+    },
+    {
+      id: 'main-tools', 
+      width: 'w-1/4', // 1/4幅（25%）
+      components: ['baseColor', 'colorRecommendation', 'toneRecommendation', 'skinColor']
+    },
+    {
+      id: 'analysis',
+      width: 'w-1/6', // 1/6幅（約16.7%）
+      components: ['hueToneExtraction']
+    }
+  ],
+  gap: 'gap-6'
+},
+```
+
+**βセクションを縦並びに戻す場合**: `/src/components/HueToneExtraction.tsx`
+```typescript
+// 色相・トーンの可視化を常に表示
+<div className="flex flex-col space-y-0">
+  <HueWheel colors={visualizationData} onHueClick={handleHueClick} isQuantized={isQuantizationEnabled} selectedColor={selectedColor} selectedScheme={selectedScheme} />
+  <SaturationLightnessPlot colors={visualizationData} onSaturationLightnessClick={handleSaturationLightnessClick} isQuantized={isQuantizationEnabled} selectedColor={selectedColor} />
+</div>
+```
+
+**サイズを元に戻す場合**:
+- HueWheel: `size = 220`, `radius = 72`  
+- SaturationLightnessPlot: `plotWidth = 145.8`, `plotHeight = 145.8`, `width = 180`, `height = 214.5`
+
+---
+
 ## 📱 レイアウト・アーキテクチャ詳細仕様
 
 ### アプリケーション全体構造
