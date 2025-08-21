@@ -205,7 +205,8 @@ console.log('Saturation variations:', TONE_SATURATION_VARIATIONS);
 console.log('Generated adjustments:', TONE_ADJUSTMENTS.length, 'patterns');
 
 export interface ColorState {
-  selectedColor: string;
+  baseColor: string; // ベースカラー（色相推薦の基準色）
+  selectedColor: string; // 現在選択中の色（表示用）
   paintColor: string; // 描画色（キャンバス用）
   recommendedColors: string[];
   recommendedTones: string[];
@@ -214,11 +215,13 @@ export interface ColorState {
   extractedColors: ExtractedColor[];
   dominantColor: ExtractedColor | null;
   isQuantizationEnabled: boolean;
+  setBaseColor: (color: string) => void;
   setSelectedColor: (color: string) => void;
   setPaintColor: (color: string) => void;
   setSelectedScheme: (schemeId: string) => void;
   setExtractedColors: (colors: ExtractedColor[], dominantColor: ExtractedColor) => void;
-  setColorFromExtracted: (color: string) => void;
+  setColorFromRecommendation: (color: string) => void; // 推薦色から選択時（描画色のみ変更）
+  setColorFromBase: (color: string) => void; // ベース色選択時（ベースカラー+描画色変更）
   generateRecommendedColors: () => void;
   generateRecommendedTones: (baseColor: string) => void;
   toggleQuantization: () => void;
@@ -409,6 +412,7 @@ export const useColorStore = create<ColorState>((set, get) => {
   const filteredDefaultTones = filterValidTones(defaultTones, defaultColor);
 
   return {
+    baseColor: defaultColor,
     selectedColor: defaultColor,
     paintColor: defaultColor,
     recommendedColors: [],
@@ -418,6 +422,10 @@ export const useColorStore = create<ColorState>((set, get) => {
     extractedColors: [],
     dominantColor: null,
     isQuantizationEnabled: true,
+
+    setBaseColor: (color: string) => {
+      set({ baseColor: color });
+    },
 
     setSelectedColor: (color: string) => {
       set({ selectedColor: color });
@@ -429,6 +437,29 @@ export const useColorStore = create<ColorState>((set, get) => {
 
     setPaintColor: (color: string) => {
       set({ paintColor: color });
+    },
+
+    // ベース色選択時: ベースカラー、selectedColor、描画色をすべて更新
+    setColorFromBase: (color: string) => {
+      set({ 
+        baseColor: color,
+        selectedColor: color,
+        paintColor: color 
+      });
+      // トーン推薦も新しいベース色で更新
+      get().generateRecommendedTones(color);
+      // 色相推薦も新しいベース色で更新
+      get().generateRecommendedColors();
+    },
+
+    // 推薦色から選択時: selectedColorと描画色のみ更新、ベースカラーは維持
+    setColorFromRecommendation: (color: string) => {
+      set({ 
+        selectedColor: color,
+        paintColor: color 
+      });
+      // トーン推薦は新しい選択色で更新
+      get().generateRecommendedTones(color);
     },
 
     setSelectedScheme: (schemeId: string) => {
@@ -448,18 +479,14 @@ export const useColorStore = create<ColorState>((set, get) => {
       // get().setSelectedColor(dominantColor.hex);
     },
 
-    setColorFromExtracted: (color: string) => {
-      get().setSelectedColor(color);
-      get().setPaintColor(color); // 描画色も同時に更新
-    },
 
     generateRecommendedColors: () => {
-      const { selectedColor, selectedScheme } = get();
+      const { baseColor, selectedScheme } = get();
       try {
-        const baseColor = chroma(selectedColor);
-        const hue = baseColor.get('hsl.h') || 0;
-        const saturation = baseColor.get('hsl.s');
-        const lightness = baseColor.get('hsl.l');
+        const baseColorChroma = chroma(baseColor);
+        const hue = baseColorChroma.get('hsl.h') || 0;
+        const saturation = baseColorChroma.get('hsl.s');
+        const lightness = baseColorChroma.get('hsl.l');
 
         // 選択された配色技法を取得
         const scheme = COLOR_SCHEMES.find(s => s.id === selectedScheme);

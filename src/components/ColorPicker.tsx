@@ -8,13 +8,14 @@ import { useTranslation } from 'react-i18next';
 import chroma from 'chroma-js';
 
 export const ColorPicker = () => {
-  const { selectedColor, setSelectedColor } = useColorStore();
+  const { selectedColor, setColorFromBase } = useColorStore();
   const { onUserAction } = useTutorial();
   const { t } = useTranslation();
 
   const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const color = e.target.value;
-    setSelectedColor(color); // setSelectedColorが内部でpaintColorも更新
+    // ベース色選択：ベースカラー、selectedColor、描画色をすべて更新
+    setColorFromBase(color);
     // チュートリアルの自動進行をトリガー
     onUserAction('click', '[data-tutorial="color-picker"]');
   };

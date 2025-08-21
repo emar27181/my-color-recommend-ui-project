@@ -14,7 +14,7 @@ interface ColorRecommendationsProps {
 }
 
 export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsProps) => {
-  const { recommendedColors, selectedScheme, setSelectedScheme, generateRecommendedTones, selectedColor, setSelectedColor, paintColor, extractedColors } = useColorStore();
+  const { recommendedColors, selectedScheme, setSelectedScheme, generateRecommendedTones, baseColor, selectedColor, setColorFromRecommendation, paintColor, extractedColors } = useColorStore();
   const { onUserAction } = useTutorial();
   const { t } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
@@ -25,8 +25,8 @@ export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsP
   }, [extractedColors, selectedColor]);
 
   const handleGenerateTones = (color: string) => {
-    // クリックされた色を描画色として設定
-    setSelectedColor(color); // setSelectedColorが内部でpaintColorも更新
+    // 推薦色から選択：描画色のみ更新、ベースカラーは維持
+    setColorFromRecommendation(color);
     generateRecommendedTones(color);
     // チュートリアルの自動進行をトリガー
     onUserAction('click', '[data-tutorial="recommended-colors"]');
@@ -43,9 +43,10 @@ export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsP
 
   // ベースカラーから色相角度を取得
   const getBaseHue = () => {
-    if (!selectedColor) return 0;
+    // 常にベースカラーを使用
+    if (!baseColor) return 0;
     try {
-      return chroma(selectedColor).get('hsl.h') || 0;
+      return chroma(baseColor).get('hsl.h') || 0;
     } catch {
       return 0;
     }
@@ -188,7 +189,7 @@ interface ToneRecommendationsProps {
 }
 
 export const ToneRecommendations = ({ isMobile = false }: ToneRecommendationsProps) => {
-  const { recommendedTones, selectedColor, generateRecommendedTones, setSelectedColor, paintColor } = useColorStore();
+  const { recommendedTones, selectedColor, generateRecommendedTones, setColorFromRecommendation, paintColor } = useColorStore();
   const { t } = useTranslation();
 
   React.useEffect(() => {
@@ -198,8 +199,8 @@ export const ToneRecommendations = ({ isMobile = false }: ToneRecommendationsPro
   }, [selectedColor, recommendedTones.length, generateRecommendedTones]);
 
   const handleToneClick = (color: string) => {
-    // クリックされた色を描画色として設定
-    setSelectedColor(color); // setSelectedColorが内部でpaintColorも更新
+    // トーン推薦色から選択：描画色のみ更新、ベースカラーは維持
+    setColorFromRecommendation(color);
   };
 
   // 色の距離を計算する関数（deltaE 2000使用）

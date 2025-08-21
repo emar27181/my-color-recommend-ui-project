@@ -7,14 +7,15 @@ interface ExtractedColorsDisplayProps {
 }
 
 export const ExtractedColorsDisplay = ({ isMobile = false }: ExtractedColorsDisplayProps) => {
-  const { extractedColors, setColorFromExtracted } = useColorStore();
+  const { extractedColors, setColorFromBase } = useColorStore();
 
   if (extractedColors.length === 0) {
     return null;
   }
 
   const handleColorSelect = (color: string) => {
-    setColorFromExtracted(color);
+    // 抽出色からの選択はベース色選択として扱う
+    setColorFromBase(color);
   };
 
   return (
