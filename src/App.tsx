@@ -98,6 +98,34 @@ const App = () => {
     }));
   }, [screenSize.width]);
 
+  // 初期スクロール位置を60px下に設定
+  useEffect(() => {
+    const setScrollPosition = () => {
+      // 複数の方法でスクロール位置を設定
+      window.scrollTo({ top: 60, left: 0, behavior: 'instant' });
+      document.documentElement.scrollTop = 60;
+      document.body.scrollTop = 60;
+    };
+
+    // 即座に実行
+    setScrollPosition();
+    
+    // requestAnimationFrame で次のフレームで実行
+    const rafId = requestAnimationFrame(() => {
+      setScrollPosition();
+    });
+
+    // タイマーでも実行（フォールバック）
+    const timerId = setTimeout(() => {
+      setScrollPosition();
+    }, 0);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      clearTimeout(timerId);
+    };
+  }, []);
+
   const deviceType = isMobile ? 'MOBILE/TABLET' : 'DESKTOP';
 
   return (
