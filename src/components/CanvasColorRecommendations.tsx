@@ -1031,9 +1031,8 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
       const b = compositePixels[index + 2];
       const a = compositePixels[index + 3];
 
-      // 既に塗られた部分（新しい色）はスキップ
-      const isAlreadyNewColor = colorDistance(r, g, b, a, newR, newG, newB, newA) < 10;
-      if (isAlreadyNewColor) return false;
+      // 既に塗られた部分でも再塗りつぶしを許可
+      // （同じ色での再塗りつぶしやわずかに異なる色への塗り替えを可能にする）
 
       // 境界線判定：明らかに暗い線、または高い不透明度の色を境界とする
       const brightness = (r + g + b) / 3;
@@ -1042,14 +1041,8 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
       // 境界線でなければ塗りつぶし対象
       return !isLine;
     };
-    // 新しい色と同じ色の場合は何もしない（境界線ベースでは緩い条件）
-    if (colorDistance(startR, startG, startB, startA, newR, newG, newB, newA) < 10) {
-      // カーソルを元に戻す
-      if (canvasRef.current) {
-        canvasRef.current.style.cursor = isFillMode ? 'pointer' : 'crosshair';
-      }
-      return;
-    }
+    // 既に同じ色が塗られている場合でも、再塗りつぶしを許可
+    // （ユーザーが意図的に同じ色で塗りつぶしたい場合があるため、この制限を削除）
 
     // クリック位置が境界線（暗い線）の場合も何もしない
     if (isClickOnLine) {
