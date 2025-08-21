@@ -1021,7 +1021,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
       algorithm: 'boundary-based (avoid dark lines)'
     });
 
-    // 境界線ベースの塗りつぶし判定（シンプル版）
+    // 標準的なフラッドフィル判定（色ベース）
     const shouldFill = (x: number, y: number) => {
       if (!canvasRef.current || x < 0 || x >= canvasRef.current.width || y < 0 || y >= canvasRef.current.height) return false;
 
@@ -1031,26 +1031,12 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
       const b = compositePixels[index + 2];
       const a = compositePixels[index + 3];
 
-      // 既に塗られた部分でも再塗りつぶしを許可
-      // （同じ色での再塗りつぶしやわずかに異なる色への塗り替えを可能にする）
-
-      // 境界線判定：明らかに暗い線、または高い不透明度の色を境界とする
-      const brightness = (r + g + b) / 3;
-      const isLine = (brightness < 100 && a > 150) || (brightness < 50); // 暗い線
-
-      // 境界線でなければ塗りつぶし対象
-      return !isLine;
+      // 開始点の色と比較して、類似した色なら塗りつぶし対象
+      const distance = colorDistance(r, g, b, a, startR, startG, startB, startA);
+      return distance <= colorTolerance;
     };
-    // 既に同じ色が塗られている場合でも、再塗りつぶしを許可
-    // （ユーザーが意図的に同じ色で塗りつぶしたい場合があるため、この制限を削除）
-
-    // クリック位置が境界線（暗い線）の場合も何もしない
-    if (isClickOnLine) {
-      if (canvasRef.current) {
-        canvasRef.current.style.cursor = isFillMode ? 'pointer' : 'crosshair';
-      }
-      return;
-    }
+    // どんな色の領域でも塗りつぶしを許可
+    // （境界線チェックも削除して、ユーザーの意図通りに塗りつぶしできるようにする）
     // 処理済みピクセルをビットマップで管理（メモリ効率向上）
     const visitedBitmap = new Uint8Array(Math.ceil(canvasRef.current.width * canvasRef.current.height / 8));
     const setVisited = (x: number, y: number) => {
