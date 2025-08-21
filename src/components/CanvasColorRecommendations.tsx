@@ -1472,8 +1472,8 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
   }, [getCurrentLayerContext, currentLayer, penSize, isEraserMode, selectedColor, saveToHistory, updateCompositeCanvas]);
 
   return (
-    <Card className={`w-full flex flex-col bg-background border-transparent ${className}`} style={{ height: 'auto' }}>
-      <CardHeader className="pb-0 pt-1">
+    <Card className={`w-full flex flex-col border-transparent ${className}`} style={{ height: 'auto', backgroundColor: '#f44336' }}>
+      <CardHeader className="pb-0 pt-1" style={{ backgroundColor: '#ff5722', margin: '4px', padding: '8px' }}>
         <div className="flex flex-wrap items-center justify-start gap-2">
           {/* 現在の描画色表示（ColorPicker風） */}
           <div className="relative cursor-pointer hover:scale-110 transition-all duration-200 flex-shrink-0">
@@ -1722,7 +1722,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
           className="hidden"
         />
       </CardHeader>
-      <CardContent className="pt-1 pb-0 flex-shrink-0">
+      <CardContent className="pt-1 pb-0 flex-shrink-0" style={{ backgroundColor: '#2196f3', margin: '4px', padding: '8px' }}>
         <div className="relative" style={{ height: `${displayHeight}px` }}>
           {/* 隠しレイヤーキャンバス */}
           <canvas
