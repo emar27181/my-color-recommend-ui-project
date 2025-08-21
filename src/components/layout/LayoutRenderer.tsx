@@ -48,8 +48,8 @@ const ComponentMap = {
   hueToneExtraction: () => (
     <HueToneExtraction />
   ),
-  canvasColorRecommendation: ({ paintCanvasRef }: any) => (
-    <CanvasColorRecommendations ref={paintCanvasRef} />
+  canvasColorRecommendation: ({ paintCanvasRef, isDebugMode }: any) => (
+    <CanvasColorRecommendations ref={paintCanvasRef} isDebugMode={isDebugMode} />
   )
 };
 
@@ -72,7 +72,7 @@ const SectionHeader = ({
   
   return (
     <h3 
-      className={`${isMobile ? 'text-xs' : 'text-lg'} font-medium ${componentKey === 'canvas' ? 'mb-1' : 'mb-2'} text-foreground cursor-pointer flex items-center justify-between leading-tight`}
+      className={`${isMobile ? 'text-xs' : 'text-lg'} font-medium ${componentKey === 'canvas' ? 'mb-0' : 'mb-2'} text-foreground cursor-pointer flex items-center justify-between leading-tight`}
       onClick={onToggle}
     >
       <span>{config.step}. {t(config.titleKey)}</span>
@@ -105,20 +105,22 @@ const Section = ({
   props, 
   collapseStates, 
   setCollapseState,
-  isMobile 
+  isMobile,
+  isDebugMode 
 }: {
   componentKey: ComponentKey;
   props: any;
   collapseStates: Record<string, boolean>;
   setCollapseState: (key: string, value: boolean) => void;
   isMobile: boolean;
+  isDebugMode: boolean;
 }) => {
   const config = COMPONENT_CONFIG[componentKey];
   const isCollapsed = collapseStates[config.collapseState];
   const Component = ComponentMap[componentKey];
 
   return (
-    <section className={componentKey === 'canvas' && !isMobile ? "flex-shrink-0 flex-1 flex flex-col min-h-[700px] h-full" : "flex-shrink-0"} style={componentKey === 'canvas' && !isMobile ? { backgroundColor: '#ffeb3b', padding: '8px' } : {}}>
+    <section className={componentKey === 'canvas' && !isMobile ? "flex-shrink-0 flex-1 flex flex-col min-h-[700px] h-full" : "flex-shrink-0"} style={componentKey === 'canvas' && !isMobile && isDebugMode ? { backgroundColor: '#ffeb3b', padding: '8px' } : {}}>
       <SectionHeader
         componentKey={componentKey}
         isCollapsed={isCollapsed}
@@ -127,7 +129,7 @@ const Section = ({
         isMobile={isMobile}
       />
       {!isCollapsed && (
-        <div className={componentKey === 'canvas' && !isMobile ? "flex-1 min-h-[650px] h-full" : ""} style={componentKey === 'canvas' && !isMobile ? { backgroundColor: '#9c27b0', padding: '8px' } : {}}>
+        <div className={componentKey === 'canvas' && !isMobile ? "flex-1 min-h-[650px] h-full" : ""} style={componentKey === 'canvas' && !isMobile && isDebugMode ? { backgroundColor: '#9c27b0', padding: '8px' } : {}}>
           <Component {...props} />
           {/* canvasセクションの下部余白をデバッグ表示 */}
           {componentKey === 'canvas' && (
@@ -156,7 +158,8 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
     isMobile,
     paintCanvasRef,
     handleExtractColorsFromCanvas,
-    handleImageUpload
+    handleImageUpload,
+    isDebugMode
   };
 
   if (isMobile) {
@@ -173,6 +176,7 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
               collapseStates={collapseStates}
               setCollapseState={setCollapseState}
               isMobile={isMobile}
+              isDebugMode={isDebugMode}
             />
           </div>
         ))}
@@ -182,7 +186,7 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
 
   // デスクトップ: 2列レイアウト
   return (
-    <div className="flex flex-1 gap-6" style={isDebugMode ? { padding: '32px', backgroundColor: 'yellow' } : { backgroundColor: '#673ab7' }}>
+    <div className="flex flex-1 gap-6" style={isDebugMode ? { padding: '16px', backgroundColor: '#673ab7' } : { padding: '16px' }}>
       {isDebugMode && (
         <div className="absolute top-20 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white p-2 rounded font-bold z-40">
           🖥️ DESKTOP LAYOUT (≥800px)
@@ -196,11 +200,10 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
             column.id !== 'canvas' ? 'space-y-4 overflow-y-auto' : ''
           }`}
           style={isDebugMode ? { 
-            padding: '32px', 
-            backgroundColor: columnIndex === 0 ? 'red' : columnIndex === 1 ? 'blue' : 'green' 
-          } : { 
-            padding: column.id === 'canvas' ? '8px 0px' : '16px',
+            padding: column.id === 'canvas' ? '8px' : '16px',
             backgroundColor: column.id === 'canvas' ? '#00bcd4' : '#e91e63'
+          } : { 
+            padding: column.id === 'canvas' ? '8px' : '16px'
           }}
         >
           {isDebugMode && (
@@ -217,6 +220,7 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
               collapseStates={collapseStates}
               setCollapseState={setCollapseState}
               isMobile={isMobile}
+              isDebugMode={isDebugMode}
             />
           ))}
         </div>
