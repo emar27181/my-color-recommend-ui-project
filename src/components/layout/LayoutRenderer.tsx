@@ -180,7 +180,7 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
     );
   }
 
-  // デスクトップ: 3列レイアウト
+  // デスクトップ: 2列レイアウト
   return (
     <div className="flex flex-1 gap-6" style={isDebugMode ? { padding: '32px', backgroundColor: 'yellow' } : { padding: '16px' }}>
       {isDebugMode && (
@@ -189,7 +189,7 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
         </div>
       )}
       
-      {columns.map((column, columnIndex) => (
+      {columns.filter(column => column.components.length > 0).map((column, columnIndex) => (
         <div 
           key={column.id} 
           className={`${column.width} flex flex-col min-h-0 ${
