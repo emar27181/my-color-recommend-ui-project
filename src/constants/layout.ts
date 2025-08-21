@@ -2,22 +2,17 @@
 export const LAYOUT_CONFIG = {
   // デスクトップレイアウト設定
   desktop: {
-    // 3列レイアウト: [キャンバス, メインツール, 分析ツール]
+    // 2列レイアウト: [キャンバス, メインツール]
     columns: [
       {
         id: 'canvas',
-        width: 'w-7/12', // 7/12幅（約58.3%）に拡大
+        width: 'w-2/3', // 2/3幅（約66.7%）に拡大
         components: ['canvasColorRecommendation']
       },
       {
         id: 'main-tools', 
-        width: 'w-1/4', // 1/4幅（25%）維持
-        components: ['baseColor', 'colorRecommendation', 'toneRecommendation', 'skinColor']
-      },
-      {
-        id: 'analysis',
-        width: 'w-1/6', // 1/6幅（約16.7%）に縮小
-        components: ['hueToneExtraction']
+        width: 'w-1/3', // 1/3幅（約33.3%）に拡大
+        components: ['baseColor', 'colorRecommendation', 'toneRecommendation', 'skinColor', 'hueToneExtraction']
       }
     ],
     gap: 'gap-6'
