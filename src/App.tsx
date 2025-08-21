@@ -91,7 +91,6 @@ const App = () => {
 
   // 画面サイズ変更時にβセクションの状態を調整（常に閉じた状態を維持）
   useEffect(() => {
-    const newIsMobile = screenSize.width < 800;
     setCollapseStates(prev => ({
       ...prev,
       isHueToneExtractionCollapsed: true // βセクションは常に閉じた状態を維持
