@@ -101,7 +101,7 @@ const App = () => {
   const deviceType = isMobile ? 'MOBILE/TABLET' : 'DESKTOP';
 
   return (
-    <main className="flex-1 pb-2 min-h-0 flex flex-col" style={isDebugMode ? { backgroundColor: 'green' } : {}}>
+    <main className="flex-1 pb-2 min-h-0 flex flex-col" style={isDebugMode ? { backgroundColor: 'green' } : { backgroundColor: '#607d8b' }}>
       {/* デバッグ情報表示 */}
       {isDebugMode && (
         <div className="fixed top-4 left-4 z-50 bg-black text-white p-2 rounded text-xs font-mono">
@@ -131,7 +131,7 @@ const App = () => {
       </div>
 
       {/* デスクトップ表示 */}
-      <div className={`${isMobile ? 'hidden' : 'flex'} flex-1`}>
+      <div className={`${isMobile ? 'hidden' : 'flex'} flex-1`} style={{ backgroundColor: '#795548' }}>
         <LayoutRenderer
           columns={LAYOUT_CONFIG.desktop.columns}
           isMobile={false}
