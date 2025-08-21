@@ -11,14 +11,14 @@ const App = () => {
   // デバイス判定（閾値800px）
   const isMobile = screenSize.width < 800;
   
-  // コラプス状態をオブジェクトで管理（モバイルではβセクションを閉じる）
+  // コラプス状態をオブジェクトで管理（βセクションはデフォルトで閉じる）
   const [collapseStates, setCollapseStates] = useState({
     isCanvasCollapsed: false,
     isBaseColorCollapsed: false,
     isColorRecommendationCollapsed: false,
     isToneRecommendationCollapsed: false,
     isSkinColorCollapsed: true,
-    isHueToneExtractionCollapsed: isMobile // モバイルでは閉じる、デスクトップでは開く
+    isHueToneExtractionCollapsed: true // βセクションをデフォルトで閉じる
   });
   
   // CanvasColorRecommendationsへの参照
@@ -89,12 +89,12 @@ const App = () => {
     };
   }, []);
 
-  // 画面サイズ変更時にβセクションの状態を調整
+  // 画面サイズ変更時にβセクションの状態を調整（常に閉じた状態を維持）
   useEffect(() => {
     const newIsMobile = screenSize.width < 800;
     setCollapseStates(prev => ({
       ...prev,
-      isHueToneExtractionCollapsed: newIsMobile
+      isHueToneExtractionCollapsed: true // βセクションは常に閉じた状態を維持
     }));
   }, [screenSize.width]);
 
