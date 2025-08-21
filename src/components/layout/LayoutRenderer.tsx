@@ -193,7 +193,7 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
         </div>
       )}
       
-      {columns.filter(column => column.components.length > 0).map((column, columnIndex) => (
+      {columns.filter(column => column.components.length > 0).map((column) => (
         <div 
           key={column.id} 
           className={`${column.width} flex flex-col min-h-0 ${
