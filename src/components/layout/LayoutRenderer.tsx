@@ -118,7 +118,7 @@ const Section = ({
   const Component = ComponentMap[componentKey];
 
   return (
-    <section className={componentKey === 'canvas' && !isMobile ? "flex-shrink-0 flex-1 flex flex-col min-h-[700px] h-full" : "flex-shrink-0"}>
+    <section className={componentKey === 'canvas' && !isMobile ? "flex-shrink-0 flex-1 flex flex-col min-h-[700px] h-full" : "flex-shrink-0"} style={componentKey === 'canvas' && !isMobile ? { backgroundColor: '#ffeb3b', padding: '8px' } : {}}>
       <SectionHeader
         componentKey={componentKey}
         isCollapsed={isCollapsed}
@@ -127,7 +127,7 @@ const Section = ({
         isMobile={isMobile}
       />
       {!isCollapsed && (
-        <div className={componentKey === 'canvas' && !isMobile ? "flex-1 min-h-[650px] h-full" : ""}>
+        <div className={componentKey === 'canvas' && !isMobile ? "flex-1 min-h-[650px] h-full" : ""} style={componentKey === 'canvas' && !isMobile ? { backgroundColor: '#9c27b0', padding: '8px' } : {}}>
           <Component {...props} />
           {/* canvasセクションの下部余白をデバッグ表示 */}
           {componentKey === 'canvas' && (
@@ -182,7 +182,7 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
 
   // デスクトップ: 2列レイアウト
   return (
-    <div className="flex flex-1 gap-6" style={isDebugMode ? { padding: '32px', backgroundColor: 'yellow' } : { padding: '16px' }}>
+    <div className="flex flex-1 gap-6" style={isDebugMode ? { padding: '32px', backgroundColor: 'yellow' } : { backgroundColor: '#673ab7' }}>
       {isDebugMode && (
         <div className="absolute top-20 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white p-2 rounded font-bold z-40">
           🖥️ DESKTOP LAYOUT (≥800px)
@@ -199,7 +199,8 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
             padding: '32px', 
             backgroundColor: columnIndex === 0 ? 'red' : columnIndex === 1 ? 'blue' : 'green' 
           } : { 
-            padding: column.id === 'canvas' ? '8px' : '16px' 
+            padding: column.id === 'canvas' ? '8px 0px' : '16px',
+            backgroundColor: column.id === 'canvas' ? '#00bcd4' : '#e91e63'
           }}
         >
           {isDebugMode && (
