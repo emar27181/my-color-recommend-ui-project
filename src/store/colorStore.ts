@@ -227,18 +227,68 @@ export interface ColorState {
   toggleQuantization: () => void;
 }
 
-// カラーソート関数: 明るい→暗いでソート
-const sortColorsByLightness = (colors: string[]): string[] => {
+// ソート手法の設定
+export type SortMethod = 'lightness_desc' | 'lightness_asc' | 'hue' | 'saturation_desc' | 'saturation_asc' | 'original' | 'random';
+
+// 現在のソート手法（簡単に変更可能）
+const CURRENT_SORT_METHOD: SortMethod = 'lightness_desc'; // ここを変更してソート手法を切り替え
+
+// カラーソート関数: 指定された手法でソート
+const sortColorsByMethod = (colors: string[], method: SortMethod = CURRENT_SORT_METHOD): string[] => {
+  if (method === 'original') {
+    return [...colors]; // 元の順序を維持
+  }
+  
+  if (method === 'random') {
+    const shuffled = [...colors];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  }
+
   return colors.sort((a, b) => {
     try {
-      const lightnessA = chroma(a).get('hsl.l');
-      const lightnessB = chroma(b).get('hsl.l');
-      return lightnessB - lightnessA; // 明るい→暗い（降順）
+      switch (method) {
+        case 'lightness_desc': {
+          const lightnessA = chroma(a).get('hsl.l');
+          const lightnessB = chroma(b).get('hsl.l');
+          return lightnessB - lightnessA; // 明るい→暗い
+        }
+        case 'lightness_asc': {
+          const lightnessA = chroma(a).get('hsl.l');
+          const lightnessB = chroma(b).get('hsl.l');
+          return lightnessA - lightnessB; // 暗い→明るい
+        }
+        case 'hue': {
+          const hueA = chroma(a).get('hsl.h') || 0;
+          const hueB = chroma(b).get('hsl.h') || 0;
+          return hueA - hueB; // 色相順（赤→橙→黄→緑→青→紫）
+        }
+        case 'saturation_desc': {
+          const satA = chroma(a).get('hsl.s');
+          const satB = chroma(b).get('hsl.s');
+          return satB - satA; // 鮮やか→くすんだ
+        }
+        case 'saturation_asc': {
+          const satA = chroma(a).get('hsl.s');
+          const satB = chroma(b).get('hsl.s');
+          return satA - satB; // くすんだ→鮮やか
+        }
+        default:
+          return 0;
+      }
     } catch (error) {
       console.error('Error sorting colors:', error);
       return 0;
     }
   });
+};
+
+// 後方互換性のための関数（既存コードで使用）
+const sortColorsByLightness = (colors: string[]): string[] => {
+  return sortColorsByMethod(colors, CURRENT_SORT_METHOD);
 };
 
 // 重複色・極端な色を除外する関数
@@ -536,10 +586,11 @@ export const useColorStore = create<ColorState>((set, get) => {
           }
         }
 
-        // 配置を固定するため、ソートせずにそのまま使用
-        console.log('Generated tones order (first 4 = lightness80% with sat 20,40,60,80):',
-          tones.slice(0, 4).map((tone, i) => `${i}: ${tone} (S:${saturations[i]}%)`));
-        set({ recommendedTones: tones, toneBaseColor: baseColor });
+        // 明るい→暗い順でソート（色相推薦と統一）
+        const sortedTones = sortColorsByLightness(tones);
+        console.log('Generated tones order (sorted by lightness):',
+          sortedTones.slice(0, 4).map((tone, i) => `${i}: ${tone}`));
+        set({ recommendedTones: sortedTones, toneBaseColor: baseColor });
       } catch (error) {
         console.error('Failed to generate recommended tones:', error);
         set({ recommendedTones: [], toneBaseColor: null });
