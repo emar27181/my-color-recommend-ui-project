@@ -1,5 +1,5 @@
 import React from 'react';
-import { useColorStore, COLOR_SCHEMES, sortSchemesByCompatibility, sortSchemesByHueDistance } from '@/store/colorStore';
+import { useColorStore, COLOR_SCHEMES, sortSchemesByCompatibility, sortSchemesByHueDistance, SCHEME_SORT_CONFIG } from '@/store/colorStore';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ColorGrid } from '@/components/common/ColorGrid';
 import { ColorWheelMini } from '@/components/common/ColorWheelMini';
@@ -19,10 +19,19 @@ export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsP
   const { t } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
 
-  // 近い色相を好むユーザ向けに色相距離順でソート
+  // 設定に基づいて配色技法をソート
   const sortedSchemes = React.useMemo(() => {
-    return sortSchemesByHueDistance(baseColor, COLOR_SCHEMES);
-  }, [baseColor]);
+    switch (SCHEME_SORT_CONFIG.method) {
+      case 'compatibility':
+        return sortSchemesByCompatibility(extractedColors, selectedColor, COLOR_SCHEMES);
+      case 'hue_distance':
+        return sortSchemesByHueDistance(baseColor, COLOR_SCHEMES);
+      case 'original':
+        return [...COLOR_SCHEMES]; // 固定順序
+      default:
+        return sortSchemesByHueDistance(baseColor, COLOR_SCHEMES);
+    }
+  }, [baseColor, extractedColors, selectedColor]);
 
   const handleGenerateTones = (color: string) => {
     // 推薦色から選択：描画色のみ更新、ベースカラーは維持

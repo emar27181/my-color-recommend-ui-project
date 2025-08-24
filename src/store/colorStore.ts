@@ -230,9 +230,62 @@ export interface ColorState {
 // ソート手法の設定
 export type SortMethod = 'lightness_desc' | 'lightness_asc' | 'hue' | 'hue_distance' | 'saturation_desc' | 'saturation_asc' | 'original' | 'random';
 
+// === 色相推薦ソート設定 ===
+// 以下の設定値を変更することで、色相推薦の並び替えを簡単に切り替えできます
+
+// 推薦色のソート手法設定
+export const COLOR_SORT_CONFIG = {
+  // 推薦色の並び替え手法 (変更可能)
+  method: 'hue_distance' as SortMethod,
+  
+  // 利用可能な手法一覧とその説明
+  availableMethods: {
+    'lightness_desc': '明るい→暗い順 (従来の方法)',
+    'lightness_asc': '暗い→明るい順',
+    'hue': '色相順 (赤→橙→黄→緑→青→紫)',
+    'hue_distance': '色相距離順 (ベースカラーに近い順)',
+    'saturation_desc': '鮮やか→くすんだ順', 
+    'saturation_asc': 'くすんだ→鮮やか順',
+    'original': '元の順序を維持 (配色技法の角度順)',
+    'random': 'ランダムシャッフル'
+  } as const
+};
+
+// 配色技法のソート手法設定
+export const SCHEME_SORT_CONFIG = {
+  // 配色技法の並び替え手法 (変更可能)
+  method: 'hue_distance' as 'compatibility' | 'hue_distance' | 'original',
+  
+  // 利用可能な手法一覧とその説明
+  availableMethods: {
+    'compatibility': '抽出色との適合度順 (従来の方法)',
+    'hue_distance': '色相距離順 (近い色相の配色技法を優先)',
+    'original': '固定順序 (COLOR_SCHEMES配列の順序)'
+  } as const
+};
+
+// === 設定値の変更方法 ===
+// 
+// 【推薦色の並び替えを変更したい場合】
+// COLOR_SORT_CONFIG.method を以下のいずれかに変更:
+// - 'lightness_desc': 明るい→暗い順 (従来の方法)  
+// - 'hue_distance': 色相距離順 (現在の設定)
+// - 'original': 配色技法の角度順
+// - その他: 'lightness_asc', 'hue', 'saturation_desc', 'saturation_asc', 'random'
+//
+// 【配色技法の並び替えを変更したい場合】
+// SCHEME_SORT_CONFIG.method を以下のいずれかに変更:
+// - 'hue_distance': 色相距離順 (現在の設定)
+// - 'compatibility': 抽出色との適合度順 (従来の方法)
+// - 'original': COLOR_SCHEMES配列の固定順序
+//
+// 変更例:
+// COLOR_SORT_CONFIG.method = 'lightness_desc';     // 明るい順に戻す
+// SCHEME_SORT_CONFIG.method = 'compatibility';     // 適合度順に戻す
+
 // 現在のソート手法（簡単に変更可能）
 // 近い色相を好むユーザという仮定で hue_distance に設定
-const CURRENT_SORT_METHOD: SortMethod = 'hue_distance'; // ここを変更してソート手法を切り替え
+const CURRENT_SORT_METHOD: SortMethod = COLOR_SORT_CONFIG.method;
 
 // 色相環上の最短距離を計算する関数
 const getHueDistance = (hue1: number, hue2: number): number => {
