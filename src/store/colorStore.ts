@@ -228,13 +228,20 @@ export interface ColorState {
 }
 
 // ソート手法の設定
-export type SortMethod = 'lightness_desc' | 'lightness_asc' | 'hue' | 'saturation_desc' | 'saturation_asc' | 'original' | 'random';
+export type SortMethod = 'lightness_desc' | 'lightness_asc' | 'hue' | 'hue_distance' | 'saturation_desc' | 'saturation_asc' | 'original' | 'random';
 
 // 現在のソート手法（簡単に変更可能）
-const CURRENT_SORT_METHOD: SortMethod = 'lightness_desc'; // ここを変更してソート手法を切り替え
+// 近い色相を好むユーザという仮定で hue_distance に設定
+const CURRENT_SORT_METHOD: SortMethod = 'hue_distance'; // ここを変更してソート手法を切り替え
+
+// 色相環上の最短距離を計算する関数
+const getHueDistance = (hue1: number, hue2: number): number => {
+  const diff = Math.abs(hue1 - hue2);
+  return Math.min(diff, 360 - diff);
+};
 
 // カラーソート関数: 指定された手法でソート
-const sortColorsByMethod = (colors: string[], method: SortMethod = CURRENT_SORT_METHOD): string[] => {
+const sortColorsByMethod = (colors: string[], method: SortMethod = CURRENT_SORT_METHOD, baseColor?: string): string[] => {
   if (method === 'original') {
     return [...colors]; // 元の順序を維持
   }
@@ -266,6 +273,18 @@ const sortColorsByMethod = (colors: string[], method: SortMethod = CURRENT_SORT_
           const hueB = chroma(b).get('hsl.h') || 0;
           return hueA - hueB; // 色相順（赤→橙→黄→緑→青→紫）
         }
+        case 'hue_distance': {
+          if (!baseColor) {
+            console.warn('hue_distance sorting requires baseColor parameter');
+            return 0;
+          }
+          const baseHue = chroma(baseColor).get('hsl.h') || 0;
+          const hueA = chroma(a).get('hsl.h') || 0;
+          const hueB = chroma(b).get('hsl.h') || 0;
+          const distanceA = getHueDistance(baseHue, hueA);
+          const distanceB = getHueDistance(baseHue, hueB);
+          return distanceA - distanceB; // 近い色相順（距離の小さい順）
+        }
         case 'saturation_desc': {
           const satA = chroma(a).get('hsl.s');
           const satB = chroma(b).get('hsl.s');
@@ -287,8 +306,8 @@ const sortColorsByMethod = (colors: string[], method: SortMethod = CURRENT_SORT_
 };
 
 // 後方互換性のための関数（既存コードで使用）
-const sortColorsByLightness = (colors: string[]): string[] => {
-  return sortColorsByMethod(colors, CURRENT_SORT_METHOD);
+const sortColorsByLightness = (colors: string[], baseColor?: string): string[] => {
+  return sortColorsByMethod(colors, CURRENT_SORT_METHOD, baseColor);
 };
 
 // 重複色・極端な色を除外する関数
@@ -552,8 +571,8 @@ export const useColorStore = create<ColorState>((set, get) => {
           return chroma.hsl(newHue, saturation, lightness).hex();
         });
 
-        // 明るい→暗い順でソート
-        const sortedRecommendations = sortColorsByLightness(recommendations);
+        // 設定されたソート手法でソート（色相距離ソートの場合はbaseColorを渡す）
+        const sortedRecommendations = sortColorsByLightness(recommendations, baseColor);
 
         set({ recommendedColors: sortedRecommendations });
       } catch (error) {
@@ -669,6 +688,47 @@ export const calculateSchemeCompatibility = (
     console.error('Error calculating scheme compatibility:', error);
     return 0;
   }
+};
+
+// 配色技法の色相距離を計算する関数
+const calculateSchemeHueDistance = (scheme: ColorScheme, baseColor: string): number => {
+  try {
+    const baseHue = chroma(baseColor).get('hsl.h') || 0;
+    
+    // 各配色角度との距離を計算し、平均距離を求める
+    const distances = scheme.angles.map(angle => {
+      const targetHue = (baseHue + angle) % 360;
+      return getHueDistance(baseHue, targetHue);
+    });
+    
+    // 平均距離を返す（近い色相順でソートするため）
+    return distances.reduce((sum, dist) => sum + dist, 0) / distances.length;
+  } catch (error) {
+    console.error('Error calculating scheme hue distance:', error);
+    return Infinity; // エラー時は最後尾に配置
+  }
+};
+
+// 配色技法を色相距離順にソートする関数（近い色相を好むユーザ向け）
+export const sortSchemesByHueDistance = (
+  baseColor: string,
+  schemes: ColorScheme[] = COLOR_SCHEMES
+): ColorScheme[] => {
+  // 各配色技法の色相距離を計算
+  const schemesWithDistances = schemes.map(scheme => ({
+    scheme,
+    hueDistance: calculateSchemeHueDistance(scheme, baseColor)
+  }));
+  
+  // 色相距離順にソート（近い順）
+  schemesWithDistances.sort((a, b) => a.hueDistance - b.hueDistance);
+  
+  console.log('Scheme hue distances:', schemesWithDistances.map(s => ({
+    name: s.scheme.name.split(':')[0],
+    distance: s.hueDistance.toFixed(1)
+  })));
+  
+  return schemesWithDistances.map(s => s.scheme);
 };
 
 // 配色技法を適合度順にソートする関数

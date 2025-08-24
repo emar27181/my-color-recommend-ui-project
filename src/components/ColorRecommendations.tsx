@@ -1,5 +1,5 @@
 import React from 'react';
-import { useColorStore, COLOR_SCHEMES, sortSchemesByCompatibility } from '@/store/colorStore';
+import { useColorStore, COLOR_SCHEMES, sortSchemesByCompatibility, sortSchemesByHueDistance } from '@/store/colorStore';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ColorGrid } from '@/components/common/ColorGrid';
 import { ColorWheelMini } from '@/components/common/ColorWheelMini';
@@ -19,10 +19,10 @@ export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsP
   const { t } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
 
-  // 抽出色に基づいて配色技法を適合度順にソート
+  // 近い色相を好むユーザ向けに色相距離順でソート
   const sortedSchemes = React.useMemo(() => {
-    return sortSchemesByCompatibility(extractedColors, selectedColor, COLOR_SCHEMES);
-  }, [extractedColors, selectedColor]);
+    return sortSchemesByHueDistance(baseColor, COLOR_SCHEMES);
+  }, [baseColor]);
 
   const handleGenerateTones = (color: string) => {
     // 推薦色から選択：描画色のみ更新、ベースカラーは維持
