@@ -113,7 +113,7 @@ export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsP
                 )}
                 <span className="truncate">
                   {selectedSchemeData ? (
-                    <span className="font-bold">{t(`colorSchemes.${selectedSchemeData.id}`)}</span>
+                    <span className="font-bold whitespace-pre-line">{selectedSchemeData.name}</span>
                   ) : (
                     t('colorRecommendations.selectScheme')
                   )}
@@ -150,7 +150,9 @@ export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsP
                         
                         {/* 配色技法名 */}
                         <div className="text-xs font-medium leading-tight min-w-0 flex-1">
-                          {t(`colorSchemes.${scheme.id}`)}
+                          <div className="whitespace-pre-line">
+                            {scheme.name}
+                          </div>
                         </div>
                       </button>
                     ))}
