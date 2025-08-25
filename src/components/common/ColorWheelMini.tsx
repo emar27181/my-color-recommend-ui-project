@@ -99,10 +99,10 @@ export const ColorWheelMini: React.FC<ColorWheelMiniProps> = ({
               <circle
                 cx={coords.x}
                 cy={coords.y}
-                r={2.5}
+                r={3.5}
                 fill={pointColor}
                 stroke="#ffffff"
-                strokeWidth={isBaseColor ? 1.2 : 0.8}
+                strokeWidth={isBaseColor ? 1.5 : 1}
                 className="drop-shadow-sm"
               />
             </g>
