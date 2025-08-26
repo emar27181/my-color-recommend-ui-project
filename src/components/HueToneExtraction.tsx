@@ -9,7 +9,7 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
   const size = 220;
   const center = size / 2;
   const radius = 72;
-  
+
   const huePoints = colors.map(color => {
     try {
       const [h] = chroma(color.hex).hsl();
@@ -38,19 +38,19 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
   // 配色技法のプロット点を計算
   const colorSchemePoints = useMemo(() => {
     if (!selectedScheme || !selectedColor) return [];
-    
+
     try {
       const scheme = COLOR_SCHEMES.find(s => s.id === selectedScheme);
       if (!scheme) return [];
-      
+
       const baseHue = chroma(selectedColor).get('hsl.h') || 0;
-      
+
       return scheme.angles.map((angle) => {
         const actualHue = (baseHue + angle) % 360;
         const radian = actualHue * (Math.PI / 180);
         const x = center + radius * Math.cos(radian - Math.PI / 2);
         const y = center + radius * Math.sin(radian - Math.PI / 2);
-        
+
         return {
           x,
           y,
@@ -69,41 +69,41 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
   // SVGクリックハンドラ
   const handleSvgClick = (event: React.MouseEvent<SVGSVGElement>) => {
     if (!onHueClick) return;
-    
+
     const svg = event.currentTarget;
     const rect = svg.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
-    
+
     // SVG座標系に変換
     const svgX = (x / rect.width) * size;
     const svgY = (y / rect.height) * size;
-    
+
     // 中心からの相対位置
     const centerX = center;
     const centerY = center;
     const deltaX = svgX - centerX;
     const deltaY = svgY - centerY;
-    
+
     // 距離チェック（色相環の範囲内かどうか）
     const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
     if (distance < 20 || distance > radius) return; // 内側の円と外側の範囲外は無視
-    
+
     // 角度計算（ラジアンから度数へ、12時方向を0度とする）
     let angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
     angle = (angle + 90) % 360; // 12時方向を0度に調整
     if (angle < 0) angle += 360;
-    
+
     onHueClick(angle);
   };
 
   return (
     <div className="w-full">
-      <svg 
-        width="100%" 
-        height={size} 
-        viewBox={`0 0 ${size} ${size}`} 
-        className="border-0 rounded cursor-pointer" 
+      <svg
+        width="100%"
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+        className="border-0 rounded cursor-pointer"
         onClick={handleSvgClick}
       >
         {/* 色相環背景 */}
@@ -124,14 +124,14 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
             );
           })}
         </defs>
-        
+
         {/* 色相環の色相セクター */}
         {Array.from({ length: 360 }, (_, degree) => {
           const angle1 = (degree - 90) * (Math.PI / 180);
           const angle2 = (degree + 1 - 90) * (Math.PI / 180);
           const innerRadius = 20;
           const outerRadius = radius;
-          
+
           const x1 = center + innerRadius * Math.cos(angle1);
           const y1 = center + innerRadius * Math.sin(angle1);
           const x2 = center + outerRadius * Math.cos(angle1);
@@ -140,11 +140,11 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
           const y3 = center + outerRadius * Math.sin(angle2);
           const x4 = center + innerRadius * Math.cos(angle2);
           const y4 = center + innerRadius * Math.sin(angle2);
-          
+
           const pathData = `M ${x1} ${y1} L ${x2} ${y2} A ${outerRadius} ${outerRadius} 0 0 1 ${x3} ${y3} L ${x4} ${y4} A ${innerRadius} ${innerRadius} 0 0 0 ${x1} ${y1}`;
           const hue = degree;
           const color = chroma.hsl(hue, 0.5, 0.5).alpha(0.3).css();
-          
+
           return (
             <path
               key={`sector-${degree}`}
@@ -154,9 +154,9 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
             />
           );
         })}
-        
+
         <circle cx={center} cy={center} r={radius} fill="none" stroke="#e5e7eb" strokeWidth="1" strokeDasharray="5,3" opacity="0.3" />
-        
+
         {/* 30度間隔の対角線: 量子化モードで切り替え */}
         {isQuantized ? (
           // 量子化モード: 太い線で30度間隔を強調
@@ -201,7 +201,7 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
             );
           })
         )}
-        
+
         {/* 角度数値ラベル: 量子化モードで切り替え */}
         {isQuantized ? (
           // 量子化モード: 30度間隔ですべて表示
@@ -244,7 +244,7 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
             );
           })
         )}
-        
+
         {/* 色相ポイント */}
         {huePoints.map((point, index) => point && (
           <circle
@@ -257,7 +257,7 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
             strokeWidth="1"
           />
         ))}
-        
+
         {/* 配色技法のプロット（選択中の色がある場合のみ） */}
         {selectedColor && colorSchemePoints.length > 0 && (
           <g>
@@ -275,7 +275,7 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
                 opacity="0.5"
               />
             ))}
-            
+
             {/* 配色技法のプロット点 */}
             {colorSchemePoints.map((point, index) => (
               <g key={`scheme-point-${index}`}>
@@ -289,7 +289,7 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
                   strokeWidth="1"
                   opacity="0.5"
                 />
-                
+
                 {/* 角度ラベル（ベース色以外） */}
                 {!point.isBase && (
                   <text
@@ -330,7 +330,7 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
   const plotHeight = 145.8;
   const width = 180;
   const height = 214.5;
-  
+
   const points = colors.map(color => {
     try {
       const [, s, l] = chroma(color.hex).hsl();
@@ -357,23 +357,23 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
   // SVGクリックハンドラ
   const handleSvgClick = (event: React.MouseEvent<SVGSVGElement>) => {
     if (!onSaturationLightnessClick) return;
-    
+
     const svg = event.currentTarget;
     const rect = svg.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
-    
+
     // SVG座標系に変換
     const svgX = (x / rect.width) * width;
     const svgY = (y / rect.height) * height;
-    
+
     // プロット領域内かチェック
     if (svgX < 20 || svgX > 20 + plotWidth || svgY < 11 || svgY > 11 + plotHeight) return;
-    
+
     // 彩度・明度を計算（0-1の範囲）
     const saturation = (svgX - 20) / plotWidth;
     const lightness = 1 - (svgY - 11) / plotHeight; // Y軸は反転
-    
+
     onSaturationLightnessClick(
       Math.max(0, Math.min(1, saturation)),
       Math.max(0, Math.min(1, lightness))
@@ -382,20 +382,20 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
 
   return (
     <div className="w-full">
-      <svg 
-        width="100%" 
-        height={height} 
-        viewBox={`0 0 ${width} ${height}`} 
-        className="border-0 rounded cursor-pointer" 
+      <svg
+        width="100%"
+        height={height}
+        viewBox={`0 0 ${width} ${height}`}
+        className="border-0 rounded cursor-pointer"
         onClick={handleSvgClick}
       >
         {/* 彩度-明度背景グラデーション */}
         <defs>
           {/* 彩度-明度の背景色グリッド */}
         </defs>
-        
+
         {/* 背景色グリッドを描画 */}
-        {Array.from({ length: 20 }, (_, i) => 
+        {Array.from({ length: 20 }, (_, i) =>
           Array.from({ length: 20 }, (_, j) => {
             const saturation = (i + 0.5) / 20;
             const lightness = (19.5 - j) / 20;
@@ -413,10 +413,10 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
             );
           })
         ).flat()}
-        
+
         {/* プロット領域の境界 */}
-        <rect x="20" y="11" width={plotWidth} height={plotHeight} fill="none" stroke="#e5e7eb" strokeWidth="1"/>
-        
+        <rect x="20" y="11" width={plotWidth} height={plotHeight} fill="none" stroke="#e5e7eb" strokeWidth="1" />
+
         {/* グリッド線: 量子化モードで切り替え */}
         {isQuantized ? (
           // 量子化モード: 10%間隔の太いグリッド
@@ -488,7 +488,7 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
             ))}
           </>
         )}
-        
+
         {/* 数値ラベル: 量子化モードで切り替え */}
         {isQuantized ? (
           // 量子化モード: 20%間隔ですべて表示
@@ -551,8 +551,8 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
             ))}
           </>
         )}
-        
-        
+
+
         {/* ポイント */}
         {points.map((point, index) => point && (
           <circle
@@ -565,7 +565,7 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
             strokeWidth="1"
           />
         ))}
-        
+
         {/* 選択中の色の強調表示 */}
         {selectedSLPoint && (
           <circle
@@ -585,7 +585,7 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
 
 export const HueToneExtraction = () => {
   const { extractedColors, selectedColor, setSelectedColor, isQuantizationEnabled, selectedScheme } = useColorStore();
-  
+
   const { t } = useTranslation();
 
   // 色相環クリック時のハンドラ
@@ -593,13 +593,13 @@ export const HueToneExtraction = () => {
     try {
       // 量子化モードが有効ならHueを量子化
       const finalHue = isQuantizationEnabled ? quantizeHue(hue) : hue;
-      
+
       // 現在の描画色のS, Lを取得
       const [, s, l] = chroma(selectedColor).hsl();
       // 新しいHueで色を作成
       const newColor = chroma.hsl(finalHue, s || 0.5, l || 0.5).hex();
       setSelectedColor(newColor);
-      
+
       console.log(`Hue click: ${hue}° -> ${finalHue}° (quantization: ${isQuantizationEnabled ? 'ON' : 'OFF'})`);
     } catch (error) {
       console.error('色相変更エラー:', error);
@@ -612,13 +612,13 @@ export const HueToneExtraction = () => {
       // 量子化モードが有効ならS, Lを量子化
       const finalSaturation = isQuantizationEnabled ? quantizeSaturationLightness(saturation) : saturation;
       const finalLightness = isQuantizationEnabled ? quantizeSaturationLightness(lightness) : lightness;
-      
+
       // 現在の描画色のHueを取得
       const [h] = chroma(selectedColor).hsl();
       // 新しいS, Lで色を作成
       const newColor = chroma.hsl(h || 0, finalSaturation, finalLightness).hex();
       setSelectedColor(newColor);
-      
+
       console.log(`S/L click: S ${saturation.toFixed(2)} -> ${finalSaturation.toFixed(2)}, L ${lightness.toFixed(2)} -> ${finalLightness.toFixed(2)} (quantization: ${isQuantizationEnabled ? 'ON' : 'OFF'})`);
     } catch (error) {
       console.error('彩度・明度変更エラー:', error);
@@ -647,7 +647,7 @@ export const HueToneExtraction = () => {
               </div>
             </div>
           )}
-          
+
           {/* 色相・トーンの可視化を常に表示 */}
           <div className="flex flex-col space-y-0">
             <HueWheel colors={visualizationData} onHueClick={handleHueClick} isQuantized={isQuantizationEnabled} selectedColor={selectedColor} selectedScheme={selectedScheme} />
@@ -659,24 +659,24 @@ export const HueToneExtraction = () => {
               {t('extractedColors.noColors')}
             </div>
           )}
-          
+
           {/* 色使用量可視化バー */}
           <div className="pt-3 border-t-4 border-pink-500 mt-3 px-2 bg-orange-200">
             {/* 実際の抽出色バー（強制表示） */}
-            <div className="mt-2 w-full h-16 rounded-sm overflow-hidden flex border-4 border-green-500 bg-white">
+            <div className="mt-2 w-full h-4 rounded-sm overflow-hidden flex border-4 border-green-500 bg-white">
               {extractedColors.map((color, index) => (
                 <div
                   key={`${color.hex}-segment-${index}`}
-                  className="h-full flex flex-col justify-center items-center text-xs font-bold text-white"
-                  style={{ 
+                  className="h-full"
+                  style={{
                     backgroundColor: color.hex,
                     width: `${color.usage * 100}%`,
-                    minWidth: '20px'
+                    minWidth: '20px',
+                    height: '16px'
                   }}
                   title={`${color.hex}: ${(color.usage * 100).toFixed(1)}%`}
                 >
-                  <div>{color.hex}</div>
-                  <div>{(color.usage * 100).toFixed(1)}%</div>
+                  &nbsp;
                 </div>
               ))}
             </div>
