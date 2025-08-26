@@ -75,10 +75,10 @@ export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsP
   // 描画色に最も近い推薦色を見つける
   const findClosestColorIndex = (colors: string[], drawingColor: string): number => {
     if (!drawingColor || colors.length === 0) return -1;
-    
+
     let closestIndex = -1;
     let minDistance = Infinity;
-    
+
     colors.forEach((color, index) => {
       const distance = calculateColorDistance(color, drawingColor);
       if (distance < minDistance) {
@@ -86,7 +86,7 @@ export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsP
         closestIndex = index;
       }
     });
-    
+
     return closestIndex;
   };
 
@@ -101,17 +101,19 @@ export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsP
             {/* 新しい配色技法選択バー（色相環付き） */}
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className={`w-full flex items-center justify-between px-2 md:px-3 py-1.5 md:py-2 bg-background text-muted-foreground hover:bg-muted/20 text-xs md:text-sm font-medium transition-colors border border-border rounded-md`}
+              className={`w-full flex items-center justify-between px-6 md:px-7 py-8 md:py-8 bg-background text-muted-foreground hover:bg-muted/20 text-xs md:text-sm font-medium transition-colors border border-border rounded-md`}
               data-tutorial="color-schemes"
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-7">
                 {/* 選択中の配色技法の色相環 */}
                 {selectedSchemeData && (
-                  <ColorWheelMini
-                    radius={12}
-                    schemeId={selectedScheme}
-                    baseHue={getBaseHue()}
-                  />
+                  <div className="flex-shrink-0 p-5">
+                    <ColorWheelMini
+                      radius={14}
+                      schemeId={selectedScheme}
+                      baseHue={getBaseHue()}
+                    />
+                  </div>
                 )}
                 <span className="truncate">
                   {selectedSchemeData ? (
@@ -126,7 +128,7 @@ export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsP
 
             {/* 展開時の配色技法一覧 */}
             {isDropdownOpen && (
-              <div 
+              <div
                 className={`absolute top-full left-0 sm:left-0 mt-1 bg-background ${BORDER_PRESETS.button} shadow-lg z-10 max-h-60 overflow-y-auto w-full`}
               >
                 <div className="p-3 min-w-0">
@@ -135,21 +137,20 @@ export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsP
                       <button
                         key={scheme.id}
                         onClick={() => handleSchemeSelect(scheme.id)}
-                        className={`flex items-center p-2 transition-all hover:scale-105 border border-border rounded-md ${
-                          selectedScheme === scheme.id
-                            ? 'bg-primary text-primary-foreground shadow-md'
-                            : 'bg-background hover:bg-muted/80 text-foreground'
-                        }`}
+                        className={`flex items-center p-2 transition-all hover:scale-105 border border-border rounded-md ${selectedScheme === scheme.id
+                          ? 'bg-primary text-primary-foreground shadow-md'
+                          : 'bg-background hover:bg-muted/80 text-foreground'
+                          }`}
                       >
                         {/* ミニ色相環 */}
-                        <div className="mr-2 flex-shrink-0">
+                        <div className="mr-5 flex-shrink-0">
                           <ColorWheelMini
-                            radius={28}
+                            radius={34}
                             schemeId={scheme.id}
                             baseHue={getBaseHue()}
                           />
                         </div>
-                        
+
                         {/* 配色技法名 */}
                         <div className="text-xs font-medium leading-tight min-w-0 flex-1">
                           <div className="whitespace-pre-line">
@@ -166,17 +167,17 @@ export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsP
           </div>
         </div>
       </CardHeader>
-      
+
       {/* ドロップダウンが開いている時のオーバーレイ */}
       {isDropdownOpen && (
-        <div 
-          className="fixed inset-0 z-5" 
+        <div
+          className="fixed inset-0 z-5"
           onClick={() => {
             setIsDropdownOpen(false);
           }}
         />
       )}
-      
+
       <CardContent className="pt-0 flex-1 overflow-auto pb-0 min-h-0">
         <div data-tutorial="recommended-colors">
           <ColorGrid
@@ -185,12 +186,12 @@ export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsP
               title: t('colorRecommendations.generateTones'),
               showClickIcon: false,
               isHighlighted: index === closestColorIndex
-          }))}
-          onColorClick={handleGenerateTones}
-          gridType="colors" // 2セクション（色推薦）: モバイル4列、PC4列
-          isMobile={isMobile}
-          emptyMessage={t('colorRecommendations.noRecommendations')}
-        />
+            }))}
+            onColorClick={handleGenerateTones}
+            gridType="colors" // 2セクション（色推薦）: モバイル4列、PC4列
+            isMobile={isMobile}
+            emptyMessage={t('colorRecommendations.noRecommendations')}
+          />
         </div>
       </CardContent>
     </Card>
@@ -228,10 +229,10 @@ export const ToneRecommendations = ({ isMobile = false }: ToneRecommendationsPro
   // 描画色に最も近いトーン色を見つける
   const findClosestToneIndex = (tones: string[], drawingColor: string): number => {
     if (!drawingColor || tones.length === 0) return -1;
-    
+
     let closestIndex = -1;
     let minDistance = Infinity;
-    
+
     tones.forEach((tone, index) => {
       const distance = calculateColorDistance(tone, drawingColor);
       if (distance < minDistance) {
@@ -239,7 +240,7 @@ export const ToneRecommendations = ({ isMobile = false }: ToneRecommendationsPro
         closestIndex = index;
       }
     });
-    
+
     return closestIndex;
   };
 
