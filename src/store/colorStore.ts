@@ -73,12 +73,6 @@ export const COLOR_SCHEMES: ColorScheme[] = [
     angles: [0, -30],
   },
   {
-    id: 'complementary',
-    name: 'ダイアード配色\n正反対の色同士',
-    description: '色相環で正反対にある色同士の組み合わせ',
-    angles: [0, 180],
-  },
-  {
     id: 'intermediate_1',
     name: 'インターミディエート配色\n中間色の組み合わせ',
     description: '隣接色と反対色の中間にある色の組み合わせ',
@@ -89,6 +83,12 @@ export const COLOR_SCHEMES: ColorScheme[] = [
     name: 'インターミディエート配色\n中間色の組み合わせ',
     description: '隣接色と反対色の中間にある色の組み合わせ',
     angles: [0, -60],
+  },
+  {
+    id: 'complementary',
+    name: 'ダイアード配色\n正反対の色同士',
+    description: '色相環で正反対にある色同士の組み合わせ',
+    angles: [0, 180],
   },
   {
     id: 'dominant_1',
