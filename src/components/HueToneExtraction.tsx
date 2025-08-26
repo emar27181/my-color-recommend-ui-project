@@ -684,20 +684,19 @@ export const HueToneExtraction = () => {
                 ))}
               </div>
               
-              {/* 色の詳細リスト */}
-              <div className="mt-2 space-y-1 max-h-32 overflow-y-auto">
+              {/* 色の横長メモリバー */}
+              <div className="mt-2 space-y-2 max-h-32 overflow-y-auto">
                 {extractedColors.map((color, index) => (
-                  <div key={`${color.hex}-detail-${index}`} className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-3 h-3 rounded-sm border border-border"
-                        style={{ backgroundColor: color.hex }}
-                      />
-                      <span className="font-mono text-muted-foreground">{color.hex}</span>
-                    </div>
-                    <span className="text-muted-foreground opacity-80">
-                      {(color.usage * 100).toFixed(1)}%
-                    </span>
+                  <div key={`${color.hex}-bar-${index}`} className="w-full">
+                    <div
+                      className="h-4 rounded-sm border border-border transition-all duration-200 hover:brightness-110"
+                      style={{ 
+                        backgroundColor: color.hex,
+                        width: `${color.usage * 100}%`,
+                        minWidth: '8px' // 最小幅を確保
+                      }}
+                      title={`${color.hex}: ${(color.usage * 100).toFixed(1)}%`}
+                    />
                   </div>
                 ))}
               </div>
