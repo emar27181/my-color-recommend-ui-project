@@ -585,6 +585,9 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
 
 export const HueToneExtraction = () => {
   const { extractedColors, selectedColor, setSelectedColor, isQuantizationEnabled, selectedScheme } = useColorStore();
+  
+  // デバッグ用ログ
+  console.log('HueToneExtraction - extractedColors:', extractedColors);
   const { t } = useTranslation();
 
   // 色相環クリック時のハンドラ
@@ -656,6 +659,48 @@ export const HueToneExtraction = () => {
           {extractedColors.length === 0 && (
             <div className="text-center text-muted-foreground text-xs py-2 opacity-50">
               {t('extractedColors.noColors')}
+            </div>
+          )}
+          
+          {/* 色使用量可視化バー */}
+          {extractedColors.length > 0 && (
+            <div className="pt-3 border-t border-border mt-3">
+              <div className="text-center text-muted-foreground text-xs mb-2 opacity-80">
+                色使用量
+              </div>
+              
+              {/* 色使用量バー */}
+              <div className="w-full h-4 bg-muted rounded-sm overflow-hidden flex">
+                {extractedColors.map((color, index) => (
+                  <div
+                    key={`${color.hex}-${index}`}
+                    style={{ 
+                      backgroundColor: color.hex,
+                      width: `${color.usage * 100}%`
+                    }}
+                    className="h-full transition-all duration-200 hover:brightness-110"
+                    title={`${color.hex}: ${(color.usage * 100).toFixed(1)}%`}
+                  />
+                ))}
+              </div>
+              
+              {/* 色の詳細リスト */}
+              <div className="mt-2 space-y-1 max-h-32 overflow-y-auto">
+                {extractedColors.map((color, index) => (
+                  <div key={`${color.hex}-detail-${index}`} className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-3 h-3 rounded-sm border border-border"
+                        style={{ backgroundColor: color.hex }}
+                      />
+                      <span className="font-mono text-muted-foreground">{color.hex}</span>
+                    </div>
+                    <span className="text-muted-foreground opacity-80">
+                      {(color.usage * 100).toFixed(1)}%
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
