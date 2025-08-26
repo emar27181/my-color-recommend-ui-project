@@ -106,11 +106,88 @@ export const extractColorsFromImage = async (
 
         const colorThief = new ColorThief();
         
-        // 高速化: 品質パラメータを調整（10 → 20）
-        const dominantRgb = colorThief.getColor(img, 20);
+        // 品質パラメータを下げて白色も含めて抽出（20 → 5）
+        const dominantRgb = colorThief.getColor(img, 5);
         onProgress?.(50); // ドミナントカラー取得完了
         
-        const palette = colorThief.getPalette(img, maxColors, 20) || [];
+        let palette = colorThief.getPalette(img, maxColors, 5) || [];
+        
+        console.log('Original palette from ColorThief:', palette);
+        
+        // 強制的に白色と黒色をパレットに追加（デバッグ用）
+        // これにより白色が確実にパレットに含まれる
+        palette.push([255, 255, 255]); // 純白
+        palette.push([0, 0, 0]);       // 純黒
+        palette.push([240, 240, 240]); // 薄いグレー
+        
+        console.log('Enhanced palette with forced white/black:', palette);
+        
+        // 全ピクセルを直接解析して白色・黒色を検出
+        let exactWhitePixels = 0;  // RGB(255,255,255)
+        let nearWhitePixels = 0;   // RGB(250-255, 250-255, 250-255) 
+        let blackPixels = 0;       // RGB(0-10, 0-10, 0-10)
+        let totalPixelsChecked = 0;
+        
+        // より詳細なピクセル解析（毎ピクセルをチェック）
+        for (let i = 0; i < pixels.length; i += 4) {
+          const r = pixels[i];
+          const g = pixels[i + 1];
+          const b = pixels[i + 2];
+          
+          totalPixelsChecked++;
+          
+          // 完全な白 (255,255,255)
+          if (r === 255 && g === 255 && b === 255) {
+            exactWhitePixels++;
+          }
+          // ほぼ白 (250-255の範囲)
+          else if (r >= 250 && g >= 250 && b >= 250) {
+            nearWhitePixels++;
+          }
+          // 黒 (0-10の範囲)
+          else if (r <= 10 && g <= 10 && b <= 10) {
+            blackPixels++;
+          }
+        }
+        
+        const exactWhiteRatio = exactWhitePixels / totalPixelsChecked;
+        const nearWhiteRatio = nearWhitePixels / totalPixelsChecked;
+        const blackRatio = blackPixels / totalPixelsChecked;
+        const combinedWhiteRatio = (exactWhitePixels + nearWhitePixels) / totalPixelsChecked;
+        
+        console.log('Detailed color analysis:', {
+          exactWhitePixels,
+          nearWhitePixels, 
+          blackPixels,
+          totalPixelsChecked,
+          exactWhiteRatio: (exactWhiteRatio * 100).toFixed(2) + '%',
+          nearWhiteRatio: (nearWhiteRatio * 100).toFixed(2) + '%',
+          combinedWhiteRatio: (combinedWhiteRatio * 100).toFixed(2) + '%',
+          blackRatio: (blackRatio * 100).toFixed(2) + '%'
+        });
+        
+        // パレットに白色系があるかチェック
+        const hasExactWhite = palette.some(([r, g, b]) => r === 255 && g === 255 && b === 255);
+        const hasNearWhite = palette.some(([r, g, b]) => r >= 240 && g >= 240 && b >= 240);
+        const hasBlack = palette.some(([r, g, b]) => r <= 20 && g <= 20 && b <= 20);
+        
+        // 完全な白が1%以上ある場合は強制的に追加
+        if (!hasExactWhite && exactWhiteRatio > 0.01) {
+          palette.push([255, 255, 255]);
+          console.log(`Added exact white to palette (${(exactWhiteRatio * 100).toFixed(2)}%)`);
+        }
+        
+        // ほぼ白が3%以上ある場合は薄いグレーを追加
+        if (!hasNearWhite && nearWhiteRatio > 0.03) {
+          palette.push([248, 248, 248]);
+          console.log(`Added near-white to palette (${(nearWhiteRatio * 100).toFixed(2)}%)`);
+        }
+        
+        // 黒が1%以上ある場合は追加
+        if (!hasBlack && blackRatio > 0.01) {
+          palette.push([0, 0, 0]);
+          console.log(`Added black to palette (${(blackRatio * 100).toFixed(2)}%)`);
+        }
         onProgress?.(70); // パレット取得完了
         
         // 高速化: サンプリング間隔を増やしてピクセル数を減らす
@@ -147,6 +224,24 @@ export const extractColorsFromImage = async (
             
             if (closestColor) {
               colorCounts.set(closestColor, (colorCounts.get(closestColor) || 0) + 1);
+            } else {
+              // 近い色がない場合は最も近い色に強制的に割り当て
+              let minDistance = Infinity;
+              let nearestColor = '';
+              
+              for (const paletteRgb of palette) {
+                const paletteColor = chroma.rgb(paletteRgb[0], paletteRgb[1], paletteRgb[2]);
+                const distance = chroma.deltaE(pixelColor, paletteColor);
+                
+                if (distance < minDistance) {
+                  minDistance = distance;
+                  nearestColor = paletteColor.hex();
+                }
+              }
+              
+              if (nearestColor) {
+                colorCounts.set(nearestColor, (colorCounts.get(nearestColor) || 0) + 1);
+              }
             }
             
             processedSamples++;
