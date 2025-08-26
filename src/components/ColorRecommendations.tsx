@@ -1,5 +1,5 @@
 import React from 'react';
-import { useColorStore, COLOR_SCHEMES, sortSchemesByCompatibility, sortSchemesByHueDistance, SCHEME_SORT_CONFIG } from '@/store/colorStore';
+import { useColorStore, COLOR_SCHEMES, sortSchemesByCompatibility, sortSchemesByHueDistance, sortSchemesByColorCount, SCHEME_SORT_CONFIG } from '@/store/colorStore';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ColorGrid } from '@/components/common/ColorGrid';
 import { ColorWheelMini } from '@/components/common/ColorWheelMini';
@@ -26,10 +26,12 @@ export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsP
         return sortSchemesByCompatibility(extractedColors, selectedColor, COLOR_SCHEMES);
       case 'hue_distance':
         return sortSchemesByHueDistance(baseColor, COLOR_SCHEMES);
+      case 'color_count':
+        return sortSchemesByColorCount(COLOR_SCHEMES);
       case 'original':
         return [...COLOR_SCHEMES]; // 固定順序
       default:
-        return sortSchemesByHueDistance(baseColor, COLOR_SCHEMES);
+        return sortSchemesByColorCount(COLOR_SCHEMES);
     }
   }, [baseColor, extractedColors, selectedColor]);
 

@@ -6,7 +6,7 @@
       "baseColorSelection": "Base Color (Source) Selection",
       "baseColorSelectionShort": "Base Color Selection",
       "colorRecommendation": "Hue (Color Scheme) Recommendation",
-      "colorRecommendationShort": "Hue Recommendation (Color Wheel Distance Order)",
+      "colorRecommendationShort": "Hue Recommendation",
       "toneRecommendation": "Tone (Brightness & Saturation) Recommendation", 
       "toneRecommendationShort": "Tone Recommendation",
       "skinColorRecommendation": "Skin Color Recommendation",

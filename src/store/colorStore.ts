@@ -248,13 +248,14 @@ export const COLOR_SORT_CONFIG = {
 // 配色技法のソート手法設定
 export const SCHEME_SORT_CONFIG = {
   // 配色技法の並び替え手法 (変更可能)
-  method: 'hue_distance' as 'compatibility' | 'hue_distance' | 'original',
+  method: 'color_count' as 'compatibility' | 'hue_distance' | 'original' | 'color_count',
   
   // 利用可能な手法一覧とその説明
   availableMethods: {
     'compatibility': '抽出色との適合度順 (従来の方法)',
     'hue_distance': '色相距離順 (近い色相の配色技法を優先)',
-    'original': '固定順序 (COLOR_SCHEMES配列の順序)'
+    'original': '固定順序 (COLOR_SCHEMES配列の順序)',
+    'color_count': '色数順 (少ない色数から多い色数へ)'
   } as const
 };
 
@@ -776,6 +777,23 @@ export const sortSchemesByHueDistance = (
   })));
   
   return schemesWithDistances.map(s => s.scheme);
+};
+
+// 配色技法を色数順にソートする関数（少ない色数から多い色数へ）
+export const sortSchemesByColorCount = (
+  schemes: ColorScheme[] = COLOR_SCHEMES
+): ColorScheme[] => {
+  const sortedSchemes = [...schemes].sort((a, b) => {
+    // angles配列の長さで色数を判定
+    return a.angles.length - b.angles.length;
+  });
+
+  console.log('Scheme color counts:', sortedSchemes.map(s => ({
+    name: s.name.split('\n')[0],
+    colorCount: s.angles.length
+  })));
+
+  return sortedSchemes;
 };
 
 // 配色技法を適合度順にソートする関数

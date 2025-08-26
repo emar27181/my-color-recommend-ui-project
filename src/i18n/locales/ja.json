@@ -6,7 +6,7 @@
       "baseColorSelection": "ベースカラー(推薦元)選択",
       "baseColorSelectionShort": "ベース色選択",
       "colorRecommendation": "色相(配色技法)推薦",
-      "colorRecommendationShort": "色相推薦（色相環距離の近い順）",
+      "colorRecommendationShort": "色相推薦",
       "toneRecommendation": "トーン(明度・彩度)推薦",
       "toneRecommendationShort": "トーン推薦",
       "skinColorRecommendation": "肌色推薦",
