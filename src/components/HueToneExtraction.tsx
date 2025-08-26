@@ -6,9 +6,9 @@ import { useMemo } from 'react';
 
 // 色相環プロット用コンポーネント
 const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedScheme }: { colors: { hex: string; usage: number }[], onHueClick?: (hue: number) => void, isQuantized: boolean, selectedColor?: string, selectedScheme?: string }) => {
-  const size = 180; // 横並び用にサイズを縮小
+  const size = 220;
   const center = size / 2;
-  const radius = 60; // 横並び用にradiusを縮小
+  const radius = 72;
   
   const huePoints = colors.map(color => {
     try {
@@ -326,10 +326,10 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
 
 // 彩度-明度散布図用コンポーネント
 const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantized, selectedColor }: { colors: { hex: string; usage: number }[], onSaturationLightnessClick?: (saturation: number, lightness: number) => void, isQuantized: boolean, selectedColor?: string }) => {
-  const plotWidth = 120; // 横並び用にプロット幅を縮小
-  const plotHeight = 120; // 横並び用にプロット高さを縮小
-  const width = 150; // 横並び用に横幅を縮小
-  const height = 180; // 横並び用に縦幅を縮小
+  const plotWidth = 145.8;
+  const plotHeight = 145.8;
+  const width = 180;
+  const height = 214.5;
   
   const points = colors.map(color => {
     try {
@@ -648,13 +648,9 @@ export const HueToneExtraction = () => {
           )}
           
           {/* 色相・トーンの可視化を常に表示 */}
-          <div className="flex space-x-2">
-            <div className="flex-1">
-              <HueWheel colors={visualizationData} onHueClick={handleHueClick} isQuantized={isQuantizationEnabled} selectedColor={selectedColor} selectedScheme={selectedScheme} />
-            </div>
-            <div className="flex-1">
-              <SaturationLightnessPlot colors={visualizationData} onSaturationLightnessClick={handleSaturationLightnessClick} isQuantized={isQuantizationEnabled} selectedColor={selectedColor} />
-            </div>
+          <div className="flex flex-col space-y-0">
+            <HueWheel colors={visualizationData} onHueClick={handleHueClick} isQuantized={isQuantizationEnabled} selectedColor={selectedColor} selectedScheme={selectedScheme} />
+            <SaturationLightnessPlot colors={visualizationData} onSaturationLightnessClick={handleSaturationLightnessClick} isQuantized={isQuantizationEnabled} selectedColor={selectedColor} />
           </div>
           {/* 抽出色がない場合のメッセージは下部に小さく表示 */}
           {extractedColors.length === 0 && (
