@@ -91,12 +91,6 @@ export const COLOR_SCHEMES: ColorScheme[] = [
     angles: [0, -60],
   },
   {
-    id: 'opponent',
-    name: 'オポーネント配色\n強いコントラストを作る色の組み合わせ',
-    description: '強いコントラストを作る色の組み合わせ',
-    angles: [0, 180],
-  },
-  {
     id: 'dominant_1',
     name: 'ドミナント配色\n似た色相でまとめた統一感のある組み合わせ',
     description: '似た色相でまとめた統一感のある組み合わせ',
