@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
+import { useColorStore } from '@/store/colorStore';
 import { ColorPicker } from '@/components/ColorPicker';
 import { ColorRecommendations, ToneRecommendations } from '@/components/ColorRecommendations';
 import { ImageUpload } from '@/components/ImageUpload';
@@ -22,6 +23,34 @@ interface LayoutRendererProps {
   setCollapseState: (key: string, value: boolean) => void;
 }
 
+// 色使用量バーコンポーネント
+const ColorUsageBar = () => {
+  const { extractedColors } = useColorStore();
+  
+  return (
+    <div className="pt-3 border-t-4 border-pink-500 mt-3 p-4 bg-orange-200">
+      {/* 実際の抽出色バー（強制表示） */}
+      <div className="mt-4 mb-4 w-full h-4 rounded-sm overflow-hidden flex border border-white bg-white">
+        {extractedColors.map((color, index) => (
+          <div
+            key={`${color.hex}-segment-${index}`}
+            className="h-full"
+            style={{
+              backgroundColor: color.hex,
+              width: `${color.usage * 100}%`,
+              minWidth: '20px',
+              height: '16px'
+            }}
+            title={`${color.hex}: ${(color.usage * 100).toFixed(1)}%`}
+          >
+            &nbsp;
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 // コンポーネントマッピング
 const ComponentMap = {
   canvas: () => (
@@ -33,6 +62,7 @@ const ComponentMap = {
         <ColorPicker />
         <ImageUpload onImageUpload={handleImageUpload} />
       </div>
+      <ColorUsageBar />
       <ExtractedColorsDisplay isMobile={isMobile} />
     </div>
   ),
