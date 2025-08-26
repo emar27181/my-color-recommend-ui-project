@@ -6,17 +6,17 @@ export const LAYOUT_CONFIG = {
     columns: [
       {
         id: 'canvas',
-        width: 'w-7/12', // 7/12幅（約58.3%）
+        width: 'w-7/12' as const, // 7/12幅（約58.3%）
         components: ['canvasColorRecommendation']
       },
       {
         id: 'main-tools', 
-        width: 'w-1/4', // 1/4幅（25%）
+        width: 'w-1/4' as const, // 1/4幅（25%）
         components: ['baseColor', 'colorRecommendation', 'toneRecommendation', 'skinColor']
       },
       {
         id: 'analysis',
-        width: 'w-1/6', // 1/6幅（約16.7%）
+        width: 'w-1/6' as const, // 1/6幅（約16.7%）
         components: ['hueToneExtraction']
       }
     ],

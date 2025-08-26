@@ -122,6 +122,10 @@ export const extractColorsFromImage = async (
         
         console.log('Enhanced palette with forced white/black:', palette);
         
+        // ピクセルデータを早めに取得
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const pixels = imageData.data;
+        
         // 全ピクセルを直接解析して白色・黒色を検出
         let exactWhitePixels = 0;  // RGB(255,255,255)
         let nearWhitePixels = 0;   // RGB(250-255, 250-255, 250-255) 
@@ -190,10 +194,8 @@ export const extractColorsFromImage = async (
         }
         onProgress?.(70); // パレット取得完了
         
-        // 高速化: サンプリング間隔を増やしてピクセル数を減らす
+        // 高速化: サンプリング間隔を増やしてピクセル数を減らす  
         const sampleRate = Math.max(1, Math.floor(Math.sqrt(width * height) / 100));
-        const imageData = ctx.getImageData(0, 0, width, height);
-        const pixels = imageData.data;
         const totalSamples = Math.floor((width * height) / (sampleRate * sampleRate));
         
         const colorCounts = new Map<string, number>();
