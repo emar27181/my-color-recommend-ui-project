@@ -661,9 +661,9 @@ export const HueToneExtraction = () => {
           )}
 
           {/* 色使用量可視化バー */}
-          <div className="pt-3 border-t-4 border-pink-500 mt-3 px-2 bg-orange-200">
+          <div className="pt-3 border-t-4 border-pink-500 mt-3 p-4 bg-orange-200">
             {/* 実際の抽出色バー（強制表示） */}
-            <div className="mt-2 w-[90%] mx-auto h-4 rounded-sm overflow-hidden flex border border-green-500 bg-white">
+            <div className="mt-4 mb-4 w-[90%] mx-auto h-4 rounded-sm overflow-hidden flex border border-white bg-white">
               {extractedColors.map((color, index) => (
                 <div
                   key={`${color.hex}-segment-${index}`}
