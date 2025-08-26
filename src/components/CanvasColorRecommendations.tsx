@@ -457,9 +457,9 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     }
   }, [layer1Context, saveToHistory, showToast, updateCompositeCanvas, resizeCanvas]);
 
-  // 座標計算のヘルパー関数（objectFit: contain対応）
+  // 座標計算のヘルパー関数（objectFit: contain対応 + 描画エリア制限）
   const getScaledCoordinates = useCallback((clientX: number, clientY: number) => {
-    if (!canvasRef.current) return { x: 0, y: 0 };
+    if (!canvasRef.current) return { x: 0, y: 0, isInDrawArea: false };
 
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
@@ -484,15 +484,30 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
       offsetY = 0;
     }
 
+    // クリック座標が実際の描画エリア内にあるかチェック
+    const clickX = clientX - rect.left;
+    const clickY = clientY - rect.top;
+    const isInDrawArea = clickX >= offsetX && clickX <= offsetX + drawWidth && 
+                         clickY >= offsetY && clickY <= offsetY + drawHeight;
+
+    // 描画エリア外の場合は無効な座標を返す
+    if (!isInDrawArea) {
+      return { x: -1, y: -1, isInDrawArea: false };
+    }
+
     // クリック座標を描画エリア内の相対座標に変換
-    const relativeX = (clientX - rect.left - offsetX) / drawWidth;
-    const relativeY = (clientY - rect.top - offsetY) / drawHeight;
+    const relativeX = (clickX - offsetX) / drawWidth;
+    const relativeY = (clickY - offsetY) / drawHeight;
 
     // キャンバス内部座標に変換
     const x = relativeX * canvas.width;
     const y = relativeY * canvas.height;
 
-    return { x: Math.max(0, Math.min(canvas.width - 1, x)), y: Math.max(0, Math.min(canvas.height - 1, y)) };
+    return { 
+      x: Math.max(0, Math.min(canvas.width - 1, x)), 
+      y: Math.max(0, Math.min(canvas.height - 1, y)),
+      isInDrawArea: true
+    };
   }, []);
 
   // キャンバスから色を抽出する関数（完全実装版）
@@ -1230,8 +1245,14 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     const layerContext = getCurrentLayerContext();
     if (!layerContext || !canvasRef.current) return;
 
-    const { x, y } = getScaledCoordinates(e.clientX, e.clientY);
-    console.log('Scaled coordinates:', { x, y });
+    const { x, y, isInDrawArea } = getScaledCoordinates(e.clientX, e.clientY);
+    console.log('Scaled coordinates:', { x, y, isInDrawArea });
+
+    // 描画エリア外の場合は何もしない
+    if (!isInDrawArea) {
+      console.log('Click outside draw area - ignoring');
+      return;
+    }
 
     // スポイトモードの場合
     if (isEyedropperMode) {
@@ -1262,14 +1283,21 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
 
     layerContext.beginPath();
     layerContext.moveTo(x, y);
-  }, [getCurrentLayerContext, getScaledCoordinates, applyDrawingSettings, isFillMode, isEyedropperMode, selectedColor, saveToHistory, pickColorFromCanvas]);
+  }, [getCurrentLayerContext, getScaledCoordinates, applyDrawingSettings, isFillMode, isEyedropperMode, selectedColor, saveToHistory, pickColorFromCanvas, floodFill]);
 
   // 描画中（最適化版）
   const draw = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     const layerContext = getCurrentLayerContext();
     if (!isDrawing || !layerContext || !canvasRef.current) return;
 
-    const { x, y } = getScaledCoordinates(e.clientX, e.clientY);
+    const { x, y, isInDrawArea } = getScaledCoordinates(e.clientX, e.clientY);
+
+    // 描画エリア外の場合は描画を停止
+    if (!isInDrawArea) {
+      setIsDrawing(false);
+      layerContext.closePath();
+      return;
+    }
 
     // 描画中は設定済みなので座標のみ更新
     layerContext.lineTo(x, y);
@@ -1301,7 +1329,13 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     if (!layerContext || !canvasRef.current) return;
 
     const touch = e.touches[0];
-    const { x, y } = getScaledCoordinates(touch.clientX, touch.clientY);
+    const { x, y, isInDrawArea } = getScaledCoordinates(touch.clientX, touch.clientY);
+
+    // 描画エリア外の場合は何もしない
+    if (!isInDrawArea) {
+      console.log('Touch outside draw area - ignoring');
+      return;
+    }
 
     // スポイトモードの場合
     if (isEyedropperMode) {
@@ -1331,7 +1365,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
 
     layerContext.beginPath();
     layerContext.moveTo(x, y);
-  }, [getCurrentLayerContext, getScaledCoordinates, applyDrawingSettings, isFillMode, isEyedropperMode, selectedColor, saveToHistory, pickColorFromCanvas]);
+  }, [getCurrentLayerContext, getScaledCoordinates, applyDrawingSettings, isFillMode, isEyedropperMode, selectedColor, saveToHistory, pickColorFromCanvas, floodFill]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault();
@@ -1339,7 +1373,14 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     if (!isDrawing || !layerContext || !canvasRef.current) return;
 
     const touch = e.touches[0];
-    const { x, y } = getScaledCoordinates(touch.clientX, touch.clientY);
+    const { x, y, isInDrawArea } = getScaledCoordinates(touch.clientX, touch.clientY);
+
+    // 描画エリア外の場合は描画を停止
+    if (!isInDrawArea) {
+      setIsDrawing(false);
+      layerContext.closePath();
+      return;
+    }
 
     // 描画中は設定済みなので座標のみ更新
     layerContext.lineTo(x, y);
