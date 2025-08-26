@@ -28,9 +28,9 @@ const ColorUsageBar = () => {
   const { extractedColors } = useColorStore();
   
   return (
-    <div className="pt-3 mt-3 p-4 bg-orange-200">
+    <div className="pt-4 mt-4 px-6 pb-4 bg-orange-200">
       {/* 実際の抽出色バー（強制表示） */}
-      <div className="mt-4 mb-4 w-full h-4 rounded-sm overflow-hidden flex border border-white bg-white">
+      <div className="mt-4 mb-4 mx-2 w-full h-4 rounded-sm overflow-hidden flex border border-white bg-white">
         {extractedColors.map((color, index) => (
           <div
             key={`${color.hex}-segment-${index}`}
