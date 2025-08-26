@@ -588,6 +588,7 @@ export const HueToneExtraction = () => {
   
   // デバッグ用ログ
   console.log('HueToneExtraction - extractedColors:', extractedColors);
+  console.log('HueToneExtraction - extractedColors length:', extractedColors.length);
   const { t } = useTranslation();
 
   // 色相環クリック時のハンドラ
@@ -636,11 +637,12 @@ export const HueToneExtraction = () => {
   }, [extractedColors]);
 
   return (
-    <Card className="w-full flex flex-col p-0">
-      <CardHeader className="p-0 flex-shrink-0">
+    <Card className="w-full flex flex-col p-0 border-4 border-purple-500 bg-yellow-200">
+      <CardHeader className="p-4 flex-shrink-0 bg-red-500 text-white">
+        <h2 className="text-lg font-bold">HueToneExtraction Component - VISIBLE!</h2>
       </CardHeader>
-      <CardContent className="p-0 flex-1 overflow-auto min-h-0">
-        <div data-tutorial="hue-tone-extraction" className="space-y-0">
+      <CardContent className="p-4 flex-1 overflow-auto min-h-0 bg-blue-100">
+        <div data-tutorial="hue-tone-extraction" className="space-y-4 bg-green-100 p-4 border-2 border-red-600">
           {/* 配色技法の表示 */}
           {selectedScheme && selectedColor && (
             <div className="px-2 py-1 text-center">
@@ -663,45 +665,57 @@ export const HueToneExtraction = () => {
           )}
           
           {/* 色使用量可視化バー */}
-          {extractedColors.length > 0 && (
-            <div className="pt-3 border-t border-border mt-3">
-              <div className="text-center text-muted-foreground text-xs mb-2 opacity-80">
-                色使用量
+          <div className="pt-3 border-t-4 border-pink-500 mt-3 px-2 bg-orange-200">
+            <div className="text-center text-black text-lg mb-2 font-bold">
+              ★ 色使用量バーエリア ({extractedColors.length}色) ★
+            </div>
+            
+            {/* 色の横並び一行バー */}
+            <div className="mt-2 w-full h-16 rounded-sm overflow-hidden flex border-4 border-red-500 bg-white">
+              {/* 常に表示するテスト用固定バー */}
+              <div className="h-full bg-red-500" style={{ width: '40%' }} title="Red: 40%">
+                <div className="text-white text-center leading-16">RED</div>
               </div>
-              
-              {/* 色使用量バー */}
-              <div className="w-full h-4 bg-muted rounded-sm overflow-hidden flex">
-                {extractedColors.map((color, index) => (
-                  <div
-                    key={`${color.hex}-${index}`}
-                    style={{ 
-                      backgroundColor: color.hex,
-                      width: `${color.usage * 100}%`
-                    }}
-                    className="h-full transition-all duration-200 hover:brightness-110"
-                    title={`${color.hex}: ${(color.usage * 100).toFixed(1)}%`}
-                  />
-                ))}
+              <div className="h-full bg-green-500" style={{ width: '30%' }} title="Green: 30%">
+                <div className="text-white text-center leading-16">GREEN</div>
               </div>
-              
-              {/* 色の横長メモリバー */}
-              <div className="mt-2 space-y-2 max-h-32 overflow-y-auto">
-                {extractedColors.map((color, index) => (
-                  <div key={`${color.hex}-bar-${index}`} className="w-full">
-                    <div
-                      className="h-4 rounded-sm border border-border transition-all duration-200 hover:brightness-110"
-                      style={{ 
-                        backgroundColor: color.hex,
-                        width: `${color.usage * 100}%`,
-                        minWidth: '8px' // 最小幅を確保
-                      }}
-                      title={`${color.hex}: ${(color.usage * 100).toFixed(1)}%`}
-                    />
-                  </div>
-                ))}
+              <div className="h-full bg-blue-500" style={{ width: '30%' }} title="Blue: 30%">
+                <div className="text-white text-center leading-16">BLUE</div>
               </div>
             </div>
-          )}
+            
+            {/* 実際の抽出色バー（強制表示） */}
+            <div className="mt-4 w-full h-16 rounded-sm overflow-hidden flex border-4 border-green-500 bg-pink-200">
+              <div className="text-center text-black font-bold mb-2 w-full">実際の抽出色バー</div>
+            </div>
+            <div className="mt-2 w-full h-16 rounded-sm overflow-hidden flex border-4 border-green-500 bg-white">
+              {extractedColors.map((color, index) => (
+                <div
+                  key={`${color.hex}-segment-${index}`}
+                  className="h-full flex flex-col justify-center items-center text-xs font-bold text-white"
+                  style={{ 
+                    backgroundColor: color.hex,
+                    width: `${color.usage * 100}%`,
+                    minWidth: '20px'
+                  }}
+                  title={`${color.hex}: ${(color.usage * 100).toFixed(1)}%`}
+                >
+                  <div>{color.hex}</div>
+                  <div>{(color.usage * 100).toFixed(1)}%</div>
+                </div>
+              ))}
+            </div>
+            
+            {/* デバッグ情報 */}
+            <div className="text-xs text-red-600 mt-1">
+              Debug: {extractedColors.length} colors extracted
+              {extractedColors.length > 0 && (
+                <div className="mt-1">
+                  Colors: {extractedColors.map(c => `${c.hex}(${(c.usage*100).toFixed(1)}%)`).join(', ')}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>
