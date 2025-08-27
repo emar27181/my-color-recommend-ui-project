@@ -105,7 +105,7 @@ const SectionHeader = ({
       className={`${isMobile ? 'text-xs' : 'text-lg'} font-medium ${
         componentKey === 'canvas' ? 'mb-0' : 'mb-2'
       } text-foreground cursor-pointer flex items-center ${
-        componentKey === 'hueToneExtraction' && isCollapsed ? 'justify-between px-1' : 'justify-between'
+        componentKey === 'hueToneExtraction' && isCollapsed ? 'justify-start gap-1 px-2' : 'justify-between'
       } leading-tight min-h-[2rem]`}
       onClick={onToggle}
     >
