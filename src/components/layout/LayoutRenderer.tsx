@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
+import { ChevronDown, ChevronUp, ChevronLeft, RefreshCw } from 'lucide-react';
 import { useColorStore } from '@/store/colorStore';
 import { ColorPicker } from '@/components/ColorPicker';
 import { ColorRecommendations, ToneRecommendations } from '@/components/ColorRecommendations';
@@ -102,39 +102,51 @@ const SectionHeader = ({
   
   return (
     <h3 
-      className={`${isMobile ? 'text-xs' : 'text-lg'} font-medium ${componentKey === 'canvas' ? 'mb-0' : 'mb-2'} text-foreground cursor-pointer flex items-center justify-between leading-tight`}
+      className={`${isMobile ? 'text-xs' : 'text-lg'} font-medium ${
+        componentKey === 'canvas' ? 'mb-0' : 'mb-2'
+      } text-foreground cursor-pointer flex items-center ${
+        componentKey === 'hueToneExtraction' && isCollapsed ? 'justify-between px-1' : 'justify-between'
+      } leading-tight min-h-[2rem]`}
       onClick={onToggle}
     >
-      <span>{config.step}. {t(config.titleKey)}</span>
-      <div className="flex items-center gap-2">
-        {config.hasUpdateButton && handleExtractColorsFromCanvas && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleExtractColorsFromCanvas();
-            }}
-            className="p-1 hover:bg-muted rounded-md border border-border transition-colors bg-transparent"
-            title="キャンバスから色を抽出"
-          >
-            <RefreshCw className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'} text-foreground`} />
-          </button>
-        )}
-        {componentKey === 'hueToneExtraction' ? (
-          // βセクションは横方向の折り畳みアイコン
-          isCollapsed ? (
-            <ChevronRight className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
-          ) : (
-            <ChevronLeft className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
-          )
-        ) : (
-          // その他のセクションは従来通り縦方向
-          isCollapsed ? (
-            <ChevronDown className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
-          ) : (
-            <ChevronUp className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
-          )
-        )}
-      </div>
+{componentKey === 'hueToneExtraction' && isCollapsed ? (
+        // βセクションが横に折りたたまれている場合は「β.」とアイコンを表示
+        <>
+          <span>{config.step}.</span>
+          <ChevronLeft className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'} text-foreground`} />
+        </>
+      ) : (
+        <>
+          <span>
+            {`${config.step}. ${t(config.titleKey)}`}
+          </span>
+          <div className="flex items-center gap-2">
+            {config.hasUpdateButton && handleExtractColorsFromCanvas && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleExtractColorsFromCanvas();
+                }}
+                className="p-1 hover:bg-muted rounded-md border border-border transition-colors bg-transparent"
+                title="キャンバスから色を抽出"
+              >
+                <RefreshCw className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'} text-foreground`} />
+              </button>
+            )}
+            {componentKey === 'hueToneExtraction' ? (
+              // βセクションは横方向の折り畳みアイコン
+              <ChevronLeft className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'} text-foreground`} />
+            ) : (
+              // その他のセクションは従来通り縦方向
+              isCollapsed ? (
+                <ChevronDown className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
+              ) : (
+                <ChevronUp className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
+              )
+            )}
+          </div>
+        </>
+      )}
     </h3>
   );
 };
@@ -253,8 +265,8 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
         // 動的な幅クラスを計算
         let dynamicWidth: string = column.width;
         if (hasHueToneExtraction && isHueToneCollapsed) {
-          // βセクションが畳まれている場合は幅を最小に
-          dynamicWidth = 'w-16'; // 最小幅（64px）
+          // βセクションが畳まれている場合は幅を「β.」とくの字分のみに
+          dynamicWidth = 'w-20'; // 「β.」+くの字分の最小幅（80px）
         } else if (!hasHueToneExtraction && isHueToneCollapsed) {
           // βセクションが畳まれている場合は他のカラムを拡張
           if (column.id === 'canvas') {
@@ -271,10 +283,10 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
               column.id !== 'canvas' ? 'space-y-4 overflow-y-auto' : ''
             }`}
           style={isDebugMode ? { 
-            padding: column.id === 'canvas' ? '8px' : '16px',
+            padding: column.id === 'canvas' ? '8px' : (hasHueToneExtraction && isHueToneCollapsed ? '8px 4px' : '16px'),
             backgroundColor: column.id === 'canvas' ? '#00bcd4' : '#e91e63'
           } : { 
-            padding: column.id === 'canvas' ? '8px' : '16px'
+            padding: column.id === 'canvas' ? '8px' : (hasHueToneExtraction && isHueToneCollapsed ? '8px 4px' : '16px')
           }}
         >
           {isDebugMode && (
