@@ -158,7 +158,8 @@ const Section = ({
   collapseStates, 
   setCollapseState,
   isMobile,
-  isDebugMode 
+  isDebugMode,
+  isAnimationEnabled
 }: {
   componentKey: ComponentKey;
   props: any;
@@ -166,6 +167,7 @@ const Section = ({
   setCollapseState: (key: string, value: boolean) => void;
   isMobile: boolean;
   isDebugMode: boolean;
+  isAnimationEnabled: boolean;
 }) => {
   const config = COMPONENT_CONFIG[componentKey];
   const isCollapsed = collapseStates[config.collapseState];
@@ -181,8 +183,10 @@ const Section = ({
         isMobile={isMobile}
       />
       {componentKey === 'hueToneExtraction' ? (
-        // βセクションは横方向の折り畳み
-        <div className={`transition-all duration-300 overflow-hidden ${
+        // βセクションは横方向の折り畳み（アニメーション設定対応）
+        <div className={`overflow-hidden ${
+          isAnimationEnabled ? 'transition-all duration-300' : ''
+        } ${
           isCollapsed ? 'w-0 opacity-0' : 'w-full opacity-100'
         }`}>
           <Component {...props} />
@@ -216,6 +220,8 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
   collapseStates,
   setCollapseState
 }) => {
+  const { isAnimationEnabled } = useColorStore();
+  
   const commonProps = {
     isMobile,
     paintCanvasRef,
@@ -239,6 +245,7 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
               setCollapseState={setCollapseState}
               isMobile={isMobile}
               isDebugMode={isDebugMode}
+              isAnimationEnabled={isAnimationEnabled}
             />
           </div>
         ))}
@@ -279,7 +286,9 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
         return (
           <div 
             key={column.id} 
-            className={`${dynamicWidth} flex flex-col min-h-0 transition-all duration-300 ${
+            className={`${dynamicWidth} flex flex-col min-h-0 ${
+              isAnimationEnabled ? 'transition-all duration-300' : ''
+            } ${
               column.id !== 'canvas' ? 'space-y-4 overflow-y-auto' : ''
             }`}
           style={isDebugMode ? { 
@@ -304,6 +313,7 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
               setCollapseState={setCollapseState}
               isMobile={isMobile}
               isDebugMode={isDebugMode}
+              isAnimationEnabled={isAnimationEnabled}
             />
           ))}
         </div>

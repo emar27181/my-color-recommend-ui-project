@@ -487,8 +487,8 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     // クリック座標が実際の描画エリア内にあるかチェック
     const clickX = clientX - rect.left;
     const clickY = clientY - rect.top;
-    const isInDrawArea = clickX >= offsetX && clickX <= offsetX + drawWidth && 
-                         clickY >= offsetY && clickY <= offsetY + drawHeight;
+    const isInDrawArea = clickX >= offsetX && clickX <= offsetX + drawWidth &&
+      clickY >= offsetY && clickY <= offsetY + drawHeight;
 
     // 描画エリア外の場合は無効な座標を返す
     if (!isInDrawArea) {
@@ -503,8 +503,8 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     const x = relativeX * canvas.width;
     const y = relativeY * canvas.height;
 
-    return { 
-      x: Math.max(0, Math.min(canvas.width - 1, x)), 
+    return {
+      x: Math.max(0, Math.min(canvas.width - 1, x)),
       y: Math.max(0, Math.min(canvas.height - 1, y)),
       isInDrawArea: true
     };
@@ -987,7 +987,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
       const isBrightEnough = brightness > 120 && brightness < 250; // 明度範囲拡大（180→120）
       const hasWarmTone = r > 160 || (r > g + 10 && r > b + 20); // 暖色系判定緩和
       const isSkinTone = (r > 200 && g > 150 && b > 100) || // 明るい肌色
-                         (r > 140 && g > 100 && b > 60);      // 暗い肌色追加
+        (r > 140 && g > 100 && b > 60);      // 暗い肌色追加
 
       return (isRGBPattern || hasWarmTone || isSkinTone) && isBrightEnough;
     };
@@ -1792,7 +1792,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
         {/* Claude Codeクレジット */}
         <div className="text-center mt-2">
           <p className="text-xs text-muted-foreground leading-tight m-0">
-            このサイトはClaude Codeを用いて作られました
+            ※このサイトはClaude Codeを用いて作られました
           </p>
         </div>
       </CardContent>

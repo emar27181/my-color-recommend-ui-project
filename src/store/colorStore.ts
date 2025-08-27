@@ -209,6 +209,7 @@ export interface ColorState {
   extractedColors: ExtractedColor[];
   dominantColor: ExtractedColor | null;
   isQuantizationEnabled: boolean;
+  isAnimationEnabled: boolean;
   setBaseColor: (color: string) => void;
   setSelectedColor: (color: string) => void;
   setPaintColor: (color: string) => void;
@@ -219,6 +220,7 @@ export interface ColorState {
   generateRecommendedColors: () => void;
   generateRecommendedTones: (baseColor: string) => void;
   toggleQuantization: () => void;
+  toggleAnimation: () => void;
 }
 
 // ソート手法の設定
@@ -539,6 +541,7 @@ export const useColorStore = create<ColorState>((set, get) => {
     extractedColors: [],
     dominantColor: null,
     isQuantizationEnabled: true,
+    isAnimationEnabled: false, // デフォルトはアニメーションOFF（true に変更でアニメーション有効）
 
     setBaseColor: (color: string) => {
       set({ baseColor: color });
@@ -666,6 +669,10 @@ export const useColorStore = create<ColorState>((set, get) => {
 
     toggleQuantization: () => {
       set(state => ({ isQuantizationEnabled: !state.isQuantizationEnabled }));
+    },
+
+    toggleAnimation: () => {
+      set(state => ({ isAnimationEnabled: !state.isAnimationEnabled }));
     },
   };
 });

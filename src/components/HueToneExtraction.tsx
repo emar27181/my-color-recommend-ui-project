@@ -648,6 +648,7 @@ export const HueToneExtraction = () => {
             </div>
           )}
 
+
           {/* 色相・トーンの可視化を常に表示 */}
           <div className="flex flex-col space-y-0">
             <HueWheel colors={visualizationData} onHueClick={handleHueClick} isQuantized={isQuantizationEnabled} selectedColor={selectedColor} selectedScheme={selectedScheme} />
