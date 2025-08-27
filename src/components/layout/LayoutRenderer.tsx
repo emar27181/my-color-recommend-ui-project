@@ -105,7 +105,7 @@ const SectionHeader = ({
       className={`${isMobile ? 'text-xs' : 'text-lg'} font-medium ${
         componentKey === 'canvas' ? 'mb-0' : 'mb-2'
       } text-foreground cursor-pointer flex items-center ${
-        componentKey === 'hueToneExtraction' && isCollapsed ? 'justify-start gap-1 px-2' : 'justify-between'
+        componentKey === 'hueToneExtraction' && isCollapsed ? 'justify-start gap-1 px-1' : 'justify-between'
       } leading-tight min-h-[2rem]`}
       onClick={onToggle}
     >
@@ -272,14 +272,14 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
         // 動的な幅クラスを計算
         let dynamicWidth: string = column.width;
         if (hasHueToneExtraction && isHueToneCollapsed) {
-          // βセクションが畳まれている場合は幅を「β.」とくの字分のみに
-          dynamicWidth = 'w-20'; // 「β.」+くの字分の最小幅（80px）
+          // βセクションが畳まれている場合は幅をコンテンツに合わせて可変に
+          dynamicWidth = 'w-auto flex-shrink-[999]'; // コンテンツサイズに応じた可変幅、最大限縮小
         } else if (!hasHueToneExtraction && isHueToneCollapsed) {
           // βセクションが畳まれている場合は他のカラムを拡張
           if (column.id === 'canvas') {
-            dynamicWidth = 'w-7/12'; // キャンバス幅を拡張
+            dynamicWidth = 'flex-1'; // キャンバス幅を最大限拡張
           } else {
-            dynamicWidth = 'w-5/12'; // メインツール幅を拡張
+            dynamicWidth = 'flex-1'; // メインツール幅を最大限拡張
           }
         }
         
@@ -292,10 +292,10 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
               column.id !== 'canvas' ? 'space-y-4 overflow-y-auto' : ''
             }`}
           style={isDebugMode ? { 
-            padding: column.id === 'canvas' ? '8px' : (hasHueToneExtraction && isHueToneCollapsed ? '8px 4px' : '16px'),
+            padding: column.id === 'canvas' ? '8px' : (hasHueToneExtraction && isHueToneCollapsed ? '8px 1px' : '16px'),
             backgroundColor: column.id === 'canvas' ? '#00bcd4' : '#e91e63'
           } : { 
-            padding: column.id === 'canvas' ? '8px' : (hasHueToneExtraction && isHueToneCollapsed ? '8px 4px' : '16px')
+            padding: column.id === 'canvas' ? '8px' : (hasHueToneExtraction && isHueToneCollapsed ? '8px 1px' : '16px')
           }}
         >
           {isDebugMode && (
