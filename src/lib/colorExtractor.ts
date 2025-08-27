@@ -127,25 +127,42 @@ export const extractColorsFromImage = async (
         const pixels = imageData.data;
         
         // 全ピクセルを直接解析して白色・黒色を検出
-        let exactWhitePixels = 0;  // RGB(255,255,255)
-        let nearWhitePixels = 0;   // RGB(250-255, 250-255, 250-255) 
+        let exactWhitePixels = 0;  // RGB(255,255,255) + 透明ピクセル
+        let nearWhitePixels = 0;   // RGB(240-255, 240-255, 240-255) 
         let blackPixels = 0;       // RGB(0-10, 0-10, 0-10)
         let totalPixelsChecked = 0;
+        let transparentPixels = 0; // 透明なピクセル数（白としてカウント）
+        
+        // RGBサンプル値を記録（最初の100ピクセル）
+        const rgbSamples = [];
         
         // より詳細なピクセル解析（毎ピクセルをチェック）
         for (let i = 0; i < pixels.length; i += 4) {
           const r = pixels[i];
           const g = pixels[i + 1];
           const b = pixels[i + 2];
+          const a = pixels[i + 3]; // アルファチャンネル（透明度）
+          
+          // 最初の100ピクセルのRGBA値をサンプルとして記録
+          if (totalPixelsChecked < 100) {
+            rgbSamples.push({r, g, b, a});
+          }
           
           totalPixelsChecked++;
+          
+          // 透明なピクセルを白色としてカウント
+          if (a < 50) { // 20%以下の透明度は白色扱い
+            transparentPixels++;
+            exactWhitePixels++; // 透明ピクセルを白色としてカウント
+            continue;
+          }
           
           // 完全な白 (255,255,255)
           if (r === 255 && g === 255 && b === 255) {
             exactWhitePixels++;
           }
-          // ほぼ白 (250-255の範囲)
-          else if (r >= 250 && g >= 250 && b >= 250) {
+          // ほぼ白 (240-255の範囲)
+          else if (r >= 240 && g >= 240 && b >= 240) {
             nearWhitePixels++;
           }
           // 黒 (0-10の範囲)
@@ -153,6 +170,9 @@ export const extractColorsFromImage = async (
             blackPixels++;
           }
         }
+        
+        // 最初の20ピクセルのサンプルを表示
+        console.log('First 20 pixel samples (RGBA):', rgbSamples.slice(0, 20));
         
         const exactWhiteRatio = exactWhitePixels / totalPixelsChecked;
         const nearWhiteRatio = nearWhitePixels / totalPixelsChecked;
@@ -163,11 +183,13 @@ export const extractColorsFromImage = async (
           exactWhitePixels,
           nearWhitePixels, 
           blackPixels,
+          transparentPixels,
           totalPixelsChecked,
           exactWhiteRatio: (exactWhiteRatio * 100).toFixed(2) + '%',
           nearWhiteRatio: (nearWhiteRatio * 100).toFixed(2) + '%',
           combinedWhiteRatio: (combinedWhiteRatio * 100).toFixed(2) + '%',
-          blackRatio: (blackRatio * 100).toFixed(2) + '%'
+          blackRatio: (blackRatio * 100).toFixed(2) + '%',
+          transparentRatio: ((transparentPixels / totalPixelsChecked) * 100).toFixed(2) + '%'
         });
         
         // パレットに白色系があるかチェック
@@ -209,6 +231,17 @@ export const extractColorsFromImage = async (
             const r = pixels[i];
             const g = pixels[i + 1];
             const b = pixels[i + 2];
+            const a = pixels[i + 3]; // アルファチャンネル
+            
+            // 透明なピクセルは白色として扱う
+            if (a < 50) {
+              // 透明ピクセルを白色としてカウント
+              const whiteHex = '#ffffff';
+              colorCounts.set(whiteHex, (colorCounts.get(whiteHex) || 0) + 1);
+              processedSamples++;
+              continue;
+            }
+            
             const pixelColor = chroma.rgb(r, g, b);
             
             let closestColor = '';
