@@ -1,114 +1,185 @@
-import { ColorPicker } from '@/components/ColorPicker';
-import { ColorRecommendations, ToneRecommendations } from '@/components/ColorRecommendations';
-import { ImageUpload } from '@/components/ImageUpload';
-import { ExtractedColorsDisplay } from '@/components/ExtractedColorsDisplay';
-import { ThemeToggle } from '@/components/ThemeToggle';
-import { NavigationMenu } from '@/components/NavigationMenu';
-import { ToastProvider } from '@/contexts/ToastContext';
-import { ToastContainer } from '@/components/ToastContainer';
-import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { HelpCircle } from 'lucide-react';
+import { type CanvasColorRecommendationsRef } from '@/components/CanvasColorRecommendations';
+import { LayoutRenderer } from '@/components/layout/LayoutRenderer';
+import { LAYOUT_CONFIG } from '@/constants/layout';
+import { useEffect, useState, useRef } from 'react';
 
-function App() {
+const App = () => {
+  
+  const [isDebugMode, setIsDebugMode] = useState(false);
+  const [screenSize, setScreenSize] = useState({ width: 0, height: 0 });
+  
+  // デバイス判定（閾値800px）
+  const isMobile = screenSize.width < 800;
+  
+  // コラプス状態をオブジェクトで管理（βセクションはデフォルトで開く）
+  const [collapseStates, setCollapseStates] = useState({
+    isCanvasCollapsed: false,
+    isBaseColorCollapsed: false,
+    isColorRecommendationCollapsed: false,
+    isToneRecommendationCollapsed: false,
+    isSkinColorCollapsed: true,
+    isHueToneExtractionCollapsed: false // βセクションをデフォルトで開く
+  });
+  
+  // CanvasColorRecommendationsへの参照
+  const canvasColorRecommendationsRef = useRef<CanvasColorRecommendationsRef>(null);
+
+  // 画像アップロード時の処理
+  const handleImageUpload = (imageFile: File) => {
+    console.log('Image uploaded, drawing to canvas:', imageFile.name);
+    canvasColorRecommendationsRef.current?.drawImageToCanvas(imageFile);
+  };
+
+  // キャンバスから色を抽出する処理
+  const handleExtractColorsFromCanvas = async () => {
+    try {
+      console.log('Attempting to extract colors from canvas...');
+      
+      if (!canvasColorRecommendationsRef.current) {
+        console.error('CanvasColorRecommendations ref is null');
+        return;
+      }
+      
+      await canvasColorRecommendationsRef.current.extractColorsFromCanvas();
+      console.log('Color extraction completed successfully');
+    } catch (error) {
+      console.error('Canvas color extraction failed:', error);
+    }
+  };
+
+  // コラプス状態更新用ヘルパー
+  const setCollapseState = (key: string, value: boolean) => {
+    setCollapseStates(prev => ({ ...prev, [key]: value }));
+  };
 
   useEffect(() => {
     // 初期表示時にページの最上端を表示
     window.scrollTo(0, 0);
+
+    // ダークモードをデフォルトに設定
+    document.documentElement.classList.add('dark');
+
+    // 画面サイズを取得・更新する関数
+    const updateScreenSize = () => {
+      setScreenSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+
+    // 初期画面サイズ設定
+    updateScreenSize();
+
+    // F5キーでデバッグモード切り替え
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'F5') {
+        event.preventDefault(); // ページリロードを防ぐ
+        setIsDebugMode(prev => !prev);
+      }
+    };
+
+    // リサイズイベントリスナー
+    window.addEventListener('resize', updateScreenSize);
+    document.addEventListener('keydown', handleKeyDown);
+    
+    // クリーンアップ
+    return () => {
+      window.removeEventListener('resize', updateScreenSize);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
+  // 画面サイズ変更時にβセクションの状態を調整（常に開いた状態を維持）
+  useEffect(() => {
+    setCollapseStates(prev => ({
+      ...prev,
+      isHueToneExtractionCollapsed: false // βセクションは常に開いた状態を維持
+    }));
+  }, [screenSize.width]);
+
+  // βセクションを強制的に開いた状態に保つ
+  useEffect(() => {
+    setCollapseStates(prev => ({
+      ...prev,
+      isHueToneExtractionCollapsed: false
+    }));
+  }, []);
+
+  // 初期スクロール位置を60px下に設定
+  useEffect(() => {
+    const setScrollPosition = () => {
+      // 複数の方法でスクロール位置を設定
+      window.scrollTo({ top: 60, left: 0, behavior: 'instant' });
+      document.documentElement.scrollTop = 60;
+      document.body.scrollTop = 60;
+    };
+
+    // 即座に実行
+    setScrollPosition();
+    
+    // requestAnimationFrame で次のフレームで実行
+    const rafId = requestAnimationFrame(() => {
+      setScrollPosition();
+    });
+
+    // タイマーでも実行（フォールバック）
+    const timerId = setTimeout(() => {
+      setScrollPosition();
+    }, 0);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      clearTimeout(timerId);
+    };
+  }, []);
+
+  const deviceType = isMobile ? 'MOBILE/TABLET' : 'DESKTOP';
+
   return (
-    <ToastProvider>
-      <div className="bg-background text-foreground min-h-screen flex flex-col">
-        {/* ヘッダーを画面上部に表示 */}
-        <header className="border-b border-border bg-background flex-shrink-0">
-          <div className="container mx-auto px-4 py-3">
-            <div className="flex justify-between items-center">
-              <NavigationMenu />
-              <div className="flex items-center gap-2">
-                <Link
-                  to="/help"
-                  className="p-2 rounded-lg bg-background/50 border-none hover:bg-muted/50 transition-colors backdrop-blur-sm"
-                  title="ヘルプページ"
-                >
-                  <HelpCircle className="w-5 h-5 text-foreground" />
-                </Link>
-                <ThemeToggle />
-              </div>
-            </div>
+    <main className="flex-1 pb-2 min-h-0 flex flex-col" style={isDebugMode ? { backgroundColor: '#607d8b', padding: '16px' } : {}}>
+      {/* デバッグ情報表示 */}
+      {isDebugMode && (
+        <div className="fixed top-4 left-4 z-50 bg-black text-white p-2 rounded text-xs font-mono">
+          <div>画面: {screenSize.width}x{screenSize.height}</div>
+          <div>デバイス: {deviceType}</div>
+          <div>800px閾値: {screenSize.width >= 800 ? 'DESKTOP' : 'MOBILE'}</div>
+        </div>
+      )}
+
+      {/* モバイル表示 */}
+      <div className={`${isMobile ? 'flex' : 'hidden'}`}>
+        {isDebugMode && (
+          <div className="bg-red-600 text-white p-2 text-center font-bold">
+            📱 MOBILE/TABLET LAYOUT (&lt;800px)
           </div>
-        </header>
-
-        {/* メインコンテンツ */}
-        <main
-          className="flex-1 px-4 pb-2 overflow-y-auto"
-        >
-          {/* Mobile/Tablet: Single Screen Layout */}
-          <div className="block xl:hidden flex flex-col">
-            {/* Step 1: ベース色選択 - コンパクト化 */}
-            <section className="flex-shrink-0 mb-1">
-              <h3 className="text-xs font-medium text-foreground leading-tight mb-0">1. ベースカラー(推薦元)選択</h3>
-              <div className="flex gap-1">
-                <div className="flex-1">
-                  <ColorPicker />
-                </div>
-                <div className="flex-1">
-                  <ImageUpload />
-                </div>
-              </div>
-              <ExtractedColorsDisplay />
-            </section>
-
-            {/* Steps 2 & 3: 色相推薦・トーン推薦 - 動的サイズ */}
-            <div className="space-y-1">
-              {/* Step 2 */}
-              <section>
-                <h3 className="text-xs font-medium mb-0 text-foreground leading-tight">2. 色相(配色技法)推薦</h3>
-                <ColorRecommendations />
-              </section>
-
-              {/* Step 3 */}
-              <section>
-                <h3 className="text-xs font-medium mb-0 text-foreground leading-tight">3. トーン(明度・彩度)推薦</h3>
-                <ToneRecommendations />
-              </section>
-            </div>
-          </div>
-
-          {/* Desktop: Single Screen Layout */}
-          <div className="hidden xl:block h-full flex flex-col">
-            {/* Step 1: ベース色選択 - 上部コンパクト配置 */}
-            <section className="flex-shrink-0 mb-2">
-              <h2 className="text-lg font-medium mb-1 text-foreground">1. ベース色選択</h2>
-              <div className="grid grid-cols-3 gap-4">
-                <ColorPicker />
-                <ImageUpload />
-                <ExtractedColorsDisplay />
-              </div>
-            </section>
-
-            {/* Steps 2 & 3: 色相推薦・トーン推薦 - 並列表示 */}
-            <div className="flex-1 grid grid-cols-2 gap-4 min-h-0">
-              <section className="min-h-0 flex flex-col">
-                <h2 className="text-lg font-medium mb-1 text-foreground flex-shrink-0">2. 色相推薦</h2>
-                <div className="flex-1 min-h-0">
-                  <ColorRecommendations />
-                </div>
-              </section>
-              <section className="min-h-0 flex flex-col mb-0">
-                <h2 className="text-lg font-medium mb-1 text-foreground flex-shrink-0">3. トーン推薦</h2>
-                <div className="flex-1 min-h-0">
-                  <ToneRecommendations />
-                </div>
-              </section>
-            </div>
-          </div>
-        </main>
-
-        <ToastContainer />
+        )}
+        <LayoutRenderer
+          columns={LAYOUT_CONFIG.desktop.columns}
+          isMobile={true}
+          isDebugMode={isDebugMode}
+          paintCanvasRef={canvasColorRecommendationsRef}
+          handleExtractColorsFromCanvas={handleExtractColorsFromCanvas}
+          handleImageUpload={handleImageUpload}
+          collapseStates={collapseStates}
+          setCollapseState={setCollapseState}
+        />
       </div>
-    </ToastProvider>
+
+      {/* デスクトップ表示 */}
+      <div className={`${isMobile ? 'hidden' : 'flex'} flex-1`} style={isDebugMode ? { backgroundColor: '#795548', padding: '12px' } : {}}>
+        <LayoutRenderer
+          columns={LAYOUT_CONFIG.desktop.columns}
+          isMobile={false}
+          isDebugMode={isDebugMode}
+          paintCanvasRef={canvasColorRecommendationsRef}
+          handleExtractColorsFromCanvas={handleExtractColorsFromCanvas}
+          handleImageUpload={handleImageUpload}
+          collapseStates={collapseStates}
+          setCollapseState={setCollapseState}
+        />
+      </div>
+    </main>
   );
-}
+};
 
 export default App;

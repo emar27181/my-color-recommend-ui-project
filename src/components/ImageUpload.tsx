@@ -10,9 +10,10 @@ import type { ExtractedColor } from '@/lib/colorExtractor';
 
 interface ImageUploadProps {
   onColorsExtracted?: (colors: ExtractedColor[], dominantColor: ExtractedColor) => void;
+  onImageUpload?: (imageFile: File) => void;
 }
 
-export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
+export const ImageUpload = ({ onColorsExtracted, onImageUpload }: ImageUploadProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -31,6 +32,9 @@ export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
     setProgress(0);
 
     try {
+      // キャンバスに画像を反映
+      onImageUpload?.(file);
+
       // プレビュー画像を設定
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -86,6 +90,7 @@ export const ImageUpload = ({ onColorsExtracted }: ImageUploadProps) => {
           onDrop={handleDrop}
           onDragOver={(e) => e.preventDefault()}
           onClick={() => fileInputRef.current?.click()}
+          data-tutorial="image-upload"
         >
           <input
             ref={fileInputRef}

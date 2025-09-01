@@ -1,8 +1,8 @@
 import React from 'react';
 import { COLOR_SCHEMES } from '@/store/colorStore';
 
-interface ColorWheelProps {
-  /** 色相環の半径（デフォルト: 50px） */
+interface ColorWheelMiniProps {
+  /** 色相環の半径（デフォルト: 24px） */
   radius?: number;
   /** 現在選択されている配色技法のID */
   schemeId?: string;
@@ -13,20 +13,20 @@ interface ColorWheelProps {
 }
 
 /**
- * 色相環表示コンポーネント
- * 配色技法のangles配列に基づいて色の配置を視覚化
+ * ミニサイズの色相環表示コンポーネント
+ * 配色技法一括表示用の小さなサイズ
  */
-export const ColorWheel: React.FC<ColorWheelProps> = ({ 
-  radius = 125, // デフォルトサイズを直接指定
+export const ColorWheelMini: React.FC<ColorWheelMiniProps> = ({
+  radius = 24, // 小さなサイズ
   schemeId,
   baseHue = 0, // ベースカラーの実際の色相値
   className = ''
 }) => {
-  const containerRadius = radius; // 外枠半径
-  const wheelRadius = radius - 2; // 色相環半径 (コンテナぎりぎりまで大きく)
+  const containerRadius = radius;
+  const wheelRadius = radius - 0.5; // 外枠ぎりぎりまで大きく
   const size = containerRadius * 2;
-  const strokeWidth = 2;
-  const plotRadius = radius * 0.85; // プロット点の配置半径 (より外側に)
+  const strokeWidth = 1;
+  const plotRadius = radius * 0.8; // プロット点の配置半径 (より外側に)
 
   // 選択された配色技法のanglesを取得
   const scheme = schemeId ? COLOR_SCHEMES.find(s => s.id === schemeId) : null;
@@ -46,9 +46,9 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
 
   return (
     <div className={`inline-block ${className}`}>
-      <svg 
-        width={size} 
-        height={size} 
+      <svg
+        width={size}
+        height={size}
         viewBox={`0 0 ${size} ${size}`}
         className="drop-shadow-sm"
         role="img"
@@ -63,7 +63,7 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
           stroke="hsl(var(--border))"
           strokeWidth={strokeWidth}
         />
-        
+
         {/* 軌道線（プロット点が配置される円） */}
         <circle
           cx={containerRadius}
@@ -71,10 +71,10 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
           r={plotRadius}
           fill="none"
           stroke="#999999"
-          strokeWidth={1.5}
-          strokeDasharray="5,3"
+          strokeWidth={0.5}
+          strokeDasharray="2,1"
         />
-        
+
         {/* 配色技法のプロット点を表示 */}
         {angles.map((angle, index) => {
           const coords = getCoordinates(angle);
@@ -82,7 +82,7 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
           // 実際の色相値を計算（ベースカラーの色相 + 配色技法の角度）
           const actualHue = (baseHue + angle) % 360;
           const pointColor = `hsl(${actualHue}, 70%, 50%)`;
-          
+
           return (
             <g key={`${angle}-${index}`}>
               {/* 中心からプロット点への線 */}
@@ -92,25 +92,23 @@ export const ColorWheel: React.FC<ColorWheelProps> = ({
                 x2={coords.x}
                 y2={coords.y}
                 stroke="#666666"
-                strokeWidth={2}
+                strokeWidth={0.5}
               />
-              
+
               {/* プロット点 */}
               <circle
                 cx={coords.x}
                 cy={coords.y}
-                r={8}
+                r={3.5}
                 fill={pointColor}
                 stroke="#ffffff"
-                strokeWidth={isBaseColor ? 3.5 : 2.5}
+                strokeWidth={isBaseColor ? 1.5 : 1}
                 className="drop-shadow-sm"
               />
             </g>
           );
         })}
-        
-        
-        
+
       </svg>
     </div>
   );

@@ -1,0 +1,82 @@
+[
+  {
+    "id": "pal001",
+    "colors": ["#32c759", "#40d6c0", "#f5e342"],
+    "mainColor": "#32c759",
+    "technique": "アナロジー",
+    "tone": "ビビッド",
+    "tags": ["ポップ", "明るい"]
+  },
+  {
+    "id": "pal002",
+    "colors": ["#e63946", "#f77f00", "#fcbf49"],
+    "mainColor": "#e63946",
+    "technique": "アナロジー",
+    "tone": "ビビッド",
+    "tags": ["暖かい", "情熱的"]
+  },
+  {
+    "id": "pal003",
+    "colors": ["#264653", "#2a9d8f", "#e9c46a"],
+    "mainColor": "#264653",
+    "technique": "トライアド",
+    "tone": "ディープ",
+    "tags": ["自然", "落ち着き"]
+  },
+  {
+    "id": "pal004",
+    "colors": ["#f72585", "#b5179e", "#7209b7"],
+    "mainColor": "#f72585",
+    "technique": "アナロジー",
+    "tone": "ビビッド",
+    "tags": ["エレガント", "モダン"]
+  },
+  {
+    "id": "pal005",
+    "colors": ["#0077b6", "#00b4d8", "#90e0ef"],
+    "mainColor": "#0077b6",
+    "technique": "モノクロマティック",
+    "tone": "クール",
+    "tags": ["爽やか", "清潔"]
+  },
+  {
+    "id": "pal006",
+    "colors": ["#ffba08", "#faa307", "#f48c06"],
+    "mainColor": "#ffba08",
+    "technique": "モノクロマティック",
+    "tone": "暖かい",
+    "tags": ["元気", "親しみやすい"]
+  },
+  {
+    "id": "pal007",
+    "colors": ["#8b5cf6", "#06ffa5", "#ffbe0b"],
+    "mainColor": "#8b5cf6",
+    "technique": "補色",
+    "tone": "ビビッド",
+    "tags": ["クリエイティブ", "個性的"]
+  },
+  {
+    "id": "pal008",
+    "colors": ["#c9ada7", "#a8dadc", "#f1faee"],
+    "mainColor": "#c9ada7",
+    "technique": "アナロジー",
+    "tone": "ソフト",
+    "tags": ["和風", "上品"]
+  },
+  {
+    "id": "pal009",
+    "colors": ["#1a1a2e", "#16213e", "#0f3460"],
+    "mainColor": "#1a1a2e",
+    "technique": "モノクロマティック",
+    "tone": "ダーク",
+    "tags": ["プロフェッショナル", "洗練"]
+  },
+  {
+    "id": "pal010",
+    "colors": ["#ffe66d", "#ff6b6b", "#4ecdc4"],
+    "mainColor": "#ffe66d",
+    "technique": "トライアド",
+    "tone": "ビビッド",
+    "tags": ["楽しい", "カラフル"]
+  }
+]

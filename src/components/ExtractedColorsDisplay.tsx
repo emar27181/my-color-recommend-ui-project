@@ -2,15 +2,20 @@ import { useColorStore } from '@/store/colorStore';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ColorGrid } from '@/components/common/ColorGrid';
 
-export const ExtractedColorsDisplay = () => {
-  const { extractedColors, setColorFromExtracted } = useColorStore();
+interface ExtractedColorsDisplayProps {
+  isMobile?: boolean;
+}
+
+export const ExtractedColorsDisplay = ({ isMobile = false }: ExtractedColorsDisplayProps) => {
+  const { extractedColors, setColorFromBase } = useColorStore();
 
   if (extractedColors.length === 0) {
     return null;
   }
 
   const handleColorSelect = (color: string) => {
-    setColorFromExtracted(color);
+    // 抽出色からの選択はベース色選択として扱う
+    setColorFromBase(color);
   };
 
   return (
@@ -22,10 +27,12 @@ export const ExtractedColorsDisplay = () => {
           <ColorGrid
             colors={extractedColors.map(color => ({
               color: color.hex,
-              title: `${color.hex} (タップで選択)`,
+              title: "タップで選択",
               subtitle: `${Math.round(color.usage * 100)}%`
             }))}
             onColorClick={handleColorSelect}
+            isMobile={isMobile}
+            gridType="baseColors" // ベース色選択専用: モバイル2列、PC4列
             emptyMessage="画像から色が抽出されていません"
           />
         </CardContent>

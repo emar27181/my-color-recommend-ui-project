@@ -1,48 +1,46 @@
 import React from 'react';
-import { createPortal } from 'react-dom';
-import { useColorStore, COLOR_SCHEMES } from '@/store/colorStore';
+import { useColorStore, COLOR_SCHEMES, sortSchemesByCompatibility, sortSchemesByHueDistance, sortSchemesByColorCount, SCHEME_SORT_CONFIG } from '@/store/colorStore';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ColorGrid } from '@/components/common/ColorGrid';
-import { ColorWheel } from '@/components/common/ColorWheel';
+import { ColorWheelMini } from '@/components/common/ColorWheelMini';
+import { useTutorial } from '@/contexts/TutorialContext';
+import { useTranslation } from 'react-i18next';
 import { ChevronDown } from 'lucide-react';
 import { BORDER_PRESETS } from '@/constants/ui';
 import chroma from 'chroma-js';
 
-export const ColorRecommendations = () => {
-  const { recommendedColors, selectedScheme, setSelectedScheme, generateRecommendedTones, selectedColor } = useColorStore();
+interface ColorRecommendationsProps {
+  isMobile?: boolean;
+}
+
+export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsProps) => {
+  const { recommendedColors, selectedScheme, setSelectedScheme, generateRecommendedTones, baseColor, selectedColor, setColorFromRecommendation, paintColor, extractedColors } = useColorStore();
+  const { onUserAction } = useTutorial();
+  const { t } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
-  const [hoveredScheme, setHoveredScheme] = React.useState<string | null>(null);
-  const [mousePosition, setMousePosition] = React.useState({ x: 0, y: 0 });
-  const [autoHideTimer, setAutoHideTimer] = React.useState<NodeJS.Timeout | null>(null);
-  
-  // 色相環の自動非表示タイマー管理（モバイルのみ）
-  React.useEffect(() => {
-    // モバイルデバイスかどうかを判定
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
-    
-    if (hoveredScheme && isMobile) {
-      // モバイルの場合のみ3秒後に自動非表示
-      const timer = setTimeout(() => {
-        setHoveredScheme(null);
-      }, 3000);
-      
-      setAutoHideTimer(timer);
-      
-      // クリーンアップ関数で前のタイマーをクリア
-      return () => {
-        clearTimeout(timer);
-      };
-    } else {
-      // PC版またはhoverがない場合はタイマーをクリア
-      if (autoHideTimer) {
-        clearTimeout(autoHideTimer);
-        setAutoHideTimer(null);
-      }
+
+  // 設定に基づいて配色技法をソート
+  const sortedSchemes = React.useMemo(() => {
+    switch (SCHEME_SORT_CONFIG.method) {
+      case 'compatibility':
+        return sortSchemesByCompatibility(extractedColors, selectedColor, COLOR_SCHEMES);
+      case 'hue_distance':
+        return sortSchemesByHueDistance(baseColor, COLOR_SCHEMES);
+      case 'color_count':
+        return sortSchemesByColorCount(COLOR_SCHEMES);
+      case 'original':
+        return [...COLOR_SCHEMES]; // 固定順序
+      default:
+        return sortSchemesByColorCount(COLOR_SCHEMES);
     }
-  }, [hoveredScheme]);
+  }, [baseColor, extractedColors, selectedColor]);
 
   const handleGenerateTones = (color: string) => {
+    // 推薦色から選択：描画色のみ更新、ベースカラーは維持
+    setColorFromRecommendation(color);
     generateRecommendedTones(color);
+    // チュートリアルの自動進行をトリガー
+    onUserAction('click', '[data-tutorial="recommended-colors"]');
   };
 
   const selectedSchemeData = COLOR_SCHEMES.find(scheme => scheme.id === selectedScheme);
@@ -50,204 +48,163 @@ export const ColorRecommendations = () => {
   const handleSchemeSelect = (schemeId: string) => {
     setSelectedScheme(schemeId);
     setIsDropdownOpen(false);
-    // PC版のみ選択完了時に色相環を非表示（モバイルは自動タイマーで管理）
-    if (!isMobile) {
-      setHoveredScheme(null);
-    }
+    // チュートリアルの自動進行をトリガー
+    onUserAction('click', '[data-tutorial="color-schemes"]');
   };
 
   // ベースカラーから色相角度を取得
   const getBaseHue = () => {
-    if (!selectedColor) return 0;
+    // 常にベースカラーを使用
+    if (!baseColor) return 0;
     try {
-      return chroma(selectedColor).get('hsl.h') || 0;
+      return chroma(baseColor).get('hsl.h') || 0;
     } catch {
       return 0;
     }
   };
 
-  // マウス位置を更新するハンドラー
-  const handleMouseMove = (event: React.MouseEvent) => {
-    setMousePosition({ x: event.clientX, y: event.clientY });
+  // 色の距離を計算する関数（deltaE 2000使用）
+  const calculateColorDistance = (color1: string, color2: string): number => {
+    try {
+      return chroma.deltaE(color1, color2);
+    } catch {
+      return Infinity;
+    }
   };
 
-  // 色相環の表示位置を計算（PC: マウス追従、モバイル: 画面中央）
-  const getTooltipPosition = () => {
-    const tooltipWidth = 200;
-    const tooltipHeight = 200;
-    
-    if (isMobile) {
-      // モバイル版: 画面中央に固定表示
-      return {
-        left: (window.innerWidth - tooltipWidth) / 2,
-        top: (window.innerHeight - tooltipHeight) / 2
-      };
-    }
-    
-    // PC版: マウス位置ベース（従来の処理）
-    const offset = 20;
-    let left = mousePosition.x + offset;
-    let top = mousePosition.y - tooltipHeight / 2;
-    
-    // 右端はみ出し防止
-    if (left + tooltipWidth > window.innerWidth) {
-      left = mousePosition.x - tooltipWidth - offset;
-    }
-    
-    // 上端はみ出し防止
-    if (top < 0) {
-      top = 10;
-    }
-    
-    // 下端はみ出し防止
-    if (top + tooltipHeight > window.innerHeight) {
-      top = window.innerHeight - tooltipHeight - 10;
-    }
-    
-    return { left, top };
+  // 描画色に最も近い推薦色を見つける
+  const findClosestColorIndex = (colors: string[], drawingColor: string): number => {
+    if (!drawingColor || colors.length === 0) return -1;
+
+    let closestIndex = -1;
+    let minDistance = Infinity;
+
+    colors.forEach((color, index) => {
+      const distance = calculateColorDistance(color, drawingColor);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestIndex = index;
+      }
+    });
+
+    return closestIndex;
   };
 
-  // モバイルデバイスかどうかを判定
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+  const closestColorIndex = findClosestColorIndex(recommendedColors, paintColor);
+
 
   return (
-    <Card className="w-full flex flex-col pb-0" style={{ height: '144px' }}>
+    <Card className="w-full flex flex-col pb-0" style={{ height: '96px', minWidth: '0' }}>
       <CardHeader className="pb-1 pt-2 flex-shrink-0">
         <div className="mt-0">
           <div className="relative">
-            {/* ドロップダウンボタン */}
+            {/* 新しい配色技法選択バー（色相環付き） */}
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className={`w-full flex items-center justify-between px-2 md:px-3 py-1.5 md:py-2 bg-transparent text-muted-foreground hover:bg-muted/20 text-xs md:text-sm font-medium transition-colors ${BORDER_PRESETS.button}`}
+              className={`w-full flex items-center justify-between px-6 md:px-7 py-8 md:py-8 bg-background text-muted-foreground hover:bg-muted/20 text-xs md:text-sm font-medium transition-colors border border-border rounded-md`}
+              data-tutorial="color-schemes"
             >
-              <span className="truncate">
-                {selectedSchemeData ? (
-                  <>
-                    {selectedSchemeData.name.split(':').map((part, index) => (
-                      <span key={index}>
-                        {index === 0 ? (
-                          <span className="font-bold">{part}</span>
-                        ) : (
-                          <span>:{part}</span>
-                        )}
-                      </span>
-                    ))}
-                  </>
-                ) : (
-                  '配色技法を選択'
+              <div className="flex items-center gap-7">
+                {/* 選択中の配色技法の色相環 */}
+                {selectedSchemeData && (
+                  <div className="flex-shrink-0 p-5">
+                    <ColorWheelMini
+                      radius={14}
+                      schemeId={selectedScheme}
+                      baseHue={getBaseHue()}
+                    />
+                  </div>
                 )}
-              </span>
+                <span className="truncate">
+                  {selectedSchemeData ? (
+                    <span className="font-bold whitespace-pre-line">{selectedSchemeData.name}</span>
+                  ) : (
+                    t('colorRecommendations.selectScheme')
+                  )}
+                </span>
+              </div>
               <ChevronDown className={`w-3 h-3 md:w-4 md:h-4 transition-transform flex-shrink-0 ml-1 ${isDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
 
-            {/* ドロップダウンメニュー */}
+            {/* 展開時の配色技法一覧 */}
             {isDropdownOpen && (
-              <div 
-                className={`absolute top-full left-0 right-0 mt-1 bg-background ${BORDER_PRESETS.button} shadow-lg z-10 max-h-60 overflow-y-auto`}
-                onMouseLeave={() => {
-                  // PC版のみマウスリーブで色相環を非表示
-                  if (!isMobile) {
-                    setHoveredScheme(null);
-                  }
-                }}
+              <div
+                className={`absolute top-full left-0 sm:left-0 mt-1 bg-background ${BORDER_PRESETS.button} shadow-lg z-10 max-h-60 overflow-y-auto w-full`}
               >
-                {COLOR_SCHEMES.map((scheme) => (
-                  <button
-                    key={scheme.id}
-                    onClick={() => handleSchemeSelect(scheme.id)}
-                    onMouseEnter={() => setHoveredScheme(scheme.id)}
-                    onMouseLeave={() => {
-                      // PC版のみマウスリーブで色相環を非表示
-                      if (!isMobile) {
-                        setHoveredScheme(null);
-                      }
-                    }}
-                    onMouseMove={handleMouseMove}
-                    className={`w-full text-left px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm hover:bg-muted transition-colors relative ${
-                      selectedScheme === scheme.id
-                        ? 'bg-primary text-primary-foreground'
-                        : 'text-foreground'
-                    }`}
-                  >
-                    <div>
-                      <div className="font-medium">
-                        {scheme.name.split(':').map((part, index) => (
-                          <span key={index}>
-                            {index === 0 ? (
-                              <span className="font-bold">{part}</span>
-                            ) : (
-                              <span>:{part}</span>
-                            )}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="text-xs opacity-75 hidden md:block">{scheme.description}</div>
-                    </div>
-                  </button>
-                ))}
+                <div className="p-3 min-w-0">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full">
+                    {sortedSchemes.map((scheme) => (
+                      <button
+                        key={scheme.id}
+                        onClick={() => handleSchemeSelect(scheme.id)}
+                        className={`flex items-center p-2 transition-all hover:scale-105 border border-border rounded-md ${selectedScheme === scheme.id
+                          ? 'bg-primary text-primary-foreground shadow-md'
+                          : 'bg-background hover:bg-muted/80 text-foreground'
+                          }`}
+                      >
+                        {/* ミニ色相環 */}
+                        <div className="mr-5 flex-shrink-0">
+                          <ColorWheelMini
+                            radius={34}
+                            schemeId={scheme.id}
+                            baseHue={getBaseHue()}
+                          />
+                        </div>
+
+                        {/* 配色技法名 */}
+                        <div className="text-xs font-medium leading-tight min-w-0 flex-1">
+                          <div className="whitespace-pre-line">
+                            {scheme.name}
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
 
-            {/* 色相環オーバーレイ表示（Portal使用） */}
-            {hoveredScheme && createPortal(
-              <div 
-                className={`fixed z-50 border border-border rounded-lg p-4 shadow-2xl pointer-events-none ${
-                  isMobile ? 'bg-card/80 backdrop-blur-sm' : 'bg-card'
-                }`}
-                role="tooltip"
-                aria-label={`${COLOR_SCHEMES.find(s => s.id === hoveredScheme)?.name} の配色パターン`}
-                style={{ 
-                  left: `${getTooltipPosition().left}px`,
-                  top: `${getTooltipPosition().top}px`,
-                  width: '200px',
-                  height: '200px'
-                }}
-              >
-                {/* 色相環コンポーネントのみ */}
-                <div className="flex items-center justify-center h-full w-full">
-                  <ColorWheel
-                    radius={125}
-                    schemeId={hoveredScheme}
-                    baseHue={getBaseHue()}
-                  />
-                </div>
-              </div>,
-              document.body
-            )}
           </div>
         </div>
       </CardHeader>
-      
+
       {/* ドロップダウンが開いている時のオーバーレイ */}
       {isDropdownOpen && (
-        <div 
-          className="fixed inset-0 z-5" 
+        <div
+          className="fixed inset-0 z-5"
           onClick={() => {
             setIsDropdownOpen(false);
-            // PC版のみドロップダウン閉じ時に色相環も非表示
-            if (!isMobile) {
-              setHoveredScheme(null);
-            }
           }}
         />
       )}
-      
+
       <CardContent className="pt-0 flex-1 overflow-auto pb-0 min-h-0">
-        <ColorGrid
-          colors={recommendedColors.map(color => ({
-            color,
-            title: `色: ${color} (タップでトーン生成)`
-          }))}
-          onColorClick={handleGenerateTones}
-          emptyMessage="色を選択すると推薦色が表示されます"
-        />
+        <div data-tutorial="recommended-colors">
+          <ColorGrid
+            colors={recommendedColors.map((color, index) => ({
+              color,
+              title: t('colorRecommendations.generateTones'),
+              showClickIcon: false,
+              isHighlighted: index === closestColorIndex
+            }))}
+            onColorClick={handleGenerateTones}
+            gridType="colors" // 2セクション（色推薦）: モバイル4列、PC4列
+            isMobile={isMobile}
+            emptyMessage={t('colorRecommendations.noRecommendations')}
+          />
+        </div>
       </CardContent>
     </Card>
   );
 };
 
-export const ToneRecommendations = () => {
-  const { recommendedTones, selectedColor, generateRecommendedTones } = useColorStore();
+interface ToneRecommendationsProps {
+  isMobile?: boolean;
+}
+
+export const ToneRecommendations = ({ isMobile = false }: ToneRecommendationsProps) => {
+  const { recommendedTones, selectedColor, generateRecommendedTones, setColorFromRecommendation, paintColor } = useColorStore();
+  const { t } = useTranslation();
 
   React.useEffect(() => {
     if (recommendedTones.length === 0 && selectedColor) {
@@ -255,19 +212,60 @@ export const ToneRecommendations = () => {
     }
   }, [selectedColor, recommendedTones.length, generateRecommendedTones]);
 
+  const handleToneClick = (color: string) => {
+    // トーン推薦色から選択：描画色のみ更新、ベースカラーは維持
+    setColorFromRecommendation(color);
+  };
+
+  // 色の距離を計算する関数（deltaE 2000使用）
+  const calculateColorDistance = (color1: string, color2: string): number => {
+    try {
+      return chroma.deltaE(color1, color2);
+    } catch {
+      return Infinity;
+    }
+  };
+
+  // 描画色に最も近いトーン色を見つける
+  const findClosestToneIndex = (tones: string[], drawingColor: string): number => {
+    if (!drawingColor || tones.length === 0) return -1;
+
+    let closestIndex = -1;
+    let minDistance = Infinity;
+
+    tones.forEach((tone, index) => {
+      const distance = calculateColorDistance(tone, drawingColor);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestIndex = index;
+      }
+    });
+
+    return closestIndex;
+  };
+
+  const closestToneIndex = findClosestToneIndex(recommendedTones, paintColor);
+
   return (
     <Card className="w-full flex flex-col pb-0">
       <CardHeader className="pb-1 pt-2 flex-shrink-0">
       </CardHeader>
       <CardContent className="pt-0 flex-1 overflow-auto pb-0 min-h-0">
-        <ColorGrid
-          colors={recommendedTones.map(tone => ({
-            color: tone,
-            title: tone
-          }))}
-          clickable={false}
-          emptyMessage="トーン推薦がありません"
-        />
+        <div data-tutorial="tone-variations">
+          <ColorGrid
+            colors={recommendedTones.map((tone, index) => ({
+              color: tone,
+              title: "色を選択",
+              showClickIcon: false,
+              isHighlighted: index === closestToneIndex
+            }))}
+            onColorClick={handleToneClick}
+            clickable={true}
+            gridType="tones"
+            isMobile={isMobile}
+            emptyMessage={t('toneRecommendations.noTones')}
+          />
+        </div>
       </CardContent>
     </Card>
   );

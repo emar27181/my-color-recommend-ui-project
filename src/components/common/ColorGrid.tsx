@@ -5,6 +5,8 @@ interface ColorData {
   color: string;
   title?: string;
   subtitle?: string;
+  showClickIcon?: boolean;
+  isHighlighted?: boolean;
 }
 
 interface ColorGridProps {
@@ -13,6 +15,8 @@ interface ColorGridProps {
   className?: string;
   emptyMessage?: string;
   clickable?: boolean;
+  gridType?: 'colors' | 'tones' | 'baseColors'; // グリッドタイプを指定（baseColors追加）
+  isMobile?: boolean; // モバイル判定
 }
 
 /**
@@ -24,7 +28,9 @@ export const ColorGrid = ({
   onColorClick,
   className = '',
   emptyMessage = '色が選択されていません',
-  clickable = true
+  clickable = true,
+  gridType = 'colors',
+  isMobile = false
 }: ColorGridProps) => {
   if (colors.length === 0) {
     return (
@@ -41,40 +47,47 @@ export const ColorGrid = ({
     );
   }
 
-  return (
-    <>
-      {/* Desktop/Tablet Layout */}
-      <div className={`hidden md:block ${RESPONSIVE_GRID.colors} ${RESPONSIVE_GRID.gap} ${className}`}>
-        {colors.map((colorData, index) => (
-          <ColorItem
-            key={index}
-            color={colorData.color}
-            title={colorData.title}
-            subtitle={colorData.subtitle}
-            onClick={() => onColorClick?.(colorData.color)}
-            clickable={clickable}
-          />
-        ))}
-      </div>
+  // グリッドタイプとデバイスタイプに応じたCSSクラスを決定
+  let gridClasses: string;
+  if (isMobile) {
+    // モバイル: gridTypeに応じて列数を決定
+    if (gridType === 'baseColors') {
+      gridClasses = RESPONSIVE_GRID.baseColorsMobile; // 1セクション: 2列
+    } else if (gridType === 'tones') {
+      gridClasses = RESPONSIVE_GRID.tonesMobile; // 3セクション（トーン）: 4列
+    } else {
+      gridClasses = RESPONSIVE_GRID.colorsMobile; // 2セクション（色推薦）: 4列
+    }
+  } else {
+    // デスクトップ: グリッドタイプに応じて列数を決定
+    if (gridType === 'baseColors') {
+      gridClasses = RESPONSIVE_GRID.baseColors; // ベース色選択: 2列
+    } else if (gridType === 'tones') {
+      gridClasses = RESPONSIVE_GRID.tones; // トーン推薦: 4列
+    } else {
+      gridClasses = RESPONSIVE_GRID.colors; // 色推薦: 4列
+    }
+  }
 
-      {/* Mobile 2-Column Layout */}
-      <div className="block md:hidden space-y-0">
-        {Array.from({ length: Math.ceil(colors.length / 2) }).map((_, rowIndex) => (
-          <div key={rowIndex} className="flex gap-1">
-            {colors.slice(rowIndex * 2, (rowIndex + 1) * 2).map((colorData, index) => (
-              <ColorItem
-                key={index}
-                color={colorData.color}
-                title={colorData.title}
-                subtitle={colorData.subtitle}
-                onClick={() => onColorClick?.(colorData.color)}
-                compact={true}
-                clickable={clickable}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
-    </>
+  // classNameでgrid-cols-*が指定されている場合は、デフォルトのgridClassesを上書き
+  const hasCustomGridCols = className.includes('grid-cols-');
+  const finalGridClasses = hasCustomGridCols ? '' : gridClasses;
+
+  return (
+    <div className={`grid ${finalGridClasses} ${RESPONSIVE_GRID.gap} ${className}`}>
+      {colors.map((colorData, index) => (
+        <ColorItem
+          key={index}
+          color={colorData.color}
+          title={colorData.title}
+          subtitle={colorData.subtitle}
+          onClick={() => onColorClick?.(colorData.color)}
+          compact={true}
+          clickable={clickable}
+          showClickIcon={colorData.showClickIcon}
+          isHighlighted={colorData.isHighlighted}
+        />
+      ))}
+    </div>
   );
 };

@@ -1,6 +1,8 @@
 import { ColorBlock } from '@/components/common/ColorBlock';
 import { CopyColorButton } from '@/components/common/CopyColorButton';
 import { TYPOGRAPHY, BORDER_PRESETS } from '@/constants/ui';
+import { SquareMousePointer } from 'lucide-react';
+import chroma from 'chroma-js';
 
 interface ColorItemProps {
   color: string;
@@ -10,6 +12,8 @@ interface ColorItemProps {
   subtitle?: string;
   compact?: boolean;
   clickable?: boolean;
+  showClickIcon?: boolean;
+  isHighlighted?: boolean; // 描画色に最も近い色のハイライト
 }
 
 /**
@@ -23,7 +27,9 @@ export const ColorItem = ({
   title,
   subtitle,
   compact = false,
-  clickable = true
+  clickable = true,
+  showClickIcon = false,
+  isHighlighted = false
 }: ColorItemProps) => {
   const handleClick = () => {
     if (clickable && onClick) {
@@ -31,34 +37,49 @@ export const ColorItem = ({
     }
   };
 
-  // デスクトップ版レイアウト
+  // ベースカラーとのコントラスト比を考慮したアイコン色を取得
+  const getIconColor = () => {
+    try {
+      const colorObj = chroma(color);
+      const lightness = colorObj.get('hsl.l');
+      // 明るい色には暗いアイコン、暗い色には明るいアイコン
+      return lightness > 0.5 ? '#374151' : '#f9fafb'; // gray-700 or gray-50
+    } catch {
+      return '#6b7280'; // デフォルト: gray-500
+    }
+  };
+
+  // デスクトップ版レイアウト（縦2段）
   if (!compact) {
     return (
       <div 
-        className={`bg-card ${BORDER_PRESETS.card} p-1 shadow-sm hover:shadow-md transition-all duration-200 ${
+        className={`bg-card ${BORDER_PRESETS.card} p-2 shadow-sm hover:shadow-md transition-all duration-200 ${
           clickable ? 'cursor-pointer' : ''
         } group ${className}`}
         onClick={handleClick}
       >
-        <div className="flex items-center gap-4">
+        {/* 1行目: カラーボックス + コピーボタン */}
+        <div className="flex items-center justify-between mb-2">
           <ColorBlock
             color={color}
             title={title || color}
+            showClickIcon={showClickIcon}
+            isHighlighted={isHighlighted}
           />
-          <div className="flex-1 min-w-0">
-            <p className={`${TYPOGRAPHY.colorCode} truncate`}>{color}</p>
-            {subtitle && (
-              <p className={TYPOGRAPHY.usage}>
-                {subtitle}
-              </p>
-            )}
-          </div>
           <CopyColorButton
             color={color}
             variant="minimal"
             className="opacity-100"
           />
         </div>
+        {/* 2行目: 使用割合のみ */}
+        {subtitle && (
+          <div className="text-center">
+            <p className={`${TYPOGRAPHY.usage}`}>
+              {subtitle}
+            </p>
+          </div>
+        )}
       </div>
     );
   }
@@ -76,14 +97,21 @@ export const ColorItem = ({
         height: '32px'
       }}>
         <div
-          className={`${BORDER_PRESETS.colorBlock} cursor-pointer hover:scale-110 transition-all duration-200`}
+          className={`${isHighlighted ? 'border-2 border-foreground rounded-md' : BORDER_PRESETS.colorBlock} cursor-pointer hover:scale-110 transition-all duration-200 flex items-center justify-center`}
           style={{
             backgroundColor: color,
             width: '24px',
             height: '24px'
           }}
           title={title || color}
-        />
+        >
+          {showClickIcon && (
+            <SquareMousePointer 
+              className="w-3 h-3" 
+              style={{ color: getIconColor() }}
+            />
+          )}
+        </div>
       </div>
       <div onClick={(e) => e.stopPropagation()}>
         <CopyColorButton
@@ -92,14 +120,13 @@ export const ColorItem = ({
           className="opacity-100 flex-shrink-0"
         />
       </div>
-      <div className="flex-1 min-w-0">
-        <span className="text-xs font-mono text-muted-foreground truncate block">{color}</span>
-        {subtitle && (
+      {subtitle && (
+        <div className="flex-1 min-w-0">
           <span className="text-xs text-muted-foreground">
             {subtitle}
           </span>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

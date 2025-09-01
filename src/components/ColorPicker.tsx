@@ -2,14 +2,34 @@ import { useColorStore } from '@/store/colorStore';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { CopyColorButton } from '@/components/common/CopyColorButton';
 import { TYPOGRAPHY, BORDER_PRESETS } from '@/constants/ui';
+import { useTutorial } from '@/contexts/TutorialContext';
 import { Palette } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import chroma from 'chroma-js';
 
 export const ColorPicker = () => {
-  const { selectedColor, setSelectedColor } = useColorStore();
+  const { baseColor, setColorFromBase } = useColorStore();
+  const { onUserAction } = useTutorial();
+  const { t } = useTranslation();
 
   const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const color = e.target.value;
-    setSelectedColor(color);
+    // ベース色選択：ベースカラー、selectedColor、描画色をすべて更新
+    setColorFromBase(color);
+    // チュートリアルの自動進行をトリガー
+    onUserAction('click', '[data-tutorial="color-picker"]');
+  };
+
+  // ベースカラーとのコントラスト比を考慮したアイコン色を取得
+  const getIconColor = () => {
+    try {
+      const color = chroma(baseColor);
+      const lightness = color.get('hsl.l');
+      // 明るい色には暗いアイコン、暗い色には明るいアイコン
+      return lightness > 0.5 ? '#374151' : '#f9fafb'; // gray-700 or gray-50
+    } catch {
+      return '#6b7280'; // デフォルト: gray-500
+    }
   };
 
   return (
@@ -21,24 +41,36 @@ export const ColorPicker = () => {
         <div className="hidden md:block h-full">
           <div className="p-1 transition-all duration-200 h-full flex items-center">
             <div className="flex items-center gap-3 w-full">
-              <div className="relative cursor-pointer">
-                <div className={`bg-white rounded-full p-2 ${BORDER_PRESETS.icon} hover:shadow-md transition-all duration-200`}>
-                  <Palette className="w-6 h-6 text-muted-foreground" />
+              <div className="flex items-center gap-3" data-tutorial="color-picker">
+                <div className="relative cursor-pointer hover:scale-110 transition-all duration-200">
+                  <input
+                    type="color"
+                    value={baseColor}
+                    onChange={handleColorChange}
+                    className="absolute inset-0 opacity-0 w-full h-full cursor-pointer z-10"
+                    title={t('colorPicker.clickToSelect')}
+                  />
+                  <div 
+                    className={`${BORDER_PRESETS.colorBlock} flex items-center justify-center pointer-events-none`}
+                    style={{
+                      backgroundColor: baseColor,
+                      width: '46px',
+                      height: '46px'
+                    }}
+                    title={`${t('colorPicker.selectedColor')}: ${baseColor} - ${t('colorPicker.clickToChange')}`}
+                  >
+                    <Palette 
+                      className="w-5 h-5" 
+                      style={{ color: getIconColor() }}
+                    />
+                  </div>
                 </div>
-                <input
-                  type="color"
-                  value={selectedColor}
-                  onChange={handleColorChange}
-                  className="absolute opacity-0 w-full h-full cursor-pointer"
-                  style={{ top: 0, left: 0 }}
-                  title="クリックで色を選択"
-                />
               </div>
               <div className="flex-1 min-w-0">
-                <p className={`${TYPOGRAPHY.colorCode} truncate`}>{selectedColor}</p>
+                <p className={`${TYPOGRAPHY.colorCode} truncate`}>{baseColor}</p>
               </div>
               <CopyColorButton
-                color={selectedColor}
+                color={baseColor}
                 variant="minimal"
                 className="opacity-100"
               />
@@ -49,26 +81,38 @@ export const ColorPicker = () => {
         {/* Mobile Layout */}
         <div className="block md:hidden h-full">
           <div className="p-1 flex items-center gap-1 h-full">
-            <div className="relative cursor-pointer">
-              <div className={`bg-white rounded-full p-1.5 ${BORDER_PRESETS.icon} hover:shadow-md transition-all duration-200`}>
-                <Palette className="w-4 h-4 text-muted-foreground" />
+            <div className="flex items-center gap-2">
+              <div className="relative cursor-pointer hover:scale-110 transition-all duration-200">
+                <input
+                  type="color"
+                  value={baseColor}
+                  onChange={handleColorChange}
+                  className="absolute inset-0 opacity-0 w-full h-full cursor-pointer z-10"
+                  title={t('colorPicker.clickToSelect')}
+                />
+                <div 
+                  className={`${BORDER_PRESETS.colorBlock} flex items-center justify-center pointer-events-none`}
+                  style={{
+                    backgroundColor: baseColor,
+                    width: '24px',
+                    height: '24px'
+                  }}
+                  title={`${t('colorPicker.selectedColor')}: ${baseColor} - ${t('colorPicker.tapToChange')}`}
+                >
+                  <Palette 
+                    className="w-3 h-3" 
+                    style={{ color: getIconColor() }}
+                  />
+                </div>
               </div>
-              <input
-                type="color"
-                value={selectedColor}
-                onChange={handleColorChange}
-                className="absolute opacity-0 w-full h-full cursor-pointer"
-                style={{ top: 0, left: 0 }}
-                title="クリックで色を選択"
-              />
             </div>
             <CopyColorButton
-              color={selectedColor}
+              color={baseColor}
               variant="minimal"
               className="opacity-100 flex-shrink-0"
             />
             <div className="flex-1 min-w-0">
-              <span className="text-xs font-mono text-muted-foreground truncate block">{selectedColor}</span>
+              <span className="text-xs font-mono text-muted-foreground truncate block">{baseColor}</span>
             </div>
           </div>
         </div>

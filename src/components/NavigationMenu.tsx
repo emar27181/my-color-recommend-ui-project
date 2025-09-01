@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Play, ClipboardPenLine, HelpCircle } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { useTutorial } from '@/contexts/TutorialContext';
 
 interface NavigationMenuProps {
   className?: string;
@@ -8,35 +10,57 @@ interface NavigationMenuProps {
 
 export const NavigationMenu = ({ className = '' }: NavigationMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { startTutorial } = useTutorial();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
-  const menuItems = [
-    { label: 'ホーム', href: '/', isActive: true },
-    { label: 'ダミーページ1', href: '/page1' },
-    { label: 'ダミーページ2', href: '/page2' },
-    { label: 'ダミーページ3', href: '/page3' },
-    { label: 'ヘルプ', href: '/help' },
-  ];
-
   return (
-    <div className={`relative ${className}`}>
+    <div className={`flex items-center gap-3 ${className}`}>
+      {/* Navigation Icons */}
+      <button
+        onClick={() => {
+          startTutorial();
+        }}
+        className="p-2 rounded-lg bg-background/50 border-none hover:bg-muted/50 transition-colors backdrop-blur-sm text-foreground"
+        title="チュートリアル"
+      >
+        <Play className="w-5 h-5 [&>path]:fill-none [&>path]:stroke-current" />
+      </button>
+      <Link
+        to="/swipe"
+        className="p-2 rounded-lg bg-background/50 border-none hover:bg-muted/50 transition-colors backdrop-blur-sm text-foreground"
+        title="スワイプ推薦"
+      >
+        <ClipboardPenLine className="w-5 h-5" />
+      </Link>
+      <div className="w-4"></div>
+      <Link
+        to="/help"
+        className="p-2 rounded-lg bg-background/50 border-none hover:bg-muted/50 transition-colors backdrop-blur-sm text-foreground"
+        title="ヘルプ"
+      >
+        <HelpCircle className="w-5 h-5" />
+      </Link>
+      <div className="p-2 rounded-lg bg-background/50 backdrop-blur-sm">
+        <ThemeToggle />
+      </div>
+      
       {/* Hamburger Menu Button */}
       <button
         onClick={toggleMenu}
-        className="p-2 rounded-lg bg-transparent border-none hover:bg-muted/50 transition-colors"
+        className="p-2 rounded-lg bg-background/50 border-none hover:bg-muted/50 transition-colors backdrop-blur-sm text-foreground"
         aria-label="メニューを開く"
       >
         {isOpen ? (
-          <X className="w-6 h-6 text-foreground" />
+          <X className="w-6 h-6" />
         ) : (
-          <Menu className="w-6 h-6 text-foreground" />
+          <Menu className="w-6 h-6" />
         )}
       </button>
 
-      {/* Dropdown Menu */}
+      {/* Dropdown Menu (placeholder for future use) */}
       {isOpen && (
         <>
           {/* Backdrop */}
@@ -45,22 +69,10 @@ export const NavigationMenu = ({ className = '' }: NavigationMenuProps) => {
             onClick={toggleMenu}
           />
 
-          {/* Menu Content */}
-          <div className="absolute top-12 left-0 z-50 min-w-48 bg-background border border-border rounded-lg shadow-lg overflow-hidden">
-            <nav className="py-2">
-              {menuItems.map((item, index) => (
-                <Link
-                  key={index}
-                  to={item.href}
-                  className={`block px-4 py-3 text-sm transition-colors hover:bg-muted ${item.isActive
-                      ? 'text-primary font-medium bg-primary/10'
-                      : 'text-foreground'
-                    }`}
-                  onClick={toggleMenu}
-                >
-                  {item.label}
-                </Link>
-              ))}
+          {/* Menu Content - Empty for now */}
+          <div className="fixed top-[68px] right-0 z-50 w-48 bg-background border border-border rounded-lg shadow-lg overflow-hidden">
+            <nav className="p-2">
+              <p className="text-sm text-muted-foreground p-2">追加メニュー項目</p>
             </nav>
           </div>
         </>
