@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Play, ClipboardPenLine, HelpCircle } from 'lucide-react';
+import { Menu, X, Play, ClipboardPenLine, HelpCircle, BarChart3 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useTutorial } from '@/contexts/TutorialContext';
 
@@ -34,6 +34,13 @@ export const NavigationMenu = ({ className = '' }: NavigationMenuProps) => {
         title="スワイプ推薦"
       >
         <ClipboardPenLine className="w-5 h-5" />
+      </Link>
+      <Link
+        to="/sns-analysis"
+        className="p-2 rounded-lg bg-background/50 border-none hover:bg-muted/50 transition-colors backdrop-blur-sm text-foreground"
+        title="SNS嗜好分析"
+      >
+        <BarChart3 className="w-5 h-5" />
       </Link>
       <div className="w-4"></div>
       <Link
