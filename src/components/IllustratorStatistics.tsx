@@ -1,3 +1,5 @@
+import HueDistributionVisualization from "./HueDistributionVisualization";
+
 interface IllustratorStatisticsProps {
   data: any;
   isExpanded?: boolean;
@@ -85,6 +87,11 @@ export default function IllustratorStatistics({ data, isExpanded = false }: Illu
           ))}
         </div>
       </div>
+
+      {/* 色相分布（色付き可視化） */}
+      {data.used_pccs_count_sum_distribution && (
+        <HueDistributionVisualization data={data.used_pccs_count_sum_distribution} />
+      )}
 
       {/* 彩度・明度分布（簡略版） */}
       <div>
