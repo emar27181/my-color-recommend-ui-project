@@ -20,7 +20,7 @@ export default function HueDistributionVisualization({ data }: HueDistributionVi
   // デバッグ: 色生成とスケーリングをテスト
   console.log('HueDistribution data:', data);
   console.log('Normalized data:', normalizedData);
-  console.log('Sample heights:', normalizedData.slice(0, 5).map(value => Math.max(Math.pow(value / 100, 0.6) * 80, 5)));
+  console.log('Sample heights:', normalizedData.slice(0, 5).map(value => Math.max(Math.pow(value / 100, 0.5) * 90, 8)));
   console.log('Sample colors:', Array.from({length: 5}, (_, i) => generateHueColor(i)));
 
   return (
@@ -38,10 +38,9 @@ export default function HueDistributionVisualization({ data }: HueDistributionVi
             {normalizedData.map((value, index) => (
               <div key={index} className="flex flex-col items-center group relative">
                 <div 
-                  className="rounded-t-sm transition-all duration-300"
+                  className="w-3 rounded-t-sm transition-all duration-300" 
                   style={{ 
-                    height: `${Math.max(Math.pow(value / 100, 0.6) * 80, 5)}%`, // 非線形スケーリング（べき乗）で差を強調
-                    width: `${Math.max(value * 0.15, 2)}px`, // 幅も分布に応じて変化（最小2px、最大約15px）
+                    height: `${Math.max(Math.pow(value / 100, 0.5) * 90, 8)}%`, // 非線形スケーリング（べき乗）で高さのみで差を強調
                     backgroundColor: generateHueColor(index),
                     opacity: value > 0 ? 1 : 0.3,
                     border: '1px solid rgba(0,0,0,0.1)'
