@@ -9,36 +9,35 @@ export default function IllustratorStatistics({ data, isExpanded = false }: Illu
   }
 
   if (!isExpanded) {
-    // 折りたたみ時は基本統計のみ表示
-    return (
-      <div className="mt-3 space-y-2">
-        <div className="grid grid-cols-2 gap-4 text-xs">
-          <div>
-            <span className="text-muted-foreground">有彩色: </span>
-            <span className="font-medium">{data.chromatic_colors_count_ave?.toFixed(1)}</span>
-          </div>
-          <div>
-            <span className="text-muted-foreground">無彩色: </span>
-            <span className="font-medium">{data.achromatic_colors_count_ave?.toFixed(1)}</span>
-          </div>
-          <div>
-            <span className="text-muted-foreground">有彩色率: </span>
-            <span className="font-medium">{(data.chromatic_colors_rate_ave * 100)?.toFixed(1)}%</span>
-          </div>
-          <div>
-            <span className="text-muted-foreground">統一性: </span>
-            <span className="font-medium">{data.mean_resultant_length_ave?.toFixed(3)}</span>
-          </div>
-        </div>
-      </div>
-    );
+    // 折りたたみ時は何も表示しない
+    return null;
   }
 
-  // 展開時は詳細統計を表示
+  // 展開時は基本統計から詳細統計まで表示
   return (
     <div className="mt-4 space-y-6">
-      {/* 基本統計情報 */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+      {/* 基本統計情報（展開時の最初の表示） */}
+      <div className="grid grid-cols-2 gap-4 text-sm">
+        <div>
+          <span className="text-muted-foreground">有彩色: </span>
+          <span className="font-medium">{data.chromatic_colors_count_ave?.toFixed(1)}</span>
+        </div>
+        <div>
+          <span className="text-muted-foreground">無彩色: </span>
+          <span className="font-medium">{data.achromatic_colors_count_ave?.toFixed(1)}</span>
+        </div>
+        <div>
+          <span className="text-muted-foreground">有彩色率: </span>
+          <span className="font-medium">{(data.chromatic_colors_rate_ave * 100)?.toFixed(1)}%</span>
+        </div>
+        <div>
+          <span className="text-muted-foreground">統一性: </span>
+          <span className="font-medium">{data.mean_resultant_length_ave?.toFixed(3)}</span>
+        </div>
+      </div>
+
+      {/* 詳細統計情報 */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-4 border-t">
         <div className="text-center">
           <p className="text-2xl font-bold text-foreground">
             {data.chromatic_colors_count_ave?.toFixed(2)}

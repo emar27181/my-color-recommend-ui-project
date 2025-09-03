@@ -123,14 +123,7 @@ export default function SnsAnalysisPage() {
                           </div>
                         </div>
                         
-                        {/* 基本統計表示（常に表示） */}
-                        {statisticsData && !isExpanded && (
-                          <div className="px-4 pb-4">
-                            <IllustratorStatistics data={statisticsData} isExpanded={false} />
-                          </div>
-                        )}
-                        
-                        {/* 詳細統計表示（展開時） */}
+                        {/* 統計表示（展開時のみ） */}
                         {isExpanded && (
                           <div className="px-4 pb-4 border-t">
                             {isLoading ? (
