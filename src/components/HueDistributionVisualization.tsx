@@ -27,7 +27,7 @@ export default function HueDistributionVisualization({ data }: HueDistributionVi
       
       {/* 色相環形式の表示 */}
       <div className="mb-6">
-        <div className="relative w-full h-40 flex items-end justify-center">
+        <div className="relative w-full h-60 flex items-end justify-center">
           {/* 背景の色相環 */}
           <div className="absolute bottom-0 w-full h-6 rounded-full bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-cyan-500 via-blue-500 via-purple-500 to-red-500 opacity-20"></div>
           
@@ -38,7 +38,7 @@ export default function HueDistributionVisualization({ data }: HueDistributionVi
                 <div 
                   className="rounded-t-sm transition-all duration-300"
                   style={{ 
-                    height: `${Math.max(value * 0.8, 2)}%`,
+                    height: `${Math.max(value * 1.2, 3)}%`, // 高さの係数を0.8→1.2に増加
                     width: `${Math.max(value * 0.15, 2)}px`, // 幅も分布に応じて変化（最小2px、最大約15px）
                     backgroundColor: generateHueColor(index),
                     opacity: value > 0 ? 1 : 0.3,
