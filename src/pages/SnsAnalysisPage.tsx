@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Palette, TrendingUp, ArrowLeft, BarChart3 } from "lucide-react";
+import { Palette, TrendingUp, ChevronDown, ChevronUp } from "lucide-react";
 import { getIllustratorNames, getIllustratorStatistics } from "@/lib/illustratorData";
 import { useState, useEffect } from "react";
 import IllustratorStatistics from "@/components/IllustratorStatistics";
@@ -7,9 +7,9 @@ import IllustratorStatistics from "@/components/IllustratorStatistics";
 export default function SnsAnalysisPage() {
   const [illustratorNames, setIllustratorNames] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedIllustrator, setSelectedIllustrator] = useState<string | null>(null);
-  const [statisticsData, setStatisticsData] = useState<any>(null);
-  const [statisticsLoading, setStatisticsLoading] = useState(false);
+  const [expandedIllustrators, setExpandedIllustrators] = useState<Set<string>>(new Set());
+  const [statisticsCache, setStatisticsCache] = useState<Record<string, any>>({});
+  const [loadingStats, setLoadingStats] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const loadNames = async () => {
@@ -26,62 +26,40 @@ export default function SnsAnalysisPage() {
     loadNames();
   }, []);
 
-  const handleIllustratorClick = async (name: string) => {
-    setSelectedIllustrator(name);
-    setStatisticsLoading(true);
-    try {
-      const data = await getIllustratorStatistics(name);
-      setStatisticsData(data);
-    } catch (error) {
-      console.error('Failed to load statistics:', error);
-    } finally {
-      setStatisticsLoading(false);
+  const handleIllustratorToggle = async (name: string) => {
+    const isExpanded = expandedIllustrators.has(name);
+    
+    if (isExpanded) {
+      // 折りたたみ
+      const newExpanded = new Set(expandedIllustrators);
+      newExpanded.delete(name);
+      setExpandedIllustrators(newExpanded);
+    } else {
+      // 展開
+      const newExpanded = new Set(expandedIllustrators);
+      newExpanded.add(name);
+      setExpandedIllustrators(newExpanded);
+      
+      // データがキャッシュされていない場合は取得
+      if (!statisticsCache[name]) {
+        const newLoading = new Set(loadingStats);
+        newLoading.add(name);
+        setLoadingStats(newLoading);
+        
+        try {
+          const data = await getIllustratorStatistics(name);
+          setStatisticsCache(prev => ({ ...prev, [name]: data }));
+        } catch (error) {
+          console.error('Failed to load statistics:', error);
+        } finally {
+          const updatedLoading = new Set(loadingStats);
+          updatedLoading.delete(name);
+          setLoadingStats(updatedLoading);
+        }
+      }
     }
   };
 
-  const handleBackClick = () => {
-    setSelectedIllustrator(null);
-    setStatisticsData(null);
-  };
-
-  // 統計詳細表示
-  if (selectedIllustrator) {
-    return (
-      <div className="min-h-screen bg-background">
-        <main className="container mx-auto px-4 py-8">
-          <div className="space-y-8">
-            {/* 戻るボタンとタイトル */}
-            <div className="flex items-center gap-4">
-              <button 
-                onClick={handleBackClick}
-                className="flex items-center gap-2 px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                戻る
-              </button>
-              <div className="flex items-center gap-2">
-                <BarChart3 className="w-6 h-6 text-foreground" />
-                <h1 className="text-3xl font-heading text-foreground">
-                  {selectedIllustrator} の統計データ
-                </h1>
-              </div>
-            </div>
-
-            {/* 統計データ表示 */}
-            {statisticsLoading ? (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">統計データを読み込み中...</p>
-              </div>
-            ) : (
-              <IllustratorStatistics data={statisticsData} />
-            )}
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  // イラストレーター一覧表示
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto px-4 py-8">
@@ -106,7 +84,7 @@ export default function SnsAnalysisPage() {
                 </h2>
               </div>
               <p className="text-muted-foreground">
-                以下のイラストレーターの色使い統計データが利用可能です
+                クリックで統計データを展開表示
               </p>
             </CardHeader>
             <CardContent>
@@ -119,21 +97,58 @@ export default function SnsAnalysisPage() {
                   <p className="text-muted-foreground">データの読み込みに失敗しました</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                  {illustratorNames.map((name, index) => (
-                    <div 
-                      key={index}
-                      onClick={() => handleIllustratorClick(name)}
-                      className="p-3 bg-muted rounded-md border hover:bg-muted/80 transition-colors cursor-pointer"
-                    >
-                      <div className="flex items-center gap-2">
-                        <TrendingUp className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-sm font-medium text-foreground truncate">
-                          {name}
-                        </span>
+                <div className="space-y-3">
+                  {illustratorNames.map((name, index) => {
+                    const isExpanded = expandedIllustrators.has(name);
+                    const isLoading = loadingStats.has(name);
+                    const statisticsData = statisticsCache[name];
+                    
+                    return (
+                      <div key={index} className="border rounded-lg">
+                        <div 
+                          onClick={() => handleIllustratorToggle(name)}
+                          className="p-4 hover:bg-muted/50 transition-colors cursor-pointer flex items-center justify-between"
+                        >
+                          <div className="flex items-center gap-3">
+                            <TrendingUp className="w-4 h-4 text-muted-foreground" />
+                            <span className="font-medium text-foreground">{name}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {isLoading && <span className="text-xs text-muted-foreground">読み込み中...</span>}
+                            {isExpanded ? (
+                              <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                            ) : (
+                              <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                            )}
+                          </div>
+                        </div>
+                        
+                        {/* 基本統計表示（常に表示） */}
+                        {statisticsData && !isExpanded && (
+                          <div className="px-4 pb-4">
+                            <IllustratorStatistics data={statisticsData} isExpanded={false} />
+                          </div>
+                        )}
+                        
+                        {/* 詳細統計表示（展開時） */}
+                        {isExpanded && (
+                          <div className="px-4 pb-4 border-t">
+                            {isLoading ? (
+                              <div className="py-6 text-center">
+                                <p className="text-muted-foreground">統計データを読み込み中...</p>
+                              </div>
+                            ) : statisticsData ? (
+                              <IllustratorStatistics data={statisticsData} isExpanded={true} />
+                            ) : (
+                              <div className="py-6 text-center">
+                                <p className="text-muted-foreground">データが見つかりません</p>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </CardContent>
