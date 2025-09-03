@@ -10,12 +10,16 @@ export default function HueDistributionVisualization({ data }: HueDistributionVi
   // 色相を24分割（15度ずつ）に対応する色を生成
   const generateHueColor = (index: number) => {
     const hue = (index * 15) % 360; // 15度ずつの色相
-    return `hsl(${hue}, 70%, 60%)`; // 彩度70%, 明度60%で統一
+    return `hsl(${hue}, 80%, 55%)`; // 彩度80%, 明度55%で鮮やか統一
   };
 
   // データの最大値を取得してスケーリング
   const maxValue = Math.max(...data);
   const normalizedData = data.map(value => (value / maxValue) * 100);
+  
+  // デバッグ: 色生成をテスト
+  console.log('HueDistribution data:', data);
+  console.log('Sample colors:', Array.from({length: 5}, (_, i) => generateHueColor(i)));
 
   return (
     <div>
@@ -36,7 +40,8 @@ export default function HueDistributionVisualization({ data }: HueDistributionVi
                   style={{ 
                     height: `${Math.max(value * 0.8, 2)}%`,
                     backgroundColor: generateHueColor(index),
-                    opacity: value > 0 ? 0.8 : 0.2
+                    opacity: value > 0 ? 1 : 0.3,
+                    border: '1px solid rgba(0,0,0,0.1)'
                   }}
                 ></div>
                 
@@ -71,8 +76,11 @@ export default function HueDistributionVisualization({ data }: HueDistributionVi
           return (
             <div key={index} className="flex items-center gap-3">
               <div 
-                className="w-4 h-4 rounded-full border"
-                style={{ backgroundColor: generateHueColor(index) }}
+                className="w-4 h-4 rounded-full"
+                style={{ 
+                  backgroundColor: generateHueColor(index),
+                  border: '2px solid rgba(0,0,0,0.2)'
+                }}
               ></div>
               <span className="text-sm text-muted-foreground w-12">{index * 15}°</span>
               
@@ -82,7 +90,8 @@ export default function HueDistributionVisualization({ data }: HueDistributionVi
                   className="h-full rounded-full transition-all duration-500"
                   style={{ 
                     width: `${value}%`,
-                    background: `linear-gradient(90deg, ${generateHueColor(index)}80, ${generateHueColor(index)}40)`
+                    backgroundColor: generateHueColor(index),
+                    opacity: 0.7
                   }}
                 ></div>
                 
@@ -91,8 +100,9 @@ export default function HueDistributionVisualization({ data }: HueDistributionVi
                   className="absolute top-1/2 left-0 transform -translate-y-1/2 h-4 rounded-full"
                   style={{
                     width: `${value}%`,
-                    background: `radial-gradient(ellipse at center, ${generateHueColor(index)} 0%, transparent 70%)`,
-                    opacity: 0.6
+                    backgroundColor: generateHueColor(index),
+                    opacity: 0.5,
+                    filter: 'blur(1px)'
                   }}
                 ></div>
               </div>
