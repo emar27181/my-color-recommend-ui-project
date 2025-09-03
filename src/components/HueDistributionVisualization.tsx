@@ -36,9 +36,10 @@ export default function HueDistributionVisualization({ data }: HueDistributionVi
             {normalizedData.map((value, index) => (
               <div key={index} className="flex flex-col items-center group relative">
                 <div 
-                  className="w-3 rounded-t-sm transition-all duration-300 hover:w-4"
+                  className="rounded-t-sm transition-all duration-300"
                   style={{ 
                     height: `${Math.max(value * 0.8, 2)}%`,
+                    width: `${Math.max(value * 0.15, 2)}px`, // 幅も分布に応じて変化（最小2px、最大約15px）
                     backgroundColor: generateHueColor(index),
                     opacity: value > 0 ? 1 : 0.3,
                     border: '1px solid rgba(0,0,0,0.1)'
@@ -76,8 +77,10 @@ export default function HueDistributionVisualization({ data }: HueDistributionVi
           return (
             <div key={index} className="flex items-center gap-3">
               <div 
-                className="w-4 h-4 rounded-full"
+                className="rounded-full flex-shrink-0"
                 style={{ 
+                  width: `${Math.max(value * 0.2, 8)}px`, // 分布に応じてサイズ変化（最小8px、最大約20px）
+                  height: `${Math.max(value * 0.2, 8)}px`,
                   backgroundColor: generateHueColor(index),
                   border: '2px solid rgba(0,0,0,0.2)'
                 }}
@@ -85,7 +88,12 @@ export default function HueDistributionVisualization({ data }: HueDistributionVi
               <span className="text-sm text-muted-foreground w-12">{index * 15}°</span>
               
               {/* ヴァイオリン風の形状 */}
-              <div className="flex-1 relative h-6 bg-muted/20 rounded-full overflow-hidden">
+              <div 
+                className="flex-1 relative bg-muted/20 rounded-full overflow-hidden"
+                style={{
+                  height: `${Math.max(value * 0.3, 6)}px` // 分布に応じて高さも変化（最小6px、最大約30px）
+                }}
+              >
                 <div 
                   className="h-full rounded-full transition-all duration-500"
                   style={{ 
@@ -97,9 +105,10 @@ export default function HueDistributionVisualization({ data }: HueDistributionVi
                 
                 {/* 中央の密度表現 */}
                 <div 
-                  className="absolute top-1/2 left-0 transform -translate-y-1/2 h-4 rounded-full"
+                  className="absolute top-1/2 left-0 transform -translate-y-1/2 rounded-full"
                   style={{
                     width: `${value}%`,
+                    height: `${Math.max(value * 0.2, 4)}px`, // バーと連動して高さ変化
                     backgroundColor: generateHueColor(index),
                     opacity: 0.5,
                     filter: 'blur(1px)'
