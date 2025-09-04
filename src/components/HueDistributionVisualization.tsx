@@ -69,58 +69,38 @@ export default function HueDistributionVisualization({ data }: HueDistributionVi
         </div>
       </div>
 
-      {/* ヴァイオリン図風の表示 */}
-      <div className="space-y-2">
-        <h5 className="text-sm font-medium text-foreground">詳細分布</h5>
-        {normalizedData.map((value, index) => {
-          if (value < 1) return null; // 値が小さいものは表示しない
-          
-          return (
-            <div key={index} className="flex items-center gap-3">
-              <div 
-                className="rounded-full flex-shrink-0"
-                style={{ 
-                  width: `${Math.max(value * 0.2, 8)}px`, // 分布に応じてサイズ変化（最小8px、最大約20px）
-                  height: `${Math.max(value * 0.2, 8)}px`,
-                  backgroundColor: generateHueColor(index),
-                  border: '2px solid rgba(0,0,0,0.2)'
-                }}
-              ></div>
-              <span className="text-sm text-muted-foreground w-12">{index * 15}°</span>
-              
-              {/* ヴァイオリン風の形状 */}
-              <div 
-                className="flex-1 relative bg-muted/20 rounded-full overflow-hidden"
-                style={{
-                  height: `${Math.max(value * 0.3, 6)}px` // 分布に応じて高さも変化（最小6px、最大約30px）
-                }}
-              >
+      {/* 詳細分布を横一列で表示 */}
+      <div>
+        <h5 className="text-sm font-medium text-foreground mb-3">詳細分布</h5>
+        <div className="flex flex-wrap gap-2 justify-center">
+          {normalizedData.map((value, index) => {
+            if (value < 1) return null; // 値が小さいものは表示しない
+            
+            return (
+              <div key={index} className="flex flex-col items-center gap-1 group relative">
                 <div 
-                  className="h-full rounded-full transition-all duration-500"
+                  className="rounded-full flex-shrink-0"
                   style={{ 
-                    width: `${value}%`,
+                    width: `${Math.max(value * 0.2, 12)}px`, // 分布に応じてサイズ変化（最小12px、最大約20px）
+                    height: `${Math.max(value * 0.2, 12)}px`,
                     backgroundColor: generateHueColor(index),
-                    opacity: 0.7
+                    border: '2px solid rgba(0,0,0,0.2)'
                   }}
                 ></div>
+                <span className="text-xs text-muted-foreground">{index * 15}°</span>
+                <span className="text-xs font-medium text-foreground">{data[index]}</span>
                 
-                {/* 中央の密度表現 */}
-                <div 
-                  className="absolute top-1/2 left-0 transform -translate-y-1/2 rounded-full"
-                  style={{
-                    width: `${value}%`,
-                    height: `${Math.max(value * 0.2, 4)}px`, // バーと連動して高さ変化
-                    backgroundColor: generateHueColor(index),
-                    opacity: 0.5,
-                    filter: 'blur(1px)'
-                  }}
-                ></div>
+                {/* ツールチップ */}
+                <div className="absolute bottom-full mb-2 hidden group-hover:block bg-background border rounded px-2 py-1 text-xs whitespace-nowrap z-10">
+                  <div className="text-center">
+                    <div className="font-medium">使用数: {data[index]}</div>
+                    <div className="text-muted-foreground">色相: {(index * 15)}°</div>
+                  </div>
+                </div>
               </div>
-              
-              <span className="text-sm font-medium text-foreground w-8">{data[index]}</span>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
   );
