@@ -97,7 +97,7 @@ export default function SnsAnalysisPage() {
                   <p className="text-muted-foreground">データの読み込みに失敗しました</p>
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-1">
                   {illustratorNames.map((name, index) => {
                     const isExpanded = expandedIllustrators.has(name);
                     const isLoading = loadingStats.has(name);
@@ -107,7 +107,7 @@ export default function SnsAnalysisPage() {
                       <div key={index} className="border rounded-lg">
                         <div 
                           onClick={() => handleIllustratorToggle(name)}
-                          className="p-4 hover:bg-muted/50 transition-colors cursor-pointer flex items-center justify-between"
+                          className="p-2 hover:bg-muted/50 transition-colors cursor-pointer flex items-center justify-between"
                         >
                           <div className="flex items-center gap-3">
                             <TrendingUp className="w-4 h-4 text-muted-foreground" />
@@ -125,7 +125,7 @@ export default function SnsAnalysisPage() {
                         
                         {/* 統計表示（展開時のみ） */}
                         {isExpanded && (
-                          <div className="px-4 pb-4 border-t">
+                          <div className="px-2 pb-2 border-t">
                             {isLoading ? (
                               <div className="py-6 text-center">
                                 <p className="text-muted-foreground">統計データを読み込み中...</p>

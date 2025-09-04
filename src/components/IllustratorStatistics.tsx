@@ -17,12 +17,12 @@ export default function IllustratorStatistics({ data, isExpanded = false }: Illu
 
   // 展開時は基本統計から詳細統計まで表示
   return (
-    <div className="mt-2 space-y-2">
+    <div className="mt-1 space-y-1">
       {/* 基本統計情報と色相分布を縦二列で表示 */}
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-1">
         {/* 左列: 基本統計情報（縦一列、横幅小さく） */}
         <div className="w-1/2">
-          <div className="bg-background border rounded p-2 space-y-1 text-xs">
+          <div className="bg-background border rounded p-1 space-y-0.5 text-xs">
             <div>
               <span className="text-muted-foreground">有彩色: </span>
               <span className="font-medium">{data.chromatic_colors_count_ave?.toFixed(1)}</span>
@@ -43,7 +43,7 @@ export default function IllustratorStatistics({ data, isExpanded = false }: Illu
         </div>
 
         {/* 右列: 色相分布 */}
-        <div className="-m-2">
+        <div className="-m-3 -mt-4">
           {data.used_pccs_count_sum_distribution && (
             <HueDistributionVisualization data={data.used_pccs_count_sum_distribution} />
           )}
@@ -51,13 +51,13 @@ export default function IllustratorStatistics({ data, isExpanded = false }: Illu
       </div>
 
       {/* 下部: その他の統計情報を横二列で表示 */}
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-1">
         {/* 左列: 有彩色数分布 */}
         <div>
-          <h4 className="text-sm font-medium text-foreground mb-1">有彩色数分布</h4>
-          <div className="bg-background border rounded p-2">
+          <h4 className="text-xs font-medium text-foreground mb-0">有彩色数分布</h4>
+          <div className="bg-background border rounded p-1">
             {/* ラベル行 */}
-            <div className="flex items-center gap-0.5 mb-1">
+            <div className="flex items-center gap-0.5 mb-0.5">
               {data.chromatic_colors_count_distribution?.slice(0, 8).map((count: number, index: number) => (
                 <div key={index} className="flex-1 text-center">
                   <span className="text-xs text-muted-foreground">{index}色</span>
@@ -66,10 +66,10 @@ export default function IllustratorStatistics({ data, isExpanded = false }: Illu
             </div>
             
             {/* バー表示行 */}
-            <div className="flex items-end gap-0.5 h-12">
+            <div className="flex items-end gap-0.5 h-8">
               {data.chromatic_colors_count_distribution?.slice(0, 8).map((count: number, index: number) => {
                 const maxCount = Math.max(...data.chromatic_colors_count_distribution.slice(0, 8));
-                const height = maxCount > 0 ? (count / maxCount) * 40 : 0; // 最大40px
+                const height = maxCount > 0 ? (count / maxCount) * 24 : 0; // 最大24px
                 
                 return (
                   <div key={index} className="flex-1 flex flex-col items-center group">
@@ -84,7 +84,7 @@ export default function IllustratorStatistics({ data, isExpanded = false }: Illu
                         </div>
                       </div>
                     </div>
-                    <div className="mt-0.5 text-xs font-medium text-foreground">
+                    <div className="mt-0 text-xs font-medium text-foreground">
                       {count}
                     </div>
                   </div>
@@ -96,10 +96,10 @@ export default function IllustratorStatistics({ data, isExpanded = false }: Illu
 
         {/* 右列: 彩度・明度分布 */}
         <div>
-          <h4 className="text-sm font-medium text-foreground mb-1">彩度・明度分布</h4>
+          <h4 className="text-xs font-medium text-foreground mb-0">彩度・明度分布</h4>
           
           {/* ヒートマップ表示 */}
-          <div className="bg-background border rounded p-2">
+          <div className="bg-background border rounded p-1">
             
             {/* ヒートマップグリッド */}
             <div className="space-y-0.5">
@@ -127,7 +127,7 @@ export default function IllustratorStatistics({ data, isExpanded = false }: Illu
                         return (
                           <div
                             key={colIndex}
-                            className="group relative h-6 rounded border border-border/50 flex items-center justify-center transition-all duration-200 hover:scale-105 overflow-hidden"
+                            className="group relative h-4 rounded border border-border/50 flex items-center justify-center transition-all duration-200 hover:scale-105 overflow-hidden"
                             style={{ backgroundColor: actualColor }}
                           >
                             {/* 使用量オーバーレイ */}
