@@ -31,7 +31,8 @@ export default function HueDistributionVisualization({ data }: HueDistributionVi
       <div className="w-full overflow-x-auto">
         <div className="flex items-end gap-0 min-w-max">
           {normalizedData.map((value, index) => {
-            if (value < 1) return null; // 値が小さいものは表示しない
+            // 値が0の場合は高さ0で表示、それ以外は最小10pxを保証
+            const height = value === 0 ? 0 : Math.max(value * 1, 10);
             
             return (
               <div key={index} className="group relative">
@@ -39,7 +40,7 @@ export default function HueDistributionVisualization({ data }: HueDistributionVi
                   className="flex-shrink-0 flex flex-col items-center"
                   style={{ 
                     width: '20px', // より細い幅に変更
-                    height: `${Math.max(value * 1, 10)}px`, // 高さを半分に（最小10px）
+                    height: `${height}px`, // 0の場合は高さ0、それ以外は最小10px
                     backgroundColor: generateHueColor(index),
                     border: '1px solid rgba(0,0,0,0.1)'
                   }}
