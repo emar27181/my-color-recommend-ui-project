@@ -25,10 +25,10 @@ export default function HueDistributionVisualization({ data }: HueDistributionVi
 
   return (
     <div>
-      <h4 className="text-base font-medium text-foreground mb-4">色相使用分布</h4>
+      <h4 className="text-base font-medium text-foreground mb-2">色相使用分布</h4>
       
       {/* 円環形式で色相分布を表示 */}
-      <div className="flex justify-center">
+      <div className="flex justify-center -my-2">
         <svg width="300" height="300" viewBox="0 0 300 300" className="transform -rotate-90">
           {normalizedData.map((value, index) => {
             // 値が0の場合は高さ0で表示、それ以外は最小値を保証
