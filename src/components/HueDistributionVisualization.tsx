@@ -27,36 +27,67 @@ export default function HueDistributionVisualization({ data }: HueDistributionVi
     <div>
       <h4 className="text-base font-medium text-foreground mb-4">色相使用分布</h4>
       
-      {/* 詳細分布をメイン表示に */}
-      <div className="w-full overflow-x-auto">
-        <div className="flex items-end gap-0 min-w-max">
+      {/* 円環形式で色相分布を表示 */}
+      <div className="flex justify-center">
+        <svg width="300" height="300" viewBox="0 0 300 300" className="transform -rotate-90">
           {normalizedData.map((value, index) => {
-            // 値が0の場合は高さ0で表示、それ以外は最小10pxを保証
-            const height = value === 0 ? 0 : Math.max(value * 1, 10);
+            // 値が0の場合は高さ0で表示、それ以外は最小値を保証
+            const height = value === 0 ? 0 : Math.max(value * 0.8, 8);
             
-            return (
-              <div key={index} className="group relative">
-                <div 
-                  className="flex-shrink-0 flex flex-col items-center"
-                  style={{ 
-                    width: '20px', // より細い幅に変更
-                    height: `${height}px`, // 0の場合は高さ0、それ以外は最小10px
-                    backgroundColor: generateHueColor(index),
-                    border: '1px solid rgba(0,0,0,0.1)'
-                  }}
-                ></div>
-              
-              {/* ツールチップ */}
-              <div className="absolute bottom-full mb-2 hidden group-hover:block bg-background border rounded px-2 py-1 text-xs whitespace-nowrap z-10 left-1/2 transform -translate-x-1/2">
-                <div className="text-center">
-                  <div className="font-medium">使用数: {data[index]}</div>
-                  <div className="text-muted-foreground">色相: {(index * 15)}°</div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-        </div>
+            // 24分割の角度計算（15度ずつ）
+            const angle = (index * 15) * (Math.PI / 180);
+            const innerRadius = 60;
+            const outerRadius = innerRadius + height;
+            
+            // セクターの開始・終了角度（15度幅）
+            const startAngle = angle - (7.5 * Math.PI / 180);
+            const endAngle = angle + (7.5 * Math.PI / 180);
+            
+            // セクターのパス計算
+            const x1 = 150 + innerRadius * Math.cos(startAngle);
+            const y1 = 150 + innerRadius * Math.sin(startAngle);
+            const x2 = 150 + outerRadius * Math.cos(startAngle);
+            const y2 = 150 + outerRadius * Math.sin(startAngle);
+            const x3 = 150 + outerRadius * Math.cos(endAngle);
+            const y3 = 150 + outerRadius * Math.sin(endAngle);
+            const x4 = 150 + innerRadius * Math.cos(endAngle);
+            const y4 = 150 + innerRadius * Math.sin(endAngle);
+            
+            const largeArcFlag = 0; // 15度なので常に小さい弧
+            
+            const pathData = height > 0 ? 
+              `M ${x1} ${y1} L ${x2} ${y2} A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 1 ${x3} ${y3} L ${x4} ${y4} A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${x1} ${y1}` :
+              '';
+            
+            return height > 0 ? (
+              <g key={index} className="group">
+                <path
+                  d={pathData}
+                  fill={generateHueColor(index)}
+                  stroke="rgba(0,0,0,0.1)"
+                  strokeWidth="0.5"
+                />
+                
+                {/* ツールチップトリガー用の透明セクター */}
+                <path
+                  d={`M 150 150 L ${x1} ${y1} A ${innerRadius + 40} ${innerRadius + 40} 0 ${largeArcFlag} 1 ${x4} ${y4} Z`}
+                  fill="transparent"
+                  className="cursor-pointer"
+                />
+                
+                {/* ツールチップ - SVG内では表示が困難なため簡略化 */}
+              </g>
+            ) : null;
+          })}
+          
+          {/* 中心円 */}
+          <circle cx="150" cy="150" r="60" fill="none" stroke="#e5e7eb" strokeWidth="1" />
+        </svg>
+      </div>
+      
+      {/* ツールチップ情報を下部に表示 */}
+      <div className="mt-4 text-center text-xs text-muted-foreground">
+        各セクターは15度間隔の色相を表示、長さは使用量に比例
       </div>
     </div>
   );
