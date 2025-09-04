@@ -131,7 +131,7 @@ export default function SnsAnalysisPage() {
                                 <p className="text-muted-foreground">統計データを読み込み中...</p>
                               </div>
                             ) : statisticsData ? (
-                              <IllustratorStatistics data={statisticsData} isExpanded={true} />
+                              <IllustratorStatistics data={statisticsData} isExpanded={true} name={name} />
                             ) : (
                               <div className="py-6 text-center">
                                 <p className="text-muted-foreground">データが見つかりません</p>

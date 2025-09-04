@@ -1,11 +1,13 @@
 import HueDistributionVisualization from "./HueDistributionVisualization";
+import { ExternalLink } from "lucide-react";
 
 interface IllustratorStatisticsProps {
   data: any;
   isExpanded?: boolean;
+  name?: string;
 }
 
-export default function IllustratorStatistics({ data, isExpanded = false }: IllustratorStatisticsProps) {
+export default function IllustratorStatistics({ data, isExpanded = false, name }: IllustratorStatisticsProps) {
   if (!data) {
     return null;
   }
@@ -24,7 +26,20 @@ export default function IllustratorStatistics({ data, isExpanded = false }: Illu
         <div className="bg-background border rounded p-3 space-y-3">
           {/* 基本統計情報セクション */}
           <div className="border rounded p-2">
-            <h4 className="text-xs font-medium text-foreground mb-2 px-1">基本統計</h4>
+            <div className="flex items-center gap-2 mb-2 px-1">
+              <h4 className="text-xs font-medium text-foreground">基本統計</h4>
+              {name && (
+                <a
+                  href={`https://instagram.com/${name}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <span>(@{name})</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              )}
+            </div>
             <div className="space-y-1 text-xs px-1">
               <div>
                 <span className="text-muted-foreground">有彩色: </span>
