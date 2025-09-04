@@ -63,28 +63,103 @@ export default function IllustratorStatistics({ data, isExpanded = false }: Illu
         <HueDistributionVisualization data={data.used_pccs_count_sum_distribution} />
       )}
 
-      {/* 彩度・明度分布（簡略版） */}
+      {/* 彩度・明度分布（ヒートマップ） */}
       <div>
         <h4 className="text-base font-medium text-foreground mb-3">彩度・明度分布</h4>
-        <div className="grid grid-cols-5 gap-1">
-          {data.saturation_lightness_count_distribution?.map((row: number[], rowIndex: number) => (
-            <div key={rowIndex} className="space-y-1">
-              <span className="text-xs text-muted-foreground text-center block">S{rowIndex + 1}</span>
-              {row.map((count: number, colIndex: number) => (
-                <div key={colIndex} className="relative h-6 bg-muted/30 rounded text-center">
-                  <div 
-                    className="bg-gradient-to-r from-blue-400 to-red-400 h-full rounded"
-                    style={{ 
-                      opacity: count > 0 ? Math.min(count / 150, 0.8) : 0.1 
-                    }}
-                  ></div>
-                  <span className="absolute inset-0 flex items-center justify-center text-xs font-medium text-foreground">
-                    {count}
-                  </span>
+        
+        {/* ヒートマップ表示 */}
+        <div className="bg-background border rounded-lg p-4">
+          
+          {/* ヒートマップグリッド */}
+          <div className="space-y-1">
+            {data.saturation_lightness_count_distribution?.map((row: number[], rowIndex: number) => {
+              // 最大値を計算してスケーリング
+              const maxInRow = Math.max(...row, 1);
+              const globalMax = Math.max(...data.saturation_lightness_count_distribution.flat(), 1);
+              
+              return (
+                <div key={rowIndex} className="flex items-center gap-1">
+                  {/* ヒートマップセル */}
+                  <div className="w-full grid grid-cols-5 gap-1">
+                    {row.map((count: number, colIndex: number) => {
+                      // 実際の彩度明度値を計算（0-1の範囲）
+                      const saturation = (rowIndex + 1) / 5; // S1=0.2, S2=0.4, ..., S5=1.0
+                      const lightness = (colIndex + 1) / 5;  // L1=0.2, L2=0.4, ..., L5=1.0
+                      
+                      // 色相0度（赤）固定でHSLカラーを生成
+                      const actualColor = `hsl(0, ${saturation * 100}%, ${lightness * 100}%)`;
+                      
+                      // ヒート強度を計算（使用量による透明度）
+                      const intensity = count / globalMax;
+                      const overlayOpacity = intensity > 0 ? Math.max(intensity * 0.4, 0.1) : 0;
+                      
+                      return (
+                        <div
+                          key={colIndex}
+                          className="group relative h-8 rounded border border-border/50 flex items-center justify-center transition-all duration-200 hover:scale-105 overflow-hidden"
+                          style={{ backgroundColor: actualColor }}
+                        >
+                          {/* 使用量オーバーレイ */}
+                          {intensity > 0 && (
+                            <div 
+                              className="absolute inset-0 bg-blue-500 pointer-events-none"
+                              style={{ opacity: overlayOpacity }}
+                            ></div>
+                          )}
+                          
+                          {/* 数値表示 */}
+                          <span 
+                            className="relative z-10 text-xs font-medium transition-colors drop-shadow-sm"
+                            style={{ 
+                              color: lightness > 0.5 ? '#000000' : '#ffffff', // 明度に応じてテキスト色を調整
+                              textShadow: lightness > 0.5 ? 'none' : '0 0 2px rgba(0,0,0,0.8)'
+                            }}
+                          >
+                            {count > 0 ? count : ''}
+                          </span>
+                          
+                          {/* ツールチップ */}
+                          <div className="absolute bottom-full mb-2 hidden group-hover:block bg-popover border rounded px-2 py-1 text-xs whitespace-nowrap z-20">
+                            <div className="text-center">
+                              <div className="font-medium">使用数: {count}</div>
+                              <div className="text-xs text-muted-foreground">
+                                彩度: {(saturation * 100).toFixed(0)}%, 明度: {(lightness * 100).toFixed(0)}%
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-              ))}
+              );
+            })}
+          </div>
+          
+          {/* 凡例 */}
+          <div className="mt-4 space-y-2 text-xs text-muted-foreground">
+            <div className="text-center">
+              <span>背景色: 実際の彩度・明度の色（色相0度固定）</span>
             </div>
-          ))}
+            <div className="flex items-center justify-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded border relative" style={{ backgroundColor: 'hsl(0, 60%, 50%)' }}>
+                  <div className="absolute inset-0 bg-blue-500 rounded" style={{ opacity: 0.4 }}></div>
+                </div>
+                <span>高使用</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded border relative" style={{ backgroundColor: 'hsl(0, 60%, 50%)' }}>
+                  <div className="absolute inset-0 bg-blue-500 rounded" style={{ opacity: 0.2 }}></div>
+                </div>
+                <span>中使用</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded border" style={{ backgroundColor: 'hsl(0, 60%, 50%)' }}></div>
+                <span>未使用</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
