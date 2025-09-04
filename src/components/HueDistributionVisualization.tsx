@@ -38,7 +38,7 @@ export default function HueDistributionVisualization({ data }: HueDistributionVi
                 <div 
                   className="flex-shrink-0 flex flex-col items-center"
                   style={{ 
-                    width: '120px', // 固定幅を大きく
+                    width: '20px', // より細い幅に変更
                     height: `${Math.max(value * 1, 10)}px`, // 高さを半分に（最小10px）
                     backgroundColor: generateHueColor(index),
                     border: '1px solid rgba(0,0,0,0.1)'
