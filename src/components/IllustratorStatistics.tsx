@@ -38,36 +38,6 @@ export default function IllustratorStatistics({ data, isExpanded = false }: Illu
         </div>
       </div>
 
-      {/* 詳細統計情報 */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-4 border-t">
-        <div className="text-center">
-          <p className="text-2xl font-bold text-foreground">
-            {data.chromatic_colors_count_ave?.toFixed(2)}
-          </p>
-          <p className="text-sm text-muted-foreground">有彩色平均数</p>
-        </div>
-        
-        <div className="text-center">
-          <p className="text-2xl font-bold text-foreground">
-            {data.achromatic_colors_count_ave?.toFixed(2)}
-          </p>
-          <p className="text-sm text-muted-foreground">無彩色平均数</p>
-        </div>
-        
-        <div className="text-center">
-          <p className="text-2xl font-bold text-foreground">
-            {(data.chromatic_colors_rate_ave * 100)?.toFixed(1)}%
-          </p>
-          <p className="text-sm text-muted-foreground">有彩色率</p>
-        </div>
-        
-        <div className="text-center">
-          <p className="text-2xl font-bold text-primary">
-            {data.mean_resultant_length_ave?.toFixed(4)}
-          </p>
-          <p className="text-sm text-muted-foreground">色統一性指標</p>
-        </div>
-      </div>
 
       {/* 有彩色数分布 */}
       <div>
