@@ -23,7 +23,9 @@ export default function IllustratorStatistics({ data, isExpanded = false }: Illu
         {/* 左列: 基本統計情報、有彩色数分布、彩度・明度分布 */}
         <div className="space-y-1">
           {/* 基本統計情報 */}
-          <div className="bg-background border rounded p-1 space-y-0.5 text-xs">
+          <div>
+            <h4 className="text-xs font-medium text-foreground mb-0">基本統計</h4>
+            <div className="bg-background border rounded p-1 space-y-0.5 text-xs">
             <div>
               <span className="text-muted-foreground">有彩色: </span>
               <span className="font-medium">{data.chromatic_colors_count_ave?.toFixed(1)}</span>
@@ -39,6 +41,7 @@ export default function IllustratorStatistics({ data, isExpanded = false }: Illu
             <div>
               <span className="text-muted-foreground">統一性: </span>
               <span className="font-medium">{data.mean_resultant_length_ave?.toFixed(3)}</span>
+            </div>
             </div>
           </div>
 
