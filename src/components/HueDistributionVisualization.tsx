@@ -72,26 +72,23 @@ export default function HueDistributionVisualization({ data }: HueDistributionVi
       {/* 詳細分布を横一列で表示 */}
       <div>
         <h5 className="text-sm font-medium text-foreground mb-3">詳細分布</h5>
-        <div className="flex flex-wrap gap-2 justify-center">
+        <div className="flex justify-center items-end gap-0">
           {normalizedData.map((value, index) => {
             if (value < 1) return null; // 値が小さいものは表示しない
             
             return (
-              <div key={index} className="flex flex-col items-center gap-1 group relative">
+              <div key={index} className="group relative">
                 <div 
-                  className="rounded-full flex-shrink-0"
+                  className="w-6 flex flex-col items-center"
                   style={{ 
-                    width: `${Math.max(value * 0.2, 12)}px`, // 分布に応じてサイズ変化（最小12px、最大約20px）
-                    height: `${Math.max(value * 0.2, 12)}px`,
+                    height: `${Math.max(value * 2, 20)}px`, // 高さで使用量を表現（最小20px）
                     backgroundColor: generateHueColor(index),
-                    border: '2px solid rgba(0,0,0,0.2)'
+                    border: '1px solid rgba(0,0,0,0.1)'
                   }}
                 ></div>
-                <span className="text-xs text-muted-foreground">{index * 15}°</span>
-                <span className="text-xs font-medium text-foreground">{data[index]}</span>
                 
                 {/* ツールチップ */}
-                <div className="absolute bottom-full mb-2 hidden group-hover:block bg-background border rounded px-2 py-1 text-xs whitespace-nowrap z-10">
+                <div className="absolute bottom-full mb-2 hidden group-hover:block bg-background border rounded px-2 py-1 text-xs whitespace-nowrap z-10 left-1/2 transform -translate-x-1/2">
                   <div className="text-center">
                     <div className="font-medium">使用数: {data[index]}</div>
                     <div className="text-muted-foreground">色相: {(index * 15)}°</div>
