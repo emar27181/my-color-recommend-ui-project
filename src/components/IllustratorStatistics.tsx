@@ -20,35 +20,35 @@ export default function IllustratorStatistics({ data, isExpanded = false }: Illu
     <div className="mt-1 space-y-1">
       {/* 全体を横二列で表示: 左側に統計情報、右側に色相分布 */}
       <div className="grid grid-cols-2 gap-1">
-        {/* 左列: 基本統計情報、有彩色数分布、彩度・明度分布 */}
-        <div className="space-y-1">
-          {/* 基本統計情報 */}
-          <div>
-            <h4 className="text-xs font-medium text-foreground mb-0">基本統計</h4>
-            <div className="bg-background border rounded p-1 space-y-0.5 text-xs">
-            <div>
-              <span className="text-muted-foreground">有彩色: </span>
-              <span className="font-medium">{data.chromatic_colors_count_ave?.toFixed(1)}</span>
-            </div>
-            <div>
-              <span className="text-muted-foreground">無彩色: </span>
-              <span className="font-medium">{data.achromatic_colors_count_ave?.toFixed(1)}</span>
-            </div>
-            <div>
-              <span className="text-muted-foreground">有彩色率: </span>
-              <span className="font-medium">{(data.chromatic_colors_rate_ave * 100)?.toFixed(1)}%</span>
-            </div>
-            <div>
-              <span className="text-muted-foreground">統一性: </span>
-              <span className="font-medium">{data.mean_resultant_length_ave?.toFixed(3)}</span>
-            </div>
+        {/* 左列: 統計データセクション */}
+        <div className="bg-background border rounded p-2 space-y-2">
+          {/* 基本統計情報セクション */}
+          <div className="border rounded p-1">
+            <h4 className="text-xs font-medium text-foreground mb-1 px-1">基本統計</h4>
+            <div className="space-y-0.5 text-xs px-1">
+              <div>
+                <span className="text-muted-foreground">有彩色: </span>
+                <span className="font-medium">{data.chromatic_colors_count_ave?.toFixed(1)}</span>
+              </div>
+              <div>
+                <span className="text-muted-foreground">無彩色: </span>
+                <span className="font-medium">{data.achromatic_colors_count_ave?.toFixed(1)}</span>
+              </div>
+              <div>
+                <span className="text-muted-foreground">有彩色率: </span>
+                <span className="font-medium">{(data.chromatic_colors_rate_ave * 100)?.toFixed(1)}%</span>
+              </div>
+              <div>
+                <span className="text-muted-foreground">統一性: </span>
+                <span className="font-medium">{data.mean_resultant_length_ave?.toFixed(3)}</span>
+              </div>
             </div>
           </div>
 
-          {/* 有彩色数分布 */}
-          <div>
-            <h4 className="text-xs font-medium text-foreground mb-0">有彩色数分布</h4>
-            <div className="bg-background border rounded p-1">
+          {/* 有彩色数分布セクション */}
+          <div className="border rounded p-1">
+            <h4 className="text-xs font-medium text-foreground mb-1 px-1">有彩色数分布</h4>
+            <div className="px-1">
               {/* ラベル行 */}
               <div className="flex items-center gap-0.5 mb-0.5">
                 {data.chromatic_colors_count_distribution?.slice(0, 8).map((count: number, index: number) => (
@@ -87,13 +87,10 @@ export default function IllustratorStatistics({ data, isExpanded = false }: Illu
             </div>
           </div>
 
-          {/* 彩度・明度分布 */}
-          <div>
-            <h4 className="text-xs font-medium text-foreground mb-0">彩度・明度分布</h4>
-            
-            {/* ヒートマップ表示 */}
-            <div className="bg-background border rounded p-1">
-              
+          {/* 彩度・明度分布セクション */}
+          <div className="border rounded p-1">
+            <h4 className="text-xs font-medium text-foreground mb-1 px-1">彩度・明度分布</h4>
+            <div className="px-1">
               {/* ヒートマップグリッド */}
               <div className="space-y-0.5">
                 {data.saturation_lightness_count_distribution?.map((row: number[], rowIndex: number) => {
@@ -159,13 +156,12 @@ export default function IllustratorStatistics({ data, isExpanded = false }: Illu
                   );
                 })}
               </div>
-              
             </div>
           </div>
         </div>
 
-        {/* 右列: 色相分布 */}
-        <div className="-m-3 -mt-4">
+        {/* 右列: 色相分布セクション */}
+        <div className="bg-background border rounded p-2 -m-3 -mt-4">
           {data.used_pccs_count_sum_distribution && (
             <HueDistributionVisualization data={data.used_pccs_count_sum_distribution} />
           )}
