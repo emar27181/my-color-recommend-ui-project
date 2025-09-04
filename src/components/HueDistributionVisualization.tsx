@@ -85,10 +85,6 @@ export default function HueDistributionVisualization({ data }: HueDistributionVi
         </svg>
       </div>
       
-      {/* ツールチップ情報を下部に表示 */}
-      <div className="mt-4 text-center text-xs text-muted-foreground">
-        各セクターは15度間隔の色相を表示、長さは使用量に比例
-      </div>
     </div>
   );
 }

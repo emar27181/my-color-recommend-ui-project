@@ -136,30 +136,6 @@ export default function IllustratorStatistics({ data, isExpanded = false }: Illu
             })}
           </div>
           
-          {/* 凡例 */}
-          <div className="mt-4 space-y-2 text-xs text-muted-foreground">
-            <div className="text-center">
-              <span>背景色: 実際の彩度・明度の色（色相0度固定）</span>
-            </div>
-            <div className="flex items-center justify-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded border relative" style={{ backgroundColor: 'hsl(0, 60%, 50%)' }}>
-                  <div className="absolute inset-0 bg-blue-500 rounded" style={{ opacity: 0.4 }}></div>
-                </div>
-                <span>高使用</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded border relative" style={{ backgroundColor: 'hsl(0, 60%, 50%)' }}>
-                  <div className="absolute inset-0 bg-blue-500 rounded" style={{ opacity: 0.2 }}></div>
-                </div>
-                <span>中使用</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded border" style={{ backgroundColor: 'hsl(0, 60%, 50%)' }}></div>
-                <span>未使用</span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
