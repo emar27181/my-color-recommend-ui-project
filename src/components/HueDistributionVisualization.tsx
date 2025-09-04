@@ -36,7 +36,7 @@ export default function HueDistributionVisualization({ data }: HueDistributionVi
             
             // 24分割の角度計算（15度ずつ）
             const angle = (index * 15) * (Math.PI / 180);
-            const innerRadius = 60;
+            const innerRadius = 30; // 60から30に縮小
             const outerRadius = innerRadius + height;
             
             // セクターの開始・終了角度（15度幅）
@@ -81,7 +81,7 @@ export default function HueDistributionVisualization({ data }: HueDistributionVi
           })}
           
           {/* 中心円 */}
-          <circle cx="150" cy="150" r="60" fill="none" stroke="#e5e7eb" strokeWidth="1" />
+          <circle cx="150" cy="150" r="30" fill="none" stroke="#e5e7eb" strokeWidth="1" />
         </svg>
       </div>
       
