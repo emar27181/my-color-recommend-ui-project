@@ -99,8 +99,9 @@ export default function SaturationLightnessHeatmap({
 
   const options = {
     responsive: false, // 固定サイズに設定
-    maintainAspectRatio: true,
-    aspectRatio: 1, // 1:1の正方形に設定
+    maintainAspectRatio: false, // aspectRatioを無効にして固定サイズを優先
+    width: 256,
+    height: 256, // 完全に正方形に設定
     plugins: {
       legend: {
         display: false,
@@ -144,6 +145,7 @@ export default function SaturationLightnessHeatmap({
         max: 100,
         grid: {
           color: 'rgba(113, 113, 122, 0.2)',
+          display: true
         },
         ticks: {
           stepSize: 20,
@@ -151,12 +153,9 @@ export default function SaturationLightnessHeatmap({
           font: {
             size: 9
           },
+          values: [0, 20, 40, 60, 80, 100], // 5x5グリッドに合わせた目盛り
           callback: function(value: any) {
-            // 5x5グリッドに合わせたラベル: 10%, 30%, 50%, 70%, 90%
-            if ([10, 30, 50, 70, 90].includes(value)) {
-              return value + '%';
-            }
-            return '';
+            return value + '%';
           }
         }
       },
@@ -174,6 +173,7 @@ export default function SaturationLightnessHeatmap({
         max: 100,
         grid: {
           color: 'rgba(113, 113, 122, 0.2)',
+          display: true
         },
         ticks: {
           stepSize: 20,
@@ -181,12 +181,9 @@ export default function SaturationLightnessHeatmap({
           font: {
             size: 9
           },
+          values: [0, 20, 40, 60, 80, 100], // 5x5グリッドに合わせた目盛り
           callback: function(value: any) {
-            // 5x5グリッドに合わせたラベル: 10%, 30%, 50%, 70%, 90%
-            if ([10, 30, 50, 70, 90].includes(value)) {
-              return value + '%';
-            }
-            return '';
+            return value + '%';
           }
         }
       }
