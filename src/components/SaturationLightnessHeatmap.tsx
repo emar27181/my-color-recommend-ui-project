@@ -28,71 +28,88 @@ export default function SaturationLightnessHeatmap({
   data, 
   title = "彩度・明度分布ヒートマップ" 
 }: SaturationLightnessHeatmapProps) {
-  const chartData = useMemo(() => {
+  const { chartData, maxValue } = useMemo(() => {
     if (!data || !Array.isArray(data)) {
-      return { datasets: [] };
+      return { chartData: { datasets: [] }, maxValue: 0 };
     }
 
-    const points: { x: number; y: number; v: number }[] = [];
-    const maxValue = Math.max(...data.flat(), 1);
+    const points: { x: number; y: number; v: number; rawValue: number }[] = [];
+    const maxValue = Math.max(...data.flat(), 0.001); // 0除算を避ける
 
-    // 5x5のグリッドから散布図用のデータポイントを生成
-    data.forEach((row, rowIndex) => {
-      row.forEach((value, colIndex) => {
-        if (value > 0) {
-          // 彩度（x軸）: 0-100%、明度（y軸）: 0-100%
-          const saturation = ((colIndex + 0.5) / 5) * 100; // 10%, 30%, 50%, 70%, 90%
-          const lightness = ((4 - rowIndex + 0.5) / 5) * 100; // 90%, 70%, 50%, 30%, 10% (Y軸反転)
-          
-          points.push({
-            x: saturation,
-            y: lightness,
-            v: value / maxValue // 正規化された値（0-1）
-          });
+    // 10x10の高密度グリッドでヒートマップを生成
+    Array.from({ length: 10 }, (_, rowIndex) => {
+      Array.from({ length: 10 }, (_, colIndex) => {
+        // 彩度（x軸）: 5%, 15%, 25%, ..., 95%
+        const saturation = ((colIndex + 0.5) / 10) * 100;
+        // 明度（y軸）: 95%, 85%, 75%, ..., 5% (上が明るい)
+        const lightness = ((9 - rowIndex + 0.5) / 10) * 100;
+        
+        // 元の5x5データから対応する値を取得
+        const origRowIndex = Math.floor(rowIndex / 2);
+        const origColIndex = Math.floor(colIndex / 2);
+        let value = 0;
+        
+        if (origRowIndex < 5 && origColIndex < 5 && data[origRowIndex] && data[origRowIndex][origColIndex]) {
+          value = data[origRowIndex][origColIndex];
         }
+        
+        // 値が0でも表示（ヒートマップらしくするため）
+        points.push({
+          x: saturation,
+          y: lightness,
+          v: value / maxValue, // 正規化された値（0-1）
+          rawValue: value
+        });
       });
     });
 
     return {
-      datasets: [
-        {
-          label: '使用頻度',
-          data: points,
-          backgroundColor: (context: any) => {
-            const point = context.raw;
-            const intensity = point.v;
-            
-            // 彩度・明度に基づいて基本色を決定
-            const saturation = point.x;
-            const lightness = point.y;
-            const hue = 0; // 赤色固定
-            
-            // HSLからRGBに変換して、使用頻度に基づいて青のオーバーレイを追加
-            const baseColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-            const overlayOpacity = Math.max(intensity * 0.7, 0.3);
-            
-            return `rgba(59, 130, 246, ${overlayOpacity})`; // 青色オーバーレイ
-          },
-          borderColor: 'rgba(255, 255, 255, 0.8)',
-          borderWidth: 1,
-          pointRadius: (context: any) => {
-            const point = context.raw;
-            const intensity = point.v;
-            return Math.max(intensity * 20, 5); // 5-20pxの範囲でサイズ変更
-          },
-          pointHoverRadius: (context: any) => {
-            const point = context.raw;
-            const intensity = point.v;
-            return Math.max(intensity * 25, 8); // ホバー時少し大きく
+      chartData: {
+        datasets: [
+          {
+            label: '使用頻度',
+            data: points,
+            backgroundColor: (context: any) => {
+              const point = context.raw;
+              const intensity = point.v;
+              
+              // ヒートマップ風の色スケール（青→緑→黄→赤）
+              if (intensity === 0) {
+                return 'rgba(240, 240, 240, 0.8)'; // 薄いグレー（未使用）
+              } else if (intensity < 0.25) {
+                // 青色（低使用量）
+                const alpha = Math.max(0.4, intensity * 2);
+                return `rgba(59, 130, 246, ${alpha})`;
+              } else if (intensity < 0.5) {
+                // 緑色（中低使用量）
+                const alpha = Math.max(0.6, intensity * 1.2);
+                return `rgba(34, 197, 94, ${alpha})`;
+              } else if (intensity < 0.75) {
+                // 黄色（中高使用量）
+                const alpha = Math.max(0.7, intensity * 1.1);
+                return `rgba(234, 179, 8, ${alpha})`;
+              } else {
+                // 赤色（高使用量）
+                const alpha = Math.max(0.8, intensity);
+                return `rgba(239, 68, 68, ${alpha})`;
+              }
+            },
+            borderColor: 'rgba(255, 255, 255, 0.3)',
+            borderWidth: 0.5,
+            pointRadius: 8, // 統一サイズでヒートマップらしく
+            pointHoverRadius: 10,
+            pointStyle: 'rect' // 四角形でヒートマップらしく
           }
-        }
-      ]
+        ]
+      },
+      maxValue
     };
   }, [data]);
 
   const options = {
     responsive: true,
-    maintainAspectRatio: false,
+    maintainAspectRatio: true,
+    aspectRatio: 1, // 1:1の正方形に設定
     plugins: {
       legend: {
         display: false,
@@ -114,8 +131,8 @@ export default function SaturationLightnessHeatmap({
           },
           label: (context: any) => {
             const point = context.raw;
-            const originalValue = Math.round(point.v * Math.max(...data.flat(), 1));
-            return `使用数: ${originalValue}`;
+            const intensity = (point.v * 100).toFixed(1);
+            return `使用強度: ${intensity}% (値: ${point.rawValue.toFixed(3)})`;
           }
         }
       }
@@ -182,9 +199,111 @@ export default function SaturationLightnessHeatmap({
     );
   }
 
+  // 使用率の高い色と凡例を表示するコンポーネント
+  const ColorAnalysis = () => {
+    // データから使用率の高い色を分析
+    const topColors = useMemo(() => {
+      if (!data || !Array.isArray(data)) return [];
+      
+      const colorData: { saturation: number; lightness: number; value: number; color: string }[] = [];
+      
+      data.forEach((row, rowIndex) => {
+        row.forEach((value, colIndex) => {
+          if (value > 0) {
+            const saturation = ((colIndex + 0.5) / 5) * 100;
+            const lightness = ((4 - rowIndex + 0.5) / 5) * 100;
+            const hslColor = `hsl(0, ${saturation}%, ${lightness}%)`;
+            
+            colorData.push({
+              saturation,
+              lightness,
+              value,
+              color: hslColor
+            });
+          }
+        });
+      });
+      
+      // 使用値でソートして上位3つを取得
+      return colorData
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 3);
+    }, [data]);
+
+    const scaleSteps = [
+      { intensity: 0, color: 'rgba(240, 240, 240, 0.8)', label: '未使用' },
+      { intensity: 0.125, color: 'rgba(59, 130, 246, 0.6)', label: '低' },
+      { intensity: 0.375, color: 'rgba(34, 197, 94, 0.7)', label: '中低' },
+      { intensity: 0.625, color: 'rgba(234, 179, 8, 0.8)', label: '中高' },
+      { intensity: 0.875, color: 'rgba(239, 68, 68, 0.9)', label: '高' }
+    ];
+
+    return (
+      <div className="flex flex-col space-y-4">
+        {/* 使用頻度凡例 */}
+        <div className="flex flex-col items-center space-y-2">
+          <div className="text-xs font-medium text-muted-foreground mb-1">
+            使用頻度
+          </div>
+          <div className="flex flex-col space-y-1">
+            {scaleSteps.reverse().map((step, index) => (
+              <div key={index} className="flex items-center space-x-2">
+                <div
+                  className="w-4 h-3 border border-border/30 rounded-sm"
+                  style={{ backgroundColor: step.color }}
+                />
+                <span className="text-xs text-muted-foreground min-w-[24px]">
+                  {step.label}
+                </span>
+              </div>
+            ))}
+          </div>
+          <div className="text-xs text-muted-foreground mt-2 text-center">
+            最大値: {maxValue.toFixed(3)}
+          </div>
+        </div>
+
+        {/* 使用率の高い色 */}
+        {topColors.length > 0 && (
+          <div className="border-t pt-3">
+            <div className="text-xs font-medium text-muted-foreground mb-2 text-center">
+              使用率の高い色
+            </div>
+            <div className="flex flex-col space-y-2">
+              {topColors.map((colorInfo, index) => (
+                <div key={index} className="flex items-center space-x-2">
+                  <div className="text-xs text-muted-foreground w-4">
+                    {index + 1}.
+                  </div>
+                  <div
+                    className="w-5 h-4 border border-border/50 rounded-sm"
+                    style={{ backgroundColor: colorInfo.color }}
+                  />
+                  <div className="flex flex-col text-xs">
+                    <span className="text-muted-foreground">
+                      S:{colorInfo.saturation.toFixed(0)}% L:{colorInfo.lightness.toFixed(0)}%
+                    </span>
+                    <span className="text-muted-foreground">
+                      値: {colorInfo.value.toFixed(3)}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
-    <div className="h-48">
-      <Scatter data={chartData} options={options} />
+    <div className="flex items-start space-x-4">
+      <div className="flex-1">
+        <Scatter data={chartData} options={options} />
+      </div>
+      <div className="flex-shrink-0">
+        <ColorAnalysis />
+      </div>
     </div>
   );
 }
