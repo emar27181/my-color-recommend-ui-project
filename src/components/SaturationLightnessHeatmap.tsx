@@ -36,22 +36,13 @@ export default function SaturationLightnessHeatmap({
     const points: { x: number; y: number; v: number; rawValue: number }[] = [];
     const maxValue = Math.max(...data.flat(), 0.001); // 0除算を避ける
 
-    // 10x10の高密度グリッドでヒートマップを生成
-    Array.from({ length: 10 }, (_, rowIndex) => {
-      Array.from({ length: 10 }, (_, colIndex) => {
-        // 彩度（x軸）: 5%, 15%, 25%, ..., 95%
-        const saturation = ((colIndex + 0.5) / 10) * 100;
-        // 明度（y軸）: 95%, 85%, 75%, ..., 5% (上が明るい)
-        const lightness = ((9 - rowIndex + 0.5) / 10) * 100;
-        
-        // 元の5x5データから対応する値を取得
-        const origRowIndex = Math.floor(rowIndex / 2);
-        const origColIndex = Math.floor(colIndex / 2);
-        let value = 0;
-        
-        if (origRowIndex < 5 && origColIndex < 5 && data[origRowIndex] && data[origRowIndex][origColIndex]) {
-          value = data[origRowIndex][origColIndex];
-        }
+    // 5x5のグリッドでヒートマップを生成
+    data.forEach((row, rowIndex) => {
+      row.forEach((value, colIndex) => {
+        // 彩度（x軸）: 10%, 30%, 50%, 70%, 90%
+        const saturation = ((colIndex + 0.5) / 5) * 100;
+        // 明度（y軸）: 90%, 70%, 50%, 30%, 10% (上が明るい、Y軸反転)
+        const lightness = ((4 - rowIndex + 0.5) / 5) * 100;
         
         // 値が0でも表示（ヒートマップらしくするため）
         points.push({
@@ -96,8 +87,8 @@ export default function SaturationLightnessHeatmap({
             },
             borderColor: 'rgba(255, 255, 255, 0.3)',
             borderWidth: 0.5,
-            pointRadius: 8, // 統一サイズでヒートマップらしく
-            pointHoverRadius: 10,
+            pointRadius: 25, // 5x5グリッドの升目を埋めるサイズ
+            pointHoverRadius: 27,
             pointStyle: 'rect' // 四角形でヒートマップらしく
           }
         ]
@@ -107,7 +98,7 @@ export default function SaturationLightnessHeatmap({
   }, [data]);
 
   const options = {
-    responsive: true,
+    responsive: false, // 固定サイズに設定
     maintainAspectRatio: true,
     aspectRatio: 1, // 1:1の正方形に設定
     plugins: {
@@ -159,6 +150,13 @@ export default function SaturationLightnessHeatmap({
           color: 'rgb(113, 113, 122)',
           font: {
             size: 9
+          },
+          callback: function(value: any) {
+            // 5x5グリッドに合わせたラベル: 10%, 30%, 50%, 70%, 90%
+            if ([10, 30, 50, 70, 90].includes(value)) {
+              return value + '%';
+            }
+            return '';
           }
         }
       },
@@ -182,6 +180,13 @@ export default function SaturationLightnessHeatmap({
           color: 'rgb(113, 113, 122)',
           font: {
             size: 9
+          },
+          callback: function(value: any) {
+            // 5x5グリッドに合わせたラベル: 10%, 30%, 50%, 70%, 90%
+            if ([10, 30, 50, 70, 90].includes(value)) {
+              return value + '%';
+            }
+            return '';
           }
         }
       }
@@ -263,42 +268,13 @@ export default function SaturationLightnessHeatmap({
           </div>
         </div>
 
-        {/* 使用率の高い色 */}
-        {topColors.length > 0 && (
-          <div className="border-t pt-3">
-            <div className="text-xs font-medium text-muted-foreground mb-2 text-center">
-              使用率の高い色
-            </div>
-            <div className="flex flex-col space-y-2">
-              {topColors.map((colorInfo, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <div className="text-xs text-muted-foreground w-4">
-                    {index + 1}.
-                  </div>
-                  <div
-                    className="w-5 h-4 border border-border/50 rounded-sm"
-                    style={{ backgroundColor: colorInfo.color }}
-                  />
-                  <div className="flex flex-col text-xs">
-                    <span className="text-muted-foreground">
-                      S:{colorInfo.saturation.toFixed(0)}% L:{colorInfo.lightness.toFixed(0)}%
-                    </span>
-                    <span className="text-muted-foreground">
-                      値: {colorInfo.value.toFixed(3)}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     );
   };
 
   return (
     <div className="flex items-start space-x-4">
-      <div className="flex-1">
+      <div className="w-64 h-64"> {/* 固定サイズ256x256px */}
         <Scatter data={chartData} options={options} />
       </div>
       <div className="flex-shrink-0">

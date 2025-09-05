@@ -350,7 +350,7 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
   const heatmapData = useMemo(() => {
     if (!showHeatmap) return [];
     
-    const gridSize = 20; // 20x20のグリッド
+    const gridSize = 5; // 5x5のグリッド
     const grid = Array(gridSize).fill(null).map(() => 
       Array(gridSize).fill(null).map(() => ({ usage: 0, colors: [] }))
     );
@@ -813,41 +813,6 @@ export const HueToneExtraction = () => {
                       </div>
                     </div>
 
-                    {/* 使用率の高い色 */}
-                    {visualizationData.length > 0 && (
-                      <div className="border-t pt-2">
-                        <div className="text-xs font-medium text-muted-foreground mb-1 text-center">
-                          使用率の高い色
-                        </div>
-                        <div className="flex flex-col space-y-1">
-                          {visualizationData
-                            .sort((a, b) => b.usage - a.usage)
-                            .slice(0, 3)
-                            .map((colorInfo, index) => {
-                              const [h, s, l] = chroma(colorInfo.hex).hsl();
-                              return (
-                                <div key={index} className="flex items-center space-x-1">
-                                  <div className="text-xs text-muted-foreground w-3">
-                                    {index + 1}.
-                                  </div>
-                                  <div
-                                    className="w-4 h-3 border border-border/50 rounded-sm"
-                                    style={{ backgroundColor: colorInfo.hex }}
-                                  />
-                                  <div className="flex flex-col text-xs">
-                                    <span className="text-muted-foreground">
-                                      S:{((s || 0) * 100).toFixed(0)}% L:{((l || 0) * 100).toFixed(0)}%
-                                    </span>
-                                    <span className="text-muted-foreground">
-                                      {(colorInfo.usage * 100).toFixed(1)}%
-                                    </span>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
               )}
