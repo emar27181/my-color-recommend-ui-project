@@ -68,7 +68,6 @@ export default function IllustratorStatistics({ data, isExpanded = false, name }
               <div className="space-y-0.5">
                 {data.saturation_lightness_count_distribution?.map((row: number[], rowIndex: number) => {
                   // 最大値を計算してスケーリング
-                  const maxInRow = Math.max(...row, 1);
                   const globalMax = Math.max(...data.saturation_lightness_count_distribution.flat(), 1);
                   
                   return (
@@ -146,7 +145,7 @@ export default function IllustratorStatistics({ data, isExpanded = false, name }
             <div className="px-1">
               {/* ラベル行 */}
               <div className="flex items-center gap-0.5 mb-1">
-                {data.chromatic_colors_count_distribution?.slice(0, 8).map((count: number, index: number) => (
+                {data.chromatic_colors_count_distribution?.slice(0, 8).map((_: number, index: number) => (
                   <div key={index} className="flex-1 text-center">
                     <span className="text-xs text-muted-foreground">{index}色</span>
                   </div>
