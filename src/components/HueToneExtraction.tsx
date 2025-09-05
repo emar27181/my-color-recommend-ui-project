@@ -1,8 +1,10 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { useColorStore, quantizeHue, quantizeSaturationLightness, COLOR_SCHEMES } from '@/store/colorStore';
 import { useTranslation } from 'react-i18next';
 import chroma from 'chroma-js';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { Grid3X3, Circle } from 'lucide-react';
 
 // 色相環プロット用コンポーネント
 const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedScheme }: { colors: { hex: string; usage: number }[], onHueClick?: (hue: number) => void, isQuantized: boolean, selectedColor?: string, selectedScheme?: string }) => {
@@ -325,7 +327,7 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
 };
 
 // 彩度-明度散布図用コンポーネント
-const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantized, selectedColor }: { colors: { hex: string; usage: number }[], onSaturationLightnessClick?: (saturation: number, lightness: number) => void, isQuantized: boolean, selectedColor?: string }) => {
+const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantized, selectedColor, showHeatmap = false }: { colors: { hex: string; usage: number }[], onSaturationLightnessClick?: (saturation: number, lightness: number) => void, isQuantized: boolean, selectedColor?: string, showHeatmap?: boolean }) => {
   const plotWidth = 145.8;
   const plotHeight = 145.8;
   const width = 180;
@@ -336,11 +338,68 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
       const [, s, l] = chroma(color.hex).hsl();
       const x = 20 + (s || 0) * plotWidth; // 左マージン最小化維持
       const y = 11 + plotHeight - (l || 0) * plotHeight; // 元の上マージンに戻す
-      return { x, y, color: color.hex, usage: color.usage };
+      return { x, y, color: color.hex, usage: color.usage, saturation: s || 0, lightness: l || 0 };
     } catch {
       return null;
     }
   }).filter(Boolean);
+
+  // ヒートマップ用のグリッドデータを計算
+  const heatmapData = useMemo(() => {
+    if (!showHeatmap) return [];
+    
+    const gridSize = 20; // 20x20のグリッド
+    const grid = Array(gridSize).fill(null).map(() => 
+      Array(gridSize).fill(null).map(() => ({ usage: 0, colors: [] }))
+    );
+    
+    // 各色を対応するグリッドセルに配置
+    colors.forEach(color => {
+      try {
+        const [, s, l] = chroma(color.hex).hsl();
+        const saturation = s || 0;
+        const lightness = l || 0;
+        
+        // グリッド座標を計算（0-19の範囲）
+        const gridX = Math.min(gridSize - 1, Math.floor(saturation * gridSize));
+        const gridY = Math.min(gridSize - 1, Math.floor((1 - lightness) * gridSize)); // Y軸反転
+        
+        grid[gridY][gridX].usage += color.usage;
+        grid[gridY][gridX].colors.push(color.hex);
+      } catch {
+        // 無効な色は無視
+      }
+    });
+    
+    // 最大値を取得してスケーリング用
+    const maxUsage = Math.max(...grid.flat().map(cell => cell.usage));
+    
+    return grid.map((row, y) =>
+      row.map((cell, x) => {
+        // そのセルに色がある場合は、最も使用量の多い色を代表色として選択
+        let representativeColor = '#ffffff';
+        if (cell.colors.length > 0) {
+          // 複数色がある場合は、セル内の平均色を計算
+          try {
+            representativeColor = chroma.average(cell.colors, 'hsl').hex();
+          } catch {
+            representativeColor = cell.colors[0]; // 平均計算に失敗した場合は最初の色を使用
+          }
+        }
+        
+        return {
+          x: 20 + (x / gridSize) * plotWidth,
+          y: 11 + (y / gridSize) * plotHeight,
+          width: plotWidth / gridSize,
+          height: plotHeight / gridSize,
+          usage: cell.usage,
+          intensity: maxUsage > 0 ? cell.usage / maxUsage : 0,
+          color: representativeColor,
+          hasColors: cell.colors.length > 0
+        };
+      })
+    ).flat();
+  }, [colors, showHeatmap, plotWidth, plotHeight]);
 
   // 選択中の色の彩度・明度を計算
   const selectedSLPoint = selectedColor ? (() => {
@@ -553,18 +612,43 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
         )}
 
 
-        {/* ポイント */}
-        {points.map((point, index) => point && (
-          <circle
-            key={index}
-            cx={point.x}
-            cy={point.y}
-            r={Math.max(3, point.usage * 20)}
-            fill={point.color}
-            stroke="white"
-            strokeWidth="1"
-          />
-        ))}
+        {/* ヒートマップまたは散布図の表示 */}
+        {showHeatmap ? (
+          // ヒートマップ表示
+          heatmapData.map((cell, index) => {
+            if (!cell.hasColors) return null;
+            
+            // 実際の色を使用し、強度に基づいて透明度を調整
+            const opacity = Math.max(0.5, Math.min(1.0, cell.intensity * 0.8 + 0.3));
+            
+            return (
+              <rect
+                key={`heatmap-${index}`}
+                x={cell.x}
+                y={cell.y}
+                width={cell.width}
+                height={cell.height}
+                fill={cell.color}
+                fillOpacity={opacity}
+                stroke="rgba(0,0,0,0.3)"
+                strokeWidth="0.5"
+              />
+            );
+          })
+        ) : (
+          // 散布図表示（既存のポイント）
+          points.map((point, index) => point && (
+            <circle
+              key={index}
+              cx={point.x}
+              cy={point.y}
+              r={Math.max(3, point.usage * 20)}
+              fill={point.color}
+              stroke="white"
+              strokeWidth="1"
+            />
+          ))
+        )}
 
         {/* 選択中の色の強調表示 */}
         {selectedSLPoint && (
@@ -585,6 +669,7 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
 
 export const HueToneExtraction = () => {
   const { extractedColors, selectedColor, setSelectedColor, isQuantizationEnabled, selectedScheme } = useColorStore();
+  const [showHeatmap, setShowHeatmap] = useState(false);
 
   const { t } = useTranslation();
 
@@ -649,10 +734,34 @@ export const HueToneExtraction = () => {
           )}
 
 
+          {/* 切り替えボタン */}
+          <div className="flex justify-center mb-2">
+            <div className="flex bg-muted rounded-md p-1">
+              <Button
+                variant={!showHeatmap ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setShowHeatmap(false)}
+                className="h-8 px-2"
+              >
+                <Circle className="w-3 h-3 mr-1 text-foreground" />
+                <span className="text-xs">散布図</span>
+              </Button>
+              <Button
+                variant={showHeatmap ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setShowHeatmap(true)}
+                className="h-8 px-2"
+              >
+                <Grid3X3 className="w-3 h-3 mr-1 text-foreground" />
+                <span className="text-xs">ヒートマップ</span>
+              </Button>
+            </div>
+          </div>
+
           {/* 色相・トーンの可視化を常に表示 */}
           <div className="flex flex-col space-y-0">
             <HueWheel colors={visualizationData} onHueClick={handleHueClick} isQuantized={isQuantizationEnabled} selectedColor={selectedColor} selectedScheme={selectedScheme} />
-            <SaturationLightnessPlot colors={visualizationData} onSaturationLightnessClick={handleSaturationLightnessClick} isQuantized={isQuantizationEnabled} selectedColor={selectedColor} />
+            <SaturationLightnessPlot colors={visualizationData} onSaturationLightnessClick={handleSaturationLightnessClick} isQuantized={isQuantizationEnabled} selectedColor={selectedColor} showHeatmap={showHeatmap} />
           </div>
           {/* 抽出色がない場合のメッセージは下部に小さく表示 */}
           {extractedColors.length === 0 && (
