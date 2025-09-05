@@ -328,10 +328,12 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
 
 // 彩度-明度散布図用コンポーネント
 const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantized, selectedColor, showHeatmap = false }: { colors: { hex: string; usage: number }[], onSaturationLightnessClick?: (saturation: number, lightness: number) => void, isQuantized: boolean, selectedColor?: string, showHeatmap?: boolean }) => {
-  const plotWidth = 145.8;
-  const plotHeight = 145.8;
+  // 1:1の正方形にするためサイズ調整
+  const plotSize = 145.8;
+  const plotWidth = plotSize;
+  const plotHeight = plotSize;
   const width = 180;
-  const height = 214.5;
+  const height = 180; // 高さも幅に合わせて正方形に
 
   const points = colors.map(color => {
     try {
@@ -616,10 +618,28 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
         {showHeatmap ? (
           // ヒートマップ表示
           heatmapData.map((cell, index) => {
-            if (!cell.hasColors) return null;
+            // ヒートマップらしい色スケール（青→緑→黄→赤）
+            let fillColor = 'rgba(240, 240, 240, 0.8)'; // デフォルト（未使用）
             
-            // 実際の色を使用し、強度に基づいて透明度を調整
-            const opacity = Math.max(0.5, Math.min(1.0, cell.intensity * 0.8 + 0.3));
+            if (cell.hasColors && cell.intensity > 0) {
+              if (cell.intensity < 0.25) {
+                // 青色（低使用量）
+                const alpha = Math.max(0.4, cell.intensity * 2);
+                fillColor = `rgba(59, 130, 246, ${alpha})`;
+              } else if (cell.intensity < 0.5) {
+                // 緑色（中低使用量）
+                const alpha = Math.max(0.6, cell.intensity * 1.2);
+                fillColor = `rgba(34, 197, 94, ${alpha})`;
+              } else if (cell.intensity < 0.75) {
+                // 黄色（中高使用量）
+                const alpha = Math.max(0.7, cell.intensity * 1.1);
+                fillColor = `rgba(234, 179, 8, ${alpha})`;
+              } else {
+                // 赤色（高使用量）
+                const alpha = Math.max(0.8, cell.intensity);
+                fillColor = `rgba(239, 68, 68, ${alpha})`;
+              }
+            }
             
             return (
               <rect
@@ -628,10 +648,9 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
                 y={cell.y}
                 width={cell.width}
                 height={cell.height}
-                fill={cell.color}
-                fillOpacity={opacity}
-                stroke="rgba(0,0,0,0.3)"
-                strokeWidth="0.5"
+                fill={fillColor}
+                stroke="rgba(255, 255, 255, 0.3)"
+                strokeWidth="0.3"
               />
             );
           })
@@ -761,7 +780,78 @@ export const HueToneExtraction = () => {
           {/* 色相・トーンの可視化を常に表示 */}
           <div className="flex flex-col space-y-0">
             <HueWheel colors={visualizationData} onHueClick={handleHueClick} isQuantized={isQuantizationEnabled} selectedColor={selectedColor} selectedScheme={selectedScheme} />
-            <SaturationLightnessPlot colors={visualizationData} onSaturationLightnessClick={handleSaturationLightnessClick} isQuantized={isQuantizationEnabled} selectedColor={selectedColor} showHeatmap={showHeatmap} />
+            <div className="flex items-start space-x-2">
+              <div className="flex-1">
+                <SaturationLightnessPlot colors={visualizationData} onSaturationLightnessClick={handleSaturationLightnessClick} isQuantized={isQuantizationEnabled} selectedColor={selectedColor} showHeatmap={showHeatmap} />
+              </div>
+              {showHeatmap && (
+                <div className="flex-shrink-0 ml-2">
+                  <div className="flex flex-col space-y-3">
+                    {/* 使用頻度凡例 */}
+                    <div className="flex flex-col items-center space-y-1">
+                      <div className="text-xs font-medium text-muted-foreground mb-1">
+                        使用頻度
+                      </div>
+                      <div className="flex flex-col space-y-0.5">
+                        {[
+                          { color: 'rgba(239, 68, 68, 0.9)', label: '高' },
+                          { color: 'rgba(234, 179, 8, 0.8)', label: '中高' },
+                          { color: 'rgba(34, 197, 94, 0.7)', label: '中低' },
+                          { color: 'rgba(59, 130, 246, 0.6)', label: '低' },
+                          { color: 'rgba(240, 240, 240, 0.8)', label: '未使用' }
+                        ].map((step, index) => (
+                          <div key={index} className="flex items-center space-x-1">
+                            <div
+                              className="w-3 h-2 border border-border/30 rounded-sm"
+                              style={{ backgroundColor: step.color }}
+                            />
+                            <span className="text-xs text-muted-foreground">
+                              {step.label}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 使用率の高い色 */}
+                    {visualizationData.length > 0 && (
+                      <div className="border-t pt-2">
+                        <div className="text-xs font-medium text-muted-foreground mb-1 text-center">
+                          使用率の高い色
+                        </div>
+                        <div className="flex flex-col space-y-1">
+                          {visualizationData
+                            .sort((a, b) => b.usage - a.usage)
+                            .slice(0, 3)
+                            .map((colorInfo, index) => {
+                              const [h, s, l] = chroma(colorInfo.hex).hsl();
+                              return (
+                                <div key={index} className="flex items-center space-x-1">
+                                  <div className="text-xs text-muted-foreground w-3">
+                                    {index + 1}.
+                                  </div>
+                                  <div
+                                    className="w-4 h-3 border border-border/50 rounded-sm"
+                                    style={{ backgroundColor: colorInfo.hex }}
+                                  />
+                                  <div className="flex flex-col text-xs">
+                                    <span className="text-muted-foreground">
+                                      S:{((s || 0) * 100).toFixed(0)}% L:{((l || 0) * 100).toFixed(0)}%
+                                    </span>
+                                    <span className="text-muted-foreground">
+                                      {(colorInfo.usage * 100).toFixed(1)}%
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
           {/* 抽出色がない場合のメッセージは下部に小さく表示 */}
           {extractedColors.length === 0 && (
