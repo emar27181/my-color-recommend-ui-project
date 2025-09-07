@@ -1,5 +1,6 @@
 import HueDistributionVisualization from "./HueDistributionVisualization";
 import SaturationLightnessHeatmap from "./SaturationLightnessHeatmap";
+import { ColorBlock } from "./common/ColorBlock";
 import { ExternalLink } from "lucide-react";
 
 interface IllustratorStatisticsProps {
@@ -17,6 +18,32 @@ export default function IllustratorStatistics({ data, isExpanded = false, name }
     // 折りたたみ時は何も表示しない
     return null;
   }
+
+  // よく使う色相を取得する関数（使用率10%以下は除外）
+  const getTopHues = (hueDistribution: number[], maxCount: number = 5) => {
+    if (!hueDistribution || hueDistribution.length === 0) return [];
+    
+    // 全体の合計値を取得
+    const totalUsage = hueDistribution.reduce((sum, value) => sum + value, 0);
+    if (totalUsage === 0) return [];
+    
+    // インデックスと値のペアを作成
+    const hueWithIndex = hueDistribution.map((value, index) => ({
+      index,
+      value,
+      hue: (index * 15) % 360, // 15度ずつの色相
+      color: `hsl(${(index * 15) % 360}, 80%, 55%)`, // 彩度80%, 明度55%
+      percentage: (value / totalUsage) * 100 // 使用率を計算
+    }));
+    
+    // 使用率10%以上のもののみをフィルタし、値でソート（降順）して上位を取得
+    return hueWithIndex
+      .filter(item => item.value > 0 && item.percentage >= 10) // 使用率10%以上のみ
+      .sort((a, b) => b.value - a.value)
+      .slice(0, maxCount);
+  };
+
+  const topHues = getTopHues(data.used_pccs_count_sum_distribution);
 
   // 展開時は基本統計から詳細統計まで表示
   return (
@@ -58,6 +85,22 @@ export default function IllustratorStatistics({ data, isExpanded = false, name }
                 <span className="text-muted-foreground">統一性: </span>
                 <span className="font-medium">{data.mean_resultant_length_ave?.toFixed(3)}</span>
               </div>
+              
+              {/* よく使う色相 */}
+              {topHues.length > 0 && (
+                <div className="mt-2">
+                  <span className="text-muted-foreground text-xs">よく使う色相:</span>
+                  <div className="flex gap-1 mt-1">
+                    {topHues.map((hue) => (
+                      <ColorBlock
+                        key={hue.index}
+                        color={hue.color}
+                        title={`色相: ${hue.hue}° (使用率: ${hue.percentage.toFixed(1)}%)`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
