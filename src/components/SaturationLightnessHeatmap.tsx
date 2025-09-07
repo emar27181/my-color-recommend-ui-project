@@ -16,14 +16,10 @@ export default function SaturationLightnessHeatmap({
 
   // セルの色を決定する関数
   const getCellColor = (value: number, maxValue: number) => {
-    if (value === 0) {
-      return 'rgba(240, 240, 240, 0.8)'; // 薄いグレー（未使用）
-    }
-    
     const intensity = value / maxValue;
     
-    // 青色の単一色相でグラデーション表現（薄い→濃い）
-    const alpha = Math.max(0.2, Math.min(1.0, intensity));
+    // 青色の単一色相でグラデーション表現（最小0.1から最大1.0まで）
+    const alpha = Math.max(0.1, Math.min(1.0, intensity));
     return `rgba(59, 130, 246, ${alpha})`;
   };
 
@@ -37,40 +33,38 @@ export default function SaturationLightnessHeatmap({
 
 
   return (
-    <div className="flex flex-col">
-      <div className="text-xs font-medium text-muted-foreground mb-2 text-center">
+    <div className="relative">
+      {/* タイトル */}
+      <div className="text-xs font-medium text-foreground mb-2 text-center">
         {title}
       </div>
-      <div className="relative">
-        {/* 1:1の正方形ヒートマップ */}
-        <div style={{ width: '250px', height: '250px' }} className="border border-border bg-background">
-          <div className="grid grid-cols-5 grid-rows-5 gap-0 p-0" style={{ width: '250px', height: '250px' }}>
-            {data.map((row, rowIndex) =>
-              row.map((value, colIndex) => (
-                <div
-                  key={`${rowIndex}-${colIndex}`}
-                  className="group relative hover:opacity-80 transition-opacity duration-200"
-                  style={{ 
-                    backgroundColor: getCellColor(value, maxValue),
-                    width: '50px',
-                    height: '50px'
-                  }}
-                  title={`彩度: ${((colIndex + 0.5) / 5 * 100).toFixed(0)}%, 明度: ${((4 - rowIndex + 0.5) / 5 * 100).toFixed(0)}%, 値: ${value.toFixed(3)}`}
-                />
-              ))
-            )}
-          </div>
+      
+      {/* ヒートマップ */}
+      <div style={{ width: '120px', height: '120px' }} className="border border-border bg-background mx-auto">
+        <div className="grid grid-cols-5 grid-rows-5 gap-0 w-full h-full">
+          {data.map((row, rowIndex) =>
+            row.map((value, colIndex) => (
+              <div
+                key={`${rowIndex}-${colIndex}`}
+                className="hover:opacity-80 transition-opacity duration-200"
+                style={{ 
+                  backgroundColor: getCellColor(value, maxValue)
+                }}
+                title={`彩度: ${((colIndex + 0.5) / 5 * 100).toFixed(0)}%, 明度: ${((4 - rowIndex + 0.5) / 5 * 100).toFixed(0)}%, 値: ${value.toFixed(3)}`}
+              />
+            ))
+          )}
         </div>
-        
-        {/* 軸ラベル */}
-        <div className="flex justify-center text-xs text-muted-foreground mt-2">
-          <span>彩度（横軸）: 0% → 100%</span>
+      </div>
+      
+      {/* 軸ラベル - 絶対位置 */}
+      <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4">
+        <div className="text-xs text-muted-foreground transform -rotate-90 whitespace-nowrap">
+          明度
         </div>
-        <div className="absolute -left-36 top-1/2 -translate-y-1/2">
-          <div className="text-xs text-muted-foreground transform -rotate-90 whitespace-nowrap">
-            明度（縦軸）: 100% ↓ 0%
-          </div>
-        </div>
+      </div>
+      <div className="text-xs text-muted-foreground mt-1 text-center">
+        彩度
       </div>
     </div>
   );
