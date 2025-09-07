@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback, useImperativeHandle, forwardRef } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CircleDashed, Plus, Minus, Eraser, Pen, PaintBucket, Undo, Redo, Palette, RefreshCw, Download, Upload, Pipette, Image, Layers } from 'lucide-react';
+import { CircleDashed, Plus, Minus, Eraser, Pen, PaintBucket, Undo, Redo, Palette, RefreshCw, Download, Upload, Pipette, Image, Layers, Wand2 } from 'lucide-react';
 import { BORDER_PRESETS } from '@/constants/ui';
 import { useColorStore } from '@/store/colorStore';
 import { useToastContext } from '@/contexts/ToastContext';
@@ -37,6 +37,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
   const [isEditingPenSize, setIsEditingPenSize] = useState(false);
   const [tempPenSize, setTempPenSize] = useState('');
   const [isExtractingColors, setIsExtractingColors] = useState(false);
+  const [isAutoColoring, setIsAutoColoring] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // キャンバスサイズ管理
@@ -1453,6 +1454,29 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     showToast('画像をダウンロードしました。', 'success');
   }, [showToast]);
 
+  // 自動彩色機能
+  const handleAutoColoring = useCallback(async () => {
+    if (!canvasRef.current || !context) {
+      showToast('キャンバスが初期化されていません。', 'error');
+      return;
+    }
+
+    setIsAutoColoring(true);
+    try {
+      // ダミーの自動彩色処理（実装予定）
+      showToast('自動彩色機能は開発中です。', 'info');
+      
+      // 実際の自動彩色ロジックをここに実装する予定
+      // 例：AI による領域分析と色付け
+      
+    } catch (error) {
+      console.error('Auto coloring failed:', error);
+      showToast('自動彩色に失敗しました。', 'error');
+    } finally {
+      setIsAutoColoring(false);
+    }
+  }, [context, showToast]);
+
   // キャンバスをクリア
   const clearCanvas = useCallback(() => {
     const layerContext = getCurrentLayerContext();
@@ -1715,6 +1739,16 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
               title="画像をアップロードしてキャンバスに描画"
             >
               <Upload className="w-4 h-4 text-foreground" />
+            </Button>
+            <Button
+              onClick={handleAutoColoring}
+              variant="outline"
+              size="sm"
+              className="h-6 px-1 sm:h-8 sm:px-2"
+              disabled={isAutoColoring}
+              title="自動彩色機能（開発中）"
+            >
+              <Wand2 className={`w-4 h-4 text-foreground ${isAutoColoring ? 'animate-pulse' : ''}`} />
             </Button>
             <Button
               onClick={() => {
