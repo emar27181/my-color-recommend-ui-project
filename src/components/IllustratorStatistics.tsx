@@ -44,6 +44,46 @@ export default function IllustratorStatistics({ data, isExpanded = false, name }
 
   const topHues = getTopHues(data.used_pccs_count_sum_distribution);
 
+  // よく使うトーンを取得する関数
+  const getTopTones = (saturationLightnessData: number[][], maxCount: number = 5) => {
+    if (!saturationLightnessData || saturationLightnessData.length === 0) return [];
+    
+    // 2次元配列を1次元に変換して処理
+    const flatData = [];
+    for (let rowIndex = 0; rowIndex < saturationLightnessData.length; rowIndex++) {
+      const row = saturationLightnessData[rowIndex];
+      for (let colIndex = 0; colIndex < row.length; colIndex++) {
+        flatData.push({
+          value: row[colIndex],
+          rowIndex,
+          colIndex,
+          saturation: ((colIndex + 0.5) / 5) * 100, // 0-100%
+          lightness: ((4 - rowIndex + 0.5) / 5) * 100, // 上が明るい（100%）、下が暗い（0%）
+        });
+      }
+    }
+
+    // 全体の合計値を取得
+    const totalUsage = flatData.reduce((sum, item) => sum + item.value, 0);
+    if (totalUsage === 0) return [];
+
+    // 最も使われている色相を取得
+    const mostUsedHue = topHues.length > 0 ? topHues[0].hue : 180; // デフォルトは青
+
+    // 各トーンの使用率を計算し、フィルタリング
+    return flatData
+      .map(item => ({
+        ...item,
+        percentage: (item.value / totalUsage) * 100,
+        color: `hsl(${mostUsedHue}, ${item.saturation}%, ${item.lightness}%)`
+      }))
+      .filter(item => item.value > 0 && item.percentage >= 5) // 5%以上のみ（トーンは色相より細かいため閾値を下げる）
+      .sort((a, b) => b.value - a.value)
+      .slice(0, maxCount);
+  };
+
+  const topTones = getTopTones(data.saturation_lightness_count_distribution);
+
   // 展開時は基本統計から詳細統計まで表示
   return (
     <div className="mt-2 space-y-2 px-3">
@@ -101,6 +141,29 @@ export default function IllustratorStatistics({ data, isExpanded = false, name }
                             height: '24px'
                           }}
                           title={`色相: ${hue.hue}° (使用率: ${hue.percentage.toFixed(1)}%)`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* よく使うトーン */}
+              {topTones.length > 0 && (
+                <div className="mt-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground text-xs">よく使うトーン:</span>
+                    <div className="flex gap-1">
+                      {topTones.map((tone, index) => (
+                        <div
+                          key={`${tone.rowIndex}-${tone.colIndex}`}
+                          className="border-2 border-transparent rounded-md cursor-pointer hover:scale-110 transition-all duration-200"
+                          style={{
+                            backgroundColor: tone.color,
+                            width: '24px',
+                            height: '24px'
+                          }}
+                          title={`彩度: ${tone.saturation.toFixed(0)}%, 明度: ${tone.lightness.toFixed(0)}% (使用率: ${tone.percentage.toFixed(1)}%)`}
                         />
                       ))}
                     </div>
