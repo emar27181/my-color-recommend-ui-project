@@ -1,6 +1,5 @@
 import HueDistributionVisualization from "./HueDistributionVisualization";
 import SaturationLightnessHeatmap from "./SaturationLightnessHeatmap";
-import { ColorBlock } from "./common/ColorBlock";
 import { ExternalLink } from "lucide-react";
 
 interface IllustratorStatisticsProps {
@@ -89,15 +88,22 @@ export default function IllustratorStatistics({ data, isExpanded = false, name }
               {/* よく使う色相 */}
               {topHues.length > 0 && (
                 <div className="mt-2">
-                  <span className="text-muted-foreground text-xs">よく使う色相:</span>
-                  <div className="flex gap-1 mt-1">
-                    {topHues.map((hue) => (
-                      <ColorBlock
-                        key={hue.index}
-                        color={hue.color}
-                        title={`色相: ${hue.hue}° (使用率: ${hue.percentage.toFixed(1)}%)`}
-                      />
-                    ))}
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground text-xs">よく使う色相:</span>
+                    <div className="flex gap-1">
+                      {topHues.map((hue) => (
+                        <div
+                          key={hue.index}
+                          className="border-2 border-transparent rounded-md cursor-pointer hover:scale-110 transition-all duration-200"
+                          style={{
+                            backgroundColor: hue.color,
+                            width: '24px',
+                            height: '24px'
+                          }}
+                          title={`色相: ${hue.hue}° (使用率: ${hue.percentage.toFixed(1)}%)`}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
