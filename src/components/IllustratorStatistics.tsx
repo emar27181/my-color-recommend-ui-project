@@ -1,5 +1,6 @@
 import HueDistributionVisualization from "./HueDistributionVisualization";
 import SaturationLightnessHeatmap from "./SaturationLightnessHeatmap";
+import IllustratorImages from "./IllustratorImages";
 import { ExternalLink } from "lucide-react";
 
 interface IllustratorStatisticsProps {
@@ -58,7 +59,6 @@ export default function IllustratorStatistics({ data, isExpanded = false, name }
     
     // フィルタリング条件
     const usageThreshold = 10; // 使用率10%以上
-    const minSaturationThreshold = hasEnoughChromatic ? 0.15 : 0.05; // 高彩度色が少ない場合は緩い条件
     
     return hueWithIndex
       .filter(item => {
@@ -123,9 +123,17 @@ export default function IllustratorStatistics({ data, isExpanded = false, name }
   // 展開時は基本統計から詳細統計まで表示
   return (
     <div className="mt-2 space-y-2 px-3">
-      {/* 全体を横二列で表示: 左側に統計情報、右側に色相分布 */}
-      <div className="grid grid-cols-2 gap-3">
-        {/* 左列: 統計データセクション */}
+      {/* 全体を横3列で表示: 左側に画像、中央に統計情報、右側に色相分布 */}
+      <div className="grid grid-cols-3 gap-3">
+        {/* 左列: 画像セクション */}
+        <div className="bg-background border rounded p-3">
+          <IllustratorImages 
+            name={name || ''} 
+            showRepresentative={true}
+            showTopLiked={true}
+          />
+        </div>
+        {/* 中央列: 統計データセクション */}
         <div className="bg-background border rounded p-3 space-y-3">
           {/* 基本統計情報セクション */}
           <div className="border rounded p-2">
@@ -190,7 +198,7 @@ export default function IllustratorStatistics({ data, isExpanded = false, name }
                   <div className="flex items-center gap-2">
                     <span className="text-muted-foreground text-xs">よく使うトーン:</span>
                     <div className="flex gap-2">
-                      {topTones.map((tone, index) => (
+                      {topTones.map((tone) => (
                         <div
                           key={`${tone.rowIndex}-${tone.colIndex}`}
                           className="border-2 border-transparent rounded-md cursor-pointer hover:scale-110 transition-all duration-200"
