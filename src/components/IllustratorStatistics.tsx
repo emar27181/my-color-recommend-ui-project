@@ -127,10 +127,10 @@ export default function IllustratorStatistics({ data, isExpanded = false, name }
               
               {/* よく使う色相 */}
               {topHues.length > 0 && (
-                <div className="mt-2">
+                <div className="mt-3 pt-2 border-t border-muted/30">
                   <div className="flex items-center gap-2">
                     <span className="text-muted-foreground text-xs">よく使う色相:</span>
-                    <div className="flex gap-1">
+                    <div className="flex gap-2">
                       {topHues.map((hue) => (
                         <div
                           key={hue.index}
@@ -150,10 +150,10 @@ export default function IllustratorStatistics({ data, isExpanded = false, name }
               
               {/* よく使うトーン */}
               {topTones.length > 0 && (
-                <div className="mt-2">
+                <div className="mt-2 pb-1">
                   <div className="flex items-center gap-2">
                     <span className="text-muted-foreground text-xs">よく使うトーン:</span>
-                    <div className="flex gap-1">
+                    <div className="flex gap-2">
                       {topTones.map((tone, index) => (
                         <div
                           key={`${tone.rowIndex}-${tone.colIndex}`}
