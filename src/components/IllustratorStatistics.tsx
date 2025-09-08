@@ -126,7 +126,7 @@ export default function IllustratorStatistics({ data, isExpanded = false, name }
       {/* 全体を横3列で表示: 左側に画像、中央に統計情報、右側に色相分布 */}
       <div className="grid grid-cols-3 gap-3">
         {/* 左列: 画像セクション */}
-        <div className="bg-background border rounded p-3">
+        <div className="bg-background border-2 border-primary/30 rounded-lg p-3">
           <IllustratorImages 
             name={name || ''} 
             showRepresentative={false}
@@ -134,7 +134,7 @@ export default function IllustratorStatistics({ data, isExpanded = false, name }
           />
         </div>
         {/* 中央列: 統計データセクション */}
-        <div className="bg-background border rounded p-3 space-y-3">
+        <div className="bg-background border rounded-lg p-3 space-y-3">
           {/* 基本統計情報セクション */}
           <div className="border rounded p-2">
             <div className="flex items-center gap-2 mb-2 px-1">
@@ -227,7 +227,7 @@ export default function IllustratorStatistics({ data, isExpanded = false, name }
         </div>
 
         {/* 右列: 色相分布と有彩色数分布セクション */}
-        <div className="bg-background border rounded p-3 space-y-3">
+        <div className="bg-background border rounded-lg p-3 space-y-3">
           {/* 色相分布 */}
           {data.used_pccs_count_sum_distribution && (
             <HueDistributionVisualization data={data.used_pccs_count_sum_distribution} />
