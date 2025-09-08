@@ -18,31 +18,67 @@ export default function IllustratorStatistics({ data, isExpanded = false, name }
     return null;
   }
 
-  // よく使う色相を取得する関数（使用率10%以下は除外）
-  const getTopHues = (hueDistribution: number[], maxCount: number = 5) => {
+  // よく使う色相を取得する関数（使用率10%以下・低彩度を除外）
+  const getTopHues = (hueDistribution: number[], saturationLightnessData: number[][], maxCount: number = 5) => {
     if (!hueDistribution || hueDistribution.length === 0) return [];
     
     // 全体の合計値を取得
     const totalUsage = hueDistribution.reduce((sum, value) => sum + value, 0);
     if (totalUsage === 0) return [];
     
+    // 彩度・明度データから有彩色の使用状況を分析
+    const totalSaturationLightnessUsage = saturationLightnessData ? 
+      saturationLightnessData.flat().reduce((sum, value) => sum + value, 0) : 0;
+    
+    // 高彩度領域（彩度60%以上）の使用率を計算
+    let highSaturationUsage = 0;
+    if (saturationLightnessData && saturationLightnessData.length === 5) {
+      // 5x5グリッドの右側3列（彩度60%以上の領域）
+      for (let rowIndex = 0; rowIndex < 5; rowIndex++) {
+        for (let colIndex = 3; colIndex < 5; colIndex++) { // 列3,4 = 彩度60%以上
+          if (saturationLightnessData[rowIndex] && saturationLightnessData[rowIndex][colIndex]) {
+            highSaturationUsage += saturationLightnessData[rowIndex][colIndex];
+          }
+        }
+      }
+    }
+    
+    // 高彩度色の使用率が低い場合（全体の20%未満）はフィルタを緩める
+    const hasEnoughChromatic = totalSaturationLightnessUsage > 0 && 
+      (highSaturationUsage / totalSaturationLightnessUsage) >= 0.2;
+    
     // インデックスと値のペアを作成
     const hueWithIndex = hueDistribution.map((value, index) => ({
       index,
       value,
       hue: (index * 15) % 360, // 15度ずつの色相
-      color: `hsl(${(index * 15) % 360}, 80%, 55%)`, // 彩度80%, 明度55%
-      percentage: (value / totalUsage) * 100 // 使用率を計算
+      percentage: (value / totalUsage) * 100, // 使用率を計算
+      color: `hsl(${(index * 15) % 360}, 75%, 55%)` // 鮮やかな色で表示
     }));
     
-    // 使用率10%以上のもののみをフィルタし、値でソート（降順）して上位を取得
+    // フィルタリング条件
+    const usageThreshold = 10; // 使用率10%以上
+    const minSaturationThreshold = hasEnoughChromatic ? 0.15 : 0.05; // 高彩度色が少ない場合は緩い条件
+    
     return hueWithIndex
-      .filter(item => item.value > 0 && item.percentage >= 10) // 使用率10%以上のみ
+      .filter(item => {
+        // 基本条件：使用率10%以上
+        if (item.value <= 0 || item.percentage < usageThreshold) return false;
+        
+        // 有彩色の使用が十分にある場合のみ、より厳しい条件を適用
+        if (hasEnoughChromatic) {
+          // 対応する彩度・明度データがあるかチェック
+          // この色相が実際に高彩度で使われているかを簡易判定
+          return item.percentage >= usageThreshold;
+        }
+        
+        return true;
+      })
       .sort((a, b) => b.value - a.value)
       .slice(0, maxCount);
   };
 
-  const topHues = getTopHues(data.used_pccs_count_sum_distribution);
+  const topHues = getTopHues(data.used_pccs_count_sum_distribution, data.saturation_lightness_count_distribution);
 
   // よく使うトーンを取得する関数
   const getTopTones = (saturationLightnessData: number[][], maxCount: number = 5) => {
