@@ -113,7 +113,7 @@ export default function IllustratorStatistics({ data, isExpanded = false, name }
         percentage: (item.value / totalUsage) * 100,
         color: `hsl(${mostUsedHue}, ${item.saturation}%, ${item.lightness}%)`
       }))
-      .filter(item => item.value > 0 && item.percentage >= 20) // 20%以上のみ表示（使用率が低いトーンは非表示）
+      .filter(item => item.value > 0 && item.percentage >= 10) // 10%以上のみ表示（適度な閾値）
       .sort((a, b) => b.value - a.value)
       .slice(0, maxCount);
   };
@@ -192,7 +192,7 @@ export default function IllustratorStatistics({ data, isExpanded = false, name }
                 </div>
               )}
               
-              {/* よく使うトーン（20%以上の使用率のみ表示） */}
+              {/* よく使うトーン（10%以上の使用率のみ表示） */}
               {topTones.length > 0 && (
                 <div className="mt-2 pb-1">
                   <div className="flex items-center gap-2">
