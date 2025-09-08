@@ -47,7 +47,7 @@ export default function IllustratorImages({
 
     if (hasError) {
       return (
-        <div className="flex flex-col items-center justify-center bg-muted rounded-lg p-2 min-h-[80px]">
+        <div className="flex flex-col items-center justify-center bg-muted rounded-md p-2 min-h-[80px]">
           <ImageOff className="w-6 h-6 text-muted-foreground mb-1" />
           <span className="text-xs text-muted-foreground text-center">画像なし</span>
         </div>
@@ -57,7 +57,7 @@ export default function IllustratorImages({
     return (
       <div className="relative group">
         {!isLoaded && (
-          <div className="flex items-center justify-center bg-muted rounded-lg p-2 min-h-[80px]">
+          <div className="flex items-center justify-center bg-muted rounded-md p-2 min-h-[80px]">
             <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary border-t-transparent" />
           </div>
         )}
@@ -65,10 +65,15 @@ export default function IllustratorImages({
           src={src}
           alt={alt}
           title={title}
-          className={`rounded-lg object-cover w-full transition-opacity duration-200 ${
+          className={`rounded-md w-full transition-opacity duration-200 ${
             isLoaded ? 'opacity-100' : 'opacity-0 absolute inset-0'
-          } hover:opacity-90 cursor-pointer`}
-          style={{ aspectRatio: '1/1', maxHeight: '120px' }}
+          } hover:opacity-90 cursor-pointer ${
+            rank === 1 ? 'object-contain' : 'object-cover'
+          }`}
+          style={{ 
+            aspectRatio: rank === 1 ? 'auto' : '1/1', 
+            maxHeight: rank === 1 ? '200px' : '120px' 
+          }}
           onError={() => handleImageError(src)}
           onLoad={() => handleImageLoad(src)}
         />
