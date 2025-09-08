@@ -129,7 +129,7 @@ export default function IllustratorStatistics({ data, isExpanded = false, name }
         <div className="bg-background border rounded p-3">
           <IllustratorImages 
             name={name || ''} 
-            showRepresentative={true}
+            showRepresentative={false}
             showTopLiked={true}
           />
         </div>

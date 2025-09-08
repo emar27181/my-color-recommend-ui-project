@@ -99,23 +99,51 @@ export default function IllustratorImages({
         </div>
       )}
 
-      {/* TOP3いいね画像 */}
+      {/* TOP3いいね画像 - TOP1大きく、TOP2/3小さく */}
       {showTopLiked && hasImages && top3Urls.length > 0 && (
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <Heart className="w-4 h-4 text-red-500" />
             <h5 className="text-xs font-medium text-foreground">いいね数TOP3</h5>
           </div>
-          <div className="grid grid-cols-3 gap-2">
-            {top3Urls.map((url, index) => (
-              <ImageComponent
-                key={url}
-                src={url}
-                alt={`${name}のいいね数${index + 1}位の作品`}
-                title={`いいね数${index + 1}位`}
-                rank={index + 1}
-              />
-            ))}
+          <div className="space-y-2">
+            {/* TOP1 - 大きく表示 */}
+            {top3Urls[0] && (
+              <div>
+                <ImageComponent
+                  src={top3Urls[0]}
+                  alt={`${name}のいいね数1位の作品`}
+                  title="いいね数1位"
+                  rank={1}
+                />
+              </div>
+            )}
+            
+            {/* TOP2/3 - 小さく横並び */}
+            {(top3Urls[1] || top3Urls[2]) && (
+              <div className="grid grid-cols-2 gap-2">
+                {top3Urls[1] && (
+                  <div className="aspect-square">
+                    <ImageComponent
+                      src={top3Urls[1]}
+                      alt={`${name}のいいね数2位の作品`}
+                      title="いいね数2位"
+                      rank={2}
+                    />
+                  </div>
+                )}
+                {top3Urls[2] && (
+                  <div className="aspect-square">
+                    <ImageComponent
+                      src={top3Urls[2]}
+                      alt={`${name}のいいね数3位の作品`}
+                      title="いいね数3位"
+                      rank={3}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
