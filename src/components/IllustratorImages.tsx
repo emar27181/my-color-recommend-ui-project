@@ -99,65 +99,64 @@ export default function IllustratorImages({
         </div>
       )}
 
-      {/* TOP3いいね画像 - TOP1大きく、TOP2/3小さく */}
+      {/* TOP3いいね画像 - コンパクトレイアウト */}
       {showTopLiked && hasImages && top3Urls.length > 0 && (
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
             <Heart className="w-4 h-4 text-red-500" />
-            <h5 className="text-xs font-medium text-foreground">いいね数TOP3</h5>
-          </div>
-          <div className="space-y-2">
-            {/* TOP1 - 大きく表示 */}
-            {top3Urls[0] && (
-              <div>
-                <ImageComponent
-                  src={top3Urls[0]}
-                  alt={`${name}のいいね数1位の作品`}
-                  title="いいね数1位"
-                  rank={1}
-                />
-              </div>
-            )}
-            
-            {/* TOP2/3 - 小さく横並び（ランキング番号なし） */}
-            {(top3Urls[1] || top3Urls[2]) && (
-              <div className="grid grid-cols-2 gap-2">
-                {top3Urls[1] && (
-                  <div className="aspect-square">
-                    <ImageComponent
-                      src={top3Urls[1]}
-                      alt={`${name}のいいね数2位の作品`}
-                      title="いいね数2位"
-                    />
-                  </div>
-                )}
-                {top3Urls[2] && (
-                  <div className="aspect-square">
-                    <ImageComponent
-                      src={top3Urls[2]}
-                      alt={`${name}のいいね数3位の作品`}
-                      title="いいね数3位"
-                    />
-                  </div>
-                )}
-              </div>
-            )}
+            <h5 className="text-xs font-semibold text-foreground">いいね数TOP3</h5>
           </div>
           
-          {/* 引用表示 */}
-          <div className="border-t border-muted/30">
-            <p className="text-xs text-muted-foreground">
+          {/* 引用表示 - スタイリッシュなデザイン */}
+          <div className="border-b border-muted/40 pb-1 mb-1">
+            <p className="text-xs text-muted-foreground font-medium">
               引用: 
               <a
                 href={`https://instagram.com/${name}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary hover:text-primary/80 transition-colors ml-1"
+                className="text-primary hover:text-primary/70 transition-colors ml-1 font-medium underline decoration-dotted underline-offset-2"
               >
                 @{name}
               </a>
             </p>
           </div>
+          
+          {/* TOP1 - 大きく表示 */}
+          {top3Urls[0] && (
+            <div className="mb-1">
+              <ImageComponent
+                src={top3Urls[0]}
+                alt={`${name}のいいね数1位の作品`}
+                title="いいね数1位"
+                rank={1}
+              />
+            </div>
+          )}
+          
+          {/* TOP2/3 - 小さく横並び */}
+          {(top3Urls[1] || top3Urls[2]) && (
+            <div className="grid grid-cols-2 gap-1">
+              {top3Urls[1] && (
+                <div className="aspect-square">
+                  <ImageComponent
+                    src={top3Urls[1]}
+                    alt={`${name}のいいね数2位の作品`}
+                    title="いいね数2位"
+                  />
+                </div>
+              )}
+              {top3Urls[2] && (
+                <div className="aspect-square">
+                  <ImageComponent
+                    src={top3Urls[2]}
+                    alt={`${name}のいいね数3位の作品`}
+                    title="いいね数3位"
+                  />
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 
