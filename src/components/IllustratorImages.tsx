@@ -119,7 +119,7 @@ export default function IllustratorImages({
               </div>
             )}
             
-            {/* TOP2/3 - 小さく横並び */}
+            {/* TOP2/3 - 小さく横並び（ランキング番号なし） */}
             {(top3Urls[1] || top3Urls[2]) && (
               <div className="grid grid-cols-2 gap-2">
                 {top3Urls[1] && (
@@ -128,7 +128,6 @@ export default function IllustratorImages({
                       src={top3Urls[1]}
                       alt={`${name}のいいね数2位の作品`}
                       title="いいね数2位"
-                      rank={2}
                     />
                   </div>
                 )}
@@ -138,7 +137,6 @@ export default function IllustratorImages({
                       src={top3Urls[2]}
                       alt={`${name}のいいね数3位の作品`}
                       title="いいね数3位"
-                      rank={3}
                     />
                   </div>
                 )}
