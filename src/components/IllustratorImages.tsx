@@ -31,7 +31,8 @@ export default function IllustratorImages({
   const top3Urls = getActualTop3Images(name);
   const hasImages = hasTopLikedImages(name);
 
-  const ImageComponent = ({ 
+  // シンプルな画像コンポーネント（アニメーション一切なし）
+  const StaticImageComponent = ({ 
     src, 
     alt, 
     title,
@@ -55,31 +56,49 @@ export default function IllustratorImages({
     }
 
     return (
-      <div className="relative group">
+      <div 
+        className="relative" 
+        style={{ pointerEvents: 'none', userSelect: 'none' }}
+        onMouseEnter={undefined}
+        onMouseLeave={undefined}
+        onMouseOver={undefined}
+        onMouseOut={undefined}
+      >
+        {/* ローディング表示 */}
         {!isLoaded && (
           <div className="flex items-center justify-center bg-muted rounded-md p-2 min-h-[80px]">
             <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary border-t-transparent" />
           </div>
         )}
+        
+        {/* 画像要素（マウスアクション完全無効） */}
         <img
           src={src}
           alt={alt}
-          title={title}
-          className={`rounded-md w-full transition-opacity duration-200 ${
-            isLoaded ? 'opacity-100' : 'opacity-0 absolute inset-0'
-          } hover:opacity-90 cursor-pointer ${
+          className={`rounded-md w-full block ${
             rank === 1 ? 'object-contain' : 'object-cover'
-          }`}
+          } ${isLoaded ? 'block' : 'hidden'}`}
           style={{ 
             aspectRatio: rank === 1 ? 'auto' : '1/1', 
-            maxHeight: rank === 1 ? '200px' : '120px' 
+            maxHeight: rank === 1 ? '200px' : '120px',
+            pointerEvents: 'none',
+            userSelect: 'none'
           }}
           onError={() => handleImageError(src)}
           onLoad={() => handleImageLoad(src)}
+          onMouseEnter={undefined}
+          onMouseLeave={undefined}
+          onMouseOver={undefined}
+          onMouseOut={undefined}
+          draggable={false}
         />
-        {/* いいね順位表示 */}
+        
+        {/* ランキングバッジ */}
         {rank && isLoaded && !hasError && (
-          <div className="absolute top-1 right-1 bg-black/70 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+          <div 
+            className="absolute top-1 right-1 bg-black bg-opacity-70 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold"
+            style={{ pointerEvents: 'none', userSelect: 'none' }}
+          >
             {rank}
           </div>
         )}
@@ -88,15 +107,18 @@ export default function IllustratorImages({
   };
 
   return (
-    <div className={`space-y-3 ${className}`}>
+    <div 
+      className={`space-y-3 ${className}`}
+      style={{ pointerEvents: 'auto' }}
+    >
       {/* 代表画像 */}
       {showRepresentative && (
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <Image className="w-4 h-4 text-muted-foreground" />
+            <Image className="w-4 h-4 text-foreground" />
             <h5 className="text-xs font-medium text-foreground">代表作品</h5>
           </div>
-          <ImageComponent
+          <StaticImageComponent
             src={representativeUrl}
             alt={`${name}の代表作品`}
             title="代表作品"
@@ -104,7 +126,7 @@ export default function IllustratorImages({
         </div>
       )}
 
-      {/* TOP3いいね画像 - コンパクトレイアウト */}
+      {/* TOP3いいね画像 */}
       {showTopLiked && hasImages && top3Urls.length > 0 && (
         <div>
           <div className="flex items-center gap-2 mb-1">
@@ -112,25 +134,25 @@ export default function IllustratorImages({
             <h5 className="text-xs font-semibold text-foreground">いいね数TOP3</h5>
           </div>
           
-          {/* 引用表示 - スタイリッシュなデザイン */}
-          <div className="border-b border-muted/40 pb-1 mb-1">
+          {/* 引用表示 */}
+          <div className="border-b border-muted pb-1 mb-1">
             <p className="text-xs text-muted-foreground font-medium">
               引用: 
               <a
                 href={`https://instagram.com/${name}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary hover:text-primary/70 transition-colors ml-1 font-medium underline decoration-dotted underline-offset-2"
+                className="text-primary ml-1 font-medium underline"
               >
                 @{name}
               </a>
             </p>
           </div>
           
-          {/* TOP1 - 大きく表示 */}
+          {/* TOP1画像 */}
           {top3Urls[0] && (
             <div className="mb-1">
-              <ImageComponent
+              <StaticImageComponent
                 src={top3Urls[0]}
                 alt={`${name}のいいね数1位の作品`}
                 title="いいね数1位"
@@ -139,12 +161,12 @@ export default function IllustratorImages({
             </div>
           )}
           
-          {/* TOP2/3 - 小さく横並び */}
+          {/* TOP2/3画像 */}
           {(top3Urls[1] || top3Urls[2]) && (
             <div className="grid grid-cols-2 gap-1">
               {top3Urls[1] && (
                 <div className="aspect-square">
-                  <ImageComponent
+                  <StaticImageComponent
                     src={top3Urls[1]}
                     alt={`${name}のいいね数2位の作品`}
                     title="いいね数2位"
@@ -153,7 +175,7 @@ export default function IllustratorImages({
               )}
               {top3Urls[2] && (
                 <div className="aspect-square">
-                  <ImageComponent
+                  <StaticImageComponent
                     src={top3Urls[2]}
                     alt={`${name}のいいね数3位の作品`}
                     title="いいね数3位"

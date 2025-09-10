@@ -178,7 +178,7 @@ export default function IllustratorStatistics({ data, isExpanded = false, name }
                       {topHues.map((hue) => (
                         <div
                           key={hue.index}
-                          className="border-2 border-transparent rounded-md cursor-pointer hover:scale-110 transition-all duration-200"
+                          className="border-2 border-transparent rounded-md"
                           style={{
                             backgroundColor: hue.color,
                             width: '24px',
@@ -201,7 +201,7 @@ export default function IllustratorStatistics({ data, isExpanded = false, name }
                       {topTones.map((tone) => (
                         <div
                           key={`${tone.rowIndex}-${tone.colIndex}`}
-                          className="border-2 border-transparent rounded-md cursor-pointer hover:scale-110 transition-all duration-200"
+                          className="border-2 border-transparent rounded-md"
                           style={{
                             backgroundColor: tone.color,
                             width: '24px',
@@ -253,18 +253,11 @@ export default function IllustratorStatistics({ data, isExpanded = false, name }
                   const height = maxCount > 0 ? (count / maxCount) * 24 : 0; // 最大24px
                   
                   return (
-                    <div key={index} className="flex-1 flex flex-col items-center group">
+                    <div key={index} className="flex-1 flex flex-col items-center">
                       <div
-                        className="w-full bg-primary rounded-t transition-all duration-300 hover:bg-primary/80 relative"
+                        className="w-full bg-primary rounded-t"
                         style={{ height: `${Math.max(height, 1)}px` }} // 最小1px
-                      >
-                        {/* ツールチップ */}
-                        <div className="absolute bottom-full mb-1 hidden group-hover:block bg-popover border rounded px-1 py-0.5 text-xs whitespace-nowrap z-10 left-1/2 transform -translate-x-1/2">
-                          <div className="text-center">
-                            <div className="font-medium">{index}色: {count}作品</div>
-                          </div>
-                        </div>
-                      </div>
+                      />
                       <div className="mt-0 text-xs font-medium text-foreground">
                         {count}
                       </div>
