@@ -230,9 +230,11 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     return () => clearTimeout(timeoutId);
   }, [canvasAspectRatio]);
 
-  // 初期化時に線画テンプレートを自動読み込み（一度のみ実行）
-  const [hasAutoLoaded, setHasAutoLoaded] = useState(false);
+  // テンプレート自動読み込みを無効化（CLAUDE.md要求に従って）
+  const [hasAutoLoaded, setHasAutoLoaded] = useState(true); // trueに設定して自動読み込みを防止
 
+  // 自動読み込みのuseEffectをコメントアウト
+  /*
   useEffect(() => {
     // レイヤーコンテキストとキャンバス参照が完全に初期化された後に線画を読み込み（初回のみ）
     console.log('Checking initialization status:', {
@@ -257,6 +259,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
       return () => clearTimeout(timer);
     }
   }, [layer1Context, layer2Context, hasAutoLoaded]);
+  */
 
   // クリーンアップ：コンポーネントアンマウント時の処理
   useEffect(() => {

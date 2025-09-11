@@ -11,7 +11,7 @@
       "toneRecommendationShort": "Tone Recommendation",
       "skinColorRecommendation": "Skin Color Recommendation",
       "hueToneExtraction": "Hue/Tone Extraction",
-      "canvasColorRecommendation": "Canvas"
+      "canvasColorRecommendation": "Drawing Canvas"
     }
   },
   "colorPicker": {
