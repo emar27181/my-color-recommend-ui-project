@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@anthropic-ai/claude-code": "^1.0.111",
     "@radix-ui/react-slot": "^1.2.3",
     "chart.js": "^4.5.0",
     "chroma-js": "^3.1.2",
