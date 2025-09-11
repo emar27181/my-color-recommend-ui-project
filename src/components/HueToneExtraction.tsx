@@ -352,7 +352,7 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
     
     const gridSize = 5; // 5x5のグリッド
     const grid = Array(gridSize).fill(null).map(() => 
-      Array(gridSize).fill(null).map(() => ({ usage: 0, colors: [] }))
+      Array(gridSize).fill(null).map(() => ({ usage: 0, colors: [] as string[] }))
     );
     
     // 各色を対応するグリッドセルに配置

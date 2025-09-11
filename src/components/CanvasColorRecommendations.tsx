@@ -231,7 +231,6 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
   }, [canvasAspectRatio]);
 
   // テンプレート自動読み込みを無効化（CLAUDE.md要求に従って）
-  const [hasAutoLoaded, setHasAutoLoaded] = useState(true); // trueに設定して自動読み込みを防止
 
   // 自動読み込みのuseEffectをコメントアウト
   /*

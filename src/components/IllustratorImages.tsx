@@ -35,12 +35,10 @@ export default function IllustratorImages({
   const StaticImageComponent = ({ 
     src, 
     alt, 
-    title,
     rank 
   }: { 
     src: string; 
     alt: string; 
-    title?: string;
     rank?: number;
   }) => {
     const hasError = imageErrors[src];
@@ -121,7 +119,6 @@ export default function IllustratorImages({
           <StaticImageComponent
             src={representativeUrl}
             alt={`${name}の代表作品`}
-            title="代表作品"
           />
         </div>
       )}
@@ -155,7 +152,6 @@ export default function IllustratorImages({
               <StaticImageComponent
                 src={top3Urls[0]}
                 alt={`${name}のいいね数1位の作品`}
-                title="いいね数1位"
                 rank={1}
               />
             </div>
@@ -169,7 +165,6 @@ export default function IllustratorImages({
                   <StaticImageComponent
                     src={top3Urls[1]}
                     alt={`${name}のいいね数2位の作品`}
-                    title="いいね数2位"
                   />
                 </div>
               )}
@@ -178,7 +173,6 @@ export default function IllustratorImages({
                   <StaticImageComponent
                     src={top3Urls[2]}
                     alt={`${name}のいいね数3位の作品`}
-                    title="いいね数3位"
                   />
                 </div>
               )}
