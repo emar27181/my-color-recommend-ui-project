@@ -28,12 +28,12 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
   const [penSize, setPenSize] = useState(20);
   const [isEraserMode, setIsEraserMode] = useState(false);
-  const [isFillMode, setIsFillMode] = useState(true);
+  const [isFillMode, setIsFillMode] = useState(false);
   const [isEyedropperMode, setIsEyedropperMode] = useState(false);
   const [previousTool, setPreviousTool] = useState<{
     isFillMode: boolean;
     isEraserMode: boolean;
-  }>({ isFillMode: true, isEraserMode: false });
+  }>({ isFillMode: false, isEraserMode: false });
   const [isEditingPenSize, setIsEditingPenSize] = useState(false);
   const [tempPenSize, setTempPenSize] = useState('');
   const [isExtractingColors, setIsExtractingColors] = useState(false);
