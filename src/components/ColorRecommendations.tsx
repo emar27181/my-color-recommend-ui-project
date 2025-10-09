@@ -1,5 +1,6 @@
 import React from 'react';
 import { useColorStore, COLOR_SCHEMES, sortSchemesByCompatibility, sortSchemesByHueDistance, sortSchemesByColorCount, SCHEME_SORT_CONFIG } from '@/store/colorStore';
+import { useConditionStore } from '@/store/conditionStore';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ColorGrid } from '@/components/common/ColorGrid';
 import { ColorWheelMini } from '@/components/common/ColorWheelMini';
@@ -15,6 +16,8 @@ interface ColorRecommendationsProps {
 
 export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsProps) => {
   const { recommendedColors, selectedScheme, setSelectedScheme, generateRecommendedTones, baseColor, selectedColor, setColorFromRecommendation, paintColor, extractedColors } = useColorStore();
+  const { getFlags } = useConditionStore();
+  const flags = getFlags();
   const { onUserAction } = useTutorial();
   const { t } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
@@ -92,6 +95,10 @@ export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsP
 
   const closestColorIndex = findClosestColorIndex(recommendedColors, paintColor);
 
+  // 色相推薦が無効な場合は非表示
+  if (!flags.HUE_RECO_ON) {
+    return null;
+  }
 
   return (
     <Card className="w-full flex flex-col pb-0" style={{ height: '96px', minWidth: '0' }}>
@@ -204,6 +211,8 @@ interface ToneRecommendationsProps {
 
 export const ToneRecommendations = ({ isMobile = false }: ToneRecommendationsProps) => {
   const { recommendedTones, selectedColor, generateRecommendedTones, setColorFromRecommendation, paintColor } = useColorStore();
+  const { getFlags } = useConditionStore();
+  const flags = getFlags();
   const { t } = useTranslation();
 
   React.useEffect(() => {
@@ -245,6 +254,11 @@ export const ToneRecommendations = ({ isMobile = false }: ToneRecommendationsPro
   };
 
   const closestToneIndex = findClosestToneIndex(recommendedTones, paintColor);
+
+  // トーン推薦が無効な場合は非表示
+  if (!flags.TONE_RECO_ON) {
+    return null;
+  }
 
   return (
     <Card className="w-full flex flex-col pb-0">
