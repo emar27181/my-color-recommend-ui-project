@@ -24,15 +24,23 @@ export interface DeviceInfo {
   userAgent: string;
 }
 
-// 実験ログ全体の型定義
-export interface ExperimentLog {
-  participant_id: string;
+// 条件ごとのログ
+export interface ConditionLog {
   condition: ExperimentCondition;
-  device: DeviceInfo;
   start_time: string;
   end_time: string | null;
   task_duration_sec: number | null;
   events: ExperimentEvent[];
+}
+
+// 実験ログ全体の型定義
+export interface ExperimentLog {
+  participant_id: string;
+  device: DeviceInfo;
+  experiment_start_time: string;
+  experiment_end_time: string | null;
+  total_duration_sec: number | null;
+  conditions: ConditionLog[];
 }
 
 // 実験状態の型定義
@@ -46,6 +54,13 @@ export interface ExperimentState {
   events: ExperimentEvent[];
   deviceInfo: DeviceInfo;
 
+  // フロー管理
+  experimentStartTime: number | null; // 全体の実験開始時刻
+  experimentEndTime: number | null;   // 全体の実験終了時刻
+  conditionLogs: ConditionLog[];      // 各条件のログ
+  currentConditionIndex: number;      // 現在の条件インデックス (0=C0, 1=C1, 2=C2, 3=C3)
+  conditionOrder: ExperimentCondition[]; // 実験順序
+
   // アクション
   setParticipantId: (id: string) => void;
   setCondition: (condition: ExperimentCondition) => void;
@@ -55,6 +70,14 @@ export interface ExperimentState {
   getExperimentLog: () => ExperimentLog;
   exportLog: () => void;
   resetExperiment: () => void;
+
+  // フロー管理アクション
+  startFullExperiment: () => void;           // 全体実験開始（C0から）
+  nextCondition: () => boolean;              // 次の条件に進む（戻り値: 次があるかどうか）
+  getCurrentCondition: () => ExperimentCondition; // 現在の条件を取得
+  hasNextCondition: () => boolean;           // 次の条件があるか
+  getNextCondition: () => ExperimentCondition | null; // 次の条件を取得
+  completeCurrentCondition: () => void;      // 現在の条件を完了
 
   // 条件による機能フラグ
   getFeatureFlags: () => {
@@ -117,6 +140,13 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
   endTime: null,
   events: [],
   deviceInfo: initialDeviceInfo,
+
+  // フロー管理
+  experimentStartTime: null,
+  experimentEndTime: null,
+  conditionLogs: [],
+  currentConditionIndex: 0,
+  conditionOrder: ['C0', 'C1', 'C2', 'C3'],
 
   // 参加者IDを設定
   setParticipantId: (id: string) => {
@@ -187,14 +217,13 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
     const state = get();
     return {
       participant_id: state.participantId,
-      condition: state.condition,
       device: state.deviceInfo,
-      start_time: state.startTime ? new Date(state.startTime).toISOString() : '',
-      end_time: state.endTime ? new Date(state.endTime).toISOString() : null,
-      task_duration_sec: state.startTime && state.endTime
-        ? parseFloat(((state.endTime - state.startTime) / 1000).toFixed(2))
+      experiment_start_time: state.experimentStartTime ? new Date(state.experimentStartTime).toISOString() : '',
+      experiment_end_time: state.experimentEndTime ? new Date(state.experimentEndTime).toISOString() : null,
+      total_duration_sec: state.experimentStartTime && state.experimentEndTime
+        ? parseFloat(((state.experimentEndTime - state.experimentStartTime) / 1000).toFixed(2))
         : null,
-      events: state.events,
+      conditions: state.conditionLogs,
     };
   },
 
@@ -208,7 +237,7 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `log_${state.participantId || 'anonymous'}_${state.condition}.json`;
+    a.download = `log_${state.participantId || 'anonymous'}_all_conditions.json`;
     a.click();
     URL.revokeObjectURL(url);
 
@@ -223,8 +252,110 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
       endTime: null,
       events: [],
       deviceInfo: collectDeviceInfo(),
+      experimentStartTime: null,
+      experimentEndTime: null,
+      conditionLogs: [],
+      currentConditionIndex: 0,
+      condition: 'C0',
     });
     console.log('Experiment reset');
+  },
+
+  // 全体実験開始（C0から）
+  startFullExperiment: () => {
+    const now = Date.now();
+    set({
+      experimentStartTime: now,
+      experimentEndTime: null,
+      conditionLogs: [],
+      currentConditionIndex: 0,
+      condition: 'C0',
+      isExperimentRunning: true,
+      startTime: now,
+      endTime: null,
+      events: [],
+      deviceInfo: collectDeviceInfo(),
+    });
+    console.log('Full experiment started at:', new Date(now).toISOString());
+  },
+
+  // 現在の条件を取得
+  getCurrentCondition: () => {
+    const state = get();
+    return state.conditionOrder[state.currentConditionIndex];
+  },
+
+  // 次の条件があるか
+  hasNextCondition: () => {
+    const state = get();
+    return state.currentConditionIndex < state.conditionOrder.length - 1;
+  },
+
+  // 次の条件を取得
+  getNextCondition: () => {
+    const state = get();
+    if (state.currentConditionIndex < state.conditionOrder.length - 1) {
+      return state.conditionOrder[state.currentConditionIndex + 1];
+    }
+    return null;
+  },
+
+  // 現在の条件を完了
+  completeCurrentCondition: () => {
+    const state = get();
+    const now = Date.now();
+
+    // 現在の条件のログを保存
+    const conditionLog: ConditionLog = {
+      condition: state.condition,
+      start_time: state.startTime ? new Date(state.startTime).toISOString() : '',
+      end_time: new Date(now).toISOString(),
+      task_duration_sec: state.startTime
+        ? parseFloat(((now - state.startTime) / 1000).toFixed(2))
+        : null,
+      events: [...state.events],
+    };
+
+    set({
+      conditionLogs: [...state.conditionLogs, conditionLog],
+      isExperimentRunning: false,
+      endTime: now,
+    });
+
+    console.log(`Condition ${state.condition} completed`, conditionLog);
+  },
+
+  // 次の条件に進む
+  nextCondition: () => {
+    const state = get();
+
+    if (state.currentConditionIndex >= state.conditionOrder.length - 1) {
+      // 全条件完了
+      const now = Date.now();
+      set({
+        experimentEndTime: now,
+        isExperimentRunning: false,
+      });
+      console.log('All conditions completed');
+      return false;
+    }
+
+    // 次の条件に進む
+    const nextIndex = state.currentConditionIndex + 1;
+    const nextCondition = state.conditionOrder[nextIndex];
+    const now = Date.now();
+
+    set({
+      currentConditionIndex: nextIndex,
+      condition: nextCondition,
+      isExperimentRunning: true,
+      startTime: now,
+      endTime: null,
+      events: [],
+    });
+
+    console.log(`Moved to condition ${nextCondition}`);
+    return true;
   },
 
   // 条件による機能フラグを取得
