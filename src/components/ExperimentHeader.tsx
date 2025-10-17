@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, Download, Activity, ArrowRight } from 'lucide-react';
+import type { CanvasColorRecommendationsRef } from '@/components/CanvasColorRecommendations';
 
 // 条件の説明
 const CONDITION_DESCRIPTIONS = {
@@ -13,7 +14,11 @@ const CONDITION_DESCRIPTIONS = {
   C3: '二段階推薦（色相＋トーン）',
 };
 
-export const ExperimentHeader = () => {
+interface ExperimentHeaderProps {
+  canvasRef?: React.RefObject<CanvasColorRecommendationsRef | null>;
+}
+
+export const ExperimentHeader = ({ canvasRef }: ExperimentHeaderProps) => {
   const navigate = useNavigate();
   const {
     participantId,
@@ -42,6 +47,12 @@ export const ExperimentHeader = () => {
       );
 
       if (confirmed) {
+        // キャンバスをリセット
+        if (canvasRef?.current) {
+          console.log('Clearing canvas for condition transition');
+          canvasRef.current.clearAllLayers();
+        }
+
         // 次の条件に進む
         nextCondition();
         // 次の条件のページに遷移

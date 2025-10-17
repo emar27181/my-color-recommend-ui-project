@@ -18,6 +18,7 @@ interface CanvasColorRecommendationsProps {
 export interface CanvasColorRecommendationsRef {
   drawImageToCanvas: (imageFile: File) => void;
   extractColorsFromCanvas: () => Promise<void>;
+  clearAllLayers: () => void;
 }
 
 const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendationsRef, CanvasColorRecommendationsProps>(({ className = '', isDebugMode = false }, ref) => {
@@ -702,11 +703,35 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     reader.readAsDataURL(imageFile);
   }, [context, saveToHistory, resizeCanvas, updateCompositeCanvas]);
 
+  // すべてのレイヤーをクリアする関数
+  const clearAllLayers = useCallback(() => {
+    if (!layer1Context || !layer2Context || !layer1CanvasRef.current || !layer2CanvasRef.current) {
+      console.log('Cannot clear layers - contexts or canvases not initialized');
+      return;
+    }
+
+    // 履歴に保存
+    saveToHistory();
+
+    // レイヤー1を透明にクリア
+    layer1Context.clearRect(0, 0, layer1CanvasRef.current.width, layer1CanvasRef.current.height);
+
+    // レイヤー2を白色でクリア
+    layer2Context.fillStyle = '#ffffff';
+    layer2Context.fillRect(0, 0, layer2CanvasRef.current.width, layer2CanvasRef.current.height);
+
+    // 合成キャンバスを更新
+    updateCompositeCanvas();
+
+    console.log('All layers cleared');
+  }, [layer1Context, layer2Context, saveToHistory, updateCompositeCanvas]);
+
   // 外部からアクセス可能な関数を公開
   useImperativeHandle(ref, () => ({
     drawImageToCanvas,
-    extractColorsFromCanvas
-  }), [drawImageToCanvas, extractColorsFromCanvas]);
+    extractColorsFromCanvas,
+    clearAllLayers
+  }), [drawImageToCanvas, extractColorsFromCanvas, clearAllLayers]);
 
   // ペンサイズ変更関数
   const increasePenSize = useCallback(() => {

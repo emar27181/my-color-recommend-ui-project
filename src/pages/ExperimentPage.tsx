@@ -184,7 +184,7 @@ const ExperimentPage = () => {
     <main className="flex-1 pb-2 min-h-0 flex flex-col" style={isDebugMode ? { backgroundColor: '#607d8b', padding: '16px' } : {}}>
       {/* 実験ヘッダー */}
       <div className="px-4 pt-2">
-        <ExperimentHeader />
+        <ExperimentHeader canvasRef={canvasColorRecommendationsRef} />
       </div>
 
       {/* 条件説明 */}
