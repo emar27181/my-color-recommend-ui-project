@@ -1,10 +1,9 @@
-import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useExperimentStore } from '@/store/experimentStore';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Play, Square, Download, User, Activity } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CheckCircle, Download, Activity, ArrowRight } from 'lucide-react';
 
 // 条件の説明
 const CONDITION_DESCRIPTIONS = {
@@ -15,49 +14,50 @@ const CONDITION_DESCRIPTIONS = {
 };
 
 export const ExperimentHeader = () => {
+  const navigate = useNavigate();
   const {
     participantId,
     condition,
     isExperimentRunning,
     events,
-    deviceInfo,
-    setParticipantId,
-    startExperiment,
-    endExperiment,
+    hasNextCondition,
+    getNextCondition,
+    completeCurrentCondition,
+    nextCondition,
     exportLog,
-    resetExperiment,
+    conditionLogs,
   } = useExperimentStore();
 
-  const [inputId, setInputId] = useState(participantId);
-  const [showInstructions, setShowInstructions] = useState(true);
+  // 条件完了ハンドラ
+  const handleComplete = () => {
+    completeCurrentCondition();
 
-  // 実験開始ハンドラ
-  const handleStart = () => {
-    if (!inputId.trim()) {
-      alert('参加者IDを入力してください');
-      return;
-    }
-    setParticipantId(inputId.trim());
-    startExperiment();
-    setShowInstructions(false);
-  };
+    // 次の条件があるかチェック
+    if (hasNextCondition()) {
+      const nextCond = getNextCondition();
 
-  // 実験終了ハンドラ
-  const handleEnd = () => {
-    if (window.confirm('実験を終了してログをダウンロードしますか？')) {
-      endExperiment();
-      // 少し遅延してからログをエクスポート（終了時刻を確実に記録するため）
-      setTimeout(() => {
+      // 確認ダイアログを表示
+      const confirmed = window.confirm(
+        `${condition} の実験が完了しました。\n\n次の条件（${nextCond}）に進みますか？`
+      );
+
+      if (confirmed) {
+        // 次の条件に進む
+        nextCondition();
+        // 次の条件のページに遷移
+        navigate(`/experiment/task?cond=${nextCond}`);
+      }
+    } else {
+      // 全条件完了
+      const confirmed = window.confirm(
+        `すべての条件（C0~C3）が完了しました！\n\n実験ログをダウンロードしますか？`
+      );
+
+      if (confirmed) {
         exportLog();
-      }, 100);
-    }
-  };
-
-  // リセットハンドラ
-  const handleReset = () => {
-    if (window.confirm('実験データをリセットしますか？（保存されていないデータは失われます）')) {
-      resetExperiment();
-      setShowInstructions(true);
+        // 完了ページに遷移
+        navigate('/experiment/complete');
+      }
     }
   };
 
@@ -66,7 +66,7 @@ export const ExperimentHeader = () => {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <CardTitle className="text-lg">実験モード</CardTitle>
+            <CardTitle className="text-lg">実験進行中</CardTitle>
             <Badge variant="outline" className="font-mono text-base px-3 py-1">
               {condition}
             </Badge>
@@ -75,86 +75,50 @@ export const ExperimentHeader = () => {
             </span>
           </div>
 
-          {/* デバイス情報 */}
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Activity className="w-4 h-4" />
-            <span>{deviceInfo.type}</span>
-            <span>•</span>
-            <span>{deviceInfo.screenWidth}x{deviceInfo.screenHeight}</span>
+          {/* 進捗表示 */}
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="font-mono">
+              参加者: {participantId}
+            </Badge>
+            <Badge variant="outline" className="font-mono">
+              進捗: {conditionLogs.length + (isExperimentRunning ? 1 : 0)}/4
+            </Badge>
           </div>
         </div>
-        {showInstructions && (
-          <CardDescription className="mt-2">
-            参加者IDを入力して「開始」ボタンを押すと、実験が開始されます。
-            すべての操作が記録され、終了時にJSONファイルとしてダウンロードされます。
-          </CardDescription>
-        )}
       </CardHeader>
 
       <CardContent className="pt-0">
-        <div className="flex items-center gap-3">
-          {/* 参加者ID入力 */}
-          {!isExperimentRunning && (
-            <div className="flex items-center gap-2 flex-1 max-w-xs">
-              <User className="w-4 h-4 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="参加者ID（例: U001）"
-                value={inputId}
-                onChange={(e) => setInputId(e.target.value)}
-                disabled={isExperimentRunning}
-                className="font-mono"
-              />
-            </div>
-          )}
-
-          {/* 参加者ID表示（実験中） */}
-          {isExperimentRunning && (
-            <div className="flex items-center gap-2">
-              <User className="w-4 h-4 text-muted-foreground" />
-              <Badge variant="secondary" className="font-mono">
-                {participantId}
-              </Badge>
-            </div>
-          )}
-
-          {/* 開始ボタン */}
-          {!isExperimentRunning && (
-            <Button onClick={handleStart} className="gap-2">
-              <Play className="w-4 h-4" />
-              開始
-            </Button>
-          )}
-
-          {/* 終了ボタン */}
-          {isExperimentRunning && (
-            <Button onClick={handleEnd} variant="destructive" className="gap-2">
-              <Square className="w-4 h-4" />
-              終了してダウンロード
-            </Button>
-          )}
-
+        <div className="flex items-center justify-between gap-3">
           {/* イベント数表示 */}
           {isExperimentRunning && (
             <div className="flex items-center gap-2 px-3 py-1 rounded-md bg-muted">
               <Activity className="w-4 h-4" />
               <span className="text-sm font-mono">
-                {events.length} イベント記録中
+                {events.length} 操作記録中
               </span>
             </div>
           )}
 
+          {/* 条件完了ボタン */}
+          {isExperimentRunning && (
+            <Button onClick={handleComplete} size="lg" className="gap-2">
+              <CheckCircle className="w-5 h-5" />
+              条件を完了
+              {hasNextCondition() && (
+                <span className="flex items-center gap-1">
+                  <ArrowRight className="w-4 h-4" />
+                  {getNextCondition()}へ
+                </span>
+              )}
+            </Button>
+          )}
+
           {/* ログダウンロードボタン（実験終了後） */}
-          {!isExperimentRunning && events.length > 0 && (
-            <>
-              <Button onClick={exportLog} variant="outline" className="gap-2">
-                <Download className="w-4 h-4" />
-                ログ再ダウンロード
-              </Button>
-              <Button onClick={handleReset} variant="ghost" size="sm">
-                リセット
-              </Button>
-            </>
+          {!isExperimentRunning && conditionLogs.length > 0 && (
+            <Button onClick={exportLog} variant="outline" className="gap-2">
+              <Download className="w-4 h-4" />
+              ログダウンロード
+            </Button>
           )}
         </div>
       </CardContent>
