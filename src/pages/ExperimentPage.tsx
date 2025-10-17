@@ -6,6 +6,7 @@ import { LAYOUT_CONFIG } from '@/constants/layout';
 import { useExperimentStore } from '@/store/experimentStore';
 import { useExperimentQuery } from '@/hooks/useQueryParams';
 import { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 /**
  * 実験ページコンポーネント
@@ -17,11 +18,20 @@ import { useEffect, useState, useRef } from 'react';
  * - C3: 二段階推薦（すべて）
  */
 const ExperimentPage = () => {
+  const navigate = useNavigate();
+
   // URLから条件を読み取る
   useExperimentQuery();
 
-  const { condition, isExperimentRunning, getFeatureFlags } = useExperimentStore();
+  const { condition, isExperimentRunning, participantId, getFeatureFlags } = useExperimentStore();
   const featureFlags = getFeatureFlags();
+
+  // 参加者IDが未設定の場合は導入ページにリダイレクト
+  useEffect(() => {
+    if (!participantId) {
+      navigate('/experiment');
+    }
+  }, [participantId, navigate]);
 
   const [isDebugMode, setIsDebugMode] = useState(false);
   const [screenSize, setScreenSize] = useState({ width: 0, height: 0 });
@@ -165,6 +175,11 @@ const ExperimentPage = () => {
 
   const deviceType = isMobile ? 'MOBILE/TABLET' : 'DESKTOP';
 
+  // 参加者IDが未設定の場合は何も表示しない（リダイレクト中）
+  if (!participantId) {
+    return null;
+  }
+
   return (
     <main className="flex-1 pb-2 min-h-0 flex flex-col" style={isDebugMode ? { backgroundColor: '#607d8b', padding: '16px' } : {}}>
       {/* 実験ヘッダー */}
@@ -172,12 +187,10 @@ const ExperimentPage = () => {
         <ExperimentHeader />
       </div>
 
-      {/* 実験説明（実験開始前のみ表示） */}
-      {!isExperimentRunning && (
-        <div className="px-4">
-          <ExperimentInstructions condition={condition} />
-        </div>
-      )}
+      {/* 条件説明 */}
+      <div className="px-4">
+        <ExperimentInstructions condition={condition} />
+      </div>
 
       {/* デバッグ情報表示 */}
       {isDebugMode && (
