@@ -72,3 +72,22 @@
 - `src/main.tsx`
 
 **コミット:** `bd257be` - feat: add site information page with Info button
+
+---
+
+### ナビゲーションUIの改善
+
+**変更内容:**
+- スワイプ推薦ボタン（ScrollTextアイコン）を非表示化
+- SNS嗜好分析のアイコンを `BarChart3` から `FlaskConical`（フラスコ）に変更
+- ナビゲーションバーのアイコン間スペースを `gap-3`（12px）から `gap-5`（20px）に拡大
+
+**理由:**
+- スワイプ推薦機能を一時的に非表示にしてUIをシンプル化
+- SNS分析ページに研究・実験のイメージを持たせるためフラスコアイコンを採用
+- アイコン間の視覚的な余白を改善し、見やすさを向上
+
+**変更ファイル:**
+- `src/components/NavigationMenu.tsx`
+
+**コミット:** `bd9c092` - refactor: update navigation UI with icon and spacing improvements
