@@ -149,9 +149,23 @@ const ExperimentPage = () => {
    * C1: toneRecommendation を除外
    * C2: colorRecommendation を除外
    * C3: すべて表示
+   *
+   * 実験中は常に除外:
+   * - skinColor (肌色推薦)
+   * - hueToneExtraction (使用色相/トーン抽出)
    */
   const filterComponentsByCondition = (components: readonly string[]): readonly string[] => {
     return components.filter(componentKey => {
+      // 実験中は肌色推薦を非表示
+      if (componentKey === 'skinColor') {
+        return false;
+      }
+
+      // 実験中は使用色相/トーン抽出を非表示
+      if (componentKey === 'hueToneExtraction') {
+        return false;
+      }
+
       // 色相推薦を表示するかチェック
       if (componentKey === 'colorRecommendation' && !featureFlags.HUE_RECO_ON) {
         return false;

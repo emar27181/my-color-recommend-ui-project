@@ -855,6 +855,40 @@ Card (統一border-presets)
 - **プログレスインジケーター**: C0→C1→C2→C3の視覚的進捗表示は不要（シンプル化）
 - **過剰な装飾**: ミニマルデザイン原則を維持
 
+### 実験タスクページ（ExperimentPage.tsx）表示制御
+
+#### 非表示コンポーネント
+実験中は認知負荷軽減のため、以下のコンポーネントを常に非表示：
+- **α. 肌色推薦（skinColor）**: 実験タスクに関係ない機能のため非表示
+- **β. 使用色相/トーン抽出（hueToneExtraction）**: 実験タスクに関係ない機能のため非表示
+
+#### 実装方法
+- **フィルタリング関数**: `ExperimentPage.tsx` の `filterComponentsByCondition` 内で除外処理
+- **除外ロジック**:
+  ```typescript
+  if (componentKey === 'skinColor') {
+    return false;  // 肌色推薦を非表示
+  }
+  if (componentKey === 'hueToneExtraction') {
+    return false;  // 使用色相/トーン抽出を非表示
+  }
+  ```
+- **デスクトップ**: `filteredColumns` がそのまま適用される
+- **モバイル**: `LayoutRenderer.tsx` で `columns` からフィルタリング済みコンポーネントのみを抽出
+  ```typescript
+  const availableComponents = new Set(
+    columns.flatMap(column => column.components)
+  );
+  const allComponents = LAYOUT_CONFIG.mobile.order
+    .filter(componentKey => availableComponents.has(componentKey));
+  ```
+- **適用範囲**: デスクトップ・モバイル両方のレイアウトに完全対応
+
+#### 目的
+- **認知負荷軽減**: 実験参加者の集中力向上
+- **UI簡素化**: 必要な機能のみを表示してシンプルなUI提供
+- **実験妥当性確保**: タスクに関係ない機能を排除して正確なデータ収集
+
 ---
 
 ## 🔧 技術仕様

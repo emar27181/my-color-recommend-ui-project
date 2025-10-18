@@ -231,9 +231,16 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
   };
 
   if (isMobile) {
-    // モバイル: 縦積みレイアウト（LAYOUT_CONFIGの順序を使用）
-    const allComponents: ComponentKey[] = LAYOUT_CONFIG.mobile.order as unknown as ComponentKey[];
-    
+    // モバイル: 縦積みレイアウト
+    // columnsから利用可能なコンポーネントのリストを取得（フィルタリング済み）
+    const availableComponents = new Set(
+      columns.flatMap(column => column.components)
+    );
+
+    // LAYOUT_CONFIGの順序を保持しつつ、利用可能なコンポーネントのみを使用
+    const allComponents: ComponentKey[] = (LAYOUT_CONFIG.mobile.order as unknown as ComponentKey[])
+      .filter(componentKey => availableComponents.has(componentKey));
+
     return (
       <div className="flex flex-col overflow-y-auto">
         {allComponents.map((componentKey) => (
