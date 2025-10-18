@@ -19,6 +19,7 @@ export const NavigationMenu = ({ className = '' }: NavigationMenuProps) => {
   return (
     <div className={`flex items-center gap-3 ${className}`}>
       {/* Navigation Icons */}
+      {/* チュートリアルボタン - 表示オフ
       <button
         onClick={() => {
           startTutorial();
@@ -28,6 +29,7 @@ export const NavigationMenu = ({ className = '' }: NavigationMenuProps) => {
       >
         <Play className="w-5 h-5 [&>path]:fill-none [&>path]:stroke-current" />
       </button>
+      */}
       <Link
         to="/swipe"
         className="p-2 rounded-lg bg-background/50 border-none hover:bg-muted/50 transition-colors backdrop-blur-sm text-foreground"
@@ -50,6 +52,7 @@ export const NavigationMenu = ({ className = '' }: NavigationMenuProps) => {
         <ClipboardList className="w-5 h-5" />
       </Link>
       <div className="w-4"></div>
+      {/* ヘルプボタン - 表示オフ
       <Link
         to="/help"
         className="p-2 rounded-lg bg-background/50 border-none hover:bg-muted/50 transition-colors backdrop-blur-sm text-foreground"
@@ -57,6 +60,7 @@ export const NavigationMenu = ({ className = '' }: NavigationMenuProps) => {
       >
         <HelpCircle className="w-5 h-5" />
       </Link>
+      */}
       <div className="p-2 rounded-lg bg-background/50 backdrop-blur-sm">
         <ThemeToggle />
       </div>
