@@ -5,6 +5,7 @@ import './index.css'
 import './i18n'
 import App from './App.tsx'
 import { HelpPage } from './pages/HelpPage.tsx'
+import { InfoPage } from './pages/InfoPage.tsx'
 import SwipeRecommender from './pages/SwipeRecommender.tsx'
 import SnsAnalysisPage from './pages/SnsAnalysisPage.tsx'
 import ExperimentIntroPage from './pages/ExperimentIntroPage.tsx'
@@ -22,6 +23,7 @@ createRoot(document.getElementById('root')!).render(
           <Routes>
             <Route path="/" element={<Layout><App /></Layout>} />
             <Route path="/help" element={<Layout><HelpPage /></Layout>} />
+            <Route path="/info" element={<Layout><InfoPage /></Layout>} />
             <Route path="/swipe" element={<Layout><SwipeRecommender /></Layout>} />
             <Route path="/sns-analysis" element={<Layout><SnsAnalysisPage /></Layout>} />
             <Route path="/experiment" element={<Layout><ExperimentIntroPage /></Layout>} />
