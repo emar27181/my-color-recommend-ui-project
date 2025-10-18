@@ -165,23 +165,24 @@ const ExperimentIntroPage = () => {
 
         {/* 参加者ID入力と開始 */}
         <Card className="border-2 border-primary/30 shadow-lg">
-          <CardHeader className="bg-primary/5">
-            <CardTitle className="flex items-center gap-2">
-              <User className="w-5 h-5" />
+          <CardHeader className="bg-primary/5 pb-4">
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <User className="w-6 h-6" />
               実験を開始
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-base mt-2">
               参加者IDを入力して実験を開始してください
             </CardDescription>
           </CardHeader>
-          <CardContent className="pt-6 space-y-4">
-            <div className="flex items-center gap-4">
+          <CardContent className="pt-8 pb-8 px-8 space-y-6">
+            <div className="space-y-3">
+              <label className="text-sm font-semibold text-foreground">参加者ID</label>
               <Input
                 type="text"
-                placeholder="参加者ID（例: U001）"
+                placeholder="例: U001"
                 value={inputId}
                 onChange={(e) => setInputId(e.target.value)}
-                className="font-mono text-lg h-12"
+                className="font-mono text-xl h-14 px-4 border-2"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     handleStart();
@@ -193,15 +194,15 @@ const ExperimentIntroPage = () => {
             <Button
               onClick={handleStart}
               size="lg"
-              className="w-full gap-2 text-lg h-14 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+              className="w-full gap-3 text-xl h-16 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
             >
-              <Play className="w-5 h-5" />
+              <Play className="w-6 h-6" />
               実験開始（C0から）
             </Button>
 
-            <Alert className="border-primary/30 bg-primary/5">
-              <InfoIcon className="h-4 w-4 text-primary" />
-              <AlertDescription className="text-sm">
+            <Alert className="border-primary/30 bg-primary/5 p-4">
+              <InfoIcon className="h-5 w-5 text-primary" />
+              <AlertDescription className="text-sm leading-relaxed ml-2">
                 C0 → C1 → C2 → C3 の順で体験します。各条件終了後、次に進む確認が表示されます。
               </AlertDescription>
             </Alert>
