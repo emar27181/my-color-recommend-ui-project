@@ -6,13 +6,15 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { InfoIcon, Play, User, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { InfoIcon, Play, User, Clock, Palette, Sparkles, Layers } from 'lucide-react';
 
 /**
- * 実験導入ページ
+ * 実験導入ページ（改良版）
  *
- * C0~C3の条件説明と参加者ID入力を行う
- * 開始ボタンでC0実験ページに遷移
+ * モダンでクリーンなUIデザイン
+ * - ビジュアル要素の強化
+ * - 色分けされた条件カード
+ * - より簡潔なテキスト
  */
 const ExperimentIntroPage = () => {
   const navigate = useNavigate();
@@ -33,147 +35,166 @@ const ExperimentIntroPage = () => {
     navigate('/experiment/task?cond=C0');
   };
 
+  // 条件データ
+  const conditions = [
+    {
+      id: 'C0',
+      name: '推薦なし',
+      description: 'カラーピッカーのみで色を選択',
+      icon: Palette,
+      color: 'bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-600',
+      badgeColor: 'bg-slate-500'
+    },
+    {
+      id: 'C1',
+      name: '色相推薦',
+      description: '補色・類似色などの推薦',
+      icon: Sparkles,
+      color: 'bg-blue-50 dark:bg-blue-950 border-blue-300 dark:border-blue-700',
+      badgeColor: 'bg-blue-500'
+    },
+    {
+      id: 'C2',
+      name: 'トーン推薦',
+      description: '明度・彩度バリエーション',
+      icon: Layers,
+      color: 'bg-purple-50 dark:bg-purple-950 border-purple-300 dark:border-purple-700',
+      badgeColor: 'bg-purple-500'
+    },
+    {
+      id: 'C3',
+      name: '二段階推薦',
+      description: '色相 + トーン（全機能）',
+      icon: Sparkles,
+      color: 'bg-green-50 dark:bg-green-950 border-green-300 dark:border-green-700',
+      badgeColor: 'bg-green-500'
+    }
+  ];
+
   return (
-    <main className="flex-1 pb-8 min-h-screen flex flex-col bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        {/* タイトル */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-3">色推薦UI評価実験</h1>
-          <p className="text-muted-foreground text-lg">
-            イラスト配色支援ツールの主観評価にご協力ください
+    <main className="flex-1 pb-8 min-h-screen flex flex-col bg-gradient-to-b from-background to-muted/20">
+      <div className="container mx-auto px-4 py-8 max-w-5xl">
+        {/* ヘッダー */}
+        <div className="text-center mb-10">
+          <div className="inline-block p-3 bg-primary/10 rounded-full mb-4">
+            <Palette className="w-12 h-12 text-primary" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            色推薦UI評価実験
+          </h1>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            イラスト配色支援ツールの主観評価実験にご協力ください
           </p>
         </div>
 
-        {/* 実験概要 */}
-        <Card className="mb-6">
+        {/* 実験概要 - コンパクト版 */}
+        <div className="grid md:grid-cols-2 gap-4 mb-8">
+          <Card className="border-2">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <Clock className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="font-semibold">所要時間</p>
+                  <p className="text-sm text-muted-foreground">約 15〜20 分</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-2">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <InfoIcon className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="font-semibold">実験形式</p>
+                  <p className="text-sm text-muted-foreground">4条件を順番に体験</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* 実験フロー */}
+        <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <InfoIcon className="w-5 h-5 text-primary" />
-              実験について
-            </CardTitle>
+            <CardTitle className="text-xl">実験の流れ</CardTitle>
             <CardDescription>
-              本実験では、4つの異なる推薦条件（C0~C3）を体験していただきます
+              4つの異なる推薦条件で同じタスクを実施します
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm">
-              イラスト配色支援ツールの異なる推薦機能が、ユーザー体験や作業効率にどのような影響を与えるかを調査します。
-              各条件で同じタスクを実施し、操作内容と所要時間を記録します。
-            </p>
-            <Alert>
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription className="text-sm">
-                <strong>所要時間：</strong>約15～20分（4条件 × 3～5分程度）<br />
-                <strong>データ収集：</strong>すべての操作が自動記録されます（個人情報は含まれません）
-              </AlertDescription>
-            </Alert>
-          </CardContent>
-        </Card>
-
-        {/* 実験条件の説明 */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>実験条件（C0 → C1 → C2 → C3の順で実施）</CardTitle>
-            <CardDescription>
-              各条件で利用できる機能が異なります
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* C0 */}
-            <div className="p-4 border rounded-lg">
-              <div className="flex items-start gap-3">
-                <Badge variant="outline" className="font-mono text-base px-3 py-1">
-                  C0
-                </Badge>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-lg mb-2">推薦なし</h3>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    通常のカラーピッカーのみで色を選択します
-                  </p>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">カラーピッカー・画像抽出・キャンバス描画が利用可能</span>
+          <CardContent>
+            {/* プログレス表示 */}
+            <div className="flex items-center justify-between mb-6">
+              {conditions.map((cond, index) => (
+                <div key={cond.id} className="flex items-center flex-1">
+                  <div className="flex flex-col items-center">
+                    <div className={`w-10 h-10 rounded-full ${cond.badgeColor} text-white flex items-center justify-center font-bold text-sm`}>
+                      {cond.id}
+                    </div>
+                    <p className="text-xs mt-1 text-center hidden md:block">{cond.name}</p>
                   </div>
+                  {index < conditions.length - 1 && (
+                    <div className="flex-1 h-0.5 bg-border mx-2" />
+                  )}
                 </div>
-              </div>
+              ))}
             </div>
 
-            {/* C1 */}
-            <div className="p-4 border rounded-lg">
-              <div className="flex items-start gap-3">
-                <Badge variant="outline" className="font-mono text-base px-3 py-1">
-                  C1
-                </Badge>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-lg mb-2">色相推薦のみ</h3>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    ベース色から色相に基づく推薦色が表示されます（補色・類似色など）
-                  </p>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">C0の機能 + 色相推薦機能</span>
+            {/* 条件カードグリッド */}
+            <div className="grid md:grid-cols-2 gap-4">
+              {conditions.map((cond) => {
+                const Icon = cond.icon;
+                return (
+                  <div
+                    key={cond.id}
+                    className={`p-4 rounded-lg border-2 ${cond.color} transition-all hover:scale-105`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`p-2 ${cond.badgeColor} rounded-lg flex-shrink-0`}>
+                        <Icon className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Badge className={`${cond.badgeColor} text-white font-mono`}>
+                            {cond.id}
+                          </Badge>
+                          <h3 className="font-semibold">{cond.name}</h3>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {cond.description}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            </div>
-
-            {/* C2 */}
-            <div className="p-4 border rounded-lg">
-              <div className="flex items-start gap-3">
-                <Badge variant="outline" className="font-mono text-base px-3 py-1">
-                  C2
-                </Badge>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-lg mb-2">トーン推薦のみ</h3>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    選択した色からトーンに基づく推薦色が表示されます（明度・彩度バリエーション）
-                  </p>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">C0の機能 + トーン推薦機能</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* C3 */}
-            <div className="p-4 border rounded-lg">
-              <div className="flex items-start gap-3">
-                <Badge variant="outline" className="font-mono text-base px-3 py-1">
-                  C3
-                </Badge>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-lg mb-2">二段階推薦</h3>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    色相とトーンの両方に基づく推薦色が表示されます
-                  </p>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">C0の機能 + 色相推薦 + トーン推薦（すべて利用可能）</span>
-                  </div>
-                </div>
-              </div>
+                );
+              })}
             </div>
           </CardContent>
         </Card>
 
         {/* 参加者ID入力と開始 */}
-        <Card className="mb-6 border-2 border-primary/20">
-          <CardHeader>
-            <CardTitle>実験を開始</CardTitle>
+        <Card className="border-2 border-primary/30 shadow-lg">
+          <CardHeader className="bg-primary/5">
+            <CardTitle className="flex items-center gap-2">
+              <User className="w-5 h-5" />
+              実験を開始
+            </CardTitle>
             <CardDescription>
-              参加者IDを入力して「実験開始」ボタンを押してください
+              参加者IDを入力して実験を開始してください
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="pt-6 space-y-4">
             <div className="flex items-center gap-4">
-              <User className="w-5 h-5 text-muted-foreground flex-shrink-0" />
               <Input
                 type="text"
                 placeholder="参加者ID（例: U001）"
                 value={inputId}
                 onChange={(e) => setInputId(e.target.value)}
-                className="font-mono flex-1"
+                className="font-mono text-lg h-12"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     handleStart();
@@ -185,17 +206,16 @@ const ExperimentIntroPage = () => {
             <Button
               onClick={handleStart}
               size="lg"
-              className="w-full gap-2 text-lg py-6"
+              className="w-full gap-2 text-lg h-14 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
             >
               <Play className="w-5 h-5" />
               実験開始（C0から）
             </Button>
 
-            <Alert>
-              <InfoIcon className="h-4 w-4" />
+            <Alert className="border-primary/30 bg-primary/5">
+              <InfoIcon className="h-4 w-4 text-primary" />
               <AlertDescription className="text-sm">
-                実験開始後、C0 → C1 → C2 → C3 の順で各条件を体験していただきます。
-                各条件終了後、次の条件に進む前に確認メッセージが表示されます。
+                C0 → C1 → C2 → C3 の順で体験します。各条件終了後、次に進む確認が表示されます。
               </AlertDescription>
             </Alert>
           </CardContent>
