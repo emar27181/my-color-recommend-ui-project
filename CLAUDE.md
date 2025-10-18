@@ -769,6 +769,94 @@ Card (統一border-presets)
 
 ---
 
+## 🧪 実験ページUI仕様（2025-10-18追加）
+
+### 基本仕様
+- **ルート**: `/experiment` (導入ページ), `/experiment/task` (実験タスクページ), `/experiment/complete` (完了ページ)
+- **コンポーネント**: `ExperimentIntroPage.tsx`, `ExperimentPage.tsx`, `ExperimentCompletePage.tsx`
+- **目的**: 色推薦UI評価実験の参加者向けインターフェース
+
+### デザイン原則（2024年UI/UXベストプラクティスに基づく）
+- **ミニマルデザイン**: 十分なホワイトスペースと明確な情報階層
+- **視覚要素による理解促進**: アイコン・色分けによる直感的な情報伝達
+- **モバイル対応**: レスポンシブグリッドによる適切な表示
+- **グラデーション効果**: 視覚的な深みと現代的な印象
+
+### 実験導入ページ（ExperimentIntroPage.tsx）レイアウト仕様
+
+#### ヘッダーセクション
+- **背景**: グラデーション（`bg-gradient-to-b from-background to-muted/20`）
+- **アイコン**: Palette アイコン（`w-12 h-12`）を円形背景（`bg-primary/10 rounded-full`）で配置
+- **タイトル**: グラデーションテキスト（`bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent`）
+- **説明文**: `text-muted-foreground text-lg` でコントラスト確保
+
+#### 実験概要カード
+- **レイアウト**: 2列グリッド（`grid md:grid-cols-2 gap-4`）
+- **所要時間カード**: Clock アイコン + 「約 15〜20 分」
+- **実験形式カード**: InfoIcon + 「4条件を順番に体験」
+- **アイコン背景**: `bg-primary/10 rounded-lg` で統一
+
+#### 実験の流れセクション
+- **タイトルカード**: 独立した枠付きカード（`border-2`）として配置
+- **条件カードグリッド**: 2列レスポンシブ（`grid md:grid-cols-2 gap-4`）
+- **色分けシステム**:
+  - **C0（推薦なし）**: `bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-600` + `bg-slate-500` バッジ
+  - **C1（色相推薦）**: `bg-blue-50 dark:bg-blue-950 border-blue-300 dark:border-blue-700` + `bg-blue-500` バッジ
+  - **C2（トーン推薦）**: `bg-purple-50 dark:bg-purple-950 border-purple-300 dark:border-purple-700` + `bg-purple-500` バッジ
+  - **C3（二段階推薦）**: `bg-green-50 dark:bg-green-950 border-green-300 dark:border-green-700` + `bg-green-500` バッジ
+
+#### 条件カード構造
+- **レイアウト**: `flex items-start gap-3`（横並び）
+- **アイコン部**: 色付き背景（`${badgeColor} rounded-lg p-2`）、白色アイコン（`text-white`）
+- **テキスト部**: `flex-1 min-w-0` でオーバーフロー制御
+- **バッジ**: `font-mono px-3 py-1` でパディング確保、視認性向上
+- **説明文**: `text-sm text-muted-foreground`
+
+### 参加者ID入力フォーム仕様
+
+#### フォームレイアウト
+- **カード強調**: `border-2 border-primary/30 shadow-lg` で視覚的に目立たせる
+- **ヘッダー背景**: `bg-primary/5` で区別
+- **コンテンツ余白**: `pt-8 pb-8 px-8 space-y-6` で十分なスペース確保
+
+#### 入力フィールド
+- **ラベル**: `text-sm font-semibold text-foreground` で明確に表示
+- **フィールドサイズ**: `h-14 text-xl px-4 border-2` で視認性向上
+- **フォント**: `font-mono` でID入力に適した等幅フォント
+- **プレースホルダー**: 「例: U001」で入力例を提示
+
+#### 開始ボタン
+- **サイズ**: `w-full h-16 text-xl` で十分なタップエリア
+- **スタイル**: グラデーション（`bg-gradient-to-r from-primary to-primary/80`）
+- **アイコン**: Play アイコン（`w-6 h-6`）と組み合わせ
+- **ホバー効果**: `hover:from-primary/90 hover:to-primary/70`
+
+#### 注意事項表示
+- **背景**: `border-primary/30 bg-primary/5` で目立たせる
+- **アイコン**: InfoIcon（`h-5 w-5 text-primary`）
+- **テキスト**: `text-sm leading-relaxed` で読みやすさ確保
+
+### アイコン使用ルール
+- **Palette**: 色推薦を表現（ヘッダー、C0条件）
+- **Sparkles**: 推薦機能を表現（C1, C3条件）
+- **Layers**: 階層的推薦を表現（C2条件）
+- **Clock**: 時間情報を表現（所要時間）
+- **InfoIcon**: 説明・注意情報を表現（実験形式、注意事項）
+- **User**: ユーザー情報を表現（参加者ID入力）
+- **Play**: アクション開始を表現（実験開始ボタン）
+
+### レスポンシブ対応
+- **モバイル**: 縦積みレイアウト、条件カード1列表示
+- **タブレット**: 2列グリッドで情報密度向上
+- **デスクトップ**: 最大幅制限（`max-w-5xl`）で読みやすさ維持
+
+### 禁止事項
+- **ホバーアニメーション**: カードの`hover:scale-110`等は使用禁止（落ち着いたUX維持）
+- **プログレスインジケーター**: C0→C1→C2→C3の視覚的進捗表示は不要（シンプル化）
+- **過剰な装飾**: ミニマルデザイン原則を維持
+
+---
+
 ## 🔧 技術仕様
 
 ### 状態管理・データフロー
