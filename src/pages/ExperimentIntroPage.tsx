@@ -119,62 +119,49 @@ const ExperimentIntroPage = () => {
         </div>
 
         {/* 実験フロー */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="text-xl">実験の流れ</CardTitle>
-            <CardDescription>
-              4つの異なる推薦条件で同じタスクを実施します
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {/* プログレス表示 */}
-            <div className="flex items-center justify-between mb-6">
-              {conditions.map((cond, index) => (
-                <div key={cond.id} className="flex items-center flex-1">
-                  <div className="flex flex-col items-center">
-                    <div className={`w-10 h-10 rounded-full ${cond.badgeColor} text-white flex items-center justify-center font-bold text-sm`}>
-                      {cond.id}
-                    </div>
-                    <p className="text-xs mt-1 text-center hidden md:block">{cond.name}</p>
-                  </div>
-                  {index < conditions.length - 1 && (
-                    <div className="flex-1 h-0.5 bg-border mx-2" />
-                  )}
-                </div>
-              ))}
-            </div>
+        <div className="mb-8 space-y-4">
+          {/* 実験の流れ - タイトルカード */}
+          <Card className="border-2">
+            <CardContent className="pt-6">
+              <div className="text-center">
+                <h2 className="text-xl font-bold mb-2">実験の流れ</h2>
+                <p className="text-muted-foreground">
+                  4つの異なる推薦条件で同じタスクを実施します
+                </p>
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* 条件カードグリッド */}
-            <div className="grid md:grid-cols-2 gap-4">
-              {conditions.map((cond) => {
-                const Icon = cond.icon;
-                return (
-                  <div
-                    key={cond.id}
-                    className={`p-4 rounded-lg border-2 ${cond.color}`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className={`p-2 ${cond.badgeColor} rounded-lg flex-shrink-0`}>
-                        <Icon className="w-5 h-5 text-white" />
+          {/* 条件カードグリッド */}
+          <div className="grid md:grid-cols-2 gap-4">
+            {conditions.map((cond) => {
+              const Icon = cond.icon;
+              return (
+                <div
+                  key={cond.id}
+                  className={`p-4 rounded-lg border-2 ${cond.color}`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`p-2 ${cond.badgeColor} rounded-lg flex-shrink-0`}>
+                      <Icon className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Badge className={`${cond.badgeColor} text-white font-mono px-3 py-1`}>
+                          {cond.id}
+                        </Badge>
+                        <h3 className="font-semibold">{cond.name}</h3>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Badge className={`${cond.badgeColor} text-white font-mono px-3 py-1`}>
-                            {cond.id}
-                          </Badge>
-                          <h3 className="font-semibold">{cond.name}</h3>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          {cond.description}
-                        </p>
-                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {cond.description}
+                      </p>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
+                </div>
+              );
+            })}
+          </div>
+        </div>
 
         {/* 参加者ID入力と開始 */}
         <Card className="border-2 border-primary/30 shadow-lg">
