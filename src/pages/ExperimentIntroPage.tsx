@@ -165,7 +165,7 @@ const ExperimentIntroPage = () => {
 
         {/* 参加者ID入力と開始 */}
         <Card className="border-2 border-primary/30 shadow-lg">
-          <CardHeader className="bg-primary/5 pb-4">
+          <CardHeader className="bg-primary/5 pt-6 pb-6 px-8">
             <CardTitle className="flex items-center gap-2 text-xl">
               <User className="w-6 h-6" />
               実験を開始
@@ -174,7 +174,7 @@ const ExperimentIntroPage = () => {
               参加者IDを入力して実験を開始してください
             </CardDescription>
           </CardHeader>
-          <CardContent className="pt-8 pb-8 px-8 space-y-6">
+          <CardContent className="pt-10 pb-10 px-10 space-y-6">
             <div className="space-y-3">
               <label className="text-sm font-semibold text-foreground">参加者ID</label>
               <Input
