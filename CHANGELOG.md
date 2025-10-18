@@ -118,3 +118,20 @@
 - `src/pages/ExperimentIntroPage.tsx`
 
 **コミット:** `41df007` - feat: redesign experiment intro page with modern UI
+
+---
+
+### 実験ページのUI微調整
+
+**変更内容:**
+- 条件カードのホバーアニメーション（拡大効果）を削除
+- 条件バッジ（C0, C1, C2, C3）にパディング（`px-3 py-1`）を追加
+
+**理由:**
+- ホバーアニメーションを削除してよりシンプルで落ち着いたUXに
+- バッジの周りに余白を設けて視認性を向上
+
+**変更ファイル:**
+- `src/pages/ExperimentIntroPage.tsx`
+
+**コミット:** `9419f13` - refactor: remove hover animation and add badge padding on experiment page
