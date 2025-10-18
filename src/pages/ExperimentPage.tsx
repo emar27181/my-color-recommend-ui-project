@@ -81,6 +81,18 @@ const ExperimentPage = () => {
     setCollapseStates(prev => ({ ...prev, [key]: value }));
   };
 
+  // 条件に応じてコラプス状態を初期化
+  useEffect(() => {
+    // C1〜C3の場合は、推薦セクションを展開状態にする
+    if (condition && condition !== 'C0') {
+      setCollapseStates(prev => ({
+        ...prev,
+        isColorRecommendationCollapsed: false,
+        isToneRecommendationCollapsed: false,
+      }));
+    }
+  }, [condition]);
+
   useEffect(() => {
     // 初期表示時にページの最上端を表示
     window.scrollTo(0, 0);
