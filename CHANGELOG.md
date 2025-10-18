@@ -135,3 +135,22 @@
 - `src/pages/ExperimentIntroPage.tsx`
 
 **コミット:** `9419f13` - refactor: remove hover animation and add badge padding on experiment page
+
+---
+
+### 実験ページレイアウトの簡略化
+
+**変更内容:**
+- プログレスインジケーター（C0→C1→C2→C3のビジュアル表示）を削除
+- 「実験の流れ」タイトルセクションを独立した枠付きカードとして分離
+- レイアウト構造をシンプル化して読みやすさを向上
+
+**理由:**
+- プログレスインジケーターを削除してページをよりシンプルに
+- タイトルセクションを枠付きカードにすることで視覚的な階層を明確化
+- 不要な要素を削除してコンテンツに集中できるUIに
+
+**変更ファイル:**
+- `src/pages/ExperimentIntroPage.tsx`
+
+**コミット:** `947f133` - refactor: simplify experiment page layout
