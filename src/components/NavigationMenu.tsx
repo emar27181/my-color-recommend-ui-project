@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Play, HelpCircle, ScrollText, BarChart3, ClipboardList, Info } from 'lucide-react';
+import { Menu, X, Play, HelpCircle, ScrollText, BarChart3, ClipboardList, Info, FlaskConical } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useTutorial } from '@/contexts/TutorialContext';
 
@@ -17,7 +17,7 @@ export const NavigationMenu = ({ className = '' }: NavigationMenuProps) => {
   };
 
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
+    <div className={`flex items-center gap-5 ${className}`}>
       {/* Navigation Icons */}
       {/* チュートリアルボタン - 表示オフ
       <button
@@ -30,6 +30,7 @@ export const NavigationMenu = ({ className = '' }: NavigationMenuProps) => {
         <Play className="w-5 h-5 [&>path]:fill-none [&>path]:stroke-current" />
       </button>
       */}
+      {/* スワイプ推薦ボタン - 表示オフ
       <Link
         to="/swipe"
         className="p-2 rounded-lg bg-background/50 border-none hover:bg-muted/50 transition-colors backdrop-blur-sm text-foreground"
@@ -37,12 +38,13 @@ export const NavigationMenu = ({ className = '' }: NavigationMenuProps) => {
       >
         <ScrollText className="w-5 h-5" />
       </Link>
+      */}
       <Link
         to="/sns-analysis"
         className="p-2 rounded-lg bg-background/50 border-none hover:bg-muted/50 transition-colors backdrop-blur-sm text-foreground"
         title="SNS嗜好分析"
       >
-        <BarChart3 className="w-5 h-5" />
+        <FlaskConical className="w-5 h-5" />
       </Link>
       <Link
         to="/experiment"
