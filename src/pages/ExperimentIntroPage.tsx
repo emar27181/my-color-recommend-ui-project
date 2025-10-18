@@ -151,7 +151,7 @@ const ExperimentIntroPage = () => {
                 return (
                   <div
                     key={cond.id}
-                    className={`p-4 rounded-lg border-2 ${cond.color} transition-all hover:scale-105`}
+                    className={`p-4 rounded-lg border-2 ${cond.color}`}
                   >
                     <div className="flex items-start gap-3">
                       <div className={`p-2 ${cond.badgeColor} rounded-lg flex-shrink-0`}>
@@ -159,7 +159,7 @@ const ExperimentIntroPage = () => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <Badge className={`${cond.badgeColor} text-white font-mono`}>
+                          <Badge className={`${cond.badgeColor} text-white font-mono px-3 py-1`}>
                             {cond.id}
                           </Badge>
                           <h3 className="font-semibold">{cond.name}</h3>
