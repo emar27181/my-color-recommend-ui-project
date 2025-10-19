@@ -174,9 +174,9 @@ const ExperimentIntroPage = () => {
               参加者IDを入力して実験を開始してください
             </CardDescription>
           </CardHeader>
-          <CardContent className="pt-10 pb-10 px-10 space-y-6">
-            <div className="space-y-3">
-              <label className="text-sm font-semibold text-foreground">参加者ID</label>
+          <CardContent className="pt-12 pb-12 px-12 space-y-8">
+            <div className="space-y-4">
+              <label className="text-base font-semibold text-foreground block mb-2">参加者ID</label>
               <Input
                 type="text"
                 placeholder="例: U001"
