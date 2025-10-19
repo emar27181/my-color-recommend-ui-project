@@ -39,14 +39,14 @@ const ExperimentPage = () => {
   // デバイス判定（閾値800px）
   const isMobile = screenSize.width < 800;
 
-  // コラプス状態をオブジェクトで管理
+  // コラプス状態をオブジェクトで管理（すべて常に開いた状態）
   const [collapseStates, setCollapseStates] = useState({
     isCanvasCollapsed: false,
     isBaseColorCollapsed: false,
     isColorRecommendationCollapsed: false,
     isToneRecommendationCollapsed: false,
-    isSkinColorCollapsed: true,
-    isHueToneExtractionCollapsed: false,
+    isSkinColorCollapsed: false, // 常に開く
+    isHueToneExtractionCollapsed: false, // 常に開く
     isCanvasColorRecommendationCollapsed: false,
   });
 
@@ -81,17 +81,7 @@ const ExperimentPage = () => {
     setCollapseStates(prev => ({ ...prev, [key]: value }));
   };
 
-  // 条件に応じてコラプス状態を初期化
-  useEffect(() => {
-    // C1〜C3の場合は、推薦セクションを展開状態にする
-    if (condition && condition !== 'C0') {
-      setCollapseStates(prev => ({
-        ...prev,
-        isColorRecommendationCollapsed: false,
-        isToneRecommendationCollapsed: false,
-      }));
-    }
-  }, [condition]);
+  // 折り畳み機能は無効化されているため、特別な処理は不要
 
   useEffect(() => {
     // 初期表示時にページの最上端を表示
