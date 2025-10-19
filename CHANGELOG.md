@@ -2,6 +2,80 @@
 
 このファイルは、色推薦アプリプロジェクトの開発履歴を記録します。
 
+## 2025-10-19
+
+### 実験ページでの推薦表示不具合の修正
+
+**不具合内容:**
+- 実験ページ（`/experiment/task?cond=C1`など）で色相推薦・トーン推薦が表示されない
+- URLパラメータで設定した条件（C1, C2, C3）が推薦コンポーネントに反映されない
+
+**原因:**
+- ColorRecommendations・ToneRecommendationsコンポーネントが`useConditionStore()`を使用
+- ExperimentPageは`useExperimentStore()`を使用
+- 2つのストアが同期されておらず、条件フラグが伝わらない
+
+**修正内容:**
+- ColorRecommendations・ToneRecommendationsに`useExperimentStore()`を追加
+- 実験モード判定ロジックを実装：
+  - `participantId`が設定されている場合（実験モード）→ `experimentStore.getFeatureFlags()`を使用
+  - それ以外（通常モード）→ `conditionStore.getFlags()`を使用
+- 通常モードと実験モードの両方で正しく動作するように改善
+
+**動作確認:**
+- C0: 推薦なし（正常に非表示）
+- C1: 色相推薦のみ表示（正常に表示）
+- C2: トーン推薦のみ表示（正常に表示）
+- C3: 色相推薦とトーン推薦の両方表示（正常に表示）
+
+**変更ファイル:**
+- `src/components/ColorRecommendations.tsx`
+
+**コミット:** `1e55d09` - fix: use experimentStore flags in recommendation components
+
+---
+
+### セクション折り畳み機能の無効化
+
+**変更内容:**
+- すべてのセクションの折り畳み機能を無効化（常に展開状態）
+- 折り畳みUI要素（ChevronDown/Up/Leftアイコン）を削除
+- 折り畳み関連のロジックを削除・簡略化
+- RefreshCwボタン（キャンバス色抽出）は維持
+
+**理由:**
+- ユーザーの要望により、すべてのコンテンツを常に表示してアクセシビリティを向上
+- 折り畳み操作の手間を削減し、よりシンプルなUIを実現
+- 実験参加者が推薦機能を見逃すリスクを排除
+
+**詳細な変更:**
+- **App.tsx**:
+  - すべての折り畳み状態を `false` に設定
+  - 不要な `useEffect` フック（折り畳み状態管理）を削除
+- **ExperimentPage.tsx**:
+  - すべての折り畳み状態を `false` に設定
+  - 条件に応じた折り畳み初期化ロジックを削除
+- **LayoutRenderer.tsx**:
+  - `SectionHeader` から折り畳みUI要素を削除
+  - クリックイベント（`onClick={onToggle}`）を削除
+  - `Section` コンポーネントの条件分岐を削除し、常に表示
+  - βセクションの横方向折り畳みロジックを削除
+  - デスクトップレイアウトの動的幅調整ロジックを削除
+
+**影響範囲:**
+- ホームページ（`/`）
+- 実験ページ（`/experiment/task`）
+- すべてのデスクトップ・モバイルレイアウト
+
+**変更ファイル:**
+- `src/App.tsx`
+- `src/pages/ExperimentPage.tsx`
+- `src/components/layout/LayoutRenderer.tsx`
+
+**コミット:** `5b161fe` - feat: disable collapse functionality for all sections
+
+---
+
 ## 2025-10-18
 
 ### C1〜C3条件で推薦UIを自動展開
