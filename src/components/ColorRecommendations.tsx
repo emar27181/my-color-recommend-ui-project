@@ -1,6 +1,7 @@
 import React from 'react';
 import { useColorStore, COLOR_SCHEMES, sortSchemesByCompatibility, sortSchemesByHueDistance, sortSchemesByColorCount, SCHEME_SORT_CONFIG } from '@/store/colorStore';
 import { useConditionStore } from '@/store/conditionStore';
+import { useExperimentStore } from '@/store/experimentStore';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ColorGrid } from '@/components/common/ColorGrid';
 import { ColorWheelMini } from '@/components/common/ColorWheelMini';
@@ -16,8 +17,16 @@ interface ColorRecommendationsProps {
 
 export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsProps) => {
   const { recommendedColors, selectedScheme, setSelectedScheme, generateRecommendedTones, baseColor, selectedColor, setColorFromRecommendation, paintColor, extractedColors } = useColorStore();
-  const { getFlags } = useConditionStore();
-  const flags = getFlags();
+
+  // 実験ストアと条件ストアの両方をチェック（実験モード優先）
+  const experimentStore = useExperimentStore();
+  const conditionStore = useConditionStore();
+
+  // 実験モードの場合はexperimentStoreのフラグを使用、それ以外はconditionStoreを使用
+  const flags = experimentStore.participantId
+    ? experimentStore.getFeatureFlags()
+    : conditionStore.getFlags();
+
   const { onUserAction } = useTutorial();
   const { t } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
@@ -211,8 +220,16 @@ interface ToneRecommendationsProps {
 
 export const ToneRecommendations = ({ isMobile = false }: ToneRecommendationsProps) => {
   const { recommendedTones, selectedColor, generateRecommendedTones, setColorFromRecommendation, paintColor } = useColorStore();
-  const { getFlags } = useConditionStore();
-  const flags = getFlags();
+
+  // 実験ストアと条件ストアの両方をチェック（実験モード優先）
+  const experimentStore = useExperimentStore();
+  const conditionStore = useConditionStore();
+
+  // 実験モードの場合はexperimentStoreのフラグを使用、それ以外はconditionStoreを使用
+  const flags = experimentStore.participantId
+    ? experimentStore.getFeatureFlags()
+    : conditionStore.getFlags();
+
   const { t } = useTranslation();
 
   React.useEffect(() => {
