@@ -165,18 +165,18 @@ const ExperimentIntroPage = () => {
 
         {/* 参加者ID入力と開始 */}
         <Card className="border-2 border-primary/30 shadow-lg">
-          <CardHeader className="bg-primary/5 pt-6 pb-6 px-8">
-            <CardTitle className="flex items-center gap-2 text-xl">
+          <CardHeader className="bg-primary/5 pt-10 pb-10 px-12">
+            <CardTitle className="flex items-center gap-2 text-xl mb-4">
               <User className="w-6 h-6" />
               実験を開始
             </CardTitle>
-            <CardDescription className="text-base mt-2">
+            <CardDescription className="text-base">
               参加者IDを入力して実験を開始してください
             </CardDescription>
           </CardHeader>
-          <CardContent className="pt-12 pb-12 px-12 space-y-8">
-            <div className="space-y-4">
-              <label className="text-base font-semibold text-foreground block mb-2">参加者ID</label>
+          <CardContent className="pt-16 pb-16 px-16 space-y-10">
+            <div className="space-y-6">
+              <label className="text-base font-semibold text-foreground block">参加者ID</label>
               <Input
                 type="text"
                 placeholder="例: U001"
@@ -200,7 +200,7 @@ const ExperimentIntroPage = () => {
               実験開始（C0から）
             </Button>
 
-            <Alert className="border-primary/30 bg-primary/5 p-4">
+            <Alert className="border-primary/30 bg-primary/5 p-6">
               <InfoIcon className="h-5 w-5 text-primary" />
               <AlertDescription className="text-sm leading-relaxed ml-2">
                 C0 → C1 → C2 → C3 の順で体験します。各条件終了後、次に進む確認が表示されます。
