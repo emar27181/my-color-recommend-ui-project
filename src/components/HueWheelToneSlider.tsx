@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useColorStore } from '@/store/colorStore';
 import chroma from 'chroma-js';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 /**
  * Test2用: 色相環＋トーンスライダーコンポーネント
@@ -19,6 +19,11 @@ export const HueWheelToneSlider = () => {
 
   // 現在の色を計算
   const currentColor = chroma.hsl(hue, saturation / 100, lightness / 100).hex();
+
+  // 色が変わるたびに描画色を即座に更新
+  useEffect(() => {
+    setPaintColor(currentColor);
+  }, [currentColor, setPaintColor]);
 
   // 色相環のサイズ設定
   const size = 240;
@@ -53,10 +58,6 @@ export const HueWheelToneSlider = () => {
     setHue(angle);
   };
 
-  // 色を適用ボタン
-  const handleApplyColor = () => {
-    setPaintColor(currentColor);
-  };
 
   // 選択中の色相位置を計算
   const selectedAngle = (hue - 90) * (Math.PI / 180);
@@ -193,18 +194,14 @@ export const HueWheelToneSlider = () => {
           </div>
         </div>
 
-        {/* プレビューと適用ボタン */}
-        <div className="flex items-center gap-4">
-          {/* カラープレビュー */}
-          <div className="flex-1">
-            <div className="text-xs text-muted-foreground mb-1">プレビュー</div>
-            <div
-              className="w-full h-16 rounded border-2 border-gray-300"
-              style={{ backgroundColor: currentColor }}
-            />
-            <div className="text-xs font-mono text-center mt-1">{currentColor}</div>
-          </div>
-
+        {/* カラープレビュー */}
+        <div>
+          <div className="text-xs text-muted-foreground mb-1">現在の描画色</div>
+          <div
+            className="w-full h-16 rounded border-2 border-gray-300"
+            style={{ backgroundColor: currentColor }}
+          />
+          <div className="text-xs font-mono text-center mt-1">{currentColor}</div>
         </div>
       </CardContent>
     </Card>
