@@ -8,6 +8,7 @@ import { ImageUpload } from '@/components/ImageUpload';
 import { ExtractedColorsDisplay } from '@/components/ExtractedColorsDisplay';
 import { SkinColorRecommendations } from '@/components/SkinColorRecommendations';
 import { HueToneExtraction } from '@/components/HueToneExtraction';
+import { MassColorGrid } from '@/components/MassColorGrid';
 // import { PaintCanvas, type PaintCanvasRef } from '@/components/PaintCanvas';
 import { CanvasColorRecommendations, type CanvasColorRecommendationsRef } from '@/components/CanvasColorRecommendations';
 import { COMPONENT_CONFIG, LAYOUT_CONFIG, type ComponentKey, type LayoutColumn } from '@/constants/layout';
@@ -19,8 +20,6 @@ interface LayoutRendererProps {
   paintCanvasRef: React.RefObject<CanvasColorRecommendationsRef | null>;
   handleExtractColorsFromCanvas: () => void;
   handleImageUpload: (file: File) => void;
-  collapseStates: Record<string, boolean>;
-  setCollapseState: (key: string, value: boolean) => void;
 }
 
 // 色使用量バーコンポーネント
@@ -66,6 +65,9 @@ const ComponentMap = {
       <ExtractedColorsDisplay isMobile={isMobile} />
     </div>
   ),
+  massColorGrid: () => (
+    <MassColorGrid />
+  ),
   colorRecommendation: ({ isMobile }: any) => (
     <ColorRecommendations isMobile={isMobile} />
   ),
@@ -86,14 +88,10 @@ const ComponentMap = {
 // セクションヘッダーコンポーネント（折り畳み機能無効化版）
 const SectionHeader = ({
   componentKey,
-  isCollapsed,
-  onToggle,
   handleExtractColorsFromCanvas,
   isMobile
 }: {
   componentKey: ComponentKey;
-  isCollapsed: boolean;
-  onToggle: () => void;
   handleExtractColorsFromCanvas?: () => void;
   isMobile: boolean;
 }) => {
@@ -128,33 +126,24 @@ const SectionHeader = ({
 };
 
 // セクションコンポーネント
-const Section = ({ 
-  componentKey, 
-  props, 
-  collapseStates, 
-  setCollapseState,
+const Section = ({
+  componentKey,
+  props,
   isMobile,
-  isDebugMode,
-  isAnimationEnabled
+  isDebugMode
 }: {
   componentKey: ComponentKey;
   props: any;
-  collapseStates: Record<string, boolean>;
-  setCollapseState: (key: string, value: boolean) => void;
   isMobile: boolean;
   isDebugMode: boolean;
-  isAnimationEnabled: boolean;
 }) => {
   const config = COMPONENT_CONFIG[componentKey];
-  const isCollapsed = collapseStates[config.collapseState];
   const Component = ComponentMap[componentKey];
 
   return (
     <section className={componentKey === 'canvas' && !isMobile ? "flex-shrink-0 flex-1 flex flex-col min-h-[700px] h-full" : "flex-shrink-0"} style={componentKey === 'canvas' && !isMobile && isDebugMode ? { backgroundColor: '#ffeb3b', padding: '8px' } : {}}>
       <SectionHeader
         componentKey={componentKey}
-        isCollapsed={isCollapsed}
-        onToggle={() => {}} // 折り畳み機能無効化
         handleExtractColorsFromCanvas={config.hasUpdateButton ? props.handleExtractColorsFromCanvas : undefined}
         isMobile={isMobile}
       />
@@ -179,11 +168,8 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
   isDebugMode,
   paintCanvasRef,
   handleExtractColorsFromCanvas,
-  handleImageUpload,
-  collapseStates,
-  setCollapseState
+  handleImageUpload
 }) => {
-  const { isAnimationEnabled } = useColorStore();
   
   const commonProps = {
     isMobile,
@@ -196,12 +182,12 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
   if (isMobile) {
     // モバイル: 縦積みレイアウト
     // columnsから利用可能なコンポーネントのリストを取得（フィルタリング済み）
-    const availableComponents = new Set(
+    const availableComponents = new Set<string>(
       columns.flatMap(column => column.components)
     );
 
     // LAYOUT_CONFIGの順序を保持しつつ、利用可能なコンポーネントのみを使用
-    const allComponents: ComponentKey[] = (LAYOUT_CONFIG.mobile.order as unknown as ComponentKey[])
+    const allComponents = LAYOUT_CONFIG.mobile.order
       .filter(componentKey => availableComponents.has(componentKey));
 
     return (
@@ -211,11 +197,8 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
             <Section
               componentKey={componentKey}
               props={commonProps}
-              collapseStates={collapseStates}
-              setCollapseState={setCollapseState}
               isMobile={isMobile}
               isDebugMode={isDebugMode}
-              isAnimationEnabled={isAnimationEnabled}
             />
           </div>
         ))}
@@ -257,11 +240,8 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
               key={componentKey}
               componentKey={componentKey as ComponentKey}
               props={commonProps}
-              collapseStates={collapseStates}
-              setCollapseState={setCollapseState}
               isMobile={isMobile}
               isDebugMode={isDebugMode}
-              isAnimationEnabled={isAnimationEnabled}
             />
           ))}
         </div>

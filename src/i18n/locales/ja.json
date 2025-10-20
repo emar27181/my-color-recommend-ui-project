@@ -5,6 +5,7 @@
       "canvas": "キャンバス",
       "baseColorSelection": "ベースカラー(推薦元)選択",
       "baseColorSelectionShort": "ベース色選択",
+      "massColorGrid": "カラーパレット",
       "colorRecommendation": "色相(配色技法)推薦",
       "colorRecommendationShort": "色相推薦",
       "toneRecommendation": "トーン(明度・彩度)推薦",

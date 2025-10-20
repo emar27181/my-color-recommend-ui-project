@@ -10,9 +10,9 @@ export const LAYOUT_CONFIG = {
         components: ['canvasColorRecommendation']
       },
       {
-        id: 'main-tools', 
+        id: 'main-tools',
         width: 'w-1/3' as const, // 1/3幅（約33.3%）- ベース色選択列を拡大
-        components: ['baseColor', 'colorRecommendation', 'toneRecommendation', 'skinColor']
+        components: ['baseColor', 'massColorGrid', 'colorRecommendation', 'toneRecommendation', 'skinColor']
       },
       {
         id: 'analysis',
@@ -25,7 +25,7 @@ export const LAYOUT_CONFIG = {
   
   // モバイルレイアウト設定（縦積み）
   mobile: {
-    order: ['canvasColorRecommendation', 'baseColor', 'colorRecommendation', 'toneRecommendation', 'skinColor', 'hueToneExtraction']
+    order: ['canvasColorRecommendation', 'baseColor', 'massColorGrid', 'colorRecommendation', 'toneRecommendation', 'skinColor', 'hueToneExtraction']
   }
 } as const;
 
@@ -78,6 +78,13 @@ export const COMPONENT_CONFIG = {
     step: '0',
     titleKey: 'app.steps.canvasColorRecommendation',
     collapseState: 'isCanvasColorRecommendationCollapsed',
+    hasUpdateButton: false
+  },
+  massColorGrid: {
+    key: 'massColorGrid',
+    step: 'T1',
+    titleKey: 'app.steps.massColorGrid',
+    collapseState: 'isMassColorGridCollapsed',
     hasUpdateButton: false
   }
 } as const;

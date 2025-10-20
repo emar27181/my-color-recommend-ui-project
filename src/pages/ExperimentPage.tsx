@@ -39,17 +39,6 @@ const ExperimentPage = () => {
   // デバイス判定（閾値800px）
   const isMobile = screenSize.width < 800;
 
-  // コラプス状態をオブジェクトで管理（すべて常に開いた状態）
-  const [collapseStates, setCollapseStates] = useState({
-    isCanvasCollapsed: false,
-    isBaseColorCollapsed: false,
-    isColorRecommendationCollapsed: false,
-    isToneRecommendationCollapsed: false,
-    isSkinColorCollapsed: false, // 常に開く
-    isHueToneExtractionCollapsed: false, // 常に開く
-    isCanvasColorRecommendationCollapsed: false,
-  });
-
   // CanvasColorRecommendationsへの参照
   const canvasColorRecommendationsRef = useRef<CanvasColorRecommendationsRef>(null);
 
@@ -75,13 +64,6 @@ const ExperimentPage = () => {
       console.error('Canvas color extraction failed:', error);
     }
   };
-
-  // コラプス状態更新用ヘルパー
-  const setCollapseState = (key: string, value: boolean) => {
-    setCollapseStates(prev => ({ ...prev, [key]: value }));
-  };
-
-  // 折り畳み機能は無効化されているため、特別な処理は不要
 
   useEffect(() => {
     // 初期表示時にページの最上端を表示
@@ -168,6 +150,11 @@ const ExperimentPage = () => {
         return false;
       }
 
+      // 大量色グリッドはTest1のみ表示
+      if (componentKey === 'massColorGrid' && !featureFlags.MASS_COLOR_GRID_ON) {
+        return false;
+      }
+
       // 色相推薦を表示するかチェック
       if (componentKey === 'colorRecommendation' && !featureFlags.HUE_RECO_ON) {
         return false;
@@ -234,8 +221,6 @@ const ExperimentPage = () => {
           paintCanvasRef={canvasColorRecommendationsRef}
           handleExtractColorsFromCanvas={handleExtractColorsFromCanvas}
           handleImageUpload={handleImageUpload}
-          collapseStates={collapseStates}
-          setCollapseState={setCollapseState}
         />
       </div>
 
@@ -248,8 +233,6 @@ const ExperimentPage = () => {
           paintCanvasRef={canvasColorRecommendationsRef}
           handleExtractColorsFromCanvas={handleExtractColorsFromCanvas}
           handleImageUpload={handleImageUpload}
-          collapseStates={collapseStates}
-          setCollapseState={setCollapseState}
         />
       </div>
     </main>
