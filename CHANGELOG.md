@@ -2,6 +2,40 @@
 
 このファイルは、色推薦アプリプロジェクトの開発履歴を記録します。
 
+## 2025-10-21
+
+### 実験ページT1/T2で描画色が即座に変更されない不具合の修正
+
+**不具合内容:**
+- 実験ページのT1（カラーパレット）でカラーボックスをクリックしても描画色が変わらない
+- T2（色相環+トーンスライダー）で色相環クリック・スライダー操作しても描画色が変わらない
+
+**原因:**
+- CanvasColorRecommendationsコンポーネントが`selectedColor`を使用
+- MassColorGrid・HueWheelToneSliderが`paintColor`を更新
+- 2つの状態が同期されておらず、描画色が反映されない
+
+**修正内容:**
+- HueWheelToneSlider: 適用ボタンを削除し、`useEffect`で色変更時に即座に`paintColor`を更新
+- CanvasColorRecommendations: `selectedColor`から`paintColor`へ全面的に統一
+  - useColorStoreからの取得を変更
+  - 全ての描画処理（ペン・塗りつぶし・スポイト）で`paintColor`を使用
+  - カラーピッカー・プレビュー表示も`paintColor`に統一
+
+**動作確認:**
+- T1: カラーボックスクリック → 即座に描画色変更 ✓
+- T2: 色相環クリック → 即座に描画色変更 ✓
+- T2: 彩度スライダー操作 → リアルタイムで描画色変更 ✓
+- T2: 明度スライダー操作 → リアルタイムで描画色変更 ✓
+
+**変更ファイル:**
+- `src/components/HueWheelToneSlider.tsx`
+- `src/components/CanvasColorRecommendations.tsx`
+
+**コミット:** `ed2aa51` - fix: 実験ページT1/T2でクリック時に描画色が即座に変更されるように修正
+
+---
+
 ## 2025-10-19
 
 ### 実験ページでの推薦表示不具合の修正
