@@ -33,6 +33,16 @@ export interface ConditionLog {
   events: ExperimentEvent[];
 }
 
+// アンケート回答の型定義
+export interface SurveyResponse {
+  usability: number[];      // SUS簡易版(5問) - 1〜5段階評価
+  effectiveness: number[];  // TAM(3問) - 1〜5段階評価
+  creativity: number[];     // Mini-CSI(3問) - 1〜5段階評価
+  favoriteUI: string;       // 最も使いやすかったUI (C0/C1/C2/C3)
+  reason: string;           // 理由（自由記述）
+  improvement: string;      // 改善点（自由記述）
+}
+
 // 実験ログ全体の型定義
 export interface ExperimentLog {
   participant_id: string;
@@ -41,6 +51,7 @@ export interface ExperimentLog {
   experiment_end_time: string | null;
   total_duration_sec: number | null;
   conditions: ConditionLog[];
+  survey?: SurveyResponse; // アンケート結果（オプショナル）
 }
 
 // 実験状態の型定義
@@ -61,6 +72,9 @@ export interface ExperimentState {
   currentConditionIndex: number;      // 現在の条件インデックス (0=C0, 1=C1, 2=C2, 3=C3)
   conditionOrder: ExperimentCondition[]; // 実験順序
 
+  // アンケート
+  surveyResponse: SurveyResponse | null; // アンケート回答
+
   // アクション
   setParticipantId: (id: string) => void;
   setCondition: (condition: ExperimentCondition) => void;
@@ -78,6 +92,9 @@ export interface ExperimentState {
   hasNextCondition: () => boolean;           // 次の条件があるか
   getNextCondition: () => ExperimentCondition | null; // 次の条件を取得
   completeCurrentCondition: () => void;      // 現在の条件を完了
+
+  // アンケートアクション
+  setSurveyResponse: (survey: SurveyResponse) => void; // アンケート回答を保存
 
   // 条件による機能フラグ
   getFeatureFlags: () => {
@@ -147,6 +164,9 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
   conditionLogs: [],
   currentConditionIndex: 0,
   conditionOrder: ['C0', 'C1', 'C2', 'C3'],
+
+  // アンケート
+  surveyResponse: null,
 
   // 参加者IDを設定
   setParticipantId: (id: string) => {
@@ -224,6 +244,7 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
         ? parseFloat(((state.experimentEndTime - state.experimentStartTime) / 1000).toFixed(2))
         : null,
       conditions: state.conditionLogs,
+      survey: state.surveyResponse || undefined, // アンケート回答を含める
     };
   },
 
@@ -356,6 +377,12 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
 
     console.log(`Moved to condition ${nextCondition}`);
     return true;
+  },
+
+  // アンケート回答を保存
+  setSurveyResponse: (survey: SurveyResponse) => {
+    set({ surveyResponse: survey });
+    console.log('Survey response saved:', survey);
   },
 
   // 条件による機能フラグを取得

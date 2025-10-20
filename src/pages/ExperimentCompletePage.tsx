@@ -1,18 +1,22 @@
-import { useExperimentStore } from '@/store/experimentStore';
+import { useState } from 'react';
+import { useExperimentStore, type SurveyResponse } from '@/store/experimentStore';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, Download, Home } from 'lucide-react';
+import { CheckCircle, Download, Home, ClipboardCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { SurveyForm } from '@/components/SurveyForm';
 
 /**
  * 実験完了ページ
  *
  * 全条件（C0~C3）完了後に表示されるページ
+ * アンケート回答後、ログをダウンロード可能
  */
 const ExperimentCompletePage = () => {
   const navigate = useNavigate();
-  const { participantId, conditionLogs, exportLog } = useExperimentStore();
+  const { participantId, conditionLogs, surveyResponse, setSurveyResponse, exportLog } = useExperimentStore();
+  const [showSurvey, setShowSurvey] = useState(!surveyResponse); // アンケート未回答時は表示
 
   // 各条件の所要時間を計算
   const getConditionDuration = (condIndex: number) => {
@@ -26,6 +30,13 @@ const ExperimentCompletePage = () => {
   const totalDuration = conditionLogs.reduce((sum, log) => {
     return sum + (log.task_duration_sec || 0);
   }, 0);
+
+  // アンケート送信ハンドラー
+  const handleSurveySubmit = (response: SurveyResponse) => {
+    setSurveyResponse(response);
+    setShowSurvey(false);
+    alert('アンケートありがとうございました！\n実験ログをダウンロードしてください。');
+  };
 
   return (
     <main className="flex-1 pb-8 min-h-screen flex flex-col bg-background">
@@ -86,33 +97,51 @@ const ExperimentCompletePage = () => {
           </CardContent>
         </Card>
 
-        {/* 次のステップ */}
-        <Card className="mb-6 border-2 border-primary/20">
-          <CardHeader>
-            <CardTitle>次のステップ</CardTitle>
-            <CardDescription>
-              実験データをダウンロードし、Googleフォームに提出してください
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Button onClick={exportLog} size="lg" className="w-full gap-2">
-              <Download className="w-5 h-5" />
-              実験ログをダウンロード
-            </Button>
-
-            <div className="text-sm text-muted-foreground space-y-2">
-              <p>
-                <strong>1.</strong> 上のボタンをクリックして、実験ログ（JSONファイル）をダウンロード
-              </p>
-              <p>
-                <strong>2.</strong> ダウンロードしたファイルをGoogleフォームにアップロード
-              </p>
-              <p>
-                <strong>3.</strong> アンケートにご回答ください
-              </p>
+        {/* アンケートセクション */}
+        {showSurvey ? (
+          <div className="mb-6">
+            <div className="mb-4 p-4 bg-primary/10 rounded-lg">
+              <div className="flex items-center gap-3">
+                <ClipboardCheck className="w-6 h-6 text-primary" />
+                <div>
+                  <h2 className="text-lg font-semibold">アンケートにご協力ください</h2>
+                  <p className="text-sm text-muted-foreground">
+                    実験ログをダウンロードする前に、アンケートに回答してください
+                  </p>
+                </div>
+              </div>
             </div>
-          </CardContent>
-        </Card>
+            <SurveyForm onSubmit={handleSurveySubmit} />
+          </div>
+        ) : (
+          /* 次のステップ */
+          <Card className="mb-6 border-2 border-primary/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+                アンケート回答完了
+              </CardTitle>
+              <CardDescription>
+                実験ログをダウンロードしてください
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Button onClick={exportLog} size="lg" className="w-full gap-2">
+                <Download className="w-5 h-5" />
+                実験ログ＋アンケート結果をダウンロード
+              </Button>
+
+              <div className="text-sm text-muted-foreground space-y-2">
+                <p>
+                  <strong>1.</strong> 上のボタンをクリックして、実験ログ（JSONファイル）をダウンロード
+                </p>
+                <p>
+                  <strong>2.</strong> ダウンロードしたファイルを研究者に提出してください
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* ホームに戻るボタン */}
         <div className="text-center">
