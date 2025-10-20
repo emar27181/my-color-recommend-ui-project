@@ -78,7 +78,7 @@ const MassColorGridContent = memo(() => {
           <button
             key={index}
             onClick={() => handleColorClick(color)}
-            className="w-12 h-12 rounded-sm border-2 border-gray-300 hover:scale-110 transition-transform cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-12 h-12 aspect-square rounded-sm border-2 border-gray-300 hover:scale-110 transition-transform cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary"
             style={{ backgroundColor: color.hex }}
             title={`${color.hex} (H:${color.hue.toFixed(0)}° S:${color.saturation}% L:${color.lightness}%)`}
           />
