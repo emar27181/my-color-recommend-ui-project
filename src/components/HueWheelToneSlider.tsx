@@ -16,6 +16,7 @@ export const HueWheelToneSlider = () => {
   const [hue, setHue] = useState(0); // 0-360
   const [saturation, setSaturation] = useState(70); // 0-100
   const [lightness, setLightness] = useState(50); // 0-100
+  const [isDraggingPlot, setIsDraggingPlot] = useState(false);
 
   // 現在の色を計算
   const currentColor = chroma.hsl(hue, saturation / 100, lightness / 100).hex();
@@ -58,11 +59,56 @@ export const HueWheelToneSlider = () => {
     setHue(angle);
   };
 
+  // 彩度×明度プロットのサイズ設定
+  const plotSize = 200;
+
+  // 彩度×明度プロットのクリック/ドラッグハンドラ
+  const handlePlotInteraction = (event: React.MouseEvent<SVGSVGElement>) => {
+    const svg = event.currentTarget;
+    const rect = svg.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    // SVG座標系に変換（0-plotSize）
+    const svgX = (x / rect.width) * plotSize;
+    const svgY = (y / rect.height) * plotSize;
+
+    // 範囲制限
+    const clampedX = Math.max(0, Math.min(plotSize, svgX));
+    const clampedY = Math.max(0, Math.min(plotSize, svgY));
+
+    // X軸=彩度（0-100）、Y軸=明度（上が100、下が0）
+    const newSaturation = Math.round((clampedX / plotSize) * 100);
+    const newLightness = Math.round(((plotSize - clampedY) / plotSize) * 100);
+
+    setSaturation(newSaturation);
+    setLightness(newLightness);
+  };
+
+  const handlePlotMouseDown = (event: React.MouseEvent<SVGSVGElement>) => {
+    setIsDraggingPlot(true);
+    handlePlotInteraction(event);
+  };
+
+  const handlePlotMouseMove = (event: React.MouseEvent<SVGSVGElement>) => {
+    if (isDraggingPlot) {
+      handlePlotInteraction(event);
+    }
+  };
+
+  const handlePlotMouseUp = () => {
+    setIsDraggingPlot(false);
+  };
+
 
   // 選択中の色相位置を計算
   const selectedAngle = (hue - 90) * (Math.PI / 180);
   const selectedX = center + ((outerRadius + innerRadius) / 2) * Math.cos(selectedAngle);
   const selectedY = center + ((outerRadius + innerRadius) / 2) * Math.sin(selectedAngle);
+
+  // プロット上のマーカー位置を計算
+  const markerX = (saturation / 100) * plotSize;
+  const markerY = ((100 - lightness) / 100) * plotSize; // Y軸は上が100
 
   return (
     <Card>
@@ -127,6 +173,64 @@ export const HueWheelToneSlider = () => {
 
           <div className="text-xs text-muted-foreground mt-2">
             色相: {hue.toFixed(0)}°
+          </div>
+        </div>
+
+        {/* 彩度×明度プロット */}
+        <div className="flex flex-col items-center">
+          <div className="text-sm font-medium mb-2">彩度 × 明度</div>
+          <svg
+            width={plotSize}
+            height={plotSize}
+            onMouseDown={handlePlotMouseDown}
+            onMouseMove={handlePlotMouseMove}
+            onMouseUp={handlePlotMouseUp}
+            onMouseLeave={handlePlotMouseUp}
+            className="cursor-crosshair border-2 border-gray-300 rounded"
+          >
+            <defs>
+              {/* 彩度グラデーション（横方向：左=白、右=純色） */}
+              <linearGradient id="saturation-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#ffffff" />
+                <stop offset="100%" stopColor={chroma.hsl(hue, 1, 0.5).hex()} />
+              </linearGradient>
+              {/* 明度グラデーション（縦方向：上=透明、下=黒） */}
+              <linearGradient id="lightness-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="rgba(0, 0, 0, 0)" />
+                <stop offset="100%" stopColor="rgba(0, 0, 0, 1)" />
+              </linearGradient>
+            </defs>
+
+            {/* ベース（彩度グラデーション：白→純色） */}
+            <rect width={plotSize} height={plotSize} fill="url(#saturation-gradient)" />
+
+            {/* オーバーレイ（明度グラデーション：透明→黒） */}
+            <rect width={plotSize} height={plotSize} fill="url(#lightness-gradient)" />
+
+            {/* グリッド線（オプション） */}
+            {Array.from({ length: 5 }, (_, i) => {
+              const pos = (i * plotSize) / 4;
+              return (
+                <g key={i}>
+                  <line x1={pos} y1={0} x2={pos} y2={plotSize} stroke="#ccc" strokeWidth={0.5} opacity={0.5} />
+                  <line x1={0} y1={pos} x2={plotSize} y2={pos} stroke="#ccc" strokeWidth={0.5} opacity={0.5} />
+                </g>
+              );
+            })}
+
+            {/* 現在位置のマーカー */}
+            <circle
+              cx={markerX}
+              cy={markerY}
+              r={6}
+              fill="white"
+              stroke="black"
+              strokeWidth={2}
+            />
+          </svg>
+
+          <div className="text-xs text-muted-foreground mt-2">
+            彩度: {saturation}% / 明度: {lightness}%
           </div>
         </div>
 
