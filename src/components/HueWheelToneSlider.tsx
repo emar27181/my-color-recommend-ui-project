@@ -226,6 +226,10 @@ export const HueWheelToneSlider = () => {
         <div className="space-y-4">
           {/* 彩度スライダー */}
           <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <label>彩度 (Saturation)</label>
+              <span className="font-mono">{saturation}%</span>
+            </div>
             <input
               type="range"
               min="0"
@@ -241,6 +245,10 @@ export const HueWheelToneSlider = () => {
 
           {/* 明度スライダー */}
           <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <label>明度 (Lightness)</label>
+              <span className="font-mono">{lightness}%</span>
+            </div>
             <input
               type="range"
               min="0"
@@ -257,10 +265,12 @@ export const HueWheelToneSlider = () => {
 
         {/* カラープレビュー */}
         <div>
+          <div className="text-xs text-muted-foreground mb-1">現在の描画色</div>
           <div
             className="w-full h-16 rounded border-2 border-gray-300"
             style={{ backgroundColor: currentColor }}
           />
+          <div className="text-xs font-mono text-center mt-1">{currentColor}</div>
         </div>
       </CardContent>
     </Card>
