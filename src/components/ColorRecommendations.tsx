@@ -104,8 +104,8 @@ export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsP
 
   const closestColorIndex = findClosestColorIndex(recommendedColors, paintColor);
 
-  // 色相推薦が無効な場合は非表示
-  if (!flags.HUE_RECO_ON) {
+  // 実験モードの場合のみフラグで制御、通常モードでは常に表示
+  if (experimentStore.participantId && !flags.HUE_RECO_ON) {
     return null;
   }
 
@@ -272,8 +272,8 @@ export const ToneRecommendations = ({ isMobile = false }: ToneRecommendationsPro
 
   const closestToneIndex = findClosestToneIndex(recommendedTones, paintColor);
 
-  // トーン推薦が無効な場合は非表示
-  if (!flags.TONE_RECO_ON) {
+  // 実験モードの場合のみフラグで制御、通常モードでは常に表示
+  if (experimentStore.participantId && !flags.TONE_RECO_ON) {
     return null;
   }
 
