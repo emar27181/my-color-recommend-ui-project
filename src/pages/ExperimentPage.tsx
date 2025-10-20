@@ -129,10 +129,9 @@ const ExperimentPage = () => {
   /**
    * 条件に応じてコンポーネントをフィルタリング
    *
-   * C0: colorRecommendation, toneRecommendation を除外
-   * C1: toneRecommendation を除外
-   * C2: colorRecommendation を除外
-   * C3: すべて表示
+   * Test1: massColorGrid のみ表示、baseColor 非表示
+   * Test2: hueWheelToneSlider のみ表示、baseColor 非表示
+   * Test3: colorRecommendation, toneRecommendation, baseColor 表示
    *
    * 実験中は常に除外:
    * - skinColor (肌色推薦)
@@ -147,6 +146,11 @@ const ExperimentPage = () => {
 
       // 実験中は使用色相/トーン抽出を非表示
       if (componentKey === 'hueToneExtraction') {
+        return false;
+      }
+
+      // Test1・Test2ではベース色選択を非表示
+      if (componentKey === 'baseColor' && (condition === 'Test1' || condition === 'Test2')) {
         return false;
       }
 
