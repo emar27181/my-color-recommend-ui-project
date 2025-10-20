@@ -78,29 +78,6 @@ export const HueWheelToneSlider = () => {
             onClick={handleHueWheelClick}
             className="cursor-crosshair"
           >
-            {/* 色相環のリング */}
-            <defs>
-              <linearGradient id="hue-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                {Array.from({ length: 12 }, (_, i) => {
-                  const h = (i * 360) / 12;
-                  const color = chroma.hsl(h, 1, 0.5).hex();
-                  return (
-                    <stop key={i} offset={`${(i / 12) * 100}%`} stopColor={color} />
-                  );
-                })}
-              </linearGradient>
-            </defs>
-
-            {/* 外側の円（背景） */}
-            <circle
-              cx={center}
-              cy={center}
-              r={outerRadius}
-              fill="none"
-              stroke="url(#hue-gradient)"
-              strokeWidth={outerRadius - innerRadius}
-            />
-
             {/* 色相グラデーション（セグメント方式） */}
             {Array.from({ length: 360 }, (_, i) => {
               const angle1 = (i - 90) * (Math.PI / 180);
