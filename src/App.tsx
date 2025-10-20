@@ -10,17 +10,7 @@ const App = () => {
   
   // デバイス判定（閾値800px）
   const isMobile = screenSize.width < 800;
-  
-  // コラプス状態をオブジェクトで管理（すべて常に開いた状態）
-  const [collapseStates, setCollapseStates] = useState({
-    isCanvasCollapsed: false,
-    isBaseColorCollapsed: false,
-    isColorRecommendationCollapsed: false,
-    isToneRecommendationCollapsed: false,
-    isSkinColorCollapsed: false, // 常に開く
-    isHueToneExtractionCollapsed: false // 常に開く
-  });
-  
+
   // CanvasColorRecommendationsへの参照
   const canvasColorRecommendationsRef = useRef<CanvasColorRecommendationsRef>(null);
 
@@ -34,22 +24,17 @@ const App = () => {
   const handleExtractColorsFromCanvas = async () => {
     try {
       console.log('Attempting to extract colors from canvas...');
-      
+
       if (!canvasColorRecommendationsRef.current) {
         console.error('CanvasColorRecommendations ref is null');
         return;
       }
-      
+
       await canvasColorRecommendationsRef.current.extractColorsFromCanvas();
       console.log('Color extraction completed successfully');
     } catch (error) {
       console.error('Canvas color extraction failed:', error);
     }
-  };
-
-  // コラプス状態更新用ヘルパー
-  const setCollapseState = (key: string, value: boolean) => {
-    setCollapseStates(prev => ({ ...prev, [key]: value }));
   };
 
   useEffect(() => {
@@ -146,8 +131,6 @@ const App = () => {
           paintCanvasRef={canvasColorRecommendationsRef}
           handleExtractColorsFromCanvas={handleExtractColorsFromCanvas}
           handleImageUpload={handleImageUpload}
-          collapseStates={collapseStates}
-          setCollapseState={setCollapseState}
         />
       </div>
 
@@ -160,8 +143,6 @@ const App = () => {
           paintCanvasRef={canvasColorRecommendationsRef}
           handleExtractColorsFromCanvas={handleExtractColorsFromCanvas}
           handleImageUpload={handleImageUpload}
-          collapseStates={collapseStates}
-          setCollapseState={setCollapseState}
         />
       </div>
     </main>

@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Play, HelpCircle, ScrollText, BarChart3, ClipboardList, Info, FlaskConical } from 'lucide-react';
+import { Menu, X, ClipboardList, Info, FlaskConical } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { useTutorial } from '@/contexts/TutorialContext';
 
 interface NavigationMenuProps {
   className?: string;
@@ -10,7 +9,6 @@ interface NavigationMenuProps {
 
 export const NavigationMenu = ({ className = '' }: NavigationMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { startTutorial } = useTutorial();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
