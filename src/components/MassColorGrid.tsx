@@ -69,7 +69,7 @@ const MassColorGridContent = memo(() => {
     <div className="space-y-4">
       {/* カラーグリッド */}
       <div
-        className="grid gap-1 overflow-auto max-h-[500px] p-2"
+        className="grid gap-1 p-2"
         style={{
           gridTemplateColumns: `repeat(${HUE_STEPS}, minmax(0, 1fr))`,
         }}
@@ -96,8 +96,8 @@ MassColorGridContent.displayName = 'MassColorGridContent';
  */
 export const MassColorGrid = () => {
   return (
-    <Card>
-      <CardContent className="pt-4">
+    <Card className="h-[600px] flex flex-col">
+      <CardContent className="pt-4 flex-1 overflow-auto">
         <MassColorGridContent />
       </CardContent>
     </Card>

@@ -4,6 +4,24 @@
 
 ## 2025-10-21
 
+### T1とT2のカード高さを統一
+
+**変更内容:**
+- MassColorGrid: カードに固定高さ `h-[600px]` を設定、フレックスレイアウト適用
+- HueWheelToneSlider: カードに固定高さ `h-[600px]` を設定、フレックスレイアウト適用
+- CardContentに `flex-1 overflow-auto` を追加してオーバーフロー制御
+
+**理由:**
+- T1（カラーパレット）とT2（色相環＋トーンスライダー）の表示下端を揃える
+- 実験条件間での視覚的統一感を向上
+- コンテンツ量に関わらず一貫した高さを維持
+
+**変更ファイル:**
+- `src/components/MassColorGrid.tsx`
+- `src/components/HueWheelToneSlider.tsx`
+
+---
+
 ### T1のカードタイトル「カラーパレット」を削除
 
 **変更内容:**

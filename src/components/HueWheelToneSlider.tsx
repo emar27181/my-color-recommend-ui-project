@@ -111,8 +111,8 @@ export const HueWheelToneSlider = () => {
   const markerY = ((100 - lightness) / 100) * plotSize; // Y軸は上が100
 
   return (
-    <Card>
-      <CardContent className="space-y-4 pt-4">
+    <Card className="h-[600px] flex flex-col">
+      <CardContent className="space-y-4 pt-4 flex-1 overflow-auto">
         {/* 色相環 */}
         <div className="flex flex-col items-center">
           <svg
