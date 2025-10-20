@@ -74,27 +74,6 @@ const App = () => {
     };
   }, []);
 
-  // ホームページではT1, T2を非表示にするフィルタリング
-  const filterHomePageComponents = (components: readonly string[]): readonly string[] => {
-    return components.filter(componentKey => {
-      // T1（カラーパレット）を非表示
-      if (componentKey === 'massColorGrid') {
-        return false;
-      }
-      // T2（色相環＋トーンスライダー）を非表示
-      if (componentKey === 'hueWheelToneSlider') {
-        return false;
-      }
-      return true;
-    });
-  };
-
-  // フィルタリング済みレイアウト
-  const filteredColumns = LAYOUT_CONFIG.desktop.columns.map(column => ({
-    ...column,
-    components: filterHomePageComponents(column.components),
-  })) as any;
-
   // 初期スクロール位置を60px下に設定
   useEffect(() => {
     const setScrollPosition = () => {
@@ -144,7 +123,7 @@ const App = () => {
           </div>
         )}
         <LayoutRenderer
-          columns={filteredColumns}
+          columns={LAYOUT_CONFIG.desktop.columns}
           isMobile={true}
           isDebugMode={isDebugMode}
           paintCanvasRef={canvasColorRecommendationsRef}
@@ -156,7 +135,7 @@ const App = () => {
       {/* デスクトップ表示 */}
       <div className={`${isMobile ? 'hidden' : 'flex'} flex-1`} style={isDebugMode ? { backgroundColor: '#795548', padding: '12px' } : {}}>
         <LayoutRenderer
-          columns={filteredColumns}
+          columns={LAYOUT_CONFIG.desktop.columns}
           isMobile={false}
           isDebugMode={isDebugMode}
           paintCanvasRef={canvasColorRecommendationsRef}

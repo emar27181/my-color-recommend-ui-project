@@ -2,7 +2,7 @@ import { type CanvasColorRecommendationsRef } from '@/components/CanvasColorReco
 import { LayoutRenderer } from '@/components/layout/LayoutRenderer';
 import { ExperimentHeader } from '@/components/ExperimentHeader';
 import { ExperimentInstructions } from '@/components/ExperimentInstructions';
-import { LAYOUT_CONFIG } from '@/constants/layout';
+import { EXPERIMENT_LAYOUT_CONFIG } from '@/constants/layout';
 import { useExperimentStore } from '@/store/experimentStore';
 import { useExperimentQuery } from '@/hooks/useQueryParams';
 import { useEffect, useState, useRef } from 'react';
@@ -175,8 +175,8 @@ const ExperimentPage = () => {
     });
   };
 
-  // 条件に応じてフィルタリングされたレイアウト設定
-  const filteredColumns = LAYOUT_CONFIG.desktop.columns.map(column => ({
+  // 条件に応じてフィルタリングされたレイアウト設定（実験専用レイアウトを使用）
+  const filteredColumns = EXPERIMENT_LAYOUT_CONFIG.desktop.columns.map(column => ({
     ...column,
     components: filterComponentsByCondition(column.components),
   })) as any;
