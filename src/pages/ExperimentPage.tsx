@@ -155,6 +155,11 @@ const ExperimentPage = () => {
         return false;
       }
 
+      // 色相環＋トーンスライダーはTest2のみ表示
+      if (componentKey === 'hueWheelToneSlider' && !featureFlags.HUE_WHEEL_SLIDER_ON) {
+        return false;
+      }
+
       // 色相推薦を表示するかチェック
       if (componentKey === 'colorRecommendation' && !featureFlags.HUE_RECO_ON) {
         return false;

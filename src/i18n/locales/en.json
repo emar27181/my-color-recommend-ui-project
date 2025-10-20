@@ -6,6 +6,7 @@
       "baseColorSelection": "Base Color (Source) Selection",
       "baseColorSelectionShort": "Base Color Selection",
       "massColorGrid": "Color Palette",
+      "hueWheelToneSlider": "Hue Wheel + Tone Slider",
       "colorRecommendation": "Hue (Color Scheme) Recommendation",
       "colorRecommendationShort": "Hue Recommendation",
       "toneRecommendation": "Tone (Brightness & Saturation) Recommendation",

@@ -9,6 +9,7 @@ import { ExtractedColorsDisplay } from '@/components/ExtractedColorsDisplay';
 import { SkinColorRecommendations } from '@/components/SkinColorRecommendations';
 import { HueToneExtraction } from '@/components/HueToneExtraction';
 import { MassColorGrid } from '@/components/MassColorGrid';
+import { HueWheelToneSlider } from '@/components/HueWheelToneSlider';
 // import { PaintCanvas, type PaintCanvasRef } from '@/components/PaintCanvas';
 import { CanvasColorRecommendations, type CanvasColorRecommendationsRef } from '@/components/CanvasColorRecommendations';
 import { COMPONENT_CONFIG, LAYOUT_CONFIG, type ComponentKey, type LayoutColumn } from '@/constants/layout';
@@ -67,6 +68,9 @@ const ComponentMap = {
   ),
   massColorGrid: () => (
     <MassColorGrid />
+  ),
+  hueWheelToneSlider: () => (
+    <HueWheelToneSlider />
   ),
   colorRecommendation: ({ isMobile }: any) => (
     <ColorRecommendations isMobile={isMobile} />
