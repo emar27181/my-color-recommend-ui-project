@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 // 実験条件の型定義
-export type ExperimentCondition = 'C0' | 'C1' | 'C2' | 'C3';
+export type ExperimentCondition = 'Test1' | 'Test2' | 'Test3';
 
 // イベントログの型定義
 export interface ExperimentEvent {
@@ -38,7 +38,7 @@ export interface SurveyResponse {
   usability: number[];      // SUS簡易版(5問) - 1〜5段階評価
   effectiveness: number[];  // TAM(3問) - 1〜5段階評価
   creativity: number[];     // Mini-CSI(3問) - 1〜5段階評価
-  favoriteUI: string;       // 最も使いやすかったUI (C0/C1/C2/C3)
+  favoriteUI: string;       // 最も使いやすかったUI (Test1/Test2/Test3)
   reason: string;           // 理由（自由記述）
   improvement: string;      // 改善点（自由記述）
 }
@@ -69,7 +69,7 @@ export interface ExperimentState {
   experimentStartTime: number | null; // 全体の実験開始時刻
   experimentEndTime: number | null;   // 全体の実験終了時刻
   conditionLogs: ConditionLog[];      // 各条件のログ
-  currentConditionIndex: number;      // 現在の条件インデックス (0=C0, 1=C1, 2=C2, 3=C3)
+  currentConditionIndex: number;      // 現在の条件インデックス (0=Test1, 1=Test2, 2=Test3)
   conditionOrder: ExperimentCondition[]; // 実験順序
 
   // アンケート
@@ -98,9 +98,10 @@ export interface ExperimentState {
 
   // 条件による機能フラグ
   getFeatureFlags: () => {
-    HUE_RECO_ON: boolean;
-    TONE_RECO_ON: boolean;
-    HARMONY_RANK_ON: boolean;
+    MASS_COLOR_GRID_ON: boolean;    // Test1: 全色相×複数トーンのグリッド表示
+    HUE_WHEEL_SLIDER_ON: boolean;   // Test2: 色相環UI＋トーンスライダー
+    HUE_RECO_ON: boolean;           // Test3: 色相推薦
+    TONE_RECO_ON: boolean;          // Test3: トーン推薦
   };
 }
 
@@ -151,7 +152,7 @@ const initialDeviceInfo = collectDeviceInfo();
 export const useExperimentStore = create<ExperimentState>((set, get) => ({
   // 初期状態
   participantId: '',
-  condition: 'C0',
+  condition: 'Test1',
   isExperimentRunning: false,
   startTime: null,
   endTime: null,
@@ -163,7 +164,7 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
   experimentEndTime: null,
   conditionLogs: [],
   currentConditionIndex: 0,
-  conditionOrder: ['C0', 'C1', 'C2', 'C3'],
+  conditionOrder: ['Test1', 'Test2', 'Test3'],
 
   // アンケート
   surveyResponse: null,
@@ -277,12 +278,12 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
       experimentEndTime: null,
       conditionLogs: [],
       currentConditionIndex: 0,
-      condition: 'C0',
+      condition: 'Test1',
     });
     console.log('Experiment reset');
   },
 
-  // 全体実験開始（C0から）
+  // 全体実験開始（Test1から）
   startFullExperiment: () => {
     const now = Date.now();
     set({
@@ -290,7 +291,7 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
       experimentEndTime: null,
       conditionLogs: [],
       currentConditionIndex: 0,
-      condition: 'C0',
+      condition: 'Test1',
       isExperimentRunning: true,
       startTime: now,
       endTime: null,
@@ -389,9 +390,10 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
   getFeatureFlags: () => {
     const { condition } = get();
     return {
-      HUE_RECO_ON: condition === 'C1' || condition === 'C3',
-      TONE_RECO_ON: condition === 'C2' || condition === 'C3',
-      HARMONY_RANK_ON: condition === 'C3',
+      MASS_COLOR_GRID_ON: condition === 'Test1',   // Test1: 全色相×複数トーンのグリッド表示
+      HUE_WHEEL_SLIDER_ON: condition === 'Test2',  // Test2: 色相環UI＋トーンスライダー
+      HUE_RECO_ON: condition === 'Test3',          // Test3: 色相推薦
+      TONE_RECO_ON: condition === 'Test3',         // Test3: トーン推薦
     };
   },
 }));
