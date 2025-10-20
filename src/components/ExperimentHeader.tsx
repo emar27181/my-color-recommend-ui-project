@@ -8,10 +8,9 @@ import type { CanvasColorRecommendationsRef } from '@/components/CanvasColorReco
 
 // 条件の説明
 const CONDITION_DESCRIPTIONS = {
-  C0: '推薦なし（通常のカラーピッカーのみ）',
-  C1: '色相推薦のみ',
-  C2: 'トーン推薦のみ',
-  C3: '二段階推薦（色相＋トーン）',
+  Test1: '既存カラーパレット方式（大量の色を一度に表示）',
+  Test2: '色相環＋トーンスライダー方式（自由に色を作成）',
+  Test3: '二段階推薦方式（色相→トーン）',
 };
 
 interface ExperimentHeaderProps {
@@ -60,7 +59,7 @@ export const ExperimentHeader = ({ canvasRef }: ExperimentHeaderProps) => {
     } else {
       // 全条件完了 - アンケートページに遷移
       window.alert(
-        `すべての条件（C0~C3）が完了しました！\n\nアンケートにご協力ください。`
+        `すべてのテスト（Test1~Test3）が完了しました！\n\nアンケートにご協力ください。`
       );
 
       // 完了ページ（アンケート）に遷移
@@ -88,7 +87,7 @@ export const ExperimentHeader = ({ canvasRef }: ExperimentHeaderProps) => {
               参加者: {participantId}
             </Badge>
             <Badge variant="outline" className="font-mono">
-              進捗: {conditionLogs.length + (isExperimentRunning ? 1 : 0)}/4
+              進捗: {conditionLogs.length + (isExperimentRunning ? 1 : 0)}/3
             </Badge>
           </div>
         </div>

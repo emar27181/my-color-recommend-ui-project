@@ -31,40 +31,32 @@ const ExperimentIntroPage = () => {
     setParticipantId(inputId.trim());
     startFullExperiment();
 
-    // C0実験ページに遷移
-    navigate('/experiment/task?cond=C0');
+    // Test1実験ページに遷移
+    navigate('/experiment/task?cond=Test1');
   };
 
   // 条件データ
   const conditions = [
     {
-      id: 'C0',
-      name: '推薦なし',
-      description: 'カラーピッカーのみで色を選択',
+      id: 'Test1',
+      name: '既存カラーパレット方式',
+      description: '全色相×複数トーンの大量の色を一度に表示',
       icon: Palette,
-      color: 'bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-600',
-      badgeColor: 'bg-slate-500'
+      color: 'bg-orange-50 dark:bg-orange-950 border-orange-300 dark:border-orange-700',
+      badgeColor: 'bg-orange-500'
     },
     {
-      id: 'C1',
-      name: '色相推薦',
-      description: '補色・類似色などの推薦',
-      icon: Sparkles,
+      id: 'Test2',
+      name: '色相環＋トーンスライダー方式',
+      description: '色相環とトーンスライダーで自由に色を作成',
+      icon: Layers,
       color: 'bg-blue-50 dark:bg-blue-950 border-blue-300 dark:border-blue-700',
       badgeColor: 'bg-blue-500'
     },
     {
-      id: 'C2',
-      name: 'トーン推薦',
-      description: '明度・彩度バリエーション',
-      icon: Layers,
-      color: 'bg-purple-50 dark:bg-purple-950 border-purple-300 dark:border-purple-700',
-      badgeColor: 'bg-purple-500'
-    },
-    {
-      id: 'C3',
-      name: '二段階推薦',
-      description: '色相 + トーン（全機能）',
+      id: 'Test3',
+      name: '二段階推薦方式',
+      description: '色相推薦→トーン推薦の二段階で選択（提案手法）',
       icon: Sparkles,
       color: 'bg-green-50 dark:bg-green-950 border-green-300 dark:border-green-700',
       badgeColor: 'bg-green-500'
@@ -111,7 +103,7 @@ const ExperimentIntroPage = () => {
                 </div>
                 <div>
                   <p className="font-semibold">実験形式</p>
-                  <p className="text-sm text-muted-foreground">4条件を順番に体験</p>
+                  <p className="text-sm text-muted-foreground">3つのテストを順番に体験</p>
                 </div>
               </div>
             </CardContent>
@@ -126,7 +118,7 @@ const ExperimentIntroPage = () => {
               <div className="text-center">
                 <h2 className="text-xl font-bold mb-2">実験の流れ</h2>
                 <p className="text-muted-foreground">
-                  4つの異なる推薦条件で同じタスクを実施します
+                  3つの異なる方式で同じタスクを実施します
                 </p>
               </div>
             </CardContent>
@@ -197,13 +189,13 @@ const ExperimentIntroPage = () => {
               className="w-full gap-3 text-xl h-16 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
             >
               <Play className="w-6 h-6" />
-              実験開始（C0から）
+              実験開始（Test1から）
             </Button>
 
             <Alert className="border-primary/30 bg-primary/5 p-6">
               <InfoIcon className="h-5 w-5 text-primary" />
               <AlertDescription className="text-sm leading-relaxed ml-2">
-                C0 → C1 → C2 → C3 の順で体験します。各条件終了後、次に進む確認が表示されます。
+                Test1 → Test2 → Test3 の順で体験します。各テスト終了後、次に進む確認が表示されます。
               </AlertDescription>
             </Alert>
           </CardContent>

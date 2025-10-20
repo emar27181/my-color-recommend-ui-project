@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -206,7 +205,7 @@ export const SurveyForm = ({ onSubmit }: SurveyFormProps) => {
           <div className="space-y-3">
             <Label className="text-base">最も使いやすかったUIを選択してください</Label>
             <RadioGroup value={favoriteUI} onValueChange={setFavoriteUI}>
-              {['C0', 'C1', 'C2', 'C3'].map((cond) => (
+              {['Test1', 'Test2', 'Test3'].map((cond) => (
                 <div key={cond} className="flex items-center space-x-2">
                   <RadioGroupItem value={cond} id={`fav-${cond}`} />
                   <Label htmlFor={`fav-${cond}`} className="cursor-pointer">{cond}</Label>

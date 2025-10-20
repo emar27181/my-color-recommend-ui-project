@@ -10,7 +10,7 @@ import { SurveyForm } from '@/components/SurveyForm';
 /**
  * 実験完了ページ
  *
- * 全条件（C0~C3）完了後に表示されるページ
+ * 全テスト（Test1~Test3）完了後に表示されるページ
  * アンケート回答後、ログをダウンロード可能
  */
 const ExperimentCompletePage = () => {
@@ -55,7 +55,7 @@ const ExperimentCompletePage = () => {
           </div>
           <h1 className="text-4xl font-bold mb-3">実験完了！</h1>
           <p className="text-muted-foreground text-lg">
-            すべての条件（C0~C3）の評価が完了しました
+            すべてのテスト（Test1~Test3）の評価が完了しました
           </p>
         </div>
 
@@ -68,9 +68,9 @@ const ExperimentCompletePage = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* 各条件の結果 */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {['C0', 'C1', 'C2', 'C3'].map((cond, index) => {
+            {/* 各テストの結果 */}
+            <div className="grid grid-cols-3 gap-4">
+              {['Test1', 'Test2', 'Test3'].map((cond, index) => {
                 const duration = getConditionDuration(index);
                 return (
                   <div key={cond} className="p-4 border rounded-lg text-center">
