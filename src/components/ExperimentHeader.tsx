@@ -3,7 +3,7 @@ import { useExperimentStore } from '@/store/experimentStore';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, Download, Activity, ArrowRight } from 'lucide-react';
+import { CheckCircle, Activity, ArrowRight } from 'lucide-react';
 import type { CanvasColorRecommendationsRef } from '@/components/CanvasColorRecommendations';
 
 // 条件の説明
@@ -29,7 +29,6 @@ export const ExperimentHeader = ({ canvasRef }: ExperimentHeaderProps) => {
     getNextCondition,
     completeCurrentCondition,
     nextCondition,
-    exportLog,
     conditionLogs,
   } = useExperimentStore();
 
@@ -59,16 +58,13 @@ export const ExperimentHeader = ({ canvasRef }: ExperimentHeaderProps) => {
         navigate(`/experiment/task?cond=${nextCond}`);
       }
     } else {
-      // 全条件完了
-      const confirmed = window.confirm(
-        `すべての条件（C0~C3）が完了しました！\n\n実験ログをダウンロードしますか？`
+      // 全条件完了 - アンケートページに遷移
+      window.alert(
+        `すべての条件（C0~C3）が完了しました！\n\nアンケートにご協力ください。`
       );
 
-      if (confirmed) {
-        exportLog();
-        // 完了ページに遷移
-        navigate('/experiment/complete');
-      }
+      // 完了ページ（アンケート）に遷移
+      navigate('/experiment/complete');
     }
   };
 
@@ -124,13 +120,6 @@ export const ExperimentHeader = ({ canvasRef }: ExperimentHeaderProps) => {
             </Button>
           )}
 
-          {/* ログダウンロードボタン（実験終了後） */}
-          {!isExperimentRunning && conditionLogs.length > 0 && (
-            <Button onClick={exportLog} variant="outline" className="gap-2">
-              <Download className="w-4 h-4" />
-              ログダウンロード
-            </Button>
-          )}
         </div>
       </CardContent>
     </Card>
