@@ -176,10 +176,32 @@ const ExperimentPage = () => {
   };
 
   // 条件に応じてフィルタリングされたレイアウト設定（実験専用レイアウトを使用）
-  const filteredColumns = EXPERIMENT_LAYOUT_CONFIG.desktop.columns.map(column => ({
+  const filteredColumnsWithEmpty = EXPERIMENT_LAYOUT_CONFIG.desktop.columns.map(column => ({
     ...column,
     components: filterComponentsByCondition(column.components),
-  })) as any;
+  }));
+
+  // 空の列を除外
+  const filteredColumns = filteredColumnsWithEmpty.filter(column => column.components.length > 0);
+
+  // 列数に応じて幅を再調整
+  const adjustedColumns = filteredColumns.map((column, index) => {
+    if (filteredColumns.length === 2) {
+      // 2列の場合: キャンバス 2/3、メインツール 1/3
+      return {
+        ...column,
+        width: index === 0 ? ('w-2/3' as const) : ('w-1/3' as const)
+      };
+    } else if (filteredColumns.length === 1) {
+      // 1列の場合: 全幅
+      return {
+        ...column,
+        width: 'w-full' as const
+      };
+    }
+    // 3列の場合: 元の幅を維持
+    return column;
+  }) as any;
 
   const deviceType = isMobile ? 'MOBILE/TABLET' : 'DESKTOP';
 
@@ -220,7 +242,7 @@ const ExperimentPage = () => {
           </div>
         )}
         <LayoutRenderer
-          columns={filteredColumns}
+          columns={adjustedColumns}
           isMobile={true}
           isDebugMode={isDebugMode}
           paintCanvasRef={canvasColorRecommendationsRef}
@@ -232,7 +254,7 @@ const ExperimentPage = () => {
       {/* デスクトップ表示 */}
       <div className={`${isMobile ? 'hidden' : 'flex'} flex-1`} style={isDebugMode ? { backgroundColor: '#795548', padding: '12px' } : {}}>
         <LayoutRenderer
-          columns={filteredColumns}
+          columns={adjustedColumns}
           isMobile={false}
           isDebugMode={isDebugMode}
           paintCanvasRef={canvasColorRecommendationsRef}
