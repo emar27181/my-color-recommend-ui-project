@@ -97,10 +97,7 @@ MassColorGridContent.displayName = 'MassColorGridContent';
 export const MassColorGrid = () => {
   return (
     <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base">カラーパレット</CardTitle>
-      </CardHeader>
-      <CardContent className="pt-0">
+      <CardContent className="pt-4">
         <MassColorGridContent />
       </CardContent>
     </Card>
