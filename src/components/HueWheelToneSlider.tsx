@@ -205,19 +205,6 @@ export const HueWheelToneSlider = () => {
             <div className="text-xs font-mono text-center mt-1">{currentColor}</div>
           </div>
 
-          {/* 適用ボタン */}
-          <button
-            onClick={handleApplyColor}
-            className="px-6 py-3 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-medium"
-          >
-            この色を使う
-          </button>
-        </div>
-
-        {/* 説明 */}
-        <div className="text-xs text-muted-foreground bg-muted p-3 rounded">
-          色相環をクリックして色相を選択し、スライダーで彩度・明度を調整できます。
-          組み合わせは無限大です。
         </div>
       </CardContent>
     </Card>
