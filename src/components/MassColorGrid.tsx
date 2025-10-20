@@ -84,12 +84,6 @@ const MassColorGridContent = memo(() => {
           />
         ))}
       </div>
-
-      {/* 統計情報 */}
-      <div className="text-xs text-muted-foreground text-center space-y-1">
-        <div>合計 {colors.length} 色（色相 {HUE_STEPS}種 × 彩度 {SATURATION_LEVELS.length}段階 × 明度 {LIGHTNESS_LEVELS.length}段階）</div>
-        <div>横: 色相（24種）/ 縦: 明度×彩度（明るい→暗い）</div>
-      </div>
     </div>
   );
 });
