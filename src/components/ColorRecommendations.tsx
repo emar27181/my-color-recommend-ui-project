@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { ChevronDown } from 'lucide-react';
 import { BORDER_PRESETS } from '@/constants/ui';
 import chroma from 'chroma-js';
+import { useLocation } from 'react-router-dom';
 
 interface ColorRecommendationsProps {
   isMobile?: boolean;
@@ -17,10 +18,14 @@ interface ColorRecommendationsProps {
 
 export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsProps) => {
   const { recommendedColors, selectedScheme, setSelectedScheme, generateRecommendedTones, baseColor, selectedColor, setColorFromRecommendation, paintColor, extractedColors } = useColorStore();
+  const location = useLocation();
 
   // 実験ストアと条件ストアの両方をチェック（実験モード優先）
   const experimentStore = useExperimentStore();
   const conditionStore = useConditionStore();
+
+  // 実験ページかどうかを判定
+  const isExperimentPage = location.pathname.startsWith('/experiment/task');
 
   // 実験モードの場合はexperimentStoreのフラグを使用、それ以外はconditionStoreを使用
   const flags = experimentStore.participantId
@@ -104,8 +109,8 @@ export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsP
 
   const closestColorIndex = findClosestColorIndex(recommendedColors, paintColor);
 
-  // 実験モードの場合のみフラグで制御、通常モードでは常に表示
-  if (experimentStore.participantId && !flags.HUE_RECO_ON) {
+  // 実験ページの場合のみフラグで制御、ホームページでは常に表示
+  if (isExperimentPage && !flags.HUE_RECO_ON) {
     return null;
   }
 
@@ -220,10 +225,14 @@ interface ToneRecommendationsProps {
 
 export const ToneRecommendations = ({ isMobile = false }: ToneRecommendationsProps) => {
   const { recommendedTones, selectedColor, generateRecommendedTones, setColorFromRecommendation, paintColor } = useColorStore();
+  const location = useLocation();
 
   // 実験ストアと条件ストアの両方をチェック（実験モード優先）
   const experimentStore = useExperimentStore();
   const conditionStore = useConditionStore();
+
+  // 実験ページかどうかを判定
+  const isExperimentPage = location.pathname.startsWith('/experiment/task');
 
   // 実験モードの場合はexperimentStoreのフラグを使用、それ以外はconditionStoreを使用
   const flags = experimentStore.participantId
@@ -272,8 +281,8 @@ export const ToneRecommendations = ({ isMobile = false }: ToneRecommendationsPro
 
   const closestToneIndex = findClosestToneIndex(recommendedTones, paintColor);
 
-  // 実験モードの場合のみフラグで制御、通常モードでは常に表示
-  if (experimentStore.participantId && !flags.TONE_RECO_ON) {
+  // 実験ページの場合のみフラグで制御、ホームページでは常に表示
+  if (isExperimentPage && !flags.TONE_RECO_ON) {
     return null;
   }
 
