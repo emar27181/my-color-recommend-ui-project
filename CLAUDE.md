@@ -44,6 +44,21 @@
 - 依存パッケージの追加や設定ファイルの修正も、1コミットにまとめず**論理単位で履歴に残す**
 - コードにエラーがある状態でのコミットは禁止（ビルド・型エラーがない状態で行う）
 
+### ホームページレイアウト保護ルール
+- **ホームページ（http://localhost:5173/）のレイアウトは変更禁止**
+- 現在のレイアウト構成（`src/constants/layout.ts`）を維持すること
+- 表示されるコンポーネント:
+  - 0. キャンバス（canvasColorRecommendation）
+  - 1. ベース色選択（baseColor）
+  - 2. 色相推薦（colorRecommendation）
+  - 3. トーン推薦（toneRecommendation）
+  - α. 肌色推薦（skinColor）
+  - β. 使用色相/トーン抽出（hueToneExtraction）
+- 非表示のコンポーネント:
+  - T1. カラーパレット（massColorGrid）
+  - T2. 色相環＋トーンスライダー（hueWheelToneSlider）
+- レイアウト変更が必要な場合は、必ずユーザーに確認してから実施すること
+
 ### デプロイメント
 - **本番デプロイ**: `netlify deploy --prod` コマンドでNetlifyにプロダクションデプロイ
 - **デプロイURL**: https://color-recommend.netlify.app
