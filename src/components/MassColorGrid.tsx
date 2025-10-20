@@ -10,13 +10,13 @@ import { memo } from 'react';
  * 大量の色を一度に表示して選択の困難さを再現
  */
 
-// 色相の数: 15度刻みで24色相
-const HUE_STEPS = 24;
+// 色相の数: 30度刻みで12色相
+const HUE_STEPS = 12;
 const HUE_INCREMENT = 360 / HUE_STEPS;
 
-// 各色相に対するトーンバリエーション
-const SATURATION_LEVELS = [30, 50, 70, 90]; // 4段階の彩度
-const LIGHTNESS_LEVELS = [85, 70, 55, 40, 25]; // 5段階の明度
+// トーン推薦と同じ明度・彩度の組み合わせ（16パターン = 4×4）
+const SATURATION_LEVELS = [20, 40, 60, 80]; // 4段階の彩度（左から右へ：薄い→鮮やか）
+const LIGHTNESS_LEVELS = [80, 60, 40, 20]; // 4段階の明度（上から下へ：明るい→暗い）
 
 interface ColorCell {
   hex: string;
