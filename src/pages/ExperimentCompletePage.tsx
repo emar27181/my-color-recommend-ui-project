@@ -35,7 +35,12 @@ const ExperimentCompletePage = () => {
   const handleSurveySubmit = (response: SurveyResponse) => {
     setSurveyResponse(response);
     setShowSurvey(false);
-    alert('アンケートありがとうございました！\n実験ログをダウンロードしてください。');
+
+    // アンケート回答後、自動でログをダウンロード
+    setTimeout(() => {
+      exportLog();
+      alert('アンケートありがとうございました！\n実験ログ（アンケート結果含む）をダウンロードしました。');
+    }, 100);
   };
 
   return (
