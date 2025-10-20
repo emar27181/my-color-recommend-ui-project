@@ -4,6 +4,23 @@
 
 ## 2025-10-21
 
+### 実験導入ページのレイアウトを中央揃え・幅制限
+
+**変更内容:**
+- ExperimentIntroPage: コンテナ幅を70%に設定（`w-[70%]`）
+- ExperimentInstructions: コンテナ幅を70%に設定、中央揃え適用（`w-[70%] mx-auto`）
+
+**理由:**
+- 実験説明の可読性向上
+- 中央揃えで視線の集中を促進
+- 適切な幅制限で長い文章を読みやすく
+
+**変更ファイル:**
+- `src/pages/ExperimentIntroPage.tsx`
+- `src/components/ExperimentInstructions.tsx`
+
+---
+
 ### T1とT2のカード高さを統一
 
 **変更内容:**

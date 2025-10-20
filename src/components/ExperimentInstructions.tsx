@@ -27,7 +27,7 @@ export const ExperimentInstructions = ({ condition }: ExperimentInstructionsProp
   const conditionInfo = CONDITION_INFO[condition];
 
   return (
-    <div className="space-y-4 mb-6">
+    <div className="w-[70%] mx-auto space-y-4 mb-6">
       {/* 現在の条件 */}
       <Card>
         <CardHeader>

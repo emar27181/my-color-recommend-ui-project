@@ -65,7 +65,7 @@ const ExperimentIntroPage = () => {
 
   return (
     <main className="flex-1 pb-8 min-h-screen flex flex-col bg-gradient-to-b from-background to-muted/20">
-      <div className="container mx-auto px-4 py-8 max-w-5xl">
+      <div className="w-[70%] mx-auto px-4 py-8">
         {/* ヘッダー */}
         <div className="text-center mb-10">
           <div className="inline-block p-3 bg-primary/10 rounded-full mb-4">
