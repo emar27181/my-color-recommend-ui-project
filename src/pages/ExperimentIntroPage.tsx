@@ -65,7 +65,7 @@ const ExperimentIntroPage = () => {
 
   return (
     <main className="flex-1 pb-8 min-h-screen flex flex-col bg-gradient-to-b from-background to-muted/20">
-      <div className="w-[70%] mx-auto px-4 py-8">
+      <div className="w-[70%] mx-auto px-4 py-8 overflow-x-hidden">
         {/* ヘッダー */}
         <div className="text-center mb-10">
           <div className="inline-block p-3 bg-primary/10 rounded-full mb-4">
@@ -157,7 +157,7 @@ const ExperimentIntroPage = () => {
 
         {/* 参加者ID入力と開始 */}
         <Card className="border-2 border-primary/30 shadow-lg">
-          <CardHeader className="bg-primary/5 pt-10 pb-10 px-12">
+          <CardHeader className="bg-primary/5 pt-10 pb-10 px-8">
             <CardTitle className="flex items-center gap-2 text-xl mb-4">
               <User className="w-6 h-6" />
               実験を開始
@@ -166,7 +166,7 @@ const ExperimentIntroPage = () => {
               参加者IDを入力して実験を開始してください
             </CardDescription>
           </CardHeader>
-          <CardContent className="pt-16 pb-16 px-16 space-y-10">
+          <CardContent className="pt-16 pb-16 px-8 space-y-10">
             <div className="space-y-6">
               <label className="text-base font-semibold text-foreground block">参加者ID</label>
               <Input
