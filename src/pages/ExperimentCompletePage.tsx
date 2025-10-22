@@ -6,6 +6,16 @@ import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Download, Home, ClipboardCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SurveyForm } from '@/components/SurveyForm';
+import {
+  EXPERIMENT_BUTTON_STYLES,
+  EXPERIMENT_CARD_STYLES,
+  EXPERIMENT_LAYOUT,
+  EXPERIMENT_ICON_STYLES,
+  EXPERIMENT_TEXT_STYLES,
+  getBadgeProps,
+  getButtonClassName,
+  getCardClassName,
+} from '@/constants/experimentTheme';
 
 /**
  * 実験完了ページ
@@ -45,15 +55,15 @@ const ExperimentCompletePage = () => {
 
   return (
     <main className="flex-1 pb-8 min-h-screen flex flex-col bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-3xl">
+      <div className={`container mx-auto px-4 py-8 ${EXPERIMENT_LAYOUT.containerWidth.standard}`}>
         {/* 完了メッセージ */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
             <div className="p-4 rounded-full bg-green-100 dark:bg-green-900">
-              <CheckCircle className="w-16 h-16 text-green-600 dark:text-green-400" />
+              <CheckCircle className={`${EXPERIMENT_ICON_STYLES.xlarge} text-green-600 dark:text-green-400`} />
             </div>
           </div>
-          <h1 className="text-4xl font-bold mb-3">実験完了！</h1>
+          <h1 className={`${EXPERIMENT_TEXT_STYLES.pageTitle} mb-3`}>実験完了！</h1>
           <p className="text-muted-foreground text-lg">
             すべてのテスト（Test1~Test3）の評価が完了しました
           </p>
@@ -64,7 +74,7 @@ const ExperimentCompletePage = () => {
           <CardHeader>
             <CardTitle>実験結果サマリー</CardTitle>
             <CardDescription>
-              参加者ID: <Badge variant="secondary" className="font-mono">{participantId}</Badge>
+              参加者ID: <Badge {...getBadgeProps('participant')}>{participantId}</Badge>
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -107,7 +117,7 @@ const ExperimentCompletePage = () => {
           <div className="mb-6">
             <div className="mb-4 p-4 bg-primary/10 rounded-lg">
               <div className="flex items-center gap-3">
-                <ClipboardCheck className="w-6 h-6 text-primary" />
+                <ClipboardCheck className={`${EXPERIMENT_ICON_STYLES.large} text-primary`} />
                 <div>
                   <h2 className="text-lg font-semibold">アンケートにご協力ください</h2>
                   <p className="text-sm text-muted-foreground">
@@ -123,7 +133,7 @@ const ExperimentCompletePage = () => {
           <Card className="mb-6 border-2 border-primary/20">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600" />
+                <CheckCircle className={`${EXPERIMENT_ICON_STYLES.default} text-green-600`} />
                 アンケート回答完了
               </CardTitle>
               <CardDescription>
@@ -131,8 +141,8 @@ const ExperimentCompletePage = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Button onClick={exportLog} size="lg" className="w-full gap-2">
-                <Download className="w-5 h-5" />
+              <Button onClick={exportLog} size="lg" className={`w-full ${getButtonClassName('primary')}`}>
+                <Download className={EXPERIMENT_ICON_STYLES.default} />
                 実験ログ＋アンケート結果をダウンロード
               </Button>
 
@@ -150,8 +160,8 @@ const ExperimentCompletePage = () => {
 
         {/* ホームに戻るボタン */}
         <div className="text-center">
-          <Button onClick={() => navigate('/')} variant="outline" className="gap-2">
-            <Home className="w-4 h-4" />
+          <Button onClick={() => navigate('/')} variant="outline" className={getButtonClassName('outline')}>
+            <Home className={EXPERIMENT_ICON_STYLES.small} />
             ホームに戻る
           </Button>
         </div>

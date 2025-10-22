@@ -5,6 +5,14 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, Activity, ArrowRight } from 'lucide-react';
 import type { CanvasColorRecommendationsRef } from '@/components/CanvasColorRecommendations';
+import {
+  EXPERIMENT_BUTTON_STYLES,
+  EXPERIMENT_CARD_STYLES,
+  EXPERIMENT_ICON_STYLES,
+  getBadgeProps,
+  getButtonClassName,
+  getCardClassName,
+} from '@/constants/experimentTheme';
 
 // 条件の説明
 const CONDITION_DESCRIPTIONS = {
@@ -68,12 +76,12 @@ export const ExperimentHeader = ({ canvasRef }: ExperimentHeaderProps) => {
   };
 
   return (
-    <Card className="mb-4 border-2 border-primary/20">
+    <Card className={`mb-4 ${getCardClassName('emphasized')}`}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <CardTitle className="text-lg">実験進行中</CardTitle>
-            <Badge variant="outline" className="font-mono text-base px-3 py-1">
+            <Badge {...getBadgeProps('condition')}>
               {condition}
             </Badge>
             <span className="text-sm text-muted-foreground">
@@ -83,10 +91,10 @@ export const ExperimentHeader = ({ canvasRef }: ExperimentHeaderProps) => {
 
           {/* 進捗表示 */}
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="font-mono">
+            <Badge {...getBadgeProps('participant')}>
               参加者: {participantId}
             </Badge>
-            <Badge variant="outline" className="font-mono">
+            <Badge {...getBadgeProps('progress')}>
               進捗: {conditionLogs.length + (isExperimentRunning ? 1 : 0)}/3
             </Badge>
           </div>
@@ -98,7 +106,7 @@ export const ExperimentHeader = ({ canvasRef }: ExperimentHeaderProps) => {
           {/* イベント数表示 */}
           {isExperimentRunning && (
             <div className="flex items-center gap-2 px-3 py-1 rounded-md bg-muted">
-              <Activity className="w-4 h-4" />
+              <Activity className={EXPERIMENT_ICON_STYLES.small} />
               <span className="text-sm font-mono">
                 {events.length} 操作記録中
               </span>
@@ -110,13 +118,13 @@ export const ExperimentHeader = ({ canvasRef }: ExperimentHeaderProps) => {
             <Button
               onClick={handleComplete}
               size="lg"
-              className="gap-2 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 text-white shadow-sm"
+              className={getButtonClassName('action')}
             >
-              <CheckCircle className="w-5 h-5" />
+              <CheckCircle className={EXPERIMENT_ICON_STYLES.default} />
               条件を完了
               {hasNextCondition() && (
                 <span className="flex items-center gap-1">
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className={EXPERIMENT_ICON_STYLES.small} />
                   {getNextCondition()}へ
                 </span>
               )}

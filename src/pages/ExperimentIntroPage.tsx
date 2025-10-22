@@ -7,6 +7,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { InfoIcon, Play, User, Clock, Palette, Sparkles, Layers } from 'lucide-react';
+import {
+  EXPERIMENT_BUTTON_STYLES,
+  EXPERIMENT_INPUT_STYLES,
+  EXPERIMENT_CARD_STYLES,
+  EXPERIMENT_CONDITION_COLORS,
+  EXPERIMENT_LAYOUT,
+  EXPERIMENT_TEXT_STYLES,
+  EXPERIMENT_ICON_STYLES,
+  getButtonClassName,
+  getInputClassName,
+  getCardClassName,
+  getConditionCardColors,
+} from '@/constants/experimentTheme';
 
 /**
  * 実験導入ページ（改良版）
@@ -38,28 +51,22 @@ const ExperimentIntroPage = () => {
   // 条件データ
   const conditions = [
     {
-      id: 'Test1',
+      id: 'Test1' as const,
       name: '既存カラーパレット方式',
       description: '全色相×複数トーンの大量の色を一度に表示',
       icon: Palette,
-      color: 'bg-orange-50 dark:bg-orange-950 border-orange-300 dark:border-orange-700',
-      badgeColor: 'bg-orange-500'
     },
     {
-      id: 'Test2',
+      id: 'Test2' as const,
       name: '色相環＋トーンスライダー方式',
       description: '色相環とトーンスライダーで自由に色を作成',
       icon: Layers,
-      color: 'bg-blue-50 dark:bg-blue-950 border-blue-300 dark:border-blue-700',
-      badgeColor: 'bg-blue-500'
     },
     {
-      id: 'Test3',
+      id: 'Test3' as const,
       name: '二段階推薦方式',
       description: '色相推薦→トーン推薦の二段階で選択（提案手法）',
       icon: Sparkles,
-      color: 'bg-green-50 dark:bg-green-950 border-green-300 dark:border-green-700',
-      badgeColor: 'bg-green-500'
     }
   ];
 
@@ -128,23 +135,24 @@ const ExperimentIntroPage = () => {
           <div className="grid md:grid-cols-2 gap-4">
             {conditions.map((cond) => {
               const Icon = cond.icon;
+              const colors = getConditionCardColors(cond.id);
               return (
                 <div
                   key={cond.id}
-                  className={`p-4 rounded-lg border-2 ${cond.color}`}
+                  className={`p-4 rounded-lg border-2 ${colors.bg} ${colors.border}`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className={`p-2 ${cond.badgeColor} rounded-lg flex-shrink-0`}>
-                      <Icon className="w-5 h-5 text-white" />
+                    <div className={`p-2 ${colors.badge} rounded-lg flex-shrink-0`}>
+                      <Icon className={`${EXPERIMENT_ICON_STYLES.default} text-white`} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <Badge className={`${cond.badgeColor} text-white font-mono px-3 py-1`}>
+                        <Badge className={`${colors.badge} text-white font-mono px-3 py-1`}>
                           {cond.id}
                         </Badge>
                         <h3 className="font-semibold">{cond.name}</h3>
                       </div>
-                      <p className="text-sm text-muted-foreground">
+                      <p className={EXPERIMENT_TEXT_STYLES.description}>
                         {cond.description}
                       </p>
                     </div>
@@ -168,13 +176,13 @@ const ExperimentIntroPage = () => {
           </CardHeader>
           <CardContent className="pt-16 pb-16 px-8 space-y-10">
             <div className="space-y-6">
-              <label className="text-base font-semibold text-foreground block">参加者ID</label>
+              <label className={EXPERIMENT_TEXT_STYLES.label}>参加者ID</label>
               <Input
                 type="text"
                 placeholder="例: U001"
                 value={inputId}
                 onChange={(e) => setInputId(e.target.value)}
-                className="font-mono text-xl h-[84px] px-4 border-2 bg-gray-50 dark:bg-gray-800 text-foreground"
+                className={getInputClassName('large')}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     handleStart();
@@ -186,9 +194,9 @@ const ExperimentIntroPage = () => {
             <Button
               onClick={handleStart}
               size="lg"
-              className="w-full gap-3 text-xl h-16 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 dark:from-green-700 dark:to-green-800 dark:hover:from-green-800 dark:hover:to-green-900 text-white"
+              className={`w-full text-xl h-16 ${getButtonClassName('action')}`}
             >
-              <Play className="w-6 h-6" />
+              <Play className={EXPERIMENT_ICON_STYLES.large} />
               実験開始（Test1から）
             </Button>
 

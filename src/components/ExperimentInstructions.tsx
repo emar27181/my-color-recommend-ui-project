@@ -2,6 +2,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { InfoIcon } from 'lucide-react';
 import type { ExperimentCondition } from '@/store/experimentStore';
+import {
+  EXPERIMENT_LAYOUT,
+  EXPERIMENT_ICON_STYLES,
+  getBadgeProps,
+} from '@/constants/experimentTheme';
 
 interface ExperimentInstructionsProps {
   condition: ExperimentCondition;
@@ -27,13 +32,13 @@ export const ExperimentInstructions = ({ condition }: ExperimentInstructionsProp
   const conditionInfo = CONDITION_INFO[condition];
 
   return (
-    <div className="w-[70%] mx-auto space-y-4 mb-6">
+    <div className={`${EXPERIMENT_LAYOUT.containerWidth.centered} space-y-4 mb-6`}>
       {/* 現在の条件 */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <InfoIcon className="w-5 h-5 text-primary" />
-            <Badge variant="outline" className="font-mono text-base">
+            <InfoIcon className={`${EXPERIMENT_ICON_STYLES.default} text-primary`} />
+            <Badge {...getBadgeProps('condition')}>
               {condition}
             </Badge>
             {conditionInfo.title}
