@@ -174,7 +174,7 @@ const ExperimentIntroPage = () => {
                 placeholder="例: U001"
                 value={inputId}
                 onChange={(e) => setInputId(e.target.value)}
-                className="font-mono text-xl h-[84px] px-4 border-2"
+                className="font-mono text-xl h-[84px] px-4 border-2 bg-white dark:bg-gray-100 dark:text-gray-900"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     handleStart();

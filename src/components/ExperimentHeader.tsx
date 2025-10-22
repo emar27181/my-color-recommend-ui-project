@@ -107,7 +107,11 @@ export const ExperimentHeader = ({ canvasRef }: ExperimentHeaderProps) => {
 
           {/* 条件完了ボタン */}
           {isExperimentRunning && (
-            <Button onClick={handleComplete} size="lg" className="gap-2">
+            <Button
+              onClick={handleComplete}
+              size="lg"
+              className="gap-2 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 text-white shadow-sm"
+            >
               <CheckCircle className="w-5 h-5" />
               条件を完了
               {hasNextCondition() && (
