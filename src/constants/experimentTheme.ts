@@ -66,7 +66,7 @@ export const EXPERIMENT_CARD_STYLES = {
 export const EXPERIMENT_INPUT_STYLES = {
   // 標準入力欄
   default: {
-    base: 'border-2 bg-background text-foreground',
+    base: 'border-2 bg-muted text-foreground',
     radius: 'rounded-md',
     padding: 'px-4',
     focus: 'focus:ring-2 focus:ring-primary/50',
@@ -74,7 +74,7 @@ export const EXPERIMENT_INPUT_STYLES = {
 
   // 大きい入力欄（参加者ID入力など）
   large: {
-    base: 'font-mono text-xl h-[84px] px-4 border-2 bg-background text-foreground',
+    base: 'font-mono text-xl h-[84px] px-4 border-2 bg-muted text-foreground',
     radius: 'rounded-md',
   },
 } as const;
