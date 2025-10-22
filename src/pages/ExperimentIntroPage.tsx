@@ -174,7 +174,7 @@ const ExperimentIntroPage = () => {
                 placeholder="例: U001"
                 value={inputId}
                 onChange={(e) => setInputId(e.target.value)}
-                className="font-mono text-xl h-[84px] px-4 border-2 bg-white dark:bg-gray-100 dark:text-gray-900"
+                className="font-mono text-xl h-[84px] px-4 border-2 bg-gray-50 dark:bg-gray-800 text-foreground"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     handleStart();
@@ -186,7 +186,7 @@ const ExperimentIntroPage = () => {
             <Button
               onClick={handleStart}
               size="lg"
-              className="w-full gap-3 text-xl h-16 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+              className="w-full gap-3 text-xl h-16 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 dark:from-green-700 dark:to-green-800 dark:hover:from-green-800 dark:hover:to-green-900 text-white"
             >
               <Play className="w-6 h-6" />
               実験開始（Test1から）
