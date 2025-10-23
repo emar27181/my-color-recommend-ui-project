@@ -6,8 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, Activity, ArrowRight } from 'lucide-react';
 import type { CanvasColorRecommendationsRef } from '@/components/CanvasColorRecommendations';
 import {
-  EXPERIMENT_BUTTON_STYLES,
-  EXPERIMENT_CARD_STYLES,
   EXPERIMENT_ICON_STYLES,
   getBadgeProps,
   getButtonClassName,

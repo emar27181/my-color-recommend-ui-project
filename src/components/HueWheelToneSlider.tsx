@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { useColorStore } from '@/store/colorStore';
 import chroma from 'chroma-js';
 import { useState, useEffect } from 'react';

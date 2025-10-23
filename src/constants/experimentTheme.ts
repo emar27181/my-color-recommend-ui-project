@@ -200,7 +200,7 @@ export const EXPERIMENT_TEXT_STYLES = {
 /**
  * ボタンのclassNameを生成
  */
-export const getButtonClassName = (type: keyof typeof EXPERIMENT_BUTTON_STYLES, size: 'default' | 'sm' | 'lg' = 'default') => {
+export const getButtonClassName = (type: keyof typeof EXPERIMENT_BUTTON_STYLES) => {
   const styles = EXPERIMENT_BUTTON_STYLES[type];
   return `${styles.base} ${styles.className}`;
 };
@@ -227,7 +227,7 @@ export const getInputClassName = (type: keyof typeof EXPERIMENT_INPUT_STYLES) =>
 /**
  * バッジのpropsを取得
  */
-export const getBadgeProps = (type: keyof typeof EXPERIMENT_BADGE_STYLES) => {
+export const getBadgeProps = (type: 'condition' | 'participant' | 'progress') => {
   const styles = EXPERIMENT_BADGE_STYLES[type];
   return {
     variant: styles.variant,

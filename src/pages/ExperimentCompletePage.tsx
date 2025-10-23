@@ -7,14 +7,11 @@ import { CheckCircle, Download, Home, ClipboardCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SurveyForm } from '@/components/SurveyForm';
 import {
-  EXPERIMENT_BUTTON_STYLES,
-  EXPERIMENT_CARD_STYLES,
   EXPERIMENT_LAYOUT,
   EXPERIMENT_ICON_STYLES,
   EXPERIMENT_TEXT_STYLES,
   getBadgeProps,
   getButtonClassName,
-  getCardClassName,
 } from '@/constants/experimentTheme';
 
 /**
