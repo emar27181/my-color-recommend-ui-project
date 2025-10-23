@@ -12,7 +12,7 @@ export interface ExperimentEvent {
   timestamp?: string;     // タイムスタンプ（ISO 8601形式）
 }
 
-// デバイス情報の型定義
+// デバイス情報の型定義（自動検出）
 export interface DeviceInfo {
   type: 'PC' | 'tablet' | 'mobile' | 'unknown';
   inputMethod?: 'mouse' | 'touch' | 'pen' | 'unknown';
@@ -22,6 +22,13 @@ export interface DeviceInfo {
   screenHeight: number;
   devicePixelRatio: number;
   userAgent: string;
+}
+
+// 参加者情報の型定義（手動入力）
+export interface ParticipantInfo {
+  deviceType: 'PC' | 'tablet' | 'smartphone' | '';  // 使用デバイス（ユーザー選択）
+  illustrationExperience: 'beginner' | 'some' | 'hobby' | 'professional' | '';  // イラスト経験
+  ageRange?: '10s' | '20s' | '30s' | '40s' | '50s' | '60s+' | '';  // 年齢層（オプション）
 }
 
 // 条件ごとのログ
@@ -46,7 +53,8 @@ export interface SurveyResponse {
 // 実験ログ全体の型定義
 export interface ExperimentLog {
   participant_id: string;
-  device: DeviceInfo;
+  participant_info: ParticipantInfo;  // 参加者情報（手動入力）
+  device: DeviceInfo;                 // デバイス情報（自動検出）
   experiment_start_time: string;
   experiment_end_time: string | null;
   total_duration_sec: number | null;
@@ -58,6 +66,7 @@ export interface ExperimentLog {
 export interface ExperimentState {
   // 状態
   participantId: string;
+  participantInfo: ParticipantInfo;  // 参加者情報（手動入力）
   condition: ExperimentCondition;
   isExperimentRunning: boolean;
   startTime: number | null;
@@ -77,6 +86,7 @@ export interface ExperimentState {
 
   // アクション
   setParticipantId: (id: string) => void;
+  setParticipantInfo: (info: ParticipantInfo) => void;  // 参加者情報を設定
   setCondition: (condition: ExperimentCondition) => void;
   startExperiment: () => void;
   endExperiment: () => void;
@@ -152,6 +162,11 @@ const initialDeviceInfo = collectDeviceInfo();
 export const useExperimentStore = create<ExperimentState>((set, get) => ({
   // 初期状態
   participantId: '',
+  participantInfo: {
+    deviceType: '',
+    illustrationExperience: '',
+    ageRange: '',
+  },
   condition: 'Test1',
   isExperimentRunning: false,
   startTime: null,
@@ -172,6 +187,11 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
   // 参加者IDを設定
   setParticipantId: (id: string) => {
     set({ participantId: id });
+  },
+
+  // 参加者情報を設定
+  setParticipantInfo: (info: ParticipantInfo) => {
+    set({ participantInfo: info });
   },
 
   // 実験条件を設定
@@ -238,6 +258,7 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
     const state = get();
     return {
       participant_id: state.participantId,
+      participant_info: state.participantInfo,  // 参加者情報（手動入力）
       device: state.deviceInfo,
       experiment_start_time: state.experimentStartTime ? new Date(state.experimentStartTime).toISOString() : '',
       experiment_end_time: state.experimentEndTime ? new Date(state.experimentEndTime).toISOString() : null,

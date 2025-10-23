@@ -6,18 +6,14 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { InfoIcon, Play, User, Clock, Palette, Sparkles, Layers } from 'lucide-react';
 import {
-  EXPERIMENT_BUTTON_STYLES,
-  EXPERIMENT_INPUT_STYLES,
-  EXPERIMENT_CARD_STYLES,
-  EXPERIMENT_CONDITION_COLORS,
-  EXPERIMENT_LAYOUT,
   EXPERIMENT_TEXT_STYLES,
   EXPERIMENT_ICON_STYLES,
   getButtonClassName,
   getInputClassName,
-  getCardClassName,
   getConditionCardColors,
 } from '@/constants/experimentTheme';
 
@@ -31,8 +27,11 @@ import {
  */
 const ExperimentIntroPage = () => {
   const navigate = useNavigate();
-  const { setParticipantId, startFullExperiment } = useExperimentStore();
+  const { setParticipantId, setParticipantInfo, startFullExperiment } = useExperimentStore();
   const [inputId, setInputId] = useState('');
+  const [deviceType, setDeviceType] = useState<'PC' | 'tablet' | 'smartphone' | ''>('');
+  const [illustrationExperience, setIllustrationExperience] = useState<'beginner' | 'some' | 'hobby' | 'professional' | ''>('');
+  const [ageRange, setAgeRange] = useState<'10s' | '20s' | '30s' | '40s' | '50s' | '60s+' | ''>('');
 
   // 実験開始ハンドラ
   const handleStart = () => {
@@ -41,7 +40,24 @@ const ExperimentIntroPage = () => {
       return;
     }
 
+    if (!deviceType) {
+      alert('使用デバイスを選択してください');
+      return;
+    }
+
+    if (!illustrationExperience) {
+      alert('イラスト経験を選択してください');
+      return;
+    }
+
+    // 参加者情報を保存
     setParticipantId(inputId.trim());
+    setParticipantInfo({
+      deviceType,
+      illustrationExperience,
+      ageRange,
+    });
+
     startFullExperiment();
 
     // Test1実験ページに遷移
@@ -188,6 +204,55 @@ const ExperimentIntroPage = () => {
                   }
                 }}
               />
+            </div>
+
+            {/* 使用デバイス選択 */}
+            <div className="space-y-3">
+              <Label className="text-base font-semibold text-foreground">使用デバイス *</Label>
+              <Select value={deviceType} onValueChange={(value: string) => setDeviceType(value as 'PC' | 'tablet' | 'smartphone' | '')}>
+                <SelectTrigger className={getInputClassName('default')}>
+                  <SelectValue placeholder="デバイスを選択してください" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="PC">PC</SelectItem>
+                  <SelectItem value="tablet">タブレット</SelectItem>
+                  <SelectItem value="smartphone">スマートフォン</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* イラスト経験選択 */}
+            <div className="space-y-3">
+              <Label className="text-base font-semibold text-foreground">イラスト経験 *</Label>
+              <Select value={illustrationExperience} onValueChange={(value: string) => setIllustrationExperience(value as 'beginner' | 'some' | 'hobby' | 'professional' | '')}>
+                <SelectTrigger className={getInputClassName('default')}>
+                  <SelectValue placeholder="経験レベルを選択してください" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="beginner">初心者（ほぼ描いたことがない）</SelectItem>
+                  <SelectItem value="some">少し経験あり（たまに描く）</SelectItem>
+                  <SelectItem value="hobby">趣味レベル（よく描く）</SelectItem>
+                  <SelectItem value="professional">プロ・セミプロレベル</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 年齢層選択（オプション） */}
+            <div className="space-y-3">
+              <Label className="text-base font-semibold text-foreground">年齢層（任意）</Label>
+              <Select value={ageRange} onValueChange={(value: string) => setAgeRange(value as '10s' | '20s' | '30s' | '40s' | '50s' | '60s+' | '')}>
+                <SelectTrigger className={getInputClassName('default')}>
+                  <SelectValue placeholder="年齢層を選択（任意）" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10s">10代</SelectItem>
+                  <SelectItem value="20s">20代</SelectItem>
+                  <SelectItem value="30s">30代</SelectItem>
+                  <SelectItem value="40s">40代</SelectItem>
+                  <SelectItem value="50s">50代</SelectItem>
+                  <SelectItem value="60s+">60代以上</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <Button
