@@ -1,10 +1,8 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { useColorStore, quantizeHue, quantizeSaturationLightness, COLOR_SCHEMES } from '@/store/colorStore';
 import { useTranslation } from 'react-i18next';
 import chroma from 'chroma-js';
-import { useMemo, useState } from 'react';
-import { Grid3X3, Circle } from 'lucide-react';
+import { useMemo } from 'react';
 
 // 色相環プロット用コンポーネント
 const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedScheme }: { colors: { hex: string; usage: number }[], onHueClick?: (hue: number) => void, isQuantized: boolean, selectedColor?: string, selectedScheme?: string }) => {
@@ -688,7 +686,8 @@ const SaturationLightnessPlot = ({ colors, onSaturationLightnessClick, isQuantiz
 
 export const HueToneExtraction = () => {
   const { extractedColors, selectedColor, setSelectedColor, isQuantizationEnabled, selectedScheme } = useColorStore();
-  const [showHeatmap, setShowHeatmap] = useState(false);
+  // 散布図のみ表示（固定）
+  const showHeatmap = false;
 
   const { t } = useTranslation();
 
@@ -753,30 +752,6 @@ export const HueToneExtraction = () => {
           )}
 
 
-          {/* 切り替えボタン */}
-          <div className="flex justify-center mb-2">
-            <div className="flex bg-muted rounded-md p-1">
-              <Button
-                variant={!showHeatmap ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setShowHeatmap(false)}
-                className="h-8 px-2"
-              >
-                <Circle className="w-3 h-3 mr-1 text-foreground" />
-                <span className="text-xs">散布図</span>
-              </Button>
-              <Button
-                variant={showHeatmap ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setShowHeatmap(true)}
-                className="h-8 px-2"
-              >
-                <Grid3X3 className="w-3 h-3 mr-1 text-foreground" />
-                <span className="text-xs">ヒートマップ</span>
-              </Button>
-            </div>
-          </div>
-
           {/* 色相・トーンの可視化を常に表示 */}
           <div className="flex flex-col space-y-0">
             <HueWheel colors={visualizationData} onHueClick={handleHueClick} isQuantized={isQuantizationEnabled} selectedColor={selectedColor} selectedScheme={selectedScheme} />
@@ -784,38 +759,6 @@ export const HueToneExtraction = () => {
               <div className="flex-1">
                 <SaturationLightnessPlot colors={visualizationData} onSaturationLightnessClick={handleSaturationLightnessClick} isQuantized={isQuantizationEnabled} selectedColor={selectedColor} showHeatmap={showHeatmap} />
               </div>
-              {showHeatmap && (
-                <div className="flex-shrink-0 ml-2">
-                  <div className="flex flex-col space-y-3">
-                    {/* 使用頻度凡例 */}
-                    <div className="flex flex-col items-center space-y-1">
-                      <div className="text-xs font-medium text-muted-foreground mb-1">
-                        使用頻度
-                      </div>
-                      <div className="flex flex-col space-y-0.5">
-                        {[
-                          { color: 'rgba(239, 68, 68, 0.9)', label: '高' },
-                          { color: 'rgba(234, 179, 8, 0.8)', label: '中高' },
-                          { color: 'rgba(34, 197, 94, 0.7)', label: '中低' },
-                          { color: 'rgba(59, 130, 246, 0.6)', label: '低' },
-                          { color: 'rgba(240, 240, 240, 0.8)', label: '未使用' }
-                        ].map((step, index) => (
-                          <div key={index} className="flex items-center space-x-1">
-                            <div
-                              className="w-3 h-2 border border-border/30 rounded-sm"
-                              style={{ backgroundColor: step.color }}
-                            />
-                            <span className="text-xs text-muted-foreground">
-                              {step.label}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
-              )}
             </div>
           </div>
           {/* 抽出色がない場合のメッセージは下部に小さく表示 */}
