@@ -68,20 +68,20 @@ const ExperimentIntroPage = () => {
   const conditions = [
     {
       id: 'Test1' as const,
-      name: '既存カラーパレット方式',
-      description: '全色相×複数トーンの大量の色を一度に表示',
+      name: 'UI方式1',
+      description: '大量の色を一度に表示',
       icon: Palette,
     },
     {
       id: 'Test2' as const,
-      name: '色相環＋トーンスライダー方式',
-      description: '色相環とトーンスライダーで自由に色を作成',
+      name: 'UI方式2',
+      description: '色相環とスライダーで色を作成',
       icon: Layers,
     },
     {
       id: 'Test3' as const,
-      name: '二段階推薦方式',
-      description: '色相推薦→トーン推薦の二段階で選択（提案手法）',
+      name: 'UI方式3',
+      description: '色相→トーンの二段階で選択',
       icon: Sparkles,
     }
   ];

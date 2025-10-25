@@ -15,16 +15,16 @@ interface ExperimentInstructionsProps {
 // 条件別の説明
 const CONDITION_INFO = {
   Test1: {
-    title: 'Test1: 既存カラーパレット方式',
-    description: '全色相×複数トーンの大量の色が一度に表示されます。多くの選択肢から色を選ぶ体験をしてください。',
+    title: 'Test1: UI方式1',
+    description: '大量の色が一度に表示されます。多くの選択肢から色を選ぶ体験をしてください。',
   },
   Test2: {
-    title: 'Test2: 色相環＋トーンスライダー方式',
-    description: '色相環とトーンスライダーで自由に色を作成できます。色の数に制限はありません。',
+    title: 'Test2: UI方式2',
+    description: '色相環とスライダーで自由に色を作成できます。色の数に制限はありません。',
   },
   Test3: {
-    title: 'Test3: 二段階推薦方式',
-    description: 'まず色相推薦から選択し、次にトーン推薦から選択します（提案手法）。',
+    title: 'Test3: UI方式3',
+    description: 'まず色相から選択し、次にトーンから選択します。',
   },
 };
 

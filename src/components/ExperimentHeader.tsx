@@ -14,9 +14,9 @@ import {
 
 // 条件の説明
 const CONDITION_DESCRIPTIONS = {
-  Test1: '既存カラーパレット方式（大量の色を一度に表示）',
-  Test2: '色相環＋トーンスライダー方式（自由に色を作成）',
-  Test3: '二段階推薦方式（色相→トーン）',
+  Test1: 'UI方式1（大量の色を一度に表示）',
+  Test2: 'UI方式2（色相環＋スライダー）',
+  Test3: 'UI方式3（色相→トーン）',
 };
 
 interface ExperimentHeaderProps {
