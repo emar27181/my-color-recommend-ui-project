@@ -222,7 +222,7 @@ export const SurveyForm = ({ onSubmit }: SurveyFormProps) => {
               onChange={(e) => setReason(e.target.value)}
               placeholder="例：色の選択が直感的で、推薦機能が役立った"
               rows={4}
-              className="resize-none"
+              className="resize-none bg-muted text-foreground border-2"
             />
           </div>
 
@@ -234,7 +234,7 @@ export const SurveyForm = ({ onSubmit }: SurveyFormProps) => {
               onChange={(e) => setImprovement(e.target.value)}
               placeholder="例：推薦色の数を増やしてほしい"
               rows={4}
-              className="resize-none"
+              className="resize-none bg-muted text-foreground border-2"
             />
           </div>
         </CardContent>
