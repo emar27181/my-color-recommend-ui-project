@@ -41,8 +41,13 @@ const App = () => {
     // 初期表示時にページの最上端を表示
     window.scrollTo(0, 0);
 
-    // ダークモードをデフォルトに設定
-    document.documentElement.classList.add('dark');
+    // localStorageから設定を読み込み、なければダークモードをデフォルトに設定
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+    }
 
     // 画面サイズを取得・更新する関数
     const updateScreenSize = () => {
