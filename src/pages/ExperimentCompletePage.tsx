@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Download, Home, ClipboardCheck } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { SurveyForm } from '@/components/SurveyForm';
 import {
   EXPERIMENT_LAYOUT,
@@ -19,9 +19,13 @@ import {
  *
  * 全テスト（Test1~Test3）完了後に表示されるページ
  * アンケート回答後、ログをダウンロード可能
+ * デバッグモード対応
  */
 const ExperimentCompletePage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isDebugMode = searchParams.get('debug') === 'true';
+
   const { participantId, conditionLogs, surveyResponse, setSurveyResponse, exportLog } = useExperimentStore();
   const [showSurvey, setShowSurvey] = useState(!surveyResponse); // アンケート未回答時は表示
 
@@ -123,7 +127,7 @@ const ExperimentCompletePage = () => {
                 </div>
               </div>
             </div>
-            <SurveyForm onSubmit={handleSurveySubmit} />
+            <SurveyForm onSubmit={handleSurveySubmit} isDebugMode={isDebugMode} />
           </div>
         ) : (
           /* 次のステップ */

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useExperimentStore } from '@/store/experimentStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { InfoIcon, Play, User, Clock, Palette, Sparkles, Layers } from 'lucide-react';
+import { InfoIcon, Play, User, Clock, Palette, Sparkles, Layers, Bug } from 'lucide-react';
 import {
   EXPERIMENT_TEXT_STYLES,
   EXPERIMENT_ICON_STYLES,
@@ -24,14 +24,18 @@ import {
  * - ビジュアル要素の強化
  * - 色分けされた条件カード
  * - より簡潔なテキスト
+ * - デバッグモード対応（?debug=true で自動入力）
  */
 const ExperimentIntroPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isDebugMode = searchParams.get('debug') === 'true';
+
   const { setParticipantId, setParticipantInfo, startFullExperiment } = useExperimentStore();
-  const [inputId, setInputId] = useState('');
-  const [deviceType, setDeviceType] = useState<'PC' | 'tablet' | 'smartphone' | ''>('');
-  const [illustrationExperience, setIllustrationExperience] = useState<'beginner' | 'some' | 'hobby' | 'professional' | ''>('');
-  const [ageRange, setAgeRange] = useState<'10s' | '20s' | '30s' | '40s' | '50s' | '60s+' | ''>('');
+  const [inputId, setInputId] = useState(isDebugMode ? 'DEBUG001' : '');
+  const [deviceType, setDeviceType] = useState<'PC' | 'tablet' | 'smartphone' | ''>(isDebugMode ? 'PC' : '');
+  const [illustrationExperience, setIllustrationExperience] = useState<'beginner' | 'some' | 'hobby' | 'professional' | ''>(isDebugMode ? 'hobby' : '');
+  const [ageRange, setAgeRange] = useState<'10s' | '20s' | '30s' | '40s' | '50s' | '60s+' | ''>(isDebugMode ? '20s' : '');
 
   // 実験開始ハンドラ
   const handleStart = () => {
@@ -60,8 +64,9 @@ const ExperimentIntroPage = () => {
 
     startFullExperiment();
 
-    // Test1実験ページに遷移
-    navigate('/experiment/task?cond=Test1');
+    // Test1実験ページに遷移（デバッグモードを引き継ぐ）
+    const debugParam = isDebugMode ? '&debug=true' : '';
+    navigate(`/experiment/task?cond=Test1${debugParam}`);
   };
 
   // 条件データ
@@ -89,6 +94,18 @@ const ExperimentIntroPage = () => {
   return (
     <main className="flex-1 pb-8 min-h-screen flex flex-col bg-gradient-to-b from-background to-muted/20">
       <div className="w-[70%] mx-auto px-4 py-8 overflow-x-hidden">
+        {/* デバッグモードインジケーター */}
+        {isDebugMode && (
+          <div className="mb-4 p-3 bg-orange-100 dark:bg-orange-900 border-2 border-orange-500 rounded-lg">
+            <div className="flex items-center gap-2 justify-center">
+              <Bug className="w-5 h-5 text-orange-700 dark:text-orange-300" />
+              <span className="font-semibold text-orange-700 dark:text-orange-300">
+                デバッグモード有効（全フィールド自動入力済み）
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* ヘッダー */}
         <div className="text-center mb-10">
           <div className="inline-block p-3 bg-primary/10 rounded-full mb-4">

@@ -6,7 +6,7 @@ import { EXPERIMENT_LAYOUT_CONFIG } from '@/constants/layout';
 import { useExperimentStore } from '@/store/experimentStore';
 import { useExperimentQuery } from '@/hooks/useQueryParams';
 import { useEffect, useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 /**
  * 実験ページコンポーネント
@@ -16,9 +16,12 @@ import { useNavigate } from 'react-router-dom';
  * - C1: 色相推薦のみ
  * - C2: トーン推薦のみ
  * - C3: 二段階推薦（すべて）
+ * デバッグモード対応（?debug=true）
  */
 const ExperimentPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isDebugMode = searchParams.get('debug') === 'true';
 
   // URLから条件を読み取る
   useExperimentQuery();
@@ -33,7 +36,6 @@ const ExperimentPage = () => {
     }
   }, [participantId, navigate]);
 
-  const [isDebugMode, setIsDebugMode] = useState(false);
   const [screenSize, setScreenSize] = useState({ width: 0, height: 0 });
 
   // デバイス判定（閾値800px）
@@ -88,22 +90,12 @@ const ExperimentPage = () => {
     // 初期画面サイズ設定
     updateScreenSize();
 
-    // F5キーでデバッグモード切り替え
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'F5') {
-        event.preventDefault();
-        setIsDebugMode(prev => !prev);
-      }
-    };
-
     // リサイズイベントリスナー
     window.addEventListener('resize', updateScreenSize);
-    document.addEventListener('keydown', handleKeyDown);
 
     // クリーンアップ
     return () => {
       window.removeEventListener('resize', updateScreenSize);
-      document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 
@@ -223,7 +215,7 @@ const ExperimentPage = () => {
     <main className="flex-1 pb-2 min-h-0 flex flex-col" style={isDebugMode ? { backgroundColor: '#607d8b', padding: '16px' } : {}}>
       {/* 実験ヘッダー */}
       <div className="px-4 pt-2">
-        <ExperimentHeader canvasRef={canvasColorRecommendationsRef} />
+        <ExperimentHeader canvasRef={canvasColorRecommendationsRef} isDebugMode={isDebugMode} />
       </div>
 
       {/* 条件説明 */}

@@ -4,10 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Bug } from 'lucide-react';
 import type { SurveyResponse } from '@/store/experimentStore';
 
 interface SurveyFormProps {
   onSubmit: (response: SurveyResponse) => void;
+  isDebugMode?: boolean;
 }
 
 /**
@@ -17,21 +19,22 @@ interface SurveyFormProps {
  * - TAM（3問）
  * - Mini-CSI（3問）
  * - 最も使いやすかったUI + 理由 + 改善点
+ * - デバッグモード対応（自動入力）
  */
-export const SurveyForm = ({ onSubmit }: SurveyFormProps) => {
-  // SUS簡易版（5問）
-  const [usability, setUsability] = useState<number[]>([0, 0, 0, 0, 0]);
+export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) => {
+  // SUS簡易版（5問）- デバッグモード時は全て4に設定
+  const [usability, setUsability] = useState<number[]>(isDebugMode ? [4, 4, 4, 4, 4] : [0, 0, 0, 0, 0]);
 
-  // TAM（3問）
-  const [effectiveness, setEffectiveness] = useState<number[]>([0, 0, 0]);
+  // TAM（3問）- デバッグモード時は全て4に設定
+  const [effectiveness, setEffectiveness] = useState<number[]>(isDebugMode ? [4, 4, 4] : [0, 0, 0]);
 
-  // Mini-CSI（3問）
-  const [creativity, setCreativity] = useState<number[]>([0, 0, 0]);
+  // Mini-CSI（3問）- デバッグモード時は全て4に設定
+  const [creativity, setCreativity] = useState<number[]>(isDebugMode ? [4, 4, 4] : [0, 0, 0]);
 
-  // 選択UI・理由・改善点
-  const [favoriteUI, setFavoriteUI] = useState<string>('');
-  const [reason, setReason] = useState<string>('');
-  const [improvement, setImprovement] = useState<string>('');
+  // 選択UI・理由・改善点 - デバッグモード時は自動入力
+  const [favoriteUI, setFavoriteUI] = useState<string>(isDebugMode ? 'Test3' : '');
+  const [reason, setReason] = useState<string>(isDebugMode ? 'デバッグモードでの自動入力テスト' : '');
+  const [improvement, setImprovement] = useState<string>(isDebugMode ? '特になし（デバッグ）' : '');
 
   // SUS質問文
   const susQuestions = [
@@ -100,6 +103,18 @@ export const SurveyForm = ({ onSubmit }: SurveyFormProps) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* デバッグモードインジケーター */}
+      {isDebugMode && (
+        <div className="p-3 bg-orange-100 dark:bg-orange-900 border-2 border-orange-500 rounded-lg">
+          <div className="flex items-center gap-2 justify-center">
+            <Bug className="w-5 h-5 text-orange-700 dark:text-orange-300" />
+            <span className="font-semibold text-orange-700 dark:text-orange-300">
+              デバッグモード有効（アンケート自動入力済み）
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* SUS簡易版 */}
       <Card>
         <CardHeader>

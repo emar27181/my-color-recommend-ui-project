@@ -21,9 +21,10 @@ const CONDITION_DESCRIPTIONS = {
 
 interface ExperimentHeaderProps {
   canvasRef?: React.RefObject<CanvasColorRecommendationsRef | null>;
+  isDebugMode?: boolean;
 }
 
-export const ExperimentHeader = ({ canvasRef }: ExperimentHeaderProps) => {
+export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentHeaderProps) => {
   const navigate = useNavigate();
   const {
     participantId,
@@ -59,8 +60,9 @@ export const ExperimentHeader = ({ canvasRef }: ExperimentHeaderProps) => {
 
         // 次の条件に進む
         nextCondition();
-        // 次の条件のページに遷移
-        navigate(`/experiment/task?cond=${nextCond}`);
+        // 次の条件のページに遷移（デバッグモードを引き継ぐ）
+        const debugParam = isDebugMode ? '&debug=true' : '';
+        navigate(`/experiment/task?cond=${nextCond}${debugParam}`);
       }
     } else {
       // 全条件完了 - アンケートページに遷移
@@ -68,8 +70,9 @@ export const ExperimentHeader = ({ canvasRef }: ExperimentHeaderProps) => {
         `すべてのテスト（Test1~Test3）が完了しました！\n\nアンケートにご協力ください。`
       );
 
-      // 完了ページ（アンケート）に遷移
-      navigate('/experiment/complete');
+      // 完了ページ（アンケート）に遷移（デバッグモードを引き継ぐ）
+      const debugParam = isDebugMode ? '?debug=true' : '';
+      navigate(`/experiment/complete${debugParam}`);
     }
   };
 
