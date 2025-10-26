@@ -26,7 +26,7 @@ const ExperimentPage = () => {
   // URLから条件を読み取る
   useExperimentQuery();
 
-  const { condition, isExperimentRunning, participantId, getFeatureFlags } = useExperimentStore();
+  const { condition, participantId, getFeatureFlags } = useExperimentStore();
   const featureFlags = getFeatureFlags();
 
   // 参加者IDが未設定の場合は導入ページにリダイレクト
@@ -204,15 +204,13 @@ const ExperimentPage = () => {
     return column;
   }) as any;
 
-  const deviceType = isMobile ? 'MOBILE/TABLET' : 'DESKTOP';
-
   // 参加者IDが未設定の場合は何も表示しない（リダイレクト中）
   if (!participantId) {
     return null;
   }
 
   return (
-    <main className="flex-1 pb-2 min-h-0 flex flex-col" style={isDebugMode ? { backgroundColor: '#607d8b', padding: '16px' } : {}}>
+    <main className="flex-1 pb-2 min-h-0 flex flex-col">
       {/* 実験ヘッダー */}
       <div className="px-4 pt-2">
         <ExperimentHeader canvasRef={canvasColorRecommendationsRef} isDebugMode={isDebugMode} />
@@ -223,29 +221,12 @@ const ExperimentPage = () => {
         <ExperimentInstructions condition={condition} />
       </div>
 
-      {/* デバッグ情報表示 */}
-      {isDebugMode && (
-        <div className="fixed top-4 left-4 z-50 bg-black text-white p-2 rounded text-xs font-mono">
-          <div>画面: {screenSize.width}x{screenSize.height}</div>
-          <div>デバイス: {deviceType}</div>
-          <div>条件: {condition}</div>
-          <div>色相推薦: {featureFlags.HUE_RECO_ON ? 'ON' : 'OFF'}</div>
-          <div>トーン推薦: {featureFlags.TONE_RECO_ON ? 'ON' : 'OFF'}</div>
-          <div>実験中: {isExperimentRunning ? 'YES' : 'NO'}</div>
-        </div>
-      )}
-
       {/* モバイル表示 */}
       <div className={`${isMobile ? 'flex' : 'hidden'}`}>
-        {isDebugMode && (
-          <div className="bg-red-600 text-white p-2 text-center font-bold">
-            📱 MOBILE/TABLET LAYOUT (&lt;800px)
-          </div>
-        )}
         <LayoutRenderer
           columns={adjustedColumns}
           isMobile={true}
-          isDebugMode={isDebugMode}
+          isDebugMode={false}
           paintCanvasRef={canvasColorRecommendationsRef}
           handleExtractColorsFromCanvas={handleExtractColorsFromCanvas}
           handleImageUpload={handleImageUpload}
@@ -253,11 +234,11 @@ const ExperimentPage = () => {
       </div>
 
       {/* デスクトップ表示 */}
-      <div className={`${isMobile ? 'hidden' : 'flex'} flex-1`} style={isDebugMode ? { backgroundColor: '#795548', padding: '12px' } : {}}>
+      <div className={`${isMobile ? 'hidden' : 'flex'} flex-1`}>
         <LayoutRenderer
           columns={adjustedColumns}
           isMobile={false}
-          isDebugMode={isDebugMode}
+          isDebugMode={false}
           paintCanvasRef={canvasColorRecommendationsRef}
           handleExtractColorsFromCanvas={handleExtractColorsFromCanvas}
           handleImageUpload={handleImageUpload}
