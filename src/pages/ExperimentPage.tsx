@@ -1,7 +1,6 @@
 import { type CanvasColorRecommendationsRef } from '@/components/CanvasColorRecommendations';
 import { LayoutRenderer } from '@/components/layout/LayoutRenderer';
 import { ExperimentHeader } from '@/components/ExperimentHeader';
-import { ExperimentInstructions } from '@/components/ExperimentInstructions';
 import { EXPERIMENT_LAYOUT_CONFIG } from '@/constants/layout';
 import { useExperimentStore } from '@/store/experimentStore';
 import { useExperimentQuery } from '@/hooks/useQueryParams';
@@ -214,11 +213,6 @@ const ExperimentPage = () => {
       {/* 実験ヘッダー */}
       <div className="px-4 pt-1">
         <ExperimentHeader canvasRef={canvasColorRecommendationsRef} isDebugMode={isDebugMode} />
-      </div>
-
-      {/* 条件説明 */}
-      <div className="px-4">
-        <ExperimentInstructions condition={condition} />
       </div>
 
       {/* モバイル表示 */}
