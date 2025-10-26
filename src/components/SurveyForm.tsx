@@ -243,7 +243,7 @@ export const SurveyForm = ({ onSubmit }: SurveyFormProps) => {
       {/* 送信ボタン */}
       <div className="flex justify-center pt-4">
         <Button type="submit" size="lg" className="w-full md:w-auto px-12">
-          アンケートを送信
+          実験結果をダウンロード
         </Button>
       </div>
     </form>
