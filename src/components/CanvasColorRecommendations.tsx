@@ -19,6 +19,10 @@ export interface CanvasColorRecommendationsRef {
   drawImageToCanvas: (imageFile: File) => void;
   extractColorsFromCanvas: () => Promise<void>;
   clearAllLayers: () => void;
+  undo: () => void;
+  redo: () => void;
+  canUndo: () => boolean;
+  canRedo: () => boolean;
 }
 
 const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendationsRef, CanvasColorRecommendationsProps>(({ className = '', isDebugMode = false }, ref) => {
@@ -726,13 +730,6 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     console.log('All layers cleared');
   }, [layer1Context, layer2Context, saveToHistory, updateCompositeCanvas]);
 
-  // 外部からアクセス可能な関数を公開
-  useImperativeHandle(ref, () => ({
-    drawImageToCanvas,
-    extractColorsFromCanvas,
-    clearAllLayers
-  }), [drawImageToCanvas, extractColorsFromCanvas, clearAllLayers]);
-
   // ペンサイズ変更関数
   const increasePenSize = useCallback(() => {
     setPenSize(prev => Math.min(prev + 2, 200)); // 最大200px
@@ -824,14 +821,26 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
       const parsedData = JSON.parse(historyData);
       const { layer1: layer1DataURL, layer2: layer2DataURL } = parsedData;
 
+      // 両方のレイヤーが読み込まれたかを追跡
+      let layer1Loaded = false;
+      let layer2Loaded = false;
+
+      const checkAndUpdate = () => {
+        // 両方のレイヤーが読み込まれた後に一度だけ合成更新
+        if (layer1Loaded && layer2Loaded) {
+          console.log('Both layers restored, updating composite canvas');
+          updateCompositeCanvas();
+        }
+      };
+
       // レイヤー1を復元
       const img1: HTMLImageElement = document.createElement('img');
       img1.onload = () => {
         if (!layer1Context || !layer1CanvasRef.current) return;
         layer1Context.clearRect(0, 0, layer1CanvasRef.current.width, layer1CanvasRef.current.height);
         layer1Context.drawImage(img1, 0, 0);
-        // 合成キャンバスを更新
-        updateCompositeCanvas();
+        layer1Loaded = true;
+        checkAndUpdate();
       };
       img1.src = layer1DataURL;
 
@@ -841,8 +850,8 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
         if (!layer2Context || !layer2CanvasRef.current) return;
         layer2Context.clearRect(0, 0, layer2CanvasRef.current.width, layer2CanvasRef.current.height);
         layer2Context.drawImage(img2, 0, 0);
-        // 合成キャンバスを更新
-        updateCompositeCanvas();
+        layer2Loaded = true;
+        checkAndUpdate();
       };
       img2.src = layer2DataURL;
     } catch (error) {
@@ -880,6 +889,17 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
       restoreFromHistory(history[newIndex]);
     }
   }, [historyIndex, history, restoreFromHistory]);
+
+  // 外部からアクセス可能な関数を公開
+  useImperativeHandle(ref, () => ({
+    drawImageToCanvas,
+    extractColorsFromCanvas,
+    clearAllLayers,
+    undo,
+    redo,
+    canUndo: () => historyIndex > 0,
+    canRedo: () => historyIndex < history.length - 1
+  }), [drawImageToCanvas, extractColorsFromCanvas, clearAllLayers, undo, redo, historyIndex, history.length]);
 
   // キャンバスから色を取得する関数（合成表示から）
   const pickColorFromCanvas = useCallback((x: number, y: number) => {
