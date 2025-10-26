@@ -2,8 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { useExperimentStore } from '@/store/experimentStore';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, Activity, ArrowRight } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { CheckCircle, ArrowRight } from 'lucide-react';
 import type { CanvasColorRecommendationsRef } from '@/components/CanvasColorRecommendations';
 import {
   EXPERIMENT_ICON_STYLES,
@@ -27,15 +27,12 @@ interface ExperimentHeaderProps {
 export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentHeaderProps) => {
   const navigate = useNavigate();
   const {
-    participantId,
     condition,
     isExperimentRunning,
-    events,
     hasNextCondition,
     getNextCondition,
     completeCurrentCondition,
     nextCondition,
-    conditionLogs,
   } = useExperimentStore();
 
   // 条件完了ハンドラ
@@ -77,61 +74,36 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
   };
 
   return (
-    <Card className={`mb-4 ${getCardClassName('emphasized')}`}>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <CardTitle className="text-lg">実験進行中</CardTitle>
+    <Card className={`mb-2 ${getCardClassName('emphasized')}`}>
+      <CardContent className="py-2 px-4">
+        <div className="flex items-center justify-between gap-3">
+          {/* 左側: 条件情報 */}
+          <div className="flex items-center gap-2">
             <Badge {...getBadgeProps('condition')}>
               {condition}
             </Badge>
-            <span className="text-sm text-muted-foreground">
+            <span className="text-xs text-muted-foreground">
               {CONDITION_DESCRIPTIONS[condition]}
             </span>
           </div>
 
-          {/* 進捗表示 */}
-          <div className="flex items-center gap-2">
-            <Badge {...getBadgeProps('participant')}>
-              参加者: {participantId}
-            </Badge>
-            <Badge {...getBadgeProps('progress')}>
-              進捗: {conditionLogs.length + (isExperimentRunning ? 1 : 0)}/3
-            </Badge>
-          </div>
-        </div>
-      </CardHeader>
-
-      <CardContent className="pt-0">
-        <div className="flex items-center justify-between gap-3">
-          {/* イベント数表示 */}
-          {isExperimentRunning && (
-            <div className="flex items-center gap-2 px-3 py-1 rounded-md bg-muted">
-              <Activity className={EXPERIMENT_ICON_STYLES.small} />
-              <span className="text-sm font-mono">
-                {events.length} 操作記録中
-              </span>
-            </div>
-          )}
-
-          {/* 条件完了ボタン */}
+          {/* 右側: 条件完了ボタン */}
           {isExperimentRunning && (
             <Button
               onClick={handleComplete}
-              size="lg"
+              size="sm"
               className={getButtonClassName('action')}
             >
-              <CheckCircle className={EXPERIMENT_ICON_STYLES.default} />
+              <CheckCircle className={EXPERIMENT_ICON_STYLES.small} />
               条件を完了
               {hasNextCondition() && (
-                <span className="flex items-center gap-1">
+                <>
                   <ArrowRight className={EXPERIMENT_ICON_STYLES.small} />
                   {getNextCondition()}へ
-                </span>
+                </>
               )}
             </Button>
           )}
-
         </div>
       </CardContent>
     </Card>

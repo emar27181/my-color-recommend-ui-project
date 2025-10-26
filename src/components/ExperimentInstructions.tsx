@@ -1,4 +1,4 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { InfoIcon } from 'lucide-react';
 import type { ExperimentCondition } from '@/store/experimentStore';
@@ -32,27 +32,21 @@ export const ExperimentInstructions = ({ condition }: ExperimentInstructionsProp
   const conditionInfo = CONDITION_INFO[condition];
 
   return (
-    <div className={`${EXPERIMENT_LAYOUT.containerWidth.centered} space-y-4 mb-6`}>
+    <div className={`${EXPERIMENT_LAYOUT.containerWidth.centered} mb-2`}>
       {/* 現在の条件 */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <InfoIcon className={`${EXPERIMENT_ICON_STYLES.default} text-primary`} />
+        <CardHeader className="py-2 px-4">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <InfoIcon className={`${EXPERIMENT_ICON_STYLES.small} text-primary`} />
             <Badge {...getBadgeProps('condition')}>
               {condition}
             </Badge>
-            {conditionInfo.title}
+            <span className="text-sm">{conditionInfo.title}</span>
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-xs">
             {conditionInfo.description}
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-2 text-sm">
-          <p className="text-muted-foreground">
-            このツールを使って、自由にイラストに色を塗ってください。
-            完了したら画面上部の「条件を完了」ボタンを押してください。
-          </p>
-        </CardContent>
       </Card>
     </div>
   );

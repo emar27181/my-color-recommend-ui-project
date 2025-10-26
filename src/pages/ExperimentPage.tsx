@@ -210,9 +210,9 @@ const ExperimentPage = () => {
   }
 
   return (
-    <main className="flex-1 pb-2 min-h-0 flex flex-col">
+    <main className="flex-1 pb-1 min-h-0 flex flex-col">
       {/* 実験ヘッダー */}
-      <div className="px-4 pt-2">
+      <div className="px-4 pt-1">
         <ExperimentHeader canvasRef={canvasColorRecommendationsRef} isDebugMode={isDebugMode} />
       </div>
 
