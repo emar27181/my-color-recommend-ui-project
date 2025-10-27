@@ -20,7 +20,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 const ExperimentPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const isDebugMode = searchParams.get('debug') !== 'false'; // デフォルトでオン
+  const isDebugMode = searchParams.get('debug') === 'true';
 
   // URLから条件を読み取る
   useExperimentQuery();

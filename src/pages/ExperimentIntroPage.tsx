@@ -29,7 +29,7 @@ import {
 const ExperimentIntroPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const isDebugMode = searchParams.get('debug') !== 'false'; // デフォルトでオン
+  const isDebugMode = searchParams.get('debug') === 'true';
 
   const { setParticipantId, setParticipantInfo, startFullExperiment } = useExperimentStore();
   const [inputId, setInputId] = useState(isDebugMode ? 'DEBUG001' : '');

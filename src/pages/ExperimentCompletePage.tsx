@@ -24,7 +24,7 @@ import {
 const ExperimentCompletePage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const isDebugMode = searchParams.get('debug') !== 'false'; // デフォルトでオン
+  const isDebugMode = searchParams.get('debug') === 'true';
 
   const { participantId, conditionLogs, surveyResponse, setSurveyResponse, exportLog } = useExperimentStore();
   const [showSurvey, setShowSurvey] = useState(!surveyResponse); // アンケート未回答時は表示

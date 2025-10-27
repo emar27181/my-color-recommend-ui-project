@@ -45,7 +45,7 @@ export const NavigationMenu = ({ className = '' }: NavigationMenuProps) => {
         <FlaskConical className="w-5 h-5" />
       </Link>
       <Link
-        to="/experiment"
+        to="/experiment?debug=true"
         className="p-2 rounded-lg bg-background/50 border-none hover:bg-muted/50 transition-colors backdrop-blur-sm text-foreground"
         title="実験ページ"
       >
