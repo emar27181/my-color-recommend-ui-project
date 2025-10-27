@@ -45,7 +45,7 @@ export interface SurveyResponse {
   usability: number[];      // SUS簡易版(5問) - 1〜5段階評価
   effectiveness: number[];  // TAM(3問) - 1〜5段階評価
   creativity: number[];     // Mini-CSI(3問) - 1〜5段階評価
-  favoriteUI: string;       // 最も使いやすかったUI (Test1/Test2/Test3)
+  favoriteUI: string[];     // 最も使いやすかったUI (Test1/Test2/Test3 複数選択可)
   reason: string;           // 理由（自由記述）
   improvement: string;      // 改善点（自由記述）
 }

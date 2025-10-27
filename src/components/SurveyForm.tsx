@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Bug } from 'lucide-react';
 import type { SurveyResponse } from '@/store/experimentStore';
 
@@ -31,8 +32,8 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
   // Mini-CSI（3問）- デバッグモード時は全て4に設定
   const [creativity, setCreativity] = useState<number[]>(isDebugMode ? [4, 4, 4] : [0, 0, 0]);
 
-  // 選択UI・理由・改善点 - デバッグモード時は自動入力
-  const [favoriteUI, setFavoriteUI] = useState<string>(isDebugMode ? 'Test3' : '');
+  // 選択UI・理由・改善点 - デバッグモード時は自動入力（複数選択可能）
+  const [favoriteUI, setFavoriteUI] = useState<string[]>(isDebugMode ? ['Test3'] : []);
   const [reason, setReason] = useState<string>(isDebugMode ? 'デバッグモードでの自動入力テスト' : '');
   const [improvement, setImprovement] = useState<string>(isDebugMode ? '特になし（デバッグ）' : '');
 
@@ -63,8 +64,8 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
     e.preventDefault();
 
     // バリデーション
-    if (!favoriteUI) {
-      alert('最も使いやすかったUIを選択してください');
+    if (favoriteUI.length === 0) {
+      alert('最も使いやすかったUIを少なくとも1つ選択してください');
       return;
     }
 
@@ -218,15 +219,25 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-3">
-            <Label className="text-base">最も使いやすかったUIを選択してください</Label>
-            <RadioGroup value={favoriteUI} onValueChange={setFavoriteUI}>
+            <Label className="text-base">最も使いやすかったUIを選択してください（複数選択可）</Label>
+            <div className="space-y-2">
               {['Test1', 'Test2', 'Test3'].map((cond) => (
                 <div key={cond} className="flex items-center space-x-2">
-                  <RadioGroupItem value={cond} id={`fav-${cond}`} />
+                  <Checkbox
+                    id={`fav-${cond}`}
+                    checked={favoriteUI.includes(cond)}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setFavoriteUI([...favoriteUI, cond]);
+                      } else {
+                        setFavoriteUI(favoriteUI.filter((ui) => ui !== cond));
+                      }
+                    }}
+                  />
                   <Label htmlFor={`fav-${cond}`} className="cursor-pointer">{cond}</Label>
                 </div>
               ))}
-            </RadioGroup>
+            </div>
           </div>
 
           <div className="space-y-3">
