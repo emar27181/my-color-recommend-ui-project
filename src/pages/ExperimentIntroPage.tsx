@@ -64,9 +64,9 @@ const ExperimentIntroPage = () => {
 
     startFullExperiment();
 
-    // Test1実験ページに遷移（デバッグモードを引き継ぐ）
+    // Test1説明ページに遷移（デバッグモードを引き継ぐ）
     const debugParam = isDebugMode ? '&debug=true' : '';
-    navigate(`/experiment/task?cond=Test1${debugParam}`);
+    navigate(`/experiment/instruction?cond=Test1${debugParam}`);
   };
 
   // 条件データ

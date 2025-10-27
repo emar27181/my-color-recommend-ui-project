@@ -9,6 +9,7 @@ import { InfoPage } from './pages/InfoPage.tsx'
 import SwipeRecommender from './pages/SwipeRecommender.tsx'
 import SnsAnalysisPage from './pages/SnsAnalysisPage.tsx'
 import ExperimentIntroPage from './pages/ExperimentIntroPage.tsx'
+import ExperimentInstructionPage from './pages/ExperimentInstructionPage.tsx'
 import ExperimentPage from './pages/ExperimentPage.tsx'
 import ExperimentCompletePage from './pages/ExperimentCompletePage.tsx'
 import { ToastProvider } from './contexts/ToastContext'
@@ -27,6 +28,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/swipe" element={<Layout><SwipeRecommender /></Layout>} />
             <Route path="/sns-analysis" element={<Layout><SnsAnalysisPage /></Layout>} />
             <Route path="/experiment" element={<Layout><ExperimentIntroPage /></Layout>} />
+            <Route path="/experiment/instruction" element={<Layout><ExperimentInstructionPage /></Layout>} />
             <Route path="/experiment/task" element={<Layout><ExperimentPage /></Layout>} />
             <Route path="/experiment/complete" element={<Layout><ExperimentCompletePage /></Layout>} />
           </Routes>

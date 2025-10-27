@@ -54,9 +54,9 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
 
       // 次の条件に進む
       nextCondition();
-      // 次の条件のページに遷移（デバッグモードを引き継ぐ）
+      // 次の条件の説明ページに遷移（デバッグモードを引き継ぐ）
       const debugParam = isDebugMode ? '&debug=true' : '';
-      navigate(`/experiment/task?cond=${nextCond}${debugParam}`);
+      navigate(`/experiment/instruction?cond=${nextCond}${debugParam}`);
     } else {
       // 全条件完了 - アンケートページに遷移
       const confirmed = window.confirm(
