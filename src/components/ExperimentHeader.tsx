@@ -12,13 +12,6 @@ import {
   getCardClassName,
 } from '@/constants/experimentTheme';
 
-// 条件の説明
-const CONDITION_DESCRIPTIONS = {
-  Test1: 'UI方式1（大量の色を一度に表示）',
-  Test2: 'UI方式2（色相環＋スライダー）',
-  Test3: 'UI方式3（色相→トーン）',
-};
-
 interface ExperimentHeaderProps {
   canvasRef?: React.RefObject<CanvasColorRecommendationsRef | null>;
   isDebugMode?: boolean;
@@ -86,9 +79,6 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
             <Badge {...getBadgeProps('condition')}>
               {condition}
             </Badge>
-            <span className="text-xs text-muted-foreground">
-              {CONDITION_DESCRIPTIONS[condition]}
-            </span>
           </div>
 
           {/* 右側: 条件完了ボタン */}
