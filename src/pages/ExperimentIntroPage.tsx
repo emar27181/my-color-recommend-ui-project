@@ -124,9 +124,6 @@ const ExperimentIntroPage = () => {
           <Card className="border-2">
             <CardContent className="pt-6">
               <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <Clock className="w-5 h-5 text-primary" />
-                </div>
                 <div>
                   <p className="font-semibold">所要時間</p>
                   <p className="text-sm text-muted-foreground">約 15〜20 分</p>
@@ -138,9 +135,6 @@ const ExperimentIntroPage = () => {
           <Card className="border-2">
             <CardContent className="pt-6">
               <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <InfoIcon className="w-5 h-5 text-primary" />
-                </div>
                 <div>
                   <p className="font-semibold">実験形式</p>
                   <p className="text-sm text-muted-foreground">3つのテストを順番に体験</p>
@@ -150,9 +144,8 @@ const ExperimentIntroPage = () => {
           </Card>
         </div>
 
-        {/* 実験フロー */}
-        <div className="mb-8 space-y-4">
-          {/* 実験の流れ - タイトルカード */}
+        {/* 実験フロー - 非表示 */}
+        {/* <div className="mb-8 space-y-4">
           <Card className="border-2">
             <CardContent className="pt-6">
               <div className="text-center">
@@ -164,7 +157,6 @@ const ExperimentIntroPage = () => {
             </CardContent>
           </Card>
 
-          {/* 条件カードグリッド */}
           <div className="grid md:grid-cols-2 gap-4">
             {conditions.map((cond) => {
               const Icon = cond.icon;
@@ -183,18 +175,15 @@ const ExperimentIntroPage = () => {
                         <Badge className={`${colors.badge} text-white font-mono px-3 py-1`}>
                           {cond.id}
                         </Badge>
-                        <h3 className="font-semibold">{cond.name}</h3>
+                        <h3>{cond.name}</h3>
                       </div>
-                      <p className={EXPERIMENT_TEXT_STYLES.description}>
-                        {cond.description}
-                      </p>
                     </div>
                   </div>
                 </div>
               );
             })}
           </div>
-        </div>
+        </div> */}
 
         {/* 参加者ID入力と開始 */}
         <Card className="border-2 border-primary/30 shadow-lg">
@@ -282,8 +271,7 @@ const ExperimentIntroPage = () => {
             </Button>
 
             <Alert className="border-primary/30 bg-primary/5 p-6">
-              <InfoIcon className="h-5 w-5 text-primary" />
-              <AlertDescription className="text-sm leading-relaxed ml-2">
+              <AlertDescription className="text-sm leading-relaxed">
                 Test1 → Test2 → Test3 の順で体験します。各テスト終了後、次に進む確認が表示されます。
               </AlertDescription>
             </Alert>
