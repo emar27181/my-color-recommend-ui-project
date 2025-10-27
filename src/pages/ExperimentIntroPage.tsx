@@ -4,17 +4,14 @@ import { useExperimentStore } from '@/store/experimentStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { InfoIcon, Play, User, Clock, Palette, Sparkles, Layers, Bug } from 'lucide-react';
+import { Play, User, Palette, Bug } from 'lucide-react';
 import {
-  EXPERIMENT_TEXT_STYLES,
   EXPERIMENT_ICON_STYLES,
   getButtonClassName,
   getInputClassName,
-  getConditionCardColors,
 } from '@/constants/experimentTheme';
 
 /**
@@ -69,27 +66,6 @@ const ExperimentIntroPage = () => {
     navigate(`/experiment/instruction?cond=Test1${debugParam}`);
   };
 
-  // 条件データ
-  const conditions = [
-    {
-      id: 'Test1' as const,
-      name: 'UI方式1',
-      description: '大量の色を一度に表示',
-      icon: Palette,
-    },
-    {
-      id: 'Test2' as const,
-      name: 'UI方式2',
-      description: '色相環とスライダーで色を作成',
-      icon: Layers,
-    },
-    {
-      id: 'Test3' as const,
-      name: 'UI方式3',
-      description: '色相→トーンの二段階で選択',
-      icon: Sparkles,
-    }
-  ];
 
   return (
     <main className="flex-1 pb-8 min-h-screen flex flex-col bg-gradient-to-b from-background to-muted/20">
