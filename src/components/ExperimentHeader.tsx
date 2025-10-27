@@ -30,8 +30,6 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
 
   // 条件完了ハンドラ
   const handleComplete = () => {
-    completeCurrentCondition();
-
     // 次の条件があるかチェック
     if (hasNextCondition()) {
       const nextCond = getNextCondition();
@@ -41,19 +39,24 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
         `${condition} の実験が完了しました。\n\n前のページには戻れません。次のページに進んで良いですか？\n\n次の条件：${nextCond}`
       );
 
-      if (confirmed) {
-        // キャンバスをリセット
-        if (canvasRef?.current) {
-          console.log('Clearing canvas for condition transition');
-          canvasRef.current.clearAllLayers();
-        }
-
-        // 次の条件に進む
-        nextCondition();
-        // 次の条件のページに遷移（デバッグモードを引き継ぐ）
-        const debugParam = isDebugMode ? '&debug=true' : '';
-        navigate(`/experiment/task?cond=${nextCond}${debugParam}`);
+      if (!confirmed) {
+        return; // キャンセル時は何もしない
       }
+
+      // 確認後に条件を完了
+      completeCurrentCondition();
+
+      // キャンバスをリセット
+      if (canvasRef?.current) {
+        console.log('Clearing canvas for condition transition');
+        canvasRef.current.clearAllLayers();
+      }
+
+      // 次の条件に進む
+      nextCondition();
+      // 次の条件のページに遷移（デバッグモードを引き継ぐ）
+      const debugParam = isDebugMode ? '&debug=true' : '';
+      navigate(`/experiment/task?cond=${nextCond}${debugParam}`);
     } else {
       // 全条件完了 - アンケートページに遷移
       const confirmed = window.confirm(
@@ -61,8 +64,11 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
       );
 
       if (!confirmed) {
-        return;
+        return; // キャンセル時は何もしない
       }
+
+      // 確認後に条件を完了
+      completeCurrentCondition();
 
       // 完了ページ（アンケート）に遷移（デバッグモードを引き継ぐ）
       const debugParam = isDebugMode ? '?debug=true' : '';
