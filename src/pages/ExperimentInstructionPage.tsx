@@ -121,7 +121,7 @@ const ExperimentInstructionPage = () => {
               <CardDescription>操作方法を動画で確認できます</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="aspect-[4/3] w-full max-w-xl max-h-[50vh] mx-auto">
+              <div className="h-[60vh] aspect-[16/9] mx-auto">
                 <iframe
                   width="100%"
                   height="100%"
