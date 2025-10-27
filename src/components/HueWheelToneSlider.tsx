@@ -112,7 +112,7 @@ export const HueWheelToneSlider = () => {
 
   return (
     <Card className="h-[600px] flex flex-col">
-      <CardContent className="space-y-4 pt-4 flex-1 overflow-auto">
+      <CardContent className="space-y-3 pt-2 flex-1 overflow-auto">
         {/* 色相環 */}
         <div className="flex flex-col items-center">
           <svg
@@ -223,7 +223,7 @@ export const HueWheelToneSlider = () => {
         </div>
 
         {/* トーンスライダー */}
-        <div className="space-y-4">
+        <div className="space-y-2">
           {/* 彩度スライダー */}
           <div className="space-y-2">
             <div className="flex justify-between text-sm">

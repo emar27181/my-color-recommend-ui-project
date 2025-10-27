@@ -71,8 +71,8 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
   };
 
   return (
-    <Card className={`mb-2 ${getCardClassName('emphasized')}`}>
-      <CardContent className="py-2 px-4">
+    <Card className={`mb-0 ${getCardClassName('emphasized')}`}>
+      <CardContent className="py-1 px-4">
         <div className="flex items-center justify-between gap-3">
           {/* 左側: 条件情報 */}
           <div className="flex items-center gap-2">

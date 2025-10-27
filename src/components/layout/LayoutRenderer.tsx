@@ -104,9 +104,9 @@ const SectionHeader = ({
 
   return (
     <h3
-      className={`${isMobile ? 'text-xs' : 'text-lg'} font-medium ${
-        componentKey === 'canvas' ? 'mb-0' : 'mb-2'
-      } text-foreground flex items-center justify-between leading-tight min-h-[2rem]`}
+      className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium ${
+        componentKey === 'canvas' ? 'mb-0' : 'mb-1'
+      } text-foreground flex items-center justify-between leading-tight min-h-[1.5rem]`}
     >
       <span>
         {`${config.step}. ${t(config.titleKey)}`}
@@ -212,7 +212,7 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
 
   // デスクトップ: 2列レイアウト（折り畳み機能無効化により幅調整不要）
   return (
-    <div className="flex flex-1 gap-6" style={isDebugMode ? { padding: '16px', backgroundColor: '#673ab7' } : { padding: '16px' }}>
+    <div className="flex flex-1 gap-4" style={isDebugMode ? { padding: '8px', backgroundColor: '#673ab7' } : { padding: '8px' }}>
       {isDebugMode && (
         <div className="absolute top-20 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white p-2 rounded font-bold z-40">
           🖥️ DESKTOP LAYOUT (≥800px)
@@ -224,13 +224,13 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
           <div
             key={column.id}
             className={`${column.width} flex flex-col min-h-0 ${
-              column.id !== 'canvas' ? 'space-y-4 overflow-y-auto' : ''
+              column.id !== 'canvas' ? 'space-y-2 overflow-y-auto' : ''
             }`}
           style={isDebugMode ? {
-            padding: column.id === 'canvas' ? '8px' : '16px',
+            padding: column.id === 'canvas' ? '4px' : '8px',
             backgroundColor: column.id === 'canvas' ? '#00bcd4' : '#e91e63'
           } : {
-            padding: column.id === 'canvas' ? '8px' : '16px'
+            padding: column.id === 'canvas' ? '4px' : '8px'
           }}
         >
           {isDebugMode && (
