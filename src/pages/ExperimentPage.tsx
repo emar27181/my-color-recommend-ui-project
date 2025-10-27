@@ -98,12 +98,12 @@ const ExperimentPage = () => {
     };
   }, []);
 
-  // 初期スクロール位置を60px下に設定
+  // 初期スクロール位置を最上端に設定
   useEffect(() => {
     const setScrollPosition = () => {
-      window.scrollTo({ top: 60, left: 0, behavior: 'instant' });
-      document.documentElement.scrollTop = 60;
-      document.body.scrollTop = 60;
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
     };
 
     setScrollPosition();
