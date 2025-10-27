@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useExperimentStore, type SurveyResponse } from '@/store/experimentStore';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,10 +24,26 @@ import {
 const ExperimentCompletePage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const isDebugMode = searchParams.get('debug') !== 'false'; // デフォルトでtrueに設定
+  const isDebugMode = searchParams.get('debug') === 'true';
 
   const { participantId, conditionLogs, surveyResponse, setSurveyResponse, exportLog } = useExperimentStore();
   const [showSurvey, setShowSurvey] = useState(!surveyResponse); // アンケート未回答時は表示
+
+  // 参加者IDが未設定、または全条件完了していない場合は実験ページにリダイレクト
+  useEffect(() => {
+    if (!participantId) {
+      console.warn('No participant ID, redirecting to experiment intro');
+      navigate('/experiment');
+      return;
+    }
+
+    // 3つの条件すべて完了していない場合
+    if (conditionLogs.length < 3) {
+      console.warn('Not all conditions completed, redirecting to experiment intro');
+      navigate('/experiment');
+      return;
+    }
+  }, [participantId, conditionLogs, navigate]);
 
   // 各条件の所要時間を計算
   const getConditionDuration = (condIndex: number) => {

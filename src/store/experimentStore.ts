@@ -300,6 +300,7 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
       conditionLogs: [],
       currentConditionIndex: 0,
       condition: 'Test1',
+      surveyResponse: null, // アンケート回答をリセット
     });
     console.log('Experiment reset');
   },
@@ -318,6 +319,7 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
       endTime: null,
       events: [],
       deviceInfo: collectDeviceInfo(),
+      surveyResponse: null, // アンケート回答をリセット
     });
     console.log('Full experiment started at:', new Date(now).toISOString());
   },
