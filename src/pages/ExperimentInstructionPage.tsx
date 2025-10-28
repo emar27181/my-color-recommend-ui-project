@@ -83,11 +83,8 @@ const ExperimentInstructionPage = () => {
         {/* タイトル */}
         <div className="text-center mb-8">
           <h1 className={`${EXPERIMENT_TEXT_STYLES.pageTitle} mb-3`}>
-            {currentInstruction.title}
+            {condition}
           </h1>
-          <p className="text-muted-foreground text-lg">
-            {currentInstruction.description}
-          </p>
         </div>
 
         {/* 使い方説明 */}
