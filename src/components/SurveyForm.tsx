@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Bug } from 'lucide-react';
 import type { SurveyResponse } from '@/store/experimentStore';
 
@@ -102,7 +101,7 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-10 py-8">
       {/* デバッグモードインジケーター */}
       {isDebugMode && (
         <div className="p-3 bg-orange-100 dark:bg-orange-900 border-2 border-orange-500 rounded-lg">
@@ -123,11 +122,11 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
             1（全くそう思わない）〜 5（非常にそう思う）で評価してください
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-8 py-6">
           {susQuestions.map((question, index) => (
-            <div key={index} className="space-y-3">
+            <div key={index} className="space-y-4">
               <Label className="text-base">{question}</Label>
-              <div className="flex gap-4 items-center">
+              <div className="flex gap-4 items-center pt-2">
                 {[1, 2, 3, 4, 5].map((value) => (
                   <label key={value} className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -155,11 +154,11 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
             1（全くそう思わない）〜 5（非常にそう思う）で評価してください
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-8 py-6">
           {tamQuestions.map((question, index) => (
-            <div key={index} className="space-y-3">
+            <div key={index} className="space-y-4">
               <Label className="text-base">{question}</Label>
-              <div className="flex gap-4 items-center">
+              <div className="flex gap-4 items-center pt-2">
                 {[1, 2, 3, 4, 5].map((value) => (
                   <label key={value} className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -187,11 +186,11 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
             1（全くそう思わない）〜 5（非常にそう思う）で評価してください
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-8 py-6">
           {csiQuestions.map((question, index) => (
-            <div key={index} className="space-y-3">
+            <div key={index} className="space-y-4">
               <Label className="text-base">{question}</Label>
-              <div className="flex gap-4 items-center">
+              <div className="flex gap-4 items-center pt-2">
                 {[1, 2, 3, 4, 5].map((value) => (
                   <label key={value} className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -216,30 +215,32 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
         <CardHeader>
           <CardTitle>4. 最も使いやすかったUI</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-3">
+        <CardContent className="space-y-8 py-6">
+          <div className="space-y-4">
             <Label className="text-base">最も使いやすかったUIを選択してください（複数選択可）</Label>
-            <div className="space-y-2">
+            <div className="flex gap-4">
               {['Test1', 'Test2', 'Test3'].map((cond) => (
-                <div key={cond} className="flex items-center space-x-2">
-                  <Checkbox
+                <label key={cond} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
                     id={`fav-${cond}`}
                     checked={favoriteUI.includes(cond)}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
+                    onChange={(e) => {
+                      if (e.target.checked) {
                         setFavoriteUI([...favoriteUI, cond]);
                       } else {
                         setFavoriteUI(favoriteUI.filter((ui) => ui !== cond));
                       }
                     }}
+                    className="w-4 h-4"
                   />
-                  <Label htmlFor={`fav-${cond}`} className="cursor-pointer">{cond}</Label>
-                </div>
+                  <span className="text-sm">{cond}</span>
+                </label>
               ))}
             </div>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             <Label htmlFor="reason" className="text-base">そう思った理由を教えてください</Label>
             <Textarea
               id="reason"
@@ -251,7 +252,7 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
             />
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             <Label htmlFor="improvement" className="text-base">改善してほしい点があれば教えてください</Label>
             <Textarea
               id="improvement"
@@ -266,7 +267,7 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
       </Card>
 
       {/* 送信ボタン */}
-      <div className="flex justify-center pt-4">
+      <div className="flex justify-center pt-8 pb-4">
         <Button type="submit" size="lg" className="w-full md:w-auto px-12">
           実験結果をダウンロード
         </Button>
