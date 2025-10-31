@@ -125,7 +125,7 @@ const ExperimentInstructionPage = () => {
                   <CardDescription>操作方法を動画で確認できます</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="aspect-video">
+                  <div className="h-[60vh] aspect-[16/9] mx-auto">
                     <iframe
                       width="100%"
                       height="100%"
@@ -153,7 +153,7 @@ const ExperimentInstructionPage = () => {
                 <img
                   src={currentInstruction.imageUrl}
                   alt={`${condition} UI画像`}
-                  className="max-w-[25vw] h-auto rounded-lg shadow-md object-contain"
+                  className="max-w-[200px] h-auto rounded-lg shadow-md object-contain"
                 />
               </CardContent>
             </Card>
