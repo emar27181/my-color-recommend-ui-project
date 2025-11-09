@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, ChevronUp, ChevronLeft, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { useColorStore } from '@/store/colorStore';
 import { ColorPicker } from '@/components/ColorPicker';
 import { ColorRecommendations, ToneRecommendations } from '@/components/ColorRecommendations';
@@ -8,6 +8,8 @@ import { ImageUpload } from '@/components/ImageUpload';
 import { ExtractedColorsDisplay } from '@/components/ExtractedColorsDisplay';
 import { SkinColorRecommendations } from '@/components/SkinColorRecommendations';
 import { HueToneExtraction } from '@/components/HueToneExtraction';
+import { MassColorGrid } from '@/components/MassColorGrid';
+import { HueWheelToneSlider } from '@/components/HueWheelToneSlider';
 // import { PaintCanvas, type PaintCanvasRef } from '@/components/PaintCanvas';
 import { CanvasColorRecommendations, type CanvasColorRecommendationsRef } from '@/components/CanvasColorRecommendations';
 import { COMPONENT_CONFIG, LAYOUT_CONFIG, type ComponentKey, type LayoutColumn } from '@/constants/layout';
@@ -19,8 +21,6 @@ interface LayoutRendererProps {
   paintCanvasRef: React.RefObject<CanvasColorRecommendationsRef | null>;
   handleExtractColorsFromCanvas: () => void;
   handleImageUpload: (file: File) => void;
-  collapseStates: Record<string, boolean>;
-  setCollapseState: (key: string, value: boolean) => void;
 }
 
 // 色使用量バーコンポーネント
@@ -66,6 +66,12 @@ const ComponentMap = {
       <ExtractedColorsDisplay isMobile={isMobile} />
     </div>
   ),
+  massColorGrid: () => (
+    <MassColorGrid />
+  ),
+  hueWheelToneSlider: () => (
+    <HueWheelToneSlider />
+  ),
   colorRecommendation: ({ isMobile }: any) => (
     <ColorRecommendations isMobile={isMobile} />
   ),
@@ -83,128 +89,78 @@ const ComponentMap = {
   )
 };
 
-// セクションヘッダーコンポーネント
-const SectionHeader = ({ 
-  componentKey, 
-  isCollapsed, 
-  onToggle, 
+// セクションヘッダーコンポーネント（折り畳み機能無効化版）
+const SectionHeader = ({
+  componentKey,
   handleExtractColorsFromCanvas,
-  isMobile 
+  isMobile
 }: {
   componentKey: ComponentKey;
-  isCollapsed: boolean;
-  onToggle: () => void;
   handleExtractColorsFromCanvas?: () => void;
   isMobile: boolean;
 }) => {
   const { t } = useTranslation();
   const config = COMPONENT_CONFIG[componentKey];
-  
+
   return (
-    <h3 
-      className={`${isMobile ? 'text-xs' : 'text-lg'} font-medium ${
-        componentKey === 'canvas' ? 'mb-0' : 'mb-2'
-      } text-foreground cursor-pointer flex items-center ${
-        componentKey === 'hueToneExtraction' && isCollapsed ? 'justify-start gap-1 px-1' : 'justify-between'
-      } leading-tight min-h-[2rem]`}
-      onClick={onToggle}
+    <h3
+      className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium ${
+        componentKey === 'canvas' ? 'mb-0' : 'mb-1'
+      } text-foreground flex items-center justify-between leading-tight min-h-[1.5rem]`}
     >
-{componentKey === 'hueToneExtraction' && isCollapsed ? (
-        // βセクションが横に折りたたまれている場合は「β.」とアイコンを表示
-        <>
-          <span>{config.step}.</span>
-          <ChevronLeft className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'} text-foreground`} />
-        </>
-      ) : (
-        <>
-          <span>
-            {`${config.step}. ${t(config.titleKey)}`}
-          </span>
-          <div className="flex items-center gap-2">
-            {config.hasUpdateButton && handleExtractColorsFromCanvas && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleExtractColorsFromCanvas();
-                }}
-                className="p-1 hover:bg-muted rounded-md border border-border transition-colors bg-transparent"
-                title="キャンバスから色を抽出"
-              >
-                <RefreshCw className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'} text-foreground`} />
-              </button>
-            )}
-            {componentKey === 'hueToneExtraction' ? (
-              // βセクションは横方向の折り畳みアイコン
-              <ChevronLeft className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'} text-foreground`} />
-            ) : (
-              // その他のセクションは従来通り縦方向
-              isCollapsed ? (
-                <ChevronDown className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
-              ) : (
-                <ChevronUp className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
-              )
-            )}
-          </div>
-        </>
-      )}
+      <span>
+        {`${config.step}. ${t(config.titleKey)}`}
+      </span>
+      <div className="flex items-center gap-2">
+        {config.hasUpdateButton && handleExtractColorsFromCanvas && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleExtractColorsFromCanvas();
+            }}
+            className="p-1 hover:bg-muted rounded-md border border-border transition-colors bg-transparent"
+            title="キャンバスから色を抽出"
+          >
+            <RefreshCw className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'} text-foreground`} />
+          </button>
+        )}
+      </div>
     </h3>
   );
 };
 
 // セクションコンポーネント
-const Section = ({ 
-  componentKey, 
-  props, 
-  collapseStates, 
-  setCollapseState,
+const Section = ({
+  componentKey,
+  props,
   isMobile,
-  isDebugMode,
-  isAnimationEnabled
+  isDebugMode
 }: {
   componentKey: ComponentKey;
   props: any;
-  collapseStates: Record<string, boolean>;
-  setCollapseState: (key: string, value: boolean) => void;
   isMobile: boolean;
   isDebugMode: boolean;
-  isAnimationEnabled: boolean;
 }) => {
   const config = COMPONENT_CONFIG[componentKey];
-  const isCollapsed = collapseStates[config.collapseState];
   const Component = ComponentMap[componentKey];
 
   return (
     <section className={componentKey === 'canvas' && !isMobile ? "flex-shrink-0 flex-1 flex flex-col min-h-[700px] h-full" : "flex-shrink-0"} style={componentKey === 'canvas' && !isMobile && isDebugMode ? { backgroundColor: '#ffeb3b', padding: '8px' } : {}}>
       <SectionHeader
         componentKey={componentKey}
-        isCollapsed={isCollapsed}
-        onToggle={() => setCollapseState(config.collapseState, !isCollapsed)}
         handleExtractColorsFromCanvas={config.hasUpdateButton ? props.handleExtractColorsFromCanvas : undefined}
         isMobile={isMobile}
       />
-      {componentKey === 'hueToneExtraction' ? (
-        // βセクションは横方向の折り畳み（アニメーション設定対応）
-        <div className={`overflow-hidden ${
-          isAnimationEnabled ? 'transition-all duration-300' : ''
-        } ${
-          isCollapsed ? 'w-0 opacity-0' : 'w-full opacity-100'
-        }`}>
-          <Component {...props} />
-        </div>
-      ) : (
-        // その他のセクションは従来通り縦方向
-        !isCollapsed && (
-          <div className={componentKey === 'canvas' && !isMobile ? "flex-1 min-h-[650px] h-full" : ""} style={componentKey === 'canvas' && !isMobile && isDebugMode ? { backgroundColor: '#9c27b0', padding: '8px' } : {}}>
-            <Component {...props} />
-            {/* canvasセクションの下部余白をデバッグ表示 */}
-            {componentKey === 'canvas' && (
-              <div style={{ backgroundColor: 'red', height: '10px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontSize: '10px', fontWeight: 'bold', color: 'white' }}>DEBUG: セクション下部余白</span>
-              </div>
-            )}
+      {/* 常に表示（折り畳み機能無効化） */}
+      <div className={componentKey === 'canvas' && !isMobile ? "flex-1 min-h-[650px] h-full" : ""} style={componentKey === 'canvas' && !isMobile && isDebugMode ? { backgroundColor: '#9c27b0', padding: '8px' } : {}}>
+        <Component {...props} />
+        {/* canvasセクションの下部余白をデバッグ表示 */}
+        {componentKey === 'canvas' && (
+          <div style={{ backgroundColor: 'red', height: '10px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ fontSize: '10px', fontWeight: 'bold', color: 'white' }}>DEBUG: セクション下部余白</span>
           </div>
-        )
-      )}
+        )}
+      </div>
     </section>
   );
 };
@@ -216,11 +172,8 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
   isDebugMode,
   paintCanvasRef,
   handleExtractColorsFromCanvas,
-  handleImageUpload,
-  collapseStates,
-  setCollapseState
+  handleImageUpload
 }) => {
-  const { isAnimationEnabled } = useColorStore();
   
   const commonProps = {
     isMobile,
@@ -231,9 +184,16 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
   };
 
   if (isMobile) {
-    // モバイル: 縦積みレイアウト（LAYOUT_CONFIGの順序を使用）
-    const allComponents: ComponentKey[] = LAYOUT_CONFIG.mobile.order as unknown as ComponentKey[];
-    
+    // モバイル: 縦積みレイアウト
+    // columnsから利用可能なコンポーネントのリストを取得（フィルタリング済み）
+    const availableComponents = new Set<string>(
+      columns.flatMap(column => column.components)
+    );
+
+    // LAYOUT_CONFIGの順序を保持しつつ、利用可能なコンポーネントのみを使用
+    const allComponents = LAYOUT_CONFIG.mobile.order
+      .filter(componentKey => availableComponents.has(componentKey));
+
     return (
       <div className="flex flex-col overflow-y-auto">
         {allComponents.map((componentKey) => (
@@ -241,11 +201,8 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
             <Section
               componentKey={componentKey}
               props={commonProps}
-              collapseStates={collapseStates}
-              setCollapseState={setCollapseState}
               isMobile={isMobile}
               isDebugMode={isDebugMode}
-              isAnimationEnabled={isAnimationEnabled}
             />
           </div>
         ))}
@@ -253,49 +210,27 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
     );
   }
 
-  // デスクトップ: 2列レイアウト
-  // βセクションの折り畳み状態を取得
-  const isHueToneCollapsed = collapseStates.isHueToneExtractionCollapsed;
-  
+  // デスクトップ: 2列レイアウト（折り畳み機能無効化により幅調整不要）
   return (
-    <div className="flex flex-1 gap-6" style={isDebugMode ? { padding: '16px', backgroundColor: '#673ab7' } : { padding: '16px' }}>
+    <div className="flex flex-1 gap-4" style={isDebugMode ? { padding: '8px', backgroundColor: '#673ab7' } : { padding: '8px' }}>
       {isDebugMode && (
         <div className="absolute top-20 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white p-2 rounded font-bold z-40">
           🖥️ DESKTOP LAYOUT (≥800px)
         </div>
       )}
-      
+
       {columns.filter(column => column.components.length > 0).map((column) => {
-        // βセクションが含まれるカラムかチェック
-        const hasHueToneExtraction = column.components.some(component => component === 'hueToneExtraction');
-        
-        // 動的な幅クラスを計算
-        let dynamicWidth: string = column.width;
-        if (hasHueToneExtraction && isHueToneCollapsed) {
-          // βセクションが畳まれている場合は幅をコンテンツに合わせて可変に
-          dynamicWidth = 'w-auto flex-shrink-[999]'; // コンテンツサイズに応じた可変幅、最大限縮小
-        } else if (!hasHueToneExtraction && isHueToneCollapsed) {
-          // βセクションが畳まれている場合は他のカラムを拡張
-          if (column.id === 'canvas') {
-            dynamicWidth = 'flex-1'; // キャンバス幅を最大限拡張
-          } else {
-            dynamicWidth = 'flex-1'; // メインツール幅を最大限拡張
-          }
-        }
-        
         return (
-          <div 
-            key={column.id} 
-            className={`${dynamicWidth} flex flex-col min-h-0 ${
-              isAnimationEnabled ? 'transition-all duration-300' : ''
-            } ${
-              column.id !== 'canvas' ? 'space-y-4 overflow-y-auto' : ''
+          <div
+            key={column.id}
+            className={`${column.width} flex flex-col min-h-0 ${
+              column.id !== 'canvas' ? 'space-y-2 overflow-y-auto' : ''
             }`}
-          style={isDebugMode ? { 
-            padding: column.id === 'canvas' ? '8px' : (hasHueToneExtraction && isHueToneCollapsed ? '8px 1px' : '16px'),
+          style={isDebugMode ? {
+            padding: column.id === 'canvas' ? '4px' : '8px',
             backgroundColor: column.id === 'canvas' ? '#00bcd4' : '#e91e63'
-          } : { 
-            padding: column.id === 'canvas' ? '8px' : (hasHueToneExtraction && isHueToneCollapsed ? '8px 1px' : '16px')
+          } : {
+            padding: column.id === 'canvas' ? '4px' : '8px'
           }}
         >
           {isDebugMode && (
@@ -303,17 +238,14 @@ export const LayoutRenderer: React.FC<LayoutRendererProps> = ({
               {column.id.toUpperCase()} PANEL
             </h1>
           )}
-          
+
           {column.components.map((componentKey) => (
             <Section
               key={componentKey}
               componentKey={componentKey as ComponentKey}
               props={commonProps}
-              collapseStates={collapseStates}
-              setCollapseState={setCollapseState}
               isMobile={isMobile}
               isDebugMode={isDebugMode}
-              isAnimationEnabled={isAnimationEnabled}
             />
           ))}
         </div>

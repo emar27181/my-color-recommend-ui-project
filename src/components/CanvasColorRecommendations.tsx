@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback, useImperativeHandle, forwardRef } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CircleDashed, Plus, Minus, Eraser, Pen, PaintBucket, Undo, Redo, Palette, RefreshCw, Download, Upload, Pipette, Image, Layers } from 'lucide-react';
+import { CircleDashed, Plus, Minus, Eraser, Pen, PaintBucket, Undo, Redo, Palette, RefreshCw, Download, Upload, Pipette, Image, Layers, Wand2 } from 'lucide-react';
 import { BORDER_PRESETS } from '@/constants/ui';
 import { useColorStore } from '@/store/colorStore';
 import { useToastContext } from '@/contexts/ToastContext';
@@ -18,25 +18,31 @@ interface CanvasColorRecommendationsProps {
 export interface CanvasColorRecommendationsRef {
   drawImageToCanvas: (imageFile: File) => void;
   extractColorsFromCanvas: () => Promise<void>;
+  clearAllLayers: () => void;
+  undo: () => void;
+  redo: () => void;
+  canUndo: () => boolean;
+  canRedo: () => boolean;
 }
 
 const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendationsRef, CanvasColorRecommendationsProps>(({ className = '', isDebugMode = false }, ref) => {
-  const { selectedColor, setSelectedColor, setExtractedColors } = useColorStore();
+  const { paintColor, setPaintColor, setExtractedColors } = useColorStore();
   const { showToast } = useToastContext();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
   const [penSize, setPenSize] = useState(20);
   const [isEraserMode, setIsEraserMode] = useState(false);
-  const [isFillMode, setIsFillMode] = useState(true);
+  const [isFillMode, setIsFillMode] = useState(false);
   const [isEyedropperMode, setIsEyedropperMode] = useState(false);
   const [previousTool, setPreviousTool] = useState<{
     isFillMode: boolean;
     isEraserMode: boolean;
-  }>({ isFillMode: true, isEraserMode: false });
+  }>({ isFillMode: false, isEraserMode: false });
   const [isEditingPenSize, setIsEditingPenSize] = useState(false);
   const [tempPenSize, setTempPenSize] = useState('');
   const [isExtractingColors, setIsExtractingColors] = useState(false);
+  const [isAutoColoring, setIsAutoColoring] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // キャンバスサイズ管理
@@ -63,7 +69,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
   // ベースカラーとのコントラスト比を考慮したアイコン色を取得
   const getIconColor = () => {
     try {
-      const color = chroma(selectedColor);
+      const color = chroma(paintColor);
       const lightness = color.get('hsl.l');
       return lightness > 0.5 ? '#374151' : '#f9fafb'; // gray-700 or gray-50
     } catch {
@@ -111,7 +117,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
   // カラーピッカーの変更ハンドラー
   const handleColorPickerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const color = e.target.value;
-    setSelectedColor(color);
+    setPaintColor(color);
   };
 
   // コンテナ幅の監視
@@ -229,9 +235,10 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     return () => clearTimeout(timeoutId);
   }, [canvasAspectRatio]);
 
-  // 初期化時に線画テンプレートを自動読み込み（一度のみ実行）
-  const [hasAutoLoaded, setHasAutoLoaded] = useState(false);
+  // テンプレート自動読み込みを無効化（CLAUDE.md要求に従って）
 
+  // 自動読み込みのuseEffectをコメントアウト
+  /*
   useEffect(() => {
     // レイヤーコンテキストとキャンバス参照が完全に初期化された後に線画を読み込み（初回のみ）
     console.log('Checking initialization status:', {
@@ -256,6 +263,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
       return () => clearTimeout(timer);
     }
   }, [layer1Context, layer2Context, hasAutoLoaded]);
+  */
 
   // クリーンアップ：コンポーネントアンマウント時の処理
   useEffect(() => {
@@ -367,9 +375,9 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
       }
     } else {
       layerContext.globalCompositeOperation = 'source-over';
-      layerContext.strokeStyle = selectedColor;
+      layerContext.strokeStyle = paintColor;
     }
-  }, [penSize, isEraserMode, currentLayer, selectedColor]);
+  }, [penSize, isEraserMode, currentLayer, paintColor]);
 
   // テンプレート画像をレイヤー1に読み込む
   const loadTemplateImage = useCallback(async () => {
@@ -699,11 +707,28 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     reader.readAsDataURL(imageFile);
   }, [context, saveToHistory, resizeCanvas, updateCompositeCanvas]);
 
-  // 外部からアクセス可能な関数を公開
-  useImperativeHandle(ref, () => ({
-    drawImageToCanvas,
-    extractColorsFromCanvas
-  }), [drawImageToCanvas, extractColorsFromCanvas]);
+  // すべてのレイヤーをクリアする関数
+  const clearAllLayers = useCallback(() => {
+    if (!layer1Context || !layer2Context || !layer1CanvasRef.current || !layer2CanvasRef.current) {
+      console.log('Cannot clear layers - contexts or canvases not initialized');
+      return;
+    }
+
+    // 履歴に保存
+    saveToHistory();
+
+    // レイヤー1を透明にクリア
+    layer1Context.clearRect(0, 0, layer1CanvasRef.current.width, layer1CanvasRef.current.height);
+
+    // レイヤー2を白色でクリア
+    layer2Context.fillStyle = '#ffffff';
+    layer2Context.fillRect(0, 0, layer2CanvasRef.current.width, layer2CanvasRef.current.height);
+
+    // 合成キャンバスを更新
+    updateCompositeCanvas();
+
+    console.log('All layers cleared');
+  }, [layer1Context, layer2Context, saveToHistory, updateCompositeCanvas]);
 
   // ペンサイズ変更関数
   const increasePenSize = useCallback(() => {
@@ -796,14 +821,26 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
       const parsedData = JSON.parse(historyData);
       const { layer1: layer1DataURL, layer2: layer2DataURL } = parsedData;
 
+      // 両方のレイヤーが読み込まれたかを追跡
+      let layer1Loaded = false;
+      let layer2Loaded = false;
+
+      const checkAndUpdate = () => {
+        // 両方のレイヤーが読み込まれた後に一度だけ合成更新
+        if (layer1Loaded && layer2Loaded) {
+          console.log('Both layers restored, updating composite canvas');
+          updateCompositeCanvas();
+        }
+      };
+
       // レイヤー1を復元
       const img1: HTMLImageElement = document.createElement('img');
       img1.onload = () => {
         if (!layer1Context || !layer1CanvasRef.current) return;
         layer1Context.clearRect(0, 0, layer1CanvasRef.current.width, layer1CanvasRef.current.height);
         layer1Context.drawImage(img1, 0, 0);
-        // 合成キャンバスを更新
-        updateCompositeCanvas();
+        layer1Loaded = true;
+        checkAndUpdate();
       };
       img1.src = layer1DataURL;
 
@@ -813,8 +850,8 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
         if (!layer2Context || !layer2CanvasRef.current) return;
         layer2Context.clearRect(0, 0, layer2CanvasRef.current.width, layer2CanvasRef.current.height);
         layer2Context.drawImage(img2, 0, 0);
-        // 合成キャンバスを更新
-        updateCompositeCanvas();
+        layer2Loaded = true;
+        checkAndUpdate();
       };
       img2.src = layer2DataURL;
     } catch (error) {
@@ -853,6 +890,17 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     }
   }, [historyIndex, history, restoreFromHistory]);
 
+  // 外部からアクセス可能な関数を公開
+  useImperativeHandle(ref, () => ({
+    drawImageToCanvas,
+    extractColorsFromCanvas,
+    clearAllLayers,
+    undo,
+    redo,
+    canUndo: () => historyIndex > 0,
+    canRedo: () => historyIndex < history.length - 1
+  }), [drawImageToCanvas, extractColorsFromCanvas, clearAllLayers, undo, redo, historyIndex, history.length]);
+
   // キャンバスから色を取得する関数（合成表示から）
   const pickColorFromCanvas = useCallback((x: number, y: number) => {
     if (!context || !canvasRef.current) return;
@@ -878,7 +926,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     const hexColor = chroma.rgb(r, g, b).hex();
 
     // 描画色として設定
-    setSelectedColor(hexColor);
+    setPaintColor(hexColor);
 
     // スポイトモードを終了し、前回のツール状態を復元
     setIsEyedropperMode(false);
@@ -889,7 +937,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     showToast(`色を取得しました: ${hexColor}`, 'success');
 
     console.log('Color picked from composite:', hexColor, `RGB(${r}, ${g}, ${b})`);
-  }, [context, setSelectedColor, showToast, previousTool]);
+  }, [context, setPaintColor, showToast, previousTool]);
 
   // 塗りつぶし機能（完全実装版）
   const floodFill = useCallback((startX: number, startY: number, newColor: string) => {
@@ -1263,13 +1311,13 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
 
     // 塗りつぶしモードの場合
     if (isFillMode) {
-      console.log('CanvasColorRecommendations: Starting flood fill at coordinates:', { x, y }, 'with color:', selectedColor, 'on layer:', currentLayer);
+      console.log('CanvasColorRecommendations: Starting flood fill at coordinates:', { x, y }, 'with color:', paintColor, 'on layer:', currentLayer);
 
       // 塗りつぶし前に現在の状態を履歴に保存
       saveToHistory();
 
       // 塗りつぶし実行
-      floodFill(x, y, selectedColor);
+      floodFill(x, y, paintColor);
       return;
     }
 
@@ -1283,7 +1331,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
 
     layerContext.beginPath();
     layerContext.moveTo(x, y);
-  }, [getCurrentLayerContext, getScaledCoordinates, applyDrawingSettings, isFillMode, isEyedropperMode, selectedColor, saveToHistory, pickColorFromCanvas, floodFill]);
+  }, [getCurrentLayerContext, getScaledCoordinates, applyDrawingSettings, isFillMode, isEyedropperMode, paintColor, saveToHistory, pickColorFromCanvas, floodFill]);
 
   // 描画中（最適化版）
   const draw = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -1345,13 +1393,13 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
 
     // 塗りつぶしモードの場合
     if (isFillMode) {
-      console.log('CanvasColorRecommendations (Touch): Starting flood fill at coordinates:', { x, y }, 'with color:', selectedColor, 'on layer:', currentLayer);
+      console.log('CanvasColorRecommendations (Touch): Starting flood fill at coordinates:', { x, y }, 'with color:', paintColor, 'on layer:', currentLayer);
 
       // 塗りつぶし前に現在の状態を履歴に保存
       saveToHistory();
 
       // 塗りつぶし実行
-      floodFill(x, y, selectedColor);
+      floodFill(x, y, paintColor);
       return;
     }
 
@@ -1365,7 +1413,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
 
     layerContext.beginPath();
     layerContext.moveTo(x, y);
-  }, [getCurrentLayerContext, getScaledCoordinates, applyDrawingSettings, isFillMode, isEyedropperMode, selectedColor, saveToHistory, pickColorFromCanvas, floodFill]);
+  }, [getCurrentLayerContext, getScaledCoordinates, applyDrawingSettings, isFillMode, isEyedropperMode, paintColor, saveToHistory, pickColorFromCanvas, floodFill]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault();
@@ -1453,6 +1501,29 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     showToast('画像をダウンロードしました。', 'success');
   }, [showToast]);
 
+  // 自動彩色機能
+  const handleAutoColoring = useCallback(async () => {
+    if (!canvasRef.current || !context) {
+      showToast('キャンバスが初期化されていません。', 'error');
+      return;
+    }
+
+    setIsAutoColoring(true);
+    try {
+      // ダミーの自動彩色処理（実装予定）
+      showToast('自動彩色機能は開発中です。', 'info');
+      
+      // 実際の自動彩色ロジックをここに実装する予定
+      // 例：AI による領域分析と色付け
+      
+    } catch (error) {
+      console.error('Auto coloring failed:', error);
+      showToast('自動彩色に失敗しました。', 'error');
+    } finally {
+      setIsAutoColoring(false);
+    }
+  }, [context, showToast]);
+
   // キャンバスをクリア
   const clearCanvas = useCallback(() => {
     const layerContext = getCurrentLayerContext();
@@ -1482,7 +1553,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
 
       // 描画設定を再設定
       layerContext.globalCompositeOperation = 'source-over';
-      layerContext.strokeStyle = isEraserMode ? '#ffffff' : selectedColor;
+      layerContext.strokeStyle = isEraserMode ? '#ffffff' : paintColor;
       layerContext.lineWidth = penSize;
       layerContext.lineCap = 'round';
       layerContext.lineJoin = 'round';
@@ -1490,7 +1561,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
       // クリア後は即座に合成更新
       updateCompositeCanvas();
     }, 10);
-  }, [getCurrentLayerContext, currentLayer, penSize, isEraserMode, selectedColor, saveToHistory, updateCompositeCanvas]);
+  }, [getCurrentLayerContext, currentLayer, penSize, isEraserMode, paintColor, saveToHistory, updateCompositeCanvas]);
 
   return (
     <Card className={`w-full flex flex-col bg-background border-transparent ${className}`} style={{ height: 'auto', ...(isDebugMode && { backgroundColor: '#f44336' }) }}>
@@ -1500,7 +1571,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
           <div className="relative cursor-pointer hover:scale-110 transition-all duration-200 flex-shrink-0">
             <input
               type="color"
-              value={selectedColor}
+              value={paintColor}
               onChange={handleColorPickerChange}
               className="absolute inset-0 opacity-0 w-full h-full cursor-pointer z-10"
               title="描画色を変更"
@@ -1508,7 +1579,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
             <div
               className={`${BORDER_PRESETS.colorBlock} flex items-center justify-center pointer-events-none w-6 h-6 sm:w-8 sm:h-8`}
               style={{
-                backgroundColor: selectedColor
+                backgroundColor: paintColor
               }}
               title="描画色 - クリックで変更"
             >
@@ -1715,6 +1786,16 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
               title="画像をアップロードしてキャンバスに描画"
             >
               <Upload className="w-4 h-4 text-foreground" />
+            </Button>
+            <Button
+              onClick={handleAutoColoring}
+              variant="outline"
+              size="sm"
+              className="h-6 px-1 sm:h-8 sm:px-2"
+              disabled={isAutoColoring}
+              title="自動彩色機能（開発中）"
+            >
+              <Wand2 className={`w-4 h-4 text-foreground ${isAutoColoring ? 'animate-pulse' : ''}`} />
             </Button>
             <Button
               onClick={() => {

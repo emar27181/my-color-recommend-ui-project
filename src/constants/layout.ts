@@ -1,4 +1,4 @@
-// レイアウト設定定数
+// ホームページ用レイアウト設定
 export const LAYOUT_CONFIG = {
   // デスクトップレイアウト設定
   desktop: {
@@ -10,7 +10,7 @@ export const LAYOUT_CONFIG = {
         components: ['canvasColorRecommendation']
       },
       {
-        id: 'main-tools', 
+        id: 'main-tools',
         width: 'w-1/3' as const, // 1/3幅（約33.3%）- ベース色選択列を拡大
         components: ['baseColor', 'colorRecommendation', 'toneRecommendation', 'skinColor']
       },
@@ -22,10 +22,40 @@ export const LAYOUT_CONFIG = {
     ],
     gap: 'gap-6'
   },
-  
+
   // モバイルレイアウト設定（縦積み）
   mobile: {
     order: ['canvasColorRecommendation', 'baseColor', 'colorRecommendation', 'toneRecommendation', 'skinColor', 'hueToneExtraction']
+  }
+} as const;
+
+// 実験ページ用レイアウト設定（T1, T2を含む）
+export const EXPERIMENT_LAYOUT_CONFIG = {
+  // デスクトップレイアウト設定
+  desktop: {
+    columns: [
+      {
+        id: 'canvas',
+        width: 'w-1/2' as const,
+        components: ['canvasColorRecommendation']
+      },
+      {
+        id: 'main-tools',
+        width: 'w-1/3' as const,
+        components: ['baseColor', 'massColorGrid', 'hueWheelToneSlider', 'colorRecommendation', 'toneRecommendation']
+      },
+      {
+        id: 'analysis',
+        width: 'w-1/6' as const,
+        components: ['hueToneExtraction']
+      }
+    ],
+    gap: 'gap-6'
+  },
+
+  // モバイルレイアウト設定（縦積み）
+  mobile: {
+    order: ['canvasColorRecommendation', 'baseColor', 'massColorGrid', 'hueWheelToneSlider', 'colorRecommendation', 'toneRecommendation', 'hueToneExtraction']
   }
 } as const;
 
@@ -78,6 +108,20 @@ export const COMPONENT_CONFIG = {
     step: '0',
     titleKey: 'app.steps.canvasColorRecommendation',
     collapseState: 'isCanvasColorRecommendationCollapsed',
+    hasUpdateButton: false
+  },
+  massColorGrid: {
+    key: 'massColorGrid',
+    step: 'T1',
+    titleKey: 'app.steps.massColorGrid',
+    collapseState: 'isMassColorGridCollapsed',
+    hasUpdateButton: false
+  },
+  hueWheelToneSlider: {
+    key: 'hueWheelToneSlider',
+    step: 'T2',
+    titleKey: 'app.steps.hueWheelToneSlider',
+    collapseState: 'isHueWheelToneSliderCollapsed',
     hasUpdateButton: false
   }
 } as const;

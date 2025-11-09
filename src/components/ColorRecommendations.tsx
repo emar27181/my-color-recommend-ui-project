@@ -1,5 +1,7 @@
 import React from 'react';
 import { useColorStore, COLOR_SCHEMES, sortSchemesByCompatibility, sortSchemesByHueDistance, sortSchemesByColorCount, SCHEME_SORT_CONFIG } from '@/store/colorStore';
+import { useConditionStore } from '@/store/conditionStore';
+import { useExperimentStore } from '@/store/experimentStore';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ColorGrid } from '@/components/common/ColorGrid';
 import { ColorWheelMini } from '@/components/common/ColorWheelMini';
@@ -8,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { ChevronDown } from 'lucide-react';
 import { BORDER_PRESETS } from '@/constants/ui';
 import chroma from 'chroma-js';
+import { useLocation } from 'react-router-dom';
 
 interface ColorRecommendationsProps {
   isMobile?: boolean;
@@ -15,6 +18,20 @@ interface ColorRecommendationsProps {
 
 export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsProps) => {
   const { recommendedColors, selectedScheme, setSelectedScheme, generateRecommendedTones, baseColor, selectedColor, setColorFromRecommendation, paintColor, extractedColors } = useColorStore();
+  const location = useLocation();
+
+  // 実験ストアと条件ストアの両方をチェック（実験モード優先）
+  const experimentStore = useExperimentStore();
+  const conditionStore = useConditionStore();
+
+  // 実験ページかどうかを判定
+  const isExperimentPage = location.pathname.startsWith('/experiment/task');
+
+  // 実験モードの場合はexperimentStoreのフラグを使用、それ以外はconditionStoreを使用
+  const flags = experimentStore.participantId
+    ? experimentStore.getFeatureFlags()
+    : conditionStore.getFlags();
+
   const { onUserAction } = useTutorial();
   const { t } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
@@ -92,6 +109,10 @@ export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsP
 
   const closestColorIndex = findClosestColorIndex(recommendedColors, paintColor);
 
+  // 実験ページの場合のみフラグで制御、ホームページでは常に表示
+  if (isExperimentPage && !flags.HUE_RECO_ON) {
+    return null;
+  }
 
   return (
     <Card className="w-full flex flex-col pb-0" style={{ height: '96px', minWidth: '0' }}>
@@ -204,6 +225,20 @@ interface ToneRecommendationsProps {
 
 export const ToneRecommendations = ({ isMobile = false }: ToneRecommendationsProps) => {
   const { recommendedTones, selectedColor, generateRecommendedTones, setColorFromRecommendation, paintColor } = useColorStore();
+  const location = useLocation();
+
+  // 実験ストアと条件ストアの両方をチェック（実験モード優先）
+  const experimentStore = useExperimentStore();
+  const conditionStore = useConditionStore();
+
+  // 実験ページかどうかを判定
+  const isExperimentPage = location.pathname.startsWith('/experiment/task');
+
+  // 実験モードの場合はexperimentStoreのフラグを使用、それ以外はconditionStoreを使用
+  const flags = experimentStore.participantId
+    ? experimentStore.getFeatureFlags()
+    : conditionStore.getFlags();
+
   const { t } = useTranslation();
 
   React.useEffect(() => {
@@ -245,6 +280,11 @@ export const ToneRecommendations = ({ isMobile = false }: ToneRecommendationsPro
   };
 
   const closestToneIndex = findClosestToneIndex(recommendedTones, paintColor);
+
+  // 実験ページの場合のみフラグで制御、ホームページでは常に表示
+  if (isExperimentPage && !flags.TONE_RECO_ON) {
+    return null;
+  }
 
   return (
     <Card className="w-full flex flex-col pb-0">

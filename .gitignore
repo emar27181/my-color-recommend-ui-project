@@ -30,3 +30,6 @@ dist-ssr
 .netlify
 
 **tmp**
+
+# Development scripts
+generate_mapping.py

@@ -5,6 +5,9 @@ import { NavigationMenu } from '@/components/NavigationMenu';
 import { LanguageToggle } from '@/components/LanguageToggle';
 import { ToastContainer } from '@/components/ToastContainer';
 import { TutorialOverlay } from '@/components/tutorial/TutorialOverlay';
+import { ConditionBadge } from '@/components/ConditionBadge';
+import { ConditionSelector } from '@/components/ConditionSelector';
+import { useExperimentCondition } from '@/hooks/useExperimentCondition';
 
 interface LayoutProps {
   children: ReactNode;
@@ -12,6 +15,8 @@ interface LayoutProps {
 }
 
 export const Layout = ({ children, showHeader = true }: LayoutProps) => {
+  // URLクエリから実験条件を初期化
+  useExperimentCondition();
 
   return (
     <div className="bg-background text-foreground h-screen flex flex-col">
@@ -29,6 +34,7 @@ export const Layout = ({ children, showHeader = true }: LayoutProps) => {
                 </Link>
               </div>
               <div className="flex items-center gap-3">
+                <ConditionSelector />
                 <LanguageToggle />
                 <div className="relative">
                   <NavigationMenu />
@@ -38,7 +44,10 @@ export const Layout = ({ children, showHeader = true }: LayoutProps) => {
           </div>
         </header>
       )}
-      
+
+      {/* 実験条件バッジ（ヘッダーの直下に配置） */}
+      <ConditionBadge />
+
       {children}
       
       <ToastContainer />

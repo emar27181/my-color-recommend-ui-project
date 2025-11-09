@@ -11,9 +11,11 @@
 - 作業は必ず `feature/xxx` のような **作業用ブランチ**で行うこと
 - `main` はPull Requestによってマージされる前提の安定ブランチとする
 
-### 2. 自動でGitコミットしない
+### 2. コミット前に必ず確認する
 - コードの編集や変更があっても、**即座に `git commit` しない**
-- 編集が完了した時点で「コミットしてもよいか」をユーザーに確認すること
+- 編集が完了した時点で**必ずユーザーに「コミットしますか？」と確認すること**
+- ユーザーの明示的な許可がない限り、勝手にコミットしてはならない
+- 確認なしでのコミットは**絶対禁止**
 
 ### 3. 論理単位ごとにコミットを分ける
 - 関数の定義・UIの更新・設定ファイルの生成など、
@@ -43,6 +45,21 @@
 
 - 依存パッケージの追加や設定ファイルの修正も、1コミットにまとめず**論理単位で履歴に残す**
 - コードにエラーがある状態でのコミットは禁止（ビルド・型エラーがない状態で行う）
+
+### ホームページレイアウト保護ルール
+- **ホームページ（http://localhost:5173/）のレイアウトは変更禁止**
+- 現在のレイアウト構成（`src/constants/layout.ts`）を維持すること
+- 表示されるコンポーネント:
+  - 0. キャンバス（canvasColorRecommendation）
+  - 1. ベース色選択（baseColor）
+  - 2. 色相推薦（colorRecommendation）
+  - 3. トーン推薦（toneRecommendation）
+  - α. 肌色推薦（skinColor）
+  - β. 使用色相/トーン抽出（hueToneExtraction）
+- 非表示のコンポーネント:
+  - T1. カラーパレット（massColorGrid）
+  - T2. 色相環＋トーンスライダー（hueWheelToneSlider）
+- レイアウト変更が必要な場合は、必ずユーザーに確認してから実施すること
 
 ### デプロイメント
 - **本番デプロイ**: `netlify deploy --prod` コマンドでNetlifyにプロダクションデプロイ
@@ -188,41 +205,19 @@ const gapSearchRadius = 1;       // 隙間検索時の探索半径（px）
 4. **ColorRecommendations** - 色推薦（左下/モバイル4番目）
 5. **ToneRecommendations** - トーン推薦（右下/モバイル5番目）
 
-### コンポーネント内レイアウト原則
-
-#### 水平レイアウト優先
-- **カラーピッカー表示**: 色ブロック + カラーコード + コピーボタンを横並び
-- **推薦色表示**: 同様に横並び維持
-- **縦長回避**: `flex items-center gap-3/4` で水平配置統一
-
-#### レスポンシブグリッドシステム
-- **色表示グリッド**: `grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5`
-- **配色技法ボタン**: `grid-cols-2 sm:grid-cols-4 md:grid-cols-6`
-- **ギャップ**: `gap-3` 統一（12px）
-
-### スペーシングシステム
-- **アプリレベル**: モバイル `p-4`、デスクトップ `p-6`
-- **セクション間**: モバイル `space-y-6`、デスクトップ `gap-6`
-- **カード内**: `p-4` から `p-6` （コンポーネント依存）
-- **要素間**: ColorItem内 `gap-4`（デスクトップ）、`gap-1`（モバイル）
+### レイアウト原則
+- **水平優先**: 色ブロック + コピーボタン + HEXコードを横並び
+- **グリッド**: 色表示4列、配色技法2-6列
+- **スペーシング**: `gap-3` (12px) 統一、モバイル超コンパクト（`mb-1`, `pt-1 pb-0`）
 
 ---
 
 ## 🔤 フォント・タイポグラフィ
 
-### フォントスタック（2025-07-01更新）
-- **メイン**: Outfit（モダン・読みやすい）
-- **見出し**: Space Grotesk（テクニカル・洗練）
-- **ディスプレイ**: Syne（アーティスティック・独特）
-- **コード**: Space Mono（未来的・クール）
-- **スタイリッシュ**: Syne（ラベル・タグ用）
-
-### 色分け・使用例
-- **HEXコード**: `font-mono`（Space Mono - 未来的でテクニカル）
-- **ラベル**: `font-stylish uppercase tracking-wider`（Syne - 洗練されたラベル）
-- **見出し**: `font-heading`（Space Grotesk - モダンで読みやすい）
-- **ディスプレイ**: `font-display`（Syne - インパクトのある表示）
-- **説明文**: `font-sans`（Outfit - 標準的な読みやすさ）
+- **メイン**: Outfit（`font-sans`）- 本文・説明
+- **見出し**: Space Grotesk（`font-heading`）- タイトル
+- **ディスプレイ**: Syne（`font-display`, `font-stylish`）- 強調・ラベル
+- **コード**: Space Mono（`font-mono`）- HEXコード
 
 ---
 
@@ -274,147 +269,47 @@ const gapSearchRadius = 1;       // 隙間検索時の探索半径（px）
 ## 🌈 色推薦表示ルール
 
 ### グラデーション並び替え
-- **推薦色表示**: 必ず明るい→暗い順でソート表示
-- **推薦トーン表示**: 同様に明るい→暗い順でソート表示
-- **実装**: `sortColorsByLightness`関数で chroma.js の lightness 値を使用
-- **適用場所**: `generateRecommendedColors()` と `generateRecommendedTones()` 内
+- **ソート**: `sortColorsByLightness`関数で明→暗順（chroma.js lightness値使用）
+- **対象**: 色相推薦・トーン推薦の両方
 
-### ソート仕様
-- **基準**: HSL の lightness 値（0-1）
-- **順序**: 降順（明るい→暗い）
-- **エラーハンドリング**: 色変換エラー時は元の順序を維持
+### レイアウト
+- **色ブロック**: 48px × 48px（PC）、40px × 40px（モバイル）
+- **配置**: 色ブロック → コピーボタン → HEXコード
+- **グリッド**: 4列（PC・モバイル共通）
 
-### スマホ用2列レイアウト仕様
-- **採用レイアウト**: 2列横並び配置（~767px）
-- **色ブロックサイズ**: 40px × 40px
-- **要素順序**: 色ブロック → コピーボタン → カラーコード
-- **ギャップ**: `gap-2` で要素間スペース確保
-- **カラーコード**: `text-xs font-mono` でコンパクト表示、`truncate` で省略
-- **コピーボタン**: 14pxアイコン、常時表示
-- **レスポンシブ**: `space-y-3` で行間確保
+### モバイル最適化
+- **余白**: `pt-1 pb-0`（超コンパクト）、最終セクション`mb-0`
+- **タイトル**: `text-xs leading-tight`
+- **ボタン**: `px-2 py-1 text-xs`
 
-### コピーボタン必須実装
-- **全デバイス対応**: スマホ・タブレット・デスクトップすべてでコピーボタン必須
-- **統一コンポーネント**: 必ず `CopyColorButton` コンポーネントを使用
-- **独自実装禁止**: 独自のSVGやbuttonタグでのコピー機能実装は禁止
-- **表示保証**: `opacity-100` で常時表示、`flex-shrink-0` で縮小防止
-- **機能保証**: 成功時のフィードバック（緑色チェックアイコン）必須
-
-### モバイル最適化仕様
-- **メインコンテナ**: `pt-1 pb-0` で上部のみ最小余白、下部余白完全削除
-- **セクションタイトル**: h3タグ、`text-xs leading-tight` で超コンパクト表示
-- **最終セクション**: `mb-0` で下部余白完全削除
-- **カードコンポーネント**: 最下部カードに `mb-0` で余白削除
-- **カードヘッダー/コンテンツ**: `pb-1 pt-2` / `pt-1` で最小限の内部余白
-- **配色技法ボタン**: `px-2 py-1 text-xs` で超コンパクトサイズ
-- **アイコン縮小**: 空状態アイコン `w-6 h-6`、コンテナ `w-12 h-12`
-- **シングルスクリーン**: 画面下部に不要な背景色領域を残さない
-
-### 肌色推薦仕様（2025-07-10追加）
-- **固定色表示**: 10色の肌色パレット（色白系→やや褐色系）
-- **色順序**: ベース色と頬色のペアを5段階で表示
-- **コンポーネント**: `SkinColorRecommendations.tsx` で実装
-- **レイアウト**: 既存のColorGridコンポーネントを使用
-- **機能**: 表示のみ（クリック機能なし）
-- **固定色リスト**: 
-  - 色白系: `#FFF5F0`（ベース）, `#FFDCD1`（頬）
-  - 明るめナチュラル: `#FFEBE1`（ベース）, `#FFCDC1`（頬）
-  - 標準的な肌色: `#FFE1CD`（ベース）, `#FFC3AA`（頬）
-  - 健康的な褐色: `#FAD2B4`（ベース）, `#FFAF8C`（頬）
-  - やや褐色系: `#FABE96`（ベース）, `#FFA582`（頬）
+### 肌色推薦
+- **固定色**: 10色（色白系→やや褐色系）、ベース色+頬色ペア×5段階
+- **コンポーネント**: `SkinColorRecommendations.tsx`
 
 ---
 
-## 🎨 ボーダー・スタイリング統一管理ルール
+## 🎨 ボーダー・スタイリング統一
 
-### 統一ボーダー仕様の原則
-- **一元管理**: すべてのボーダー（枠線・角丸）は `src/constants/ui.ts` で統一管理
-- **色相推薦基準**: 角の丸みは色相推薦カラーボックスの `rounded` (4px) を基準とする
-- **プリセット活用**: よく使われる組み合わせは `BORDER_PRESETS` として定義済み
+### 原則
+- **一元管理**: `src/constants/ui.ts` の `BORDER_PRESETS` で統一
+- **基準角丸**: `rounded` (4px) を基準
 
-### ボーダースタイル定義
-```typescript
-// 枠線の太さ
-width: {
-  thin: 'border',     // 1px
-  normal: 'border-2', // 2px  
-  thick: 'border-4'   // 4px
-}
+### プリセット
+- **カラーブロック**: 透明枠線 + 小さい角丸
+- **カード**: 細い枠線 + 中程度角丸
+- **ボタン**: 透明枠線 + 中程度角丸
 
-// 枠線の色
-color: {
-  transparent: 'border-transparent',
-  default: 'border-border',
-  muted: 'border-gray-300',
-  accent: 'border-primary'
-}
-
-// 角の丸み（色相推薦カラーボックス基準）
-radius: {
-  none: 'rounded-none',
-  small: 'rounded',      // 4px - 基準
-  medium: 'rounded-md',  // 6px
-  large: 'rounded-lg',   // 8px
-  full: 'rounded-full'   // 完全な円形
-}
-```
-
-### ボーダープリセット使用例
-- **カラーブロック**: `BORDER_PRESETS.colorBlock` - 透明枠線 + 小さい角丸
-- **カード**: `BORDER_PRESETS.card` - 細い枠線 + 中程度の角丸  
-- **ボタン**: `BORDER_PRESETS.button` - 透明枠線 + 中程度の角丸
-- **アップロード**: `BORDER_PRESETS.upload` - 点線 + 大きい角丸
-- **アイコン**: `BORDER_PRESETS.icon` - 透明枠線のみ
-- **プレビュー**: `BORDER_PRESETS.preview` - 大きい角丸のみ
-
-### 実装ルール
-- **コンポーネント更新**: 既存のハードコードされたTailwindクラスは統一プリセットに置き換え
-- **新規コンポーネント**: 必ず `BORDER_PRESETS` を使用し、独自のボーダー指定禁止
-- **一貫性保持**: プロジェクト全体で同じ角丸・枠線仕様を維持
-- **色相環UI統一**: 色相環選択UIの背景と枠線は `BORDER_PRESETS.colorBlock` を使用し、他のカラーボックスと統一
-- **背景色統一**: 色相環コンテナは `bg-background` を使用してテーマに応じた背景色を適用
-- **配色技法選択バー統一**: 配色技法選択バーとドロップダウン項目の背景は `bg-background`、枠線は `border border-border rounded-md` を使用してベースカラー選択エリアのカード枠線と統一
-- **配色技法ドロップダウン仕様**: PC版では4列表示（`grid-cols-4`）、固定幅600pxで親コンテナの制約を回避
+### ルール
+- ハードコード禁止、必ず `BORDER_PRESETS` 使用
 
 ---
 
 ## 🎨 アイコン統一ルール
 
-### アイコン色統一仕様
-- **統一クラス**: すべてのアイコンに `text-foreground` クラスを適用
-- **テーマ対応**: ライト・ダークモード自動切り替え
-  - **ライトモード**: 暗い色（`oklch(0.145 0 0)`）
-  - **ダークモード**: 白っぽい色（`oklch(0.985 0 0)`）
-- **ライブラリ**: `lucide-react` アイコンセット使用
-- **アイコン選定**: [Lucide公式サイト](https://lucide.dev)から適切なアイコンを選択
-
-### 適用対象アイコン
-- **ナビゲーション**: Home, Menu, X, ChevronUp, ChevronDown
-- **機能アイコン**: Sun/Moon（テーマ切り替え）, CircleDashed（リセット）, Copy, Check（コピー）
-- **UI要素**: Languages, Bug（デバッグ）, Palette, UploadCloud等
-
-### 実装ルール
-- **必須クラス**: 新規アイコンには必ず `text-foreground` を追加
-- **固定色禁止**: `text-red-500` 等の固定色クラス使用禁止
-- **一貫性保持**: プロジェクト全体で統一された視覚体験を提供
-- **アクセシビリティ**: テーマ変更時の視認性を確保
-
-### 実装例
-```tsx
-// ✅ 正しい実装
-<CircleDashed className="w-4 h-4 text-foreground" />
-<Home className="w-5 h-5 text-foreground" />
-
-// ❌ 避けるべき実装
-<CircleDashed className="w-4 h-4 text-gray-600" />
-<Home className="w-5 h-5" /> // 色指定なし
-```
-
-### アイコン選定ガイドライン
-- **公式サイト参照**: https://lucide.dev でアイコンを検索・確認
-- **機能適合性**: アイコンの意味が機能と一致することを確認
-- **視覚的一貫性**: プロジェクト全体で統一された印象を保つ
-- **アクセシビリティ**: 明確で理解しやすいアイコンを選択
+- **色**: すべてのアイコンに `text-foreground`（テーマ自動対応）
+- **ライブラリ**: `lucide-react`
+- **選定**: [lucide.dev](https://lucide.dev) から適切なアイコン選択
+- **禁止**: 固定色クラス（`text-red-500`等）使用禁止
 
 ---
 
@@ -480,248 +375,36 @@ radius: {
 
 ---
 
-## 🔄 レイアウト変更履歴・復元方法
+## 🔄 レイアウト変更履歴
 
-### 現在のレイアウト（2025-08-21変更）
-- **デスクトップ**: 2列レイアウト [キャンバス 2/3幅, メインツール 1/3幅]
-- **βセクション配置**: αセクション（skinColor）の下に配置
-- **βセクション表示**: 横並び（色相環 + 彩度明度プロット）
+### 現在（2025-08-21）
+- **デスクトップ**: 2列 [キャンバス 2/3, メインツール 1/3]
+- **βセクション**: 横並び（色相環 + 彩度明度プロット）
 
-### 変更前のレイアウト（復元用設定）
-変更前の3列レイアウトに戻す場合は、`/src/constants/layout.ts` を以下に変更：
-
-```typescript
-// デスクトップレイアウト設定
-desktop: {
-  // 3列レイアウト: [キャンバス, メインツール, 分析ツール]
-  columns: [
-    {
-      id: 'canvas',
-      width: 'w-7/12', // 7/12幅（約58.3%）
-      components: ['canvasColorRecommendation']
-    },
-    {
-      id: 'main-tools', 
-      width: 'w-1/4', // 1/4幅（25%）
-      components: ['baseColor', 'colorRecommendation', 'toneRecommendation', 'skinColor']
-    },
-    {
-      id: 'analysis',
-      width: 'w-1/6', // 1/6幅（約16.7%）
-      components: ['hueToneExtraction']
-    }
-  ],
-  gap: 'gap-6'
-},
-```
-
-**βセクションを縦並びに戻す場合**: `/src/components/HueToneExtraction.tsx`
-```typescript
-// 色相・トーンの可視化を常に表示
-<div className="flex flex-col space-y-0">
-  <HueWheel colors={visualizationData} onHueClick={handleHueClick} isQuantized={isQuantizationEnabled} selectedColor={selectedColor} selectedScheme={selectedScheme} />
-  <SaturationLightnessPlot colors={visualizationData} onSaturationLightnessClick={handleSaturationLightnessClick} isQuantized={isQuantizationEnabled} selectedColor={selectedColor} />
-</div>
-```
-
-**サイズを元に戻す場合**:
-- HueWheel: `size = 220`, `radius = 72`  
-- SaturationLightnessPlot: `plotWidth = 145.8`, `plotHeight = 145.8`, `width = 180`, `height = 214.5`
+### 過去レイアウト復元方法
+- `/src/constants/layout.ts` で3列レイアウト設定変更可能
+- βセクション縦並び: `/src/components/HueToneExtraction.tsx` で `flex-col` に変更
 
 ---
 
-## 📱 レイアウト・アーキテクチャ詳細仕様
+## 📱 レイアウト・アーキテクチャ
 
-### アプリケーション全体構造
+### 基本構造
+- **全体**: Layout.tsx（全ページ共通ヘッダー・ナビゲーション）
+- **レスポンシブ**: モバイル（縦積み）⇔ デスクトップ（グリッド）
+- **ブレークポイント**: xl (1280px) でレイアウト切り替え
 
-#### 最上位レイアウト（App.tsx）
-```
-ToastProvider
-└── div (min-h-screen flex flex-col)
-    ├── header (固定ヘッダー)
-    │   └── container
-    │       └── NavigationMenu + [HelpButton, ThemeToggle]
-    ├── main (flex-1 メインコンテンツ)
-    │   ├── Mobile/Tablet レイアウト (block xl:hidden)
-    │   └── Desktop レイアウト (hidden xl:block)
-    └── ToastContainer (固定位置)
-```
+### グリッド・スペーシング
+- **色推薦**: 4列グリッド（PC・モバイル共通）
+- **トーン推薦**: 4列グリッド
+- **ギャップ**: `gap-3` (12px)
+- **モバイル余白**: 超コンパクト設計（`mb-1`, `pt-1 pb-0`）
 
-#### 基本レイアウトパターン
-- **全画面**: `min-h-screen flex flex-col` - 画面全体を縦方向のフレックスコンテナ
-- **ヘッダー固定**: `flex-shrink-0` でヘッダーサイズ固定
-- **メインコンテンツ**: `flex-1` で残り領域を占有
-- **レスポンシブ切り替え**: `xl:` ブレークポイント（1280px）でレイアウト変更
-
-### レスポンシブレイアウト詳細
-
-#### モバイル・タブレット（~1279px）
-```
-main (px-4 pb-2)
-└── section.1 ベースカラー選択 (flex-shrink-0 mb-1)
-    └── div (flex gap-1)
-        ├── ColorPicker (flex-1)
-        └── ImageUpload (flex-1)
-    └── ExtractedColorsDisplay
-└── div.2-3 推薦セクション (space-y-1)
-    ├── section.2 色相推薦
-    └── section.3 トーン推薦
-```
-
-#### デスクトップ（1280px~）
-```
-main (h-full flex flex-col)
-└── section.1 ベースカラー選択 (flex-shrink-0 mb-2)
-    └── div (grid grid-cols-3 gap-4)
-        ├── ColorPicker
-        ├── ImageUpload
-        └── ExtractedColorsDisplay
-└── div.2-3 推薦セクション (flex-1 grid grid-cols-2 gap-4)
-    ├── section.2 色相推薦 (min-h-0 flex flex-col)
-    └── section.3 トーン推薦 (min-h-0 flex flex-col)
-```
-
-### 主要UIコンポーネント一覧
-
-#### レイアウト・構造系
-| コンポーネント名 | ファイル | 役割 |
-|------------------|----------|------|
-| Layout | `/src/components/Layout.tsx` | 全ページ共通レイアウト・ヘッダー統一 |
-| App | `/src/App.tsx` | ホームページメインコンテンツ |
-| NavigationMenu | `/src/components/NavigationMenu.tsx` | ハンバーガーメニューナビゲーション |
-| ThemeToggle | `/src/components/ThemeToggle.tsx` | ライト・ダークモード切り替え |
-| ToastContainer | `/src/components/ToastContainer.tsx` | 通知メッセージ表示 |
-
-#### 機能系メインコンポーネント
-| コンポーネント名 | ファイル | 役割 |
-|------------------|----------|------|
-| ColorPicker | `/src/components/ColorPicker.tsx` | カラーピッカー（パレットアイコン式） |
-| ImageUpload | `/src/components/ImageUpload.tsx` | 画像アップロード・色抽出 |
-| ExtractedColorsDisplay | `/src/components/ExtractedColorsDisplay.tsx` | 抽出色表示・選択 |
-| ColorRecommendations | `/src/components/ColorRecommendations.tsx` | 色相推薦・配色技法選択 |
-| ToneRecommendations | `/src/components/ColorRecommendations.tsx` | トーン推薦表示 |
-
-#### 共通・再利用系コンポーネント
-| コンポーネント名 | ファイル | 役割 |
-|------------------|----------|------|
-| ColorGrid | `/src/components/common/ColorGrid.tsx` | 統一カラーグリッドレイアウト |
-| ColorItem | `/src/components/common/ColorItem.tsx` | 色表示アイテム（デスクトップ・モバイル対応） |
-| ColorBlock | `/src/components/common/ColorBlock.tsx` | 統一色表示ブロック |
-| CopyColorButton | `/src/components/common/CopyColorButton.tsx` | 統一コピーボタン |
-| ProgressBar | `/src/components/common/ProgressBar.tsx` | プログレスバー |
-
-#### shadcn/ui基盤コンポーネント
-| コンポーネント名 | ファイル | 役割 |
-|------------------|----------|------|
-| Card | `/src/components/ui/card.tsx` | カード・コンテナ |
-| Button | `/src/components/ui/button.tsx` | ボタン |
-| Input | `/src/components/ui/input.tsx` | 入力フィールド |
-| Toast | `/src/components/ui/toast.tsx` | トースト通知 |
-
-### グリッドシステム・レスポンシブ仕様
-
-#### 定義済みグリッドパターン（constants/ui.ts）
-```typescript
-RESPONSIVE_GRID = {
-  colors: 'grid-cols-4', // 色推薦: PC・モバイル共に4列
-  baseColors: 'grid-cols-2', // ベース色選択: PC・モバイル共に2列
-  baseColorsMobile: 'grid-cols-2', // ベース色選択モバイル: 2列
-  tones: 'grid-cols-4', // トーン推薦: PC・モバイル共に4列
-  schemes: 'grid-cols-2 sm:grid-cols-4 md:grid-cols-6',
-  gap: 'gap-3',
-  padding: 'p-4'
-}
-```
-
-#### ブレークポイント定義
-- **xs**: 475px（拡張）
-- **sm**: 640px（標準Tailwind）
-- **md**: 768px（標準Tailwind）
-- **lg**: 1024px（標準Tailwind）
-- **xl**: 1280px（メイン切り替えポイント）
-- **2xl**: 1536px（拡張）
-
-#### カラーグリッドレスポンシブ動作
-- **モバイル**: 2列固定（`flex gap-1` による2列レイアウト）
-- **タブレット～**: 3-5列可変（`grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5`）
-
-### スペーシング・余白システム
-
-#### セクション間スペーシング
-- **モバイル**: `mb-1` (4px), `space-y-1` (4px) - 超コンパクト
-- **デスクトップ**: `mb-2` (8px), `gap-4` (16px) - 標準
-
-#### カード内部スペーシング
-- **ヘッダー**: `pb-1 pt-2` (上8px, 下4px)
-- **コンテンツ**: `pt-1` (上4px), `pb-0` (下0px)
-  
-#### モバイル最適化余白
-- **メインコンテナ**: `px-4 pb-2` (横16px, 下8px)
-- **最終セクション**: `mb-0` で下部余白完全削除
-- **タイトル**: `text-xs leading-tight` 超コンパクト
-
-### ヘッダー・ナビゲーション構造（2025-07-01更新）
-
-#### 統一Layoutコンポーネント
-- **ファイル**: `src/components/Layout.tsx`
-- **用途**: 全ページ共通のヘッダー・フッター・基本構造
-- **ルーティング**: main.tsxで各ページをLayoutでラップ
-- **props**: `showHeader?: boolean` でヘッダー表示制御
-
-#### ヘッダーレイアウト
-```
-Layout
-└── header (border-b border-border bg-background flex-shrink-0)
-    └── container (mx-auto px-4 py-3)
-        └── flex (justify-between items-center)
-            ├── div (flex items-center gap-2)
-            │   ├── TutorialButton (Play icon)
-            │   ├── SwipeButton (ClipboardPenLine icon, Link to="/swipe")
-            │   ├── HelpButton (HelpCircle icon, Link to="/help")
-            │   └── ThemeToggle (Sun/Moon icon)
-            └── NavigationMenu (ハンバーガーメニュー - 右端配置)
-```
-
-#### NavigationMenu仕様
-- **トリガー**: ハンバーガーアイコン（Menu/X）
-- **レイアウト**: ドロップダウン式メニュー
-- **背景**: backdrop-blur-sm 効果
-- **メニュー項目**: ホーム、ダミーページ1-3、ヘルプ
-
-#### ページ配置調整ルール
-- **スワイプページ**: ステータスバー位置を `top-16` (モバイル) / `top-20` (デスクトップ) に調整
-- **一般ページ**: ヘッダー下の適切な余白を確保
-- **個別ヘッダー禁止**: 各ページで独自ヘッダーを作成せず、Layout統一を使用
-
-### カードレイアウト詳細仕様
-
-#### Card基本構造
-```
-Card (統一border-presets)
-├── CardHeader (pb-1 pt-2 flex-shrink-0)
-└── CardContent (pt-0 flex-1 overflow-auto pb-0)
-```
-
-#### 高さ制約システム
-- **ColorRecommendations**: 固定高さ `144px`
-- **その他**: `h-full` で親コンテナに従う
-- **フレックス**: `min-h-0` でオーバーフロー制御
-
-### カラー表示レイアウト仕様
-
-#### ColorItem レスポンシブ構造
-- **デスクトップ**: `flex items-center gap-4` - 横並び標準レイアウト
-- **モバイル**: 2列コンパクトレイアウト - `flex-1` で等幅分割
-
-#### 色要素配置順序
-1. **ColorBlock** - 色表示ブロック
-2. **CopyColorButton** - コピーボタン
-3. **カラーコード** - HEX値表示
-
-#### ColorGrid 動作パターン
-- **空状態**: 中央配置のプレースホルダー表示
-- **データ有り**: レスポンシブグリッド表示
-- **クリック動作**: `onColorClick` コールバック実行
+### カード構造
+- **基本**: Card（統一border-presets）
+- **ヘッダー**: `pb-1 pt-2`
+- **コンテンツ**: `pt-0 pb-0`
+- **オーバーフロー**: `min-h-0` で制御
 
 ---
 
@@ -769,491 +452,113 @@ Card (統一border-presets)
 
 ---
 
+## 🧪 実験ページUI仕様
+
+### 基本仕様
+- **ルート**: `/experiment`, `/experiment/task`, `/experiment/complete`
+- **目的**: 色推薦UI評価実験用インターフェース
+
+### デザイン原則
+- **ミニマルデザイン**: 明確な情報階層、十分なホワイトスペース
+- **視覚的理解促進**: アイコン・色分けで直感的に情報伝達
+- **条件色分け**: C0（灰）、C1（青）、C2（紫）、C3（緑）
+
+### 実験タスクページの表示制御
+- **非表示**: skinColor（α）、hueToneExtraction（β）を常に非表示
+- **自動展開**: C1〜C3では該当する推薦セクションを自動展開
+- **目的**: 認知負荷軽減、タスク集中促進
+
+### デバッグモード重要注意事項
+- **デフォルト**: デバッグモードはオフ
+- **有効化**: URLに `?debug=true` を追加した場合のみ有効化
+- **ナビゲーションバー**: 実験ページボタンは `?debug=true` 付きリンク
+- **本番実験時**: URLパラメータなし、または `?debug=false` で実施すること
+- **自動入力の危険性**: デバッグモードでは参加者情報・アンケートが自動入力される
+  - **重要**: アンケート自動入力により `surveyResponse` がストアに保存される
+  - この状態で実験を開始すると、アンケート画面がスキップされる
+  - **対策**: 実験開始時（`startFullExperiment`）で必ず `surveyResponse: null` をリセット
+  - **対策**: 実験リセット時（`resetExperiment`）でも `surveyResponse: null` をリセット
+- **ストア永続化の禁止**: `experimentStore` は Zustand の persist 機能を使用しない
+  - リロード時に状態がリセットされることで、デバッグデータの混入を防ぐ
+- **開発時の注意**: デバッグモードで実験を実行した後は、必ずリロードして状態をクリア
+
+---
+
 ## 🔧 技術仕様
 
-### 状態管理・データフロー
-
-#### Zustandストア構造（colorStore.ts）
-```typescript
-interface ColorState {
-  selectedColor: string;           // 選択中のベースカラー
-  recommendedColors: string[];     // 色相推薦結果
-  recommendedTones: string[];      // トーン推薦結果
-  selectedScheme: string;          // 選択中の配色技法
-  toneBaseColor: string | null;    // トーン生成の基準色
-  extractedColors: ExtractedColor[]; // 画像から抽出された色
-  dominantColor: ExtractedColor | null; // ドミナントカラー
-}
-```
-
-#### 色推薦アルゴリズム
-- **色相推薦**: HSL色空間での色相角度操作
+### 色推薦アルゴリズム
+- **色相推薦**: HSL色空間での角度操作、13種類の配色技法
 - **トーン推薦**: 明度・彩度の段階的変化
-- **ソート機能**: `chroma.js` lightness値による明るい→暗い順
-- **重複除去**: 同一色・極端な色（#000000, #FFFFFF）の自動除外
+- **ソート**: `chroma.js` lightness値で明→暗順
 
-#### 配色技法データ
-- **総計**: 13種類の配色技法
-- **角度ベース**: 色相環での角度指定による色生成
-- **アルゴリズム**: Identity, Analogous, Dyad, Triad, Tetrad, Split, Pentad, Hexad
-
-### CSS・スタイリング仕様
-
-#### Tailwind CSS設定
-- **ダークモード**: class-based切り替え
-- **カスタムブレークポイント**: xs(475px), 2xl(1536px)
-- **フォント設定**: Inter（メイン）, JetBrains Mono（コード）
-- **カラーシステム**: CSS変数ベースのテーマ対応
-
-#### CSS変数システム
-```css
-:root {
-  --background: oklch(1 0 0);      /* ライトモード背景 */
-  --foreground: oklch(0.145 0 0);  /* ライトモード文字 */
-  --primary: oklch(0.205 0 0);     /* プライマリ色 */
-  --card: oklch(1 0 0);            /* カード背景 */
-  --border: oklch(0.922 0 0);      /* 境界線 */
-}
-
-.dark {
-  --background: oklch(0.145 0 0);  /* ダークモード背景 */
-  --foreground: oklch(0.985 0 0);  /* ダークモード文字 */
-  /* ... その他ダークモード変数 */
-}
-```
-
-#### モバイル最適化CSS
-- **スクロールバー非表示**: webkit-scrollbar, scrollbar-width
-- **タッチスクロール**: -webkit-overflow-scrolling: touch
-- **オーバーフロー制御**: overflow-x: hidden
-
-#### カスタムアニメーション
-- **fadeIn**: opacity + translateY 変化
-- **scaleIn**: opacity + scale 変化
-- **グラスモーフィズム**: backdrop-filter blur効果
-
-### パフォーマンス・最適化
-
-#### 色処理最適化
-- **遅延評価**: 必要時のみ色計算実行
-- **重複排除**: Set使用による効率的な重複除去
-- **エラーハンドリング**: chroma.js例外の適切な処理
-
-#### レンダリング最適化
-- **条件分岐レンダリング**: 空配列時のプレースホルダー表示
-- **レスポンシブ分岐**: CSS Grid vs Flexbox の適切な使い分け
-- **画像最適化**: objectFit, maxHeight による表示制御
-
-### 使用ライブラリ
-- **アイコン**: lucide-react
-- **色操作**: chroma-js（色相・明度・彩度計算）
-- **状態管理**: zustand（軽量グローバル状態）
-- **UI**: shadcn/ui + Tailwind CSS
-- **型定義**: TypeScript（厳密型チェック）
-- **画像処理**: ColorThief（色抽出）
-
-### ファイル構成
-```
-src/
-├── components/
-│   ├── Layout.tsx                  # 全ページ共通レイアウト・ヘッダー統一
-│   ├── ColorPicker.tsx             # カラーピッカー（パレットアイコン式）
-│   ├── ColorRecommendations.tsx    # 色相推薦・配色技法選択
-│   ├── ExtractedColorsDisplay.tsx  # 抽出色表示・選択
-│   ├── ImageUpload.tsx             # 画像アップロード・色抽出
-│   ├── NavigationMenu.tsx          # ハンバーガーメニューナビゲーション
-│   ├── ThemeToggle.tsx             # ライト・ダークモード切り替え
-│   ├── ToastContainer.tsx          # 通知メッセージ表示
-│   ├── common/
-│   │   ├── ColorBlock.tsx          # 統一色表示ブロック
-│   │   ├── ColorGrid.tsx           # 統一カラーグリッドレイアウト
-│   │   ├── ColorItem.tsx           # 色表示アイテム（レスポンシブ対応）
-│   │   ├── ColorWheel.tsx          # 色相環視覚補助コンポーネント
-│   │   ├── CopyColorButton.tsx     # 統一コピーボタン
-│   │   └── ProgressBar.tsx         # プログレスバー
-│   └── ui/
-│       ├── button.tsx              # shadcn/ui ボタン
-│       ├── card.tsx                # shadcn/ui カード
-│       ├── input.tsx               # shadcn/ui 入力フィールド
-│       └── toast.tsx               # shadcn/ui トースト
-├── constants/
-│   └── ui.ts                       # UI統一定数・ボーダープリセット
-├── contexts/
-│   └── ToastContext.tsx            # トースト通知コンテキスト
-├── hooks/
-│   ├── useScrollVisibility.ts      # スクロール表示制御
-│   └── useToast.ts                 # トースト通知フック
-├── lib/
-│   ├── clipboard.ts                # クリップボード操作
-│   ├── colorExtractor.ts           # 色抽出ロジック
-│   └── utils.ts                    # ユーティリティ関数
-├── pages/
-│   └── HelpPage.tsx                # ヘルプページ
-├── store/
-│   └── colorStore.ts               # 色・配色技法管理 + グラデーションソート
-└── types/
-    └── colorthief.d.ts             # ColorThief型定義
-```
+### CSS・スタイリング
+- **ダークモード**: class-based切り替え、CSS変数ベース
+- **フォント**: Outfit（メイン）、Space Grotesk（見出し）、Space Mono（コード）、Syne（スタイリッシュ）
+- **ブレークポイント**: xs(475px), sm(640px), md(768px), lg(1024px), xl(1280px), 2xl(1536px)
 
 ---
 
----
+## 🧹 コード整理ルール
 
-## 📱 現在のレイアウト状態
-
-### アプリケーション構成（2025-06-21時点）
-- **メインレイアウト**: レスポンシブグリッド（モバイル縦積み ↔ デスクトップ3+2列）
-- **色表示**: ColorBlock（48x48px、6px角丸）統一仕様
-- **カード**: 中程度角丸（6px）、統一ボーダー
-- **スペーシング**: gap-3（12px）基準、モバイルp-4/デスクトップp-6
-
-### 主要機能エリア
-1. **色選択セクション**: ColorPicker（手動選択）
-2. **画像処理セクション**: ImageUpload + ExtractedColorsDisplay
-3. **推薦システム**: ColorRecommendations（配色技法選択）
-4. **トーン生成**: ToneRecommendations（明度・彩度バリエーション）
-
----
-
-## 🧹 コード整理・クリーンアップルール
-
-### 不要ファイル削除対象
-以下のファイルは開発中の実験的コンポーネントで本番環境では不要のため削除対象：
-
-#### テスト・実験用コンポーネント（削除対象）
-- `/src/AppSimple.tsx` - 未使用の簡易版アプリ
-- `/src/components/ColorPickerTest.tsx` - 未使用のUI実験コンポーネント  
-- `/src/components/HorizontalColorTest.tsx` - 未使用のレイアウト実験コンポーネント
-- `/src/components/SimpleTest.tsx` - AppSimple.tsx でのみ使用される基本テストコンポーネント
-- `/src/components/test/` - 空ディレクトリ（実際のテストファイルは存在しない）
-
-#### ダミーページ（要確認）
-- `/src/pages/DummyPage1.tsx`
-- `/src/pages/DummyPage2.tsx` 
-- `/src/pages/DummyPage3.tsx`
-
-**削除理由**: これらは本番機能と重複する実験的コンポーネントで、実際の機能は本番コンポーネント（ColorPicker.tsx、ColorItem.tsx等）で実装済み
-
-### ファイル整理ルール
-1. **実験的コンポーネント禁止**: `*Test.tsx` 形式の実験用コンポーネントは作成しない
-2. **本番コンポーネント優先**: 機能実装は必ず本番用コンポーネント（ColorPicker.tsx等）で行う
-3. **未使用ファイル削除**: import されていないコンポーネントは定期的に削除
-4. **ディレクトリ構造維持**: 空ディレクトリは削除し、必要な場合のみ作成
+- **実験的コンポーネント禁止**: `*Test.tsx` 形式は作成しない
+- **本番コンポーネント優先**: 機能は本番用コンポーネントで実装
+- **未使用ファイル削除**: import されていないコンポーネントは削除
 
 ---
 
 ## 🎡 色相環UI視覚補助ルール
 
-### 色相環表示システム仕様
+### 基本仕様
+- **表示条件**: 配色技法ドロップダウンのホバー/タップ時
+- **PC**: マウスカーソル追従、ホバー制御
+- **モバイル**: タップ位置表示、3秒自動非表示
+- **コンポーネント**: `ColorWheel.tsx`（React Portal使用）
+- **角度計算**: `(angle - 90) * Math.PI / 180` でベースカラー真上配置
 
-#### 基本表示ルール
-- **表示条件**: 配色技法選択ドロップダウンの項目ホバー時のみ表示
-- **表示内容**: 配色技法のangles配列に基づく正確な色相関係を視覚化
-- **コンポーネント**: `ColorWheel.tsx` を使用（統一コンポーネント）
-- **配置**: React Portal を使用してdocument.bodyに直接レンダリング
-
-#### デバイス別動作仕様
-
-##### PC版（デスクトップ）
-- **表示タイミング**: マウスホバー時に即座表示
-- **非表示タイミング**: マウスリーブ時に即座非表示
-- **位置**: マウスカーソルの右20px、垂直中央配置
-- **背景**: 完全不透明（`bg-card`）
-- **自動非表示**: なし（ホバー制御のみ）
-
-##### モバイル版（タッチデバイス）
-- **表示タイミング**: タップ時に表示
-- **非表示タイミング**: 3秒後自動非表示
-- **位置**: タップ位置基準（画面端調整あり）
-- **背景**: 半透明80%（`bg-card/80 backdrop-blur-sm`）
-- **自動非表示**: 3秒タイマー
-
-#### 色相環ビジュアル仕様
-- **外枠円**: 色相環の境界線
-- **軌道線**: プロット点配置円を点線表示（strokeDasharray="5,3"）
-- **ベースカラー**: 12時方向（真上）に配置、大きいマーカー（半径6px）
-- **関連色**: 配色技法角度に基づく配置、小さいマーカー（半径4px）
-- **接続線**: 中心から各プロット点への点線
-- **サイズ**: 半径56px、コンテナ160x160px
-
-#### 技術実装ルール
-- **角度計算**: `(angle - 90) * Math.PI / 180` でベースカラーを真上配置
-- **デバイス判定**: User-Agent + 画面幅768px以下でモバイル判定
-- **Portal使用**: 親要素のスタッキングコンテキスト回避
-- **イベント制御**: PC/モバイルで異なるマウスイベント処理
-
-#### 禁止事項
-- 色相環の常時表示
-- baseHue依存の角度計算（純粋な配色技法角度を使用）
-- 固定位置配置（必ずマウス/タップ位置ベース）
-- デバイス判定なしの統一動作
 
 ---
 
-## ✅ 最近解決された課題
-
-### PC版色相環選択バーの表示・レイアウト問題（2025-06-25解決）
-- **問題**: PC版の色相環選択バー下部見切れ、レスポンシブ列数の複雑さ
-- **解決策**: 
-  - **列数シンプル化**: `grid-cols-2 xl:grid-cols-6`（モバイル2列・PC6列）
-  - **レイアウト変更**: 色相環と名前を縦配置から横配置に変更
-  - **サイズ最適化**: ColorWheelMiniを20px→28pxに拡大
-  - **Flex最適化**: `flex-shrink-0`、`flex-1`でレイアウト安定化
-- **結果**: PC版での下部見切れ解消、視認性向上
-
-### 色相環デザイン統一（2025-06-25解決）
-- **問題**: 色相環の点の色がバラバラ、透明度による視認性低下、不要な中心点
-- **解決策**:
-  - **色統一**: 全ての点を青色（`#3b82f6`）に統一
-  - **透明度削除**: `opacity-60`、`opacity-80`を削除して完全不透明に
-  - **中心点削除**: 不要な中心円を削除してクリーンな見た目に
-  - **枠線調整**: 適切な太さに調整（ColorWheel: 1.5px/1px、ColorWheelMini: 0.8px/0.5px）
-- **結果**: 統一感のあるクリーンな色相環デザイン
-
-## 🚧 未解決課題・TODO
-
-### キャンバスUI要素間のスペーシング調整（中優先度）
-- **現状**: ペン/消しゴム/塗りつぶしボタン、Undo/Redoボタン、ペンサイズ調整ボタン同士の間隔が狭い
-- **要件**: 各ボタン群内のボタン同士に適切なパディング（4px-20px程度）を設ける
-- **課題**: gap-5（20px）に変更したが視覚的変化が見られず、元の設定に戻された
-- **次回対応**: ボタン間隔の調整方法を再検討（margin、padding、gap以外のアプローチ含む）
-
-### 色使用量バーのパディング表示問題（中優先度）
-- **現状**: 色使用量バーの外側コンテナにパディング設定（`pt-4 mt-4 px-6 pb-4`）を追加したが視覚的に表示されていない
-- **要件**: 色使用量バーの周囲に適切なパディングを設けて視覚的な余白を確保
-- **試行済み設定**: 
-  - 外側コンテナ: `pt-4 mt-4 px-6 pb-4` (上16px, 左右24px, 下16px)
-  - バー本体: `mx-2` (左右8px)
-- **課題**: CSSクラスが適用されているが実際の表示に反映されていない可能性
-- **次回対応**: 
-  - 他のスタイルとの競合確認
-  - 開発者ツールでの実際の適用CSS検証
-  - インラインスタイルでの検証
-  - 親要素のオーバーフロー制御確認
-
-### 色相環の色テーマ対応（低優先度）
-- **現状**: 色相環の点が固定色（`#3b82f6`）で統一されている
-- **将来的改善案**: ライト・ダークモード対応の動的色変更
-- **優先度**: 低（現在の固定色でも十分な視認性を確保済み）
-
-### 配色技法選択バーのミニ色相環表示領域問題（高優先度）
-- **問題**: 配色技法選択バー（閉じた状態）で表示される選択中配色技法のColorWheelMiniが見切れる
-- **現状**: パディング・マージン・縦幅の調整を試行したが根本的な解決に至らず
-- **試行済み調整**: 
-  - ColorWheelMini周りのパディングを`p-1`→`p-3`→`p-5`に段階的増加
-  - ボタン全体の縦パディングを`py-2`→`py-6`→`py-8`に拡大
-  - ギャップとマージンの調整（`gap-2`→`gap-7`, `mr-2`→`mr-5`）
-- **課題**: 根本的な表示領域制約が別の要因にある可能性
-- **次回対応**: 
-  - カード全体の高さ制約（`height: '96px'`）の見直し
-  - ColorWheelMiniの描画範囲とコンテナサイズの検証
-  - オーバーフロー制御（`overflow`プロパティ）の調査
-  - SVGビューボックスとサイズの整合性確認
-
----
-
-## 📱 スワイプ式色推薦ページ仕様（2025-07-01追加）
+## 📱 スワイプ式色推薦ページ仕様
 
 ### 基本仕様
 - **ルート**: `/swipe`
 - **コンポーネント**: `SwipeRecommender.tsx`
-- **目的**: モバイルアプリライクなスワイプ操作による配色評価UI
+- **目的**: スワイプ操作による配色評価UI
 
-### レイアウト・デザイン仕様
+### デザイン
+- **背景**: メインカラーがフルスクリーン背景
+- **カード**: 角丸32px、画面幅80%、極薄透明背景
+- **タイポグラフィ**: Space Mono（HEX）、Syne（ラベル）、Space Grotesk（メタ情報）
 
-#### フルスクリーン背景
-- **背景色**: メインカラーが画面全体の背景（`backgroundColor: currentPalette.mainColor`）
-- **余白**: 画面端から`px-8 py-6`、適切な視覚的余白を確保
-- **カードサイズ**: 画面幅の80%（`w-[80vw] max-w-sm`）
-
-#### カードデザイン
-- **メインカード**: 角丸32px（`rounded-[2rem]`）、太い境界線4px
-- **背景**: 極薄透明背景（`${textColor}05`）でコントラスト対応
-- **内部余白**: `p-10`で十分な内部スペース
-- **コンテンツ幅**: カード内要素は90%幅（`w-[90%] mx-auto`）
-
-#### タイポグラフィ
-- **HEXコード**: `text-4xl font-mono tracking-[0.2em]`（Space Mono）
-- **ラベル**: `font-stylish uppercase tracking-widest`（Syne）
-- **メタ情報**: `font-heading`（Space Grotesk）
-- **英語表記**: "Main Color", "Technique", "Tone", "SWIPE TO RATE"
-
-### 機能仕様
-
-#### スワイプ操作
-- **ライブラリ**: framer-motion + react-swipeable
-- **左スワイプ**: Dislike → 次のカードへ
-- **右スワイプ**: Like → 次のカードへ
-- **アニメーション**: 回転・フェード・スケール効果
-
-#### インタラクション
-- **スワイプインジケーター**: ドラッグ中に"LIKE"/"NOPE"表示
-- **ボタン操作**: 下部のハート・Xボタンでも操作可能
-- **ホバー効果**: パレット色にホバーでHEXコード表示
-
-#### 状態管理
-- **評価記録**: like/dislikeを配列で保持
-- **結果表示**: 全カード完了後に統計表示
-- **リセット機能**: "もう一度試す"でセッション再開
-
-### データ仕様
-- **サンプルデータ**: `src/data/palettes.json`（10件の配色パレット）
-- **カラーパレット構造**: mainColor、colors配列、technique、tone、tags
-- **配色技法**: アナロジー、補色、トライアド、モノクロマティック等
-
-### 技術実装
-
-#### フォント・コントラスト
-- **自動色調整**: `getContrastColor()`でメインカラーに応じてテキスト色を白/黒切り替え
-- **統一透明度**: 背景要素は03-08の統一透明度システム
-
-#### レスポンシブ対応
-- **モバイル最適化**: タッチジェスチャー完全対応
-- **デスクトップ**: マウス操作でも利用可能
-- **ビューポート**: 各デバイスで適切な余白とカードサイズ
+### 機能
+- **スワイプ**: framer-motion + react-swipeable（左=Dislike、右=Like）
+- **評価記録**: like/dislike配列で保持
+- **データ**: `src/data/palettes.json`（10件の配色パレット）
 
 ---
 
-## 📝 開発履歴・セッションログ
+## 📝 技術スタック・アーキテクチャ概要
 
-### 🎯 メジャー機能追加履歴
-
-#### [2025-07-01] スワイプ式色推薦ページ実装
-- **スワイプ式色推薦ページ**: `/swipe` ルートで新しいモバイルアプリ風UI実装
-  - **フルスクリーン背景**: メインカラーが画面全体を占める没入型デザイン
-  - **スワイプ操作**: framer-motion + react-swipeableによる滑らかなジェスチャー操作
-  - **配色カード**: 10種類の配色パレットサンプルデータ（`src/data/palettes.json`）
-  - **評価システム**: Like/Dislikeスワイプによる配色評価・統計表示
-  - **レスポンシブ対応**: 画面幅80%のカードサイズで適切な余白確保
-
-#### [2025-06-17] 全面UIリデザイン・モバイル最適化
-- **グラデーション並び替え機能**: `sortColorsByLightness`関数でchroma.js lightness値による明るい→暗い順ソート
-- **スマホ用2列レイアウト**: 40px色ブロック + コピーボタン + カラーコード
-- **モダンUIデザイン**: ナビゲーション固定ヘッダー + バックドロップブラー
-- **ミニマルデザイン適用**: 冗長な説明文削除、ステップ名明確化
-- **角丸デザイン変更**: `rounded`（4px）→ `rounded-sm`（2px）でシャープ化
-
-#### [2025-06-20] 超コンパクトモバイル表示
-- **モバイル単画面表示最適化**: セクションタイトル縮小、余白網羅的削減
-- **固定ヘッダーとビューポート最適化**: ナビゲーションバー直下からコンテンツ表示
-- **下部余白完全削除**: 画面下部に不要な背景色領域を残さない設計
-
-### 🔧 技術改善履歴
-
-#### 色表示技術の進化
-1. **ピクセルサイズ表示** → **Canvas要素** → **48px Button統一**
-2. **近似計算** → **実際のピクセル分析（deltaE色差使用）**
-3. **バラバラなサイズ** → **48px統一仕様**
-4. **複雑なレイアウト** → **シンプルなモバイルUI**
-
-#### UI統一化・コンポーネント化
-- **統一ColorBlockコンポーネント**: 全色表示を統一（`src/components/common/ColorBlock.tsx`）
-- **統一CopyColorButtonコンポーネント**: 3種類のバリアント（minimal, compact, full）
-- **UI統一定数**: `src/constants/ui.ts`で48px Canvas仕様を統一定義
-- **ボーダー・スタイリング統一管理**: `BORDER_PRESETS`での一元管理
-
-#### レスポンシブ・モバイルファースト
-- **レスポンシブグリッド**: 2-6列のモバイル対応グリッド統一
-- **モバイルファーストデザイン**: 縦並びカード型レイアウトでタッチ操作最適化
-- **アクセシビリティ向上**: 十分な色見本サイズと明確なラベリング
-
-#### 国際化・ナイトモード
-- **配色技法名英語化**: 補色配色→Dyad、三角配色→Triad、四角配色→Tetrad等
-- **ナイトモードデフォルト**: App.tsxに`dark`クラス追加
-- **おしゃれフォント設定**: Inter（メイン）、JetBrains Mono（コード）
-
-### 📋 主要コミット履歴
-
-#### 最新（2025-07-01）
-- `f145dad` - Update PROJECT_RULES.md with latest layout and navigation structure
-- `c07eb47` - Add CLAUDE.md with complete project rules for session persistence
-- `8967eda` - Move hamburger menu to right side of navigation bar
-- `428cc97` - Add global navigation layout and refactor page structure
-
-#### グラデーション・モバイル最適化（2025-06-17）
-- `ed210e0` - Add gradient sorting for color recommendations
-- `9c5be61` - Consolidate project rules into single PROJECT_RULES.md
-- `b401e56` - Implement mobile 2-column layout for color and tone recommendations
-- `d4900c4` - Implement modern minimal UI design overhaul
-- `cf4225e` - Add mandatory copy button implementation rules
-
-#### コンパクト表示・構文修正（2025-06-20）
-- `2884c0c` - Optimize mobile UI spacing for compact single-screen display
-- `d3597e6` - Further optimize mobile spacing and fix syntax errors
-- `bb77e3f` - Remove bottom margin and add mobile optimization rules
-
-#### 色表示技術確立（2025-06-16）
-- `581d730` - Improve responsive design for color recommendation pages
-- `99a9c07` - Fix color extraction percentage calculation and standardize color display sizes
-- `3a3b09d` - Standardize all color displays to 64px and document UI specifications
-
-### 🏗️ 現在のアーキテクチャ状態
-
-#### UI統一仕様
-- **色表示**: 48px × 48px Canvas要素、`border-2 border-gray-300`、`rounded-sm`（2px）
-- **レスポンシブグリッド**: 色表示2-5列、配色技法2-6列、`gap-3`統一
-- **モバイル最適化**: `pt-1 pb-0`、超コンパクト表示、シングルスクリーン設計
-
-#### 技術スタック
-- **色処理**: ColorThief + chroma-js、deltaE色差判定、実際ピクセル数計算
-- **状態管理**: Zustand（軽量グローバル状態）
-- **UI**: shadcn/ui + Tailwind CSS、モバイルファーストデザイン
+### 使用技術
+- **色処理**: ColorThief + chroma-js（色抽出・色空間計算）
+- **状態管理**: Zustand
+- **UI**: shadcn/ui + Tailwind CSS
 - **配色技法**: 13種類（Identity, Analogous, Dyad, Triad, Tetrad, Split, Pentad, Hexad等）
 
-#### コンポーネント構成
-- **統一レイアウト**: Layout.tsx（全ページ共通ヘッダー・ナビゲーション）
-- **色表示統一**: ColorBlock.tsx、CopyColorButton.tsx
-- **レスポンシブグリッド**: ColorGrid.tsx、ColorItem.tsx
-- **配色技法**: ColorRecommendations.tsx、ToneRecommendations.tsx
+### 主要コンポーネント
+- **レイアウト**: Layout.tsx（全ページ共通）
+- **色表示**: ColorBlock.tsx、ColorItem.tsx、ColorGrid.tsx
+- **機能**: ColorPicker.tsx、ColorRecommendations.tsx、ToneRecommendations.tsx、ImageUpload.tsx
 
 ---
 
-## 🚧 未解決課題・TODO
+## 🚧 既知の課題
 
-### 色抽出アルゴリズムの白色検出問題（高優先度）
-- **現状**: 画像から白色を正しく抽出できない（実際に白色が多い画像でも2%程度の検出率）
-- **調査済み対策**: 
-  - 透明ピクセルを白色としてカウント（alpha < 50 = #ffffff扱い）
-  - 透明度基準の緩和（200→50、128→50）
-  - 白色検出範囲の拡大（250-255→240-255）
-  - RGBAサンプル値のコンソール出力によるデバッグ
-- **未解決原因**: 上記対策を実施しても検出率が改善されない
-- **次回対応**: 
-  - ColorThiefアルゴリズムの制約調査
-  - 品質パラメータ（quality）の調整テスト
-  - 直接ピクセル解析とColorThief結果の比較
-  - サンプリング方法の見直し
-  - 白色強制追加の閾値調整（現在1%→より低い値）
+### 白色検出問題
+- 画像から白色の正確な抽出が困難（ColorThiefアルゴリズムの制約）
 
-### 色相環選択バーのレスポンシブ表示問題（中優先度）
-- **問題**: PCでも色相環選択バーが2列で表示される
-- **期待動作**: スマホ2列、PC4列の適切なレスポンシブ表示
-- **現状**: `grid-cols-2 sm:grid-cols-4` が期待通りに動作していない
-- **影響範囲**: `src/components/ColorRecommendations.tsx` の配色技法ドロップダウン
-- **調査要件**: 
-  - Tailwind CSSブレークポイント動作の確認
-  - ドロップダウン幅制限との競合チェック
-  - 代替レスポンシブアプローチの検討
-
-### 左右分割レスポンシブレイアウト問題（中優先度）
-- **問題**: デスクトップで左右分割レイアウトが表示されず、すべて縦積みになる
-- **期待動作**: スマホ（~1023px）縦積み、PC（1024px以上）左右分割
-- **現状**: `hidden lg:flex` と `lg:hidden` の組み合わせが期待通りに動作しない
-- **影響範囲**: `src/App.tsx` のメインレイアウト切り替え
-- **調査要件**:
-  - Tailwind CSSレスポンシブ条件の検証
-  - Layout.tsx の高さ制約（h-screen）との競合チェック
-  - 強制表示は動作するため、条件文の論理的問題の可能性
-- **テスト済み**:
-  - 強制表示（`flex`）: ✅ 正常動作
-  - 逆転条件: ✅ 動作確認済み
-  - 各ブレークポイント（md, lg, xl）: ❌ すべて縦積み表示
-
-### 解決予定
-- 白色検出アルゴリズムの根本的見直し（最優先）
-- レスポンシブ条件の根本的見直し
-- 代替アプローチの検討（CSS Grid、JS制御等）
-- 次回セッションで優先的に対応
+### レスポンシブ表示問題
+- 一部のブレークポイントで期待通りに動作しない箇所あり
 
 ---
 

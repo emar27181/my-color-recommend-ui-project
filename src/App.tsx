@@ -10,17 +10,7 @@ const App = () => {
   
   // デバイス判定（閾値800px）
   const isMobile = screenSize.width < 800;
-  
-  // コラプス状態をオブジェクトで管理（βセクションはデフォルトで開く）
-  const [collapseStates, setCollapseStates] = useState({
-    isCanvasCollapsed: false,
-    isBaseColorCollapsed: false,
-    isColorRecommendationCollapsed: false,
-    isToneRecommendationCollapsed: false,
-    isSkinColorCollapsed: true,
-    isHueToneExtractionCollapsed: false // βセクションをデフォルトで開く
-  });
-  
+
   // CanvasColorRecommendationsへの参照
   const canvasColorRecommendationsRef = useRef<CanvasColorRecommendationsRef>(null);
 
@@ -34,12 +24,12 @@ const App = () => {
   const handleExtractColorsFromCanvas = async () => {
     try {
       console.log('Attempting to extract colors from canvas...');
-      
+
       if (!canvasColorRecommendationsRef.current) {
         console.error('CanvasColorRecommendations ref is null');
         return;
       }
-      
+
       await canvasColorRecommendationsRef.current.extractColorsFromCanvas();
       console.log('Color extraction completed successfully');
     } catch (error) {
@@ -47,17 +37,17 @@ const App = () => {
     }
   };
 
-  // コラプス状態更新用ヘルパー
-  const setCollapseState = (key: string, value: boolean) => {
-    setCollapseStates(prev => ({ ...prev, [key]: value }));
-  };
-
   useEffect(() => {
     // 初期表示時にページの最上端を表示
     window.scrollTo(0, 0);
 
-    // ダークモードをデフォルトに設定
-    document.documentElement.classList.add('dark');
+    // localStorageから設定を読み込み、なければダークモードをデフォルトに設定
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+    }
 
     // 画面サイズを取得・更新する関数
     const updateScreenSize = () => {
@@ -87,22 +77,6 @@ const App = () => {
       window.removeEventListener('resize', updateScreenSize);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
-
-  // 画面サイズ変更時にβセクションの状態を調整（常に開いた状態を維持）
-  useEffect(() => {
-    setCollapseStates(prev => ({
-      ...prev,
-      isHueToneExtractionCollapsed: false // βセクションは常に開いた状態を維持
-    }));
-  }, [screenSize.width]);
-
-  // βセクションを強制的に開いた状態に保つ
-  useEffect(() => {
-    setCollapseStates(prev => ({
-      ...prev,
-      isHueToneExtractionCollapsed: false
-    }));
   }, []);
 
   // 初期スクロール位置を60px下に設定
@@ -160,8 +134,6 @@ const App = () => {
           paintCanvasRef={canvasColorRecommendationsRef}
           handleExtractColorsFromCanvas={handleExtractColorsFromCanvas}
           handleImageUpload={handleImageUpload}
-          collapseStates={collapseStates}
-          setCollapseState={setCollapseState}
         />
       </div>
 
@@ -174,8 +146,6 @@ const App = () => {
           paintCanvasRef={canvasColorRecommendationsRef}
           handleExtractColorsFromCanvas={handleExtractColorsFromCanvas}
           handleImageUpload={handleImageUpload}
-          collapseStates={collapseStates}
-          setCollapseState={setCollapseState}
         />
       </div>
     </main>
