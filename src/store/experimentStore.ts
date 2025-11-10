@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import JSZip from 'jszip';
 
 // 実験条件の型定義
-export type ExperimentCondition = 'Test1' | 'Test2' | 'Test3';
+export type ExperimentCondition = 'Test1' | 'Test2';
 
 // イベントログの型定義
 export interface ExperimentEvent {
@@ -47,7 +47,7 @@ export interface SurveyResponse {
   usability: number[];      // SUS簡易版(5問) - 1〜5段階評価
   effectiveness: number[];  // TAM(3問) - 1〜5段階評価
   creativity: number[];     // Mini-CSI(3問) - 1〜5段階評価
-  favoriteUI: string[];     // 最も使いやすかったUI (Test1/Test2/Test3 複数選択可)
+  favoriteUI: string[];     // 最も使いやすかったUI (Test1/Test2 複数選択可)
   reason: string;           // 理由（自由記述）
   improvement: string;      // 改善点（自由記述）
 }
@@ -80,7 +80,7 @@ export interface ExperimentState {
   experimentStartTime: number | null; // 全体の実験開始時刻
   experimentEndTime: number | null;   // 全体の実験終了時刻
   conditionLogs: ConditionLog[];      // 各条件のログ
-  currentConditionIndex: number;      // 現在の条件インデックス (0=Test1, 1=Test2, 2=Test3)
+  currentConditionIndex: number;      // 現在の条件インデックス (0=Test1, 1=Test2)
   conditionOrder: ExperimentCondition[]; // 実験順序
 
   // アンケート
@@ -111,9 +111,9 @@ export interface ExperimentState {
   // 条件による機能フラグ
   getFeatureFlags: () => {
     MASS_COLOR_GRID_ON: boolean;    // Test1: 全色相×複数トーンのグリッド表示
-    HUE_WHEEL_SLIDER_ON: boolean;   // Test2: 色相環UI＋トーンスライダー
-    HUE_RECO_ON: boolean;           // Test3: 色相推薦
-    TONE_RECO_ON: boolean;          // Test3: トーン推薦
+    HUE_WHEEL_SLIDER_ON: boolean;   // (未使用)
+    HUE_RECO_ON: boolean;           // Test2: 色相推薦
+    TONE_RECO_ON: boolean;          // Test2: トーン推薦
   };
 }
 
@@ -181,7 +181,7 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
   experimentEndTime: null,
   conditionLogs: [],
   currentConditionIndex: 0,
-  conditionOrder: ['Test1', 'Test3'],
+  conditionOrder: ['Test1', 'Test2'],
 
   // アンケート
   surveyResponse: null,
@@ -436,9 +436,9 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
     const { condition } = get();
     return {
       MASS_COLOR_GRID_ON: condition === 'Test1',   // Test1: 全色相×複数トーンのグリッド表示
-      HUE_WHEEL_SLIDER_ON: condition === 'Test2',  // Test2: 色相環UI＋トーンスライダー
-      HUE_RECO_ON: condition === 'Test3',          // Test3: 色相推薦
-      TONE_RECO_ON: condition === 'Test3',         // Test3: トーン推薦
+      HUE_WHEEL_SLIDER_ON: false,                  // (未使用)
+      HUE_RECO_ON: condition === 'Test2',          // Test2: 色相推薦
+      TONE_RECO_ON: condition === 'Test2',         // Test2: トーン推薦
     };
   },
 }));

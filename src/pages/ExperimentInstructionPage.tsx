@@ -44,11 +44,11 @@ const ExperimentInstructionPage = () => {
         'キャンバス上で描画して配色を試してみてください',
       ],
     },
-    Test3: {
-      title: 'Test3: 色相→トーンの二段階で選択',
+    Test2: {
+      title: 'Test2: 色相→トーンの二段階で選択',
       description: 'ベース色を選択すると、配色技法に基づいた推薦色が表示されます。',
       videoUrl: 'https://www.youtube.com/embed/Sr1CyI3407c',
-      imageUrl: '/images/UI_test/image_T3.png',
+      imageUrl: '/images/UI_test/image_T2.png',
       steps: [
         'ベース色を選択します（カラーピッカーまたは画像アップロード）',
         '色相推薦から配色技法を選択します',

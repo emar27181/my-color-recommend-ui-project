@@ -82,7 +82,7 @@ const ExperimentCompletePage = () => {
           </div>
           <h1 className={`${EXPERIMENT_TEXT_STYLES.pageTitle} mb-3`}>実験完了！</h1>
           <p className="text-muted-foreground text-lg">
-            すべてのテスト（Test1, Test3）の評価が完了しました
+            すべてのテスト（Test1, Test2）の評価が完了しました
           </p>
         </div>
 
@@ -97,7 +97,7 @@ const ExperimentCompletePage = () => {
           <CardContent className="space-y-4">
             {/* 各テストの結果 */}
             <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
-              {['Test1', 'Test3'].map((cond, index) => {
+              {['Test1', 'Test2'].map((cond, index) => {
                 const duration = getConditionDuration(index);
                 return (
                   <div key={cond} className="p-4 border rounded-lg text-center">
