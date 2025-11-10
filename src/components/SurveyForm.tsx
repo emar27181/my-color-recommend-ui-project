@@ -219,7 +219,7 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
           <div className="space-y-4">
             <Label className="text-base">最も使いやすかったUIを選択してください（複数選択可）</Label>
             <div className="flex gap-4">
-              {['Test1', 'Test2', 'Test3'].map((cond) => (
+              {['Test1', 'Test3'].map((cond) => (
                 <label key={cond} className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"

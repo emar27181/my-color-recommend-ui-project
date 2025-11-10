@@ -63,7 +63,7 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
     } else {
       // 全条件完了 - アンケートページに遷移
       const confirmed = window.confirm(
-        `すべてのテスト（Test1~Test3）が完了しました！\n\n前のページには戻れません。アンケートページに進んで良いですか？`
+        `すべてのテスト（Test1, Test3）が完了しました！\n\n前のページには戻れません。アンケートページに進んで良いですか？`
       );
 
       if (!confirmed) {

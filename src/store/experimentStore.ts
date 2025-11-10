@@ -181,7 +181,7 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
   experimentEndTime: null,
   conditionLogs: [],
   currentConditionIndex: 0,
-  conditionOrder: ['Test1', 'Test2', 'Test3'],
+  conditionOrder: ['Test1', 'Test3'],
 
   // アンケート
   surveyResponse: null,

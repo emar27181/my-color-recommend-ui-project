@@ -44,17 +44,6 @@ const ExperimentInstructionPage = () => {
         'キャンバス上で描画して配色を試してみてください',
       ],
     },
-    Test2: {
-      title: 'Test2: 色相環とスライダーで色を作成',
-      description: '色相環とトーンスライダーを使って自由に色を作成します。',
-      videoUrl: '', // Test2の動画URL（後で追加）
-      imageUrl: '/images/UI_test/image_T2.png',
-      steps: [
-        '色相環をクリックして色相を選択します',
-        '彩度・明度スライダーで色のトーンを調整します',
-        'プレビューで確認しながら、好きな色を作成してください',
-      ],
-    },
     Test3: {
       title: 'Test3: 色相→トーンの二段階で選択',
       description: 'ベース色を選択すると、配色技法に基づいた推薦色が表示されます。',
