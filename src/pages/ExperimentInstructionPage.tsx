@@ -90,9 +90,8 @@ const ExperimentInstructionPage = () => {
           </h1>
         </div>
 
-        {/* 2カラムレイアウト */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          {/* 左側：説明とデモ動画 */}
+        {/* 説明とデモ動画 */}
+        <div className="mb-6">
           <div className="space-y-6">
             {/* 使い方説明 */}
             <Card>
@@ -125,38 +124,33 @@ const ExperimentInstructionPage = () => {
                   <CardDescription>操作方法を動画で確認できます</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-[60vh] aspect-[16/9] mx-auto">
-                    <iframe
-                      width="100%"
-                      height="100%"
-                      src={currentInstruction.videoUrl}
-                      title={`${condition} デモ動画`}
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      className="rounded-lg"
-                    ></iframe>
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* 左側：動画 */}
+                    <div className="h-[60vh] aspect-[16/9]">
+                      <iframe
+                        width="100%"
+                        height="100%"
+                        src={currentInstruction.videoUrl}
+                        title={`${condition} デモ動画`}
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        className="rounded-lg"
+                      ></iframe>
+                    </div>
+                    {/* 右側：UIプレビュー */}
+                    <div className="h-[60vh] flex flex-col items-center justify-center">
+                      <h3 className="text-sm font-semibold mb-4 text-muted-foreground">UIプレビュー</h3>
+                      <img
+                        src={currentInstruction.imageUrl}
+                        alt={`${condition} UI画像`}
+                        className="max-w-full h-auto rounded-lg shadow-md object-contain"
+                      />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
             )}
-          </div>
-
-          {/* 右側：UI画像 */}
-          <div>
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle>UIプレビュー</CardTitle>
-                <CardDescription>実際の操作画面のイメージです</CardDescription>
-              </CardHeader>
-              <CardContent className="flex items-center justify-center p-4">
-                <img
-                  src={currentInstruction.imageUrl}
-                  alt={`${condition} UI画像`}
-                  className="max-w-[200px] h-auto rounded-lg shadow-md object-contain"
-                />
-              </CardContent>
-            </Card>
           </div>
         </div>
 
