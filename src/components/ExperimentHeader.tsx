@@ -30,6 +30,9 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
 
   // 条件完了ハンドラ
   const handleComplete = () => {
+    // キャンバス画像を取得
+    const canvasImage = canvasRef?.current?.getCanvasImage() || undefined;
+
     // 次の条件があるかチェック
     if (hasNextCondition()) {
       const nextCond = getNextCondition();
@@ -43,8 +46,8 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
         return; // キャンセル時は何もしない
       }
 
-      // 確認後に条件を完了
-      completeCurrentCondition();
+      // 確認後に条件を完了（キャンバス画像を保存）
+      completeCurrentCondition(canvasImage);
 
       // キャンバスをリセット
       if (canvasRef?.current) {
@@ -67,8 +70,8 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
         return; // キャンセル時は何もしない
       }
 
-      // 確認後に条件を完了
-      completeCurrentCondition();
+      // 確認後に条件を完了（キャンバス画像を保存）
+      completeCurrentCondition(canvasImage);
 
       // 完了ページ（アンケート）に遷移（デバッグモードを引き継ぐ）
       const debugParam = isDebugMode ? '?debug=true' : '';

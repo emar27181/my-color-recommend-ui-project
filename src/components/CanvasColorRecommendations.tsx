@@ -23,6 +23,7 @@ export interface CanvasColorRecommendationsRef {
   redo: () => void;
   canUndo: () => boolean;
   canRedo: () => boolean;
+  getCanvasImage: () => string | null; // キャンバス画像をbase64データURLで取得
 }
 
 const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendationsRef, CanvasColorRecommendationsProps>(({ className = '', isDebugMode = false }, ref) => {
@@ -890,6 +891,18 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     }
   }, [historyIndex, history, restoreFromHistory]);
 
+  // キャンバス画像を取得する関数
+  const getCanvasImage = useCallback((): string | null => {
+    if (!canvasRef.current) return null;
+    try {
+      // 合成表示キャンバスからPNG形式のbase64データURLを取得
+      return canvasRef.current.toDataURL('image/png');
+    } catch (error) {
+      console.error('Failed to get canvas image:', error);
+      return null;
+    }
+  }, []);
+
   // 外部からアクセス可能な関数を公開
   useImperativeHandle(ref, () => ({
     drawImageToCanvas,
@@ -898,8 +911,9 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     undo,
     redo,
     canUndo: () => historyIndex > 0,
-    canRedo: () => historyIndex < history.length - 1
-  }), [drawImageToCanvas, extractColorsFromCanvas, clearAllLayers, undo, redo, historyIndex, history.length]);
+    canRedo: () => historyIndex < history.length - 1,
+    getCanvasImage
+  }), [drawImageToCanvas, extractColorsFromCanvas, clearAllLayers, undo, redo, historyIndex, history.length, getCanvasImage]);
 
   // キャンバスから色を取得する関数（合成表示から）
   const pickColorFromCanvas = useCallback((x: number, y: number) => {

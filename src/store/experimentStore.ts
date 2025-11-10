@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import JSZip from 'jszip';
 
 // 実験条件の型定義
 export type ExperimentCondition = 'Test1' | 'Test2' | 'Test3';
@@ -38,6 +39,7 @@ export interface ConditionLog {
   end_time: string | null;
   task_duration_sec: number | null;
   events: ExperimentEvent[];
+  canvas_image?: string; // キャンバス画像のbase64データURL
 }
 
 // アンケート回答の型定義
@@ -101,7 +103,7 @@ export interface ExperimentState {
   getCurrentCondition: () => ExperimentCondition; // 現在の条件を取得
   hasNextCondition: () => boolean;           // 次の条件があるか
   getNextCondition: () => ExperimentCondition | null; // 次の条件を取得
-  completeCurrentCondition: () => void;      // 現在の条件を完了
+  completeCurrentCondition: (canvasImage?: string) => void;      // 現在の条件を完了
 
   // アンケートアクション
   setSurveyResponse: (survey: SurveyResponse) => void; // アンケート回答を保存
@@ -270,21 +272,40 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
     };
   },
 
-  // JSONログをエクスポート
-  exportLog: () => {
+  // JSONログとキャンバス画像をZIPでエクスポート
+  exportLog: async () => {
     const state = get();
     const log = state.getExperimentLog();
 
-    // JSONファイルとしてダウンロード
-    const blob = new Blob([JSON.stringify(log, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `log_${state.participantId || 'anonymous'}_all_conditions.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    // ZIPファイルを作成
+    const zip = new JSZip();
 
-    console.log('Log exported:', log);
+    // JSONログを追加
+    zip.file(`log_${state.participantId || 'anonymous'}.json`, JSON.stringify(log, null, 2));
+
+    // 各条件のキャンバス画像を追加
+    state.conditionLogs.forEach((condLog) => {
+      if (condLog.canvas_image) {
+        // base64データURLから画像データを抽出
+        const base64Data = condLog.canvas_image.replace(/^data:image\/\w+;base64,/, '');
+        zip.file(`${condLog.condition}_canvas.png`, base64Data, { base64: true });
+      }
+    });
+
+    // ZIPファイルを生成してダウンロード
+    try {
+      const blob = await zip.generateAsync({ type: 'blob' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `experiment_${state.participantId || 'anonymous'}.zip`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      console.log('Log and canvas images exported as ZIP');
+    } catch (error) {
+      console.error('Failed to create ZIP file:', error);
+    }
   },
 
   // 実験をリセット
@@ -346,7 +367,7 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
   },
 
   // 現在の条件を完了
-  completeCurrentCondition: () => {
+  completeCurrentCondition: (canvasImage?: string) => {
     const state = get();
     const now = Date.now();
 
@@ -359,6 +380,7 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
         ? parseFloat(((now - state.startTime) / 1000).toFixed(2))
         : null,
       events: [...state.events],
+      canvas_image: canvasImage, // キャンバス画像を保存
     };
 
     set({

@@ -66,7 +66,7 @@ const ExperimentCompletePage = () => {
     // アンケート回答後、自動でログをダウンロード
     setTimeout(() => {
       exportLog();
-      alert('アンケートありがとうございました！\n実験ログ（アンケート結果含む）をダウンロードしました。');
+      alert('アンケートありがとうございました！\n実験データ（ログ・アンケート・イラスト画像）をZIPファイルでダウンロードしました。');
     }, 100);
   };
 
@@ -160,15 +160,20 @@ const ExperimentCompletePage = () => {
             <CardContent className="space-y-4">
               <Button onClick={exportLog} size="lg" className={`w-full ${getButtonClassName('primary')}`}>
                 <Download className={EXPERIMENT_ICON_STYLES.default} />
-                実験ログ＋アンケート結果をダウンロード
+                実験データをダウンロード（ZIP）
               </Button>
 
               <div className="text-sm text-muted-foreground space-y-2">
                 <p>
-                  <strong>1.</strong> 上のボタンをクリックして、実験ログ（JSONファイル）をダウンロード
+                  <strong>1.</strong> 上のボタンをクリックして、実験データ（ZIPファイル）をダウンロード
+                </p>
+                <p className="ml-6 text-xs">
+                  • 実験ログ（JSON）<br />
+                  • アンケート結果<br />
+                  • 完成イラスト画像（各テスト）
                 </p>
                 <p>
-                  <strong>2.</strong> ダウンロードしたファイルを研究者に提出してください
+                  <strong>2.</strong> ダウンロードしたZIPファイルを研究者に提出してください
                 </p>
               </div>
             </CardContent>
