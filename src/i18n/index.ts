@@ -19,13 +19,14 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
+    lng: 'ja', // デフォルト言語を日本語に設定
     fallbackLng: 'ja',
     debug: false,
     interpolation: {
       escapeValue: false,
     },
     detection: {
-      order: ['localStorage', 'navigator', 'htmlTag'],
+      order: ['localStorage'], // localStorageのみを検出（ブラウザ言語は無視）
       caches: ['localStorage'],
     }
   });

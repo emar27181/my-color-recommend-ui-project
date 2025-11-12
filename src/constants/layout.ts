@@ -42,7 +42,7 @@ export const EXPERIMENT_LAYOUT_CONFIG = {
       {
         id: 'main-tools',
         width: 'w-1/3' as const,
-        components: ['baseColor', 'massColorGrid', 'hueWheelToneSlider', 'colorRecommendation', 'toneRecommendation']
+        components: ['baseColor', 'massColorGrid', 'colorRecommendation', 'toneRecommendation']
       },
       {
         id: 'analysis',
@@ -55,7 +55,7 @@ export const EXPERIMENT_LAYOUT_CONFIG = {
 
   // モバイルレイアウト設定（縦積み）
   mobile: {
-    order: ['canvasColorRecommendation', 'baseColor', 'massColorGrid', 'hueWheelToneSlider', 'colorRecommendation', 'toneRecommendation', 'hueToneExtraction']
+    order: ['canvasColorRecommendation', 'baseColor', 'massColorGrid', 'colorRecommendation', 'toneRecommendation', 'hueToneExtraction']
   }
 } as const;
 

@@ -126,8 +126,7 @@ const ExperimentPage = () => {
    * 条件に応じてコンポーネントをフィルタリング
    *
    * Test1: massColorGrid のみ表示、baseColor 非表示
-   * Test2: hueWheelToneSlider のみ表示、baseColor 非表示
-   * Test3: colorRecommendation, toneRecommendation, baseColor 表示
+   * Test2: colorRecommendation, toneRecommendation のみ表示、baseColor 非表示
    *
    * 実験中は常に除外:
    * - skinColor (肌色推薦)
