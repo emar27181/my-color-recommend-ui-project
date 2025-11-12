@@ -483,12 +483,14 @@ const gapSearchRadius = 1;       // 隙間検索時の探索半径（px）
 - **開発時の注意**: デバッグモードで実験を実行した後は、必ずリロードして状態をクリア
 
 ### 実験説明ページ（ExperimentInstructionPage）UI仕様
-- **レイアウト**: 動画とUIプレビュー画像を横並びで配置
-- **Test1**: 動画なし、UIプレビュー画像のみ中央表示（`max-w-[320px]`）
-- **Test2**: 動画（左7割）とUIプレビュー画像（右3割）を横並びで表示
+- **レイアウト**: 動画とUIプレビュー画像を横並びで配置（7:3比率）
+- **Test1 & Test2共通仕様**:
   - グリッドレイアウト: `grid-cols-10`、動画 `col-span-7`、画像 `col-span-3`
   - 動画: 16:9アスペクト比を維持
   - 画像: 親コンテナ幅に合わせて自動調整（`w-full h-auto`）
+- **動画URL**:
+  - Test1: `https://www.youtube.com/embed/PLACEHOLDER_T1`（動画準備中・枠のみ表示）
+  - Test2: `https://www.youtube.com/embed/Sr1CyI3407c`
 - **画像パス**:
   - Test1: `/images/UI_test/image_T1.png`
   - Test2: `/images/UI_test/image_T3.png`（二段階推薦の画像）
