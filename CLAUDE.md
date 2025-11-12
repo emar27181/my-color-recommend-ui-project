@@ -487,7 +487,7 @@ const gapSearchRadius = 1;       // 隙間検索時の探索半径（px）
 - **Test1 & Test2共通仕様**:
   - グリッドレイアウト: `grid-cols-10`、動画 `col-span-7`、画像 `col-span-3`
   - 動画: 16:9アスペクト比を維持
-  - 画像: 親コンテナ幅に合わせて自動調整（`w-full h-auto`）
+  - 画像: 親コンテナ幅の80%表示（`w-4/5 h-auto`）、余白 `p-4`
 - **動画URL**:
   - Test1: `https://www.youtube.com/embed/PLACEHOLDER_T1`（動画準備中・枠のみ表示）
   - Test2: `https://www.youtube.com/embed/Sr1CyI3407c`

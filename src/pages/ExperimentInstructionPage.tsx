@@ -129,11 +129,11 @@ const ExperimentInstructionPage = () => {
                     </div>
                     {/* 右側：UIプレビュー（3割） */}
                     <div className="col-span-3 flex flex-col">
-                      <div className="flex items-center justify-center">
+                      <div className="flex items-center justify-center p-4">
                         <img
                           src={currentInstruction.imageUrl}
                           alt={`${condition} UI画像`}
-                          className="w-full h-auto object-contain rounded-lg shadow-md border border-border"
+                          className="w-4/5 h-auto object-contain rounded-lg shadow-md border border-border"
                         />
                       </div>
                     </div>
@@ -147,7 +147,7 @@ const ExperimentInstructionPage = () => {
                     <img
                       src={currentInstruction.imageUrl}
                       alt={`${condition} UI画像`}
-                      className="w-full h-auto max-w-[320px] object-contain rounded-lg shadow-lg border border-border"
+                      className="w-4/5 h-auto max-w-[256px] object-contain rounded-lg shadow-lg border border-border"
                     />
                   </div>
                 </CardContent>
