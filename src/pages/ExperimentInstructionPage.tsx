@@ -113,9 +113,9 @@ const ExperimentInstructionPage = () => {
                   <CardDescription>操作方法を動画で確認できます</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 gap-6">
-                    {/* 左側：動画 */}
-                    <div className="flex flex-col">
+                  <div className="grid grid-cols-10 gap-6">
+                    {/* 左側：動画（7割） */}
+                    <div className="col-span-7 flex flex-col">
                       <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                         <iframe
                           className="absolute top-0 left-0 w-full h-full rounded-lg border border-border"
@@ -127,14 +127,14 @@ const ExperimentInstructionPage = () => {
                         ></iframe>
                       </div>
                     </div>
-                    {/* 右側：UIプレビュー */}
-                    <div className="flex flex-col">
+                    {/* 右側：UIプレビュー（3割） */}
+                    <div className="col-span-3 flex flex-col">
                       <h3 className="text-sm font-semibold mb-3 text-muted-foreground text-center">UIプレビュー</h3>
                       <div className="flex items-center justify-center">
                         <img
                           src={currentInstruction.imageUrl}
                           alt={`${condition} UI画像`}
-                          className="w-full max-w-[320px] h-auto object-contain rounded-lg shadow-md border border-border"
+                          className="w-full h-auto object-contain rounded-lg shadow-md border border-border"
                         />
                       </div>
                     </div>
