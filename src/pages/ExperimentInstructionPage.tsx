@@ -129,7 +129,6 @@ const ExperimentInstructionPage = () => {
                     </div>
                     {/* 右側：UIプレビュー（3割） */}
                     <div className="col-span-3 flex flex-col">
-                      <h3 className="text-sm font-semibold mb-3 text-muted-foreground text-center">UIプレビュー</h3>
                       <div className="flex items-center justify-center">
                         <img
                           src={currentInstruction.imageUrl}
@@ -143,11 +142,7 @@ const ExperimentInstructionPage = () => {
               </Card>
             ) : (
               <Card>
-                <CardHeader>
-                  <CardTitle>UIプレビュー</CardTitle>
-                  <CardDescription>実際の操作画面を確認できます</CardDescription>
-                </CardHeader>
-                <CardContent>
+                <CardContent className="pt-6">
                   <div className="flex items-center justify-center py-8">
                     <img
                       src={currentInstruction.imageUrl}
