@@ -248,7 +248,7 @@ const ExperimentIntroPage = () => {
 
             <Alert className="border-primary/30 bg-primary/5 p-6">
               <AlertDescription className="text-sm leading-relaxed">
-                Test1 → Test2 → Test3 の順で体験します。各テスト終了後、次に進む確認が表示されます。
+                Test1 → Test2 の順で体験します。各テスト終了後、次に進む確認が表示されます。
               </AlertDescription>
             </Alert>
           </CardContent>
