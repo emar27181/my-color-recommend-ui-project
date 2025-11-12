@@ -48,7 +48,7 @@ const ExperimentInstructionPage = () => {
       title: 'Test2: 色相→トーンの二段階で選択',
       description: 'ベース色を選択すると、配色技法に基づいた推薦色が表示されます。',
       videoUrl: 'https://www.youtube.com/embed/Sr1CyI3407c',
-      imageUrl: '/images/UI_test/image_T2.png',
+      imageUrl: '/images/UI_test/image_T3.png',
       steps: [
         'ベース色を選択します（カラーピッカーまたは画像アップロード）',
         '色相推薦から配色技法を選択します',
@@ -102,8 +102,8 @@ const ExperimentInstructionPage = () => {
               </CardContent>
             </Card>
 
-            {/* デモ動画 */}
-            {currentInstruction.videoUrl && (
+            {/* デモ動画・UIプレビュー */}
+            {currentInstruction.videoUrl ? (
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -113,29 +113,47 @@ const ExperimentInstructionPage = () => {
                   <CardDescription>操作方法を動画で確認できます</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-6">
                     {/* 左側：動画 */}
-                    <div className="h-[60vh] aspect-[16/9]">
-                      <iframe
-                        width="100%"
-                        height="100%"
-                        src={currentInstruction.videoUrl}
-                        title={`${condition} デモ動画`}
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        className="rounded-lg"
-                      ></iframe>
+                    <div className="flex flex-col">
+                      <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                        <iframe
+                          className="absolute top-0 left-0 w-full h-full rounded-lg border border-border"
+                          src={currentInstruction.videoUrl}
+                          title={`${condition} デモ動画`}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        ></iframe>
+                      </div>
                     </div>
                     {/* 右側：UIプレビュー */}
-                    <div className="h-[60vh] flex flex-col items-center justify-center">
-                      <h3 className="text-sm font-semibold mb-4 text-muted-foreground">UIプレビュー</h3>
-                      <img
-                        src={currentInstruction.imageUrl}
-                        alt={`${condition} UI画像`}
-                        className="max-w-full h-auto rounded-lg shadow-md object-contain"
-                      />
+                    <div className="flex flex-col">
+                      <h3 className="text-sm font-semibold mb-3 text-muted-foreground text-center">UIプレビュー</h3>
+                      <div className="flex items-center justify-center">
+                        <img
+                          src={currentInstruction.imageUrl}
+                          alt={`${condition} UI画像`}
+                          className="w-full max-w-[320px] h-auto object-contain rounded-lg shadow-md border border-border"
+                        />
+                      </div>
                     </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                <CardHeader>
+                  <CardTitle>UIプレビュー</CardTitle>
+                  <CardDescription>実際の操作画面を確認できます</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-center py-8">
+                    <img
+                      src={currentInstruction.imageUrl}
+                      alt={`${condition} UI画像`}
+                      className="w-full h-auto max-w-[320px] object-contain rounded-lg shadow-lg border border-border"
+                    />
                   </div>
                 </CardContent>
               </Card>
