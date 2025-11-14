@@ -505,8 +505,8 @@ const gapSearchRadius = 1;       // 隙間検索時の探索半径（px）
   - UI1: `https://www.youtube.com/embed/PLACEHOLDER_U1`（動画準備中・枠のみ表示）
   - UI2: `https://www.youtube.com/embed/Sr1CyI3407c`
 - **画像パス**:
-  - UI1: `/images/UI_test/image_U1.png`
-  - UI2: `/images/UI_test/image_U2.png`（二段階推薦の画像）
+  - UI1: `/images/UI_test/image_T1.png`
+  - UI2: `/images/UI_test/image_T3.png`（二段階推薦の画像）
 
 ---
 

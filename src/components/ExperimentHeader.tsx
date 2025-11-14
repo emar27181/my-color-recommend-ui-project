@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useExperimentStore } from '@/store/experimentStore';
+import { useExperimentStore, parsePattern } from '@/store/experimentStore';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -26,6 +26,8 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
     getNextCondition,
     completeCurrentCondition,
     nextCondition,
+    currentConditionIndex,
+    experimentPatterns,
   } = useExperimentStore();
 
   // 条件完了ハンドラ
@@ -57,9 +59,20 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
 
       // 次の条件に進む
       nextCondition();
-      // 次の条件の説明ページに遷移（デバッグモードを引き継ぐ）
+
+      // 次のパターンのmaterialを取得
+      const nextPatternIndex = currentConditionIndex + 1;
+      const nextPattern = experimentPatterns[nextPatternIndex];
+      const { material: nextMaterial } = parsePattern(nextPattern);
+
       const debugParam = isDebugMode ? '&debug=true' : '';
-      navigate(`/experiment/instruction?cond=${nextCond}${debugParam}`);
+
+      // TaskAの時のみ説明ページへ、TaskBの時は直接タスクページへ
+      if (nextMaterial === 'taskA') {
+        navigate(`/experiment/instruction?cond=${nextCond}${debugParam}`);
+      } else {
+        navigate(`/experiment/task?cond=${nextCond}${debugParam}`);
+      }
     } else {
       // 全条件完了 - アンケートページに遷移
       const confirmed = window.confirm(

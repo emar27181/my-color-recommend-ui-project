@@ -37,7 +37,7 @@ const ExperimentInstructionPage = () => {
       title: 'UI1: 大量の色を一度に表示',
       description: '色相とトーンの組み合わせで大量の色を一覧表示します。',
       videoUrl: '', // UI1の動画URL（動画準備中）
-      imageUrl: '/images/UI_test/image_U1.png',
+      imageUrl: '/images/UI_test/image_T1.png',
       steps: [
         '画面に表示されている色グリッドから、好きな色をクリックして選択します',
         '選択した色がキャンバスの描画色として設定されます',
@@ -48,7 +48,7 @@ const ExperimentInstructionPage = () => {
       title: 'UI2: 色相→トーンの二段階で選択',
       description: 'ベース色を選択すると、配色技法に基づいた推薦色が表示されます。',
       videoUrl: 'https://www.youtube.com/embed/Sr1CyI3407c',
-      imageUrl: '/images/UI_test/image_U2.png',
+      imageUrl: '/images/UI_test/image_T3.png',
       steps: [
         'ベース色を選択します（カラーピッカーまたは画像アップロード）',
         '色相推薦から配色技法を選択します',
