@@ -96,7 +96,7 @@ MassColorGridContent.displayName = 'MassColorGridContent';
  */
 export const MassColorGrid = () => {
   return (
-    <Card className="h-[600px] flex flex-col">
+    <Card className="h-[650px] flex flex-col">
       <CardContent className="pt-2 flex-1 overflow-auto">
         <MassColorGridContent />
       </CardContent>
