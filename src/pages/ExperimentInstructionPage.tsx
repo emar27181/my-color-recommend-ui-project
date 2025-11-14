@@ -36,7 +36,7 @@ const ExperimentInstructionPage = () => {
     Test1: {
       title: 'Test1: 大量の色を一度に表示',
       description: '色相とトーンの組み合わせで大量の色を一覧表示します。',
-      videoUrl: 'https://www.youtube.com/embed/PLACEHOLDER_T1', // Test1の動画URL（動画準備中）
+      videoUrl: '', // Test1の動画URL（動画準備中）
       imageUrl: '/images/UI_test/image_T1.png',
       steps: [
         '画面に表示されている色グリッドから、好きな色をクリックして選択します',
