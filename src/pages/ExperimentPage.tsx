@@ -125,8 +125,8 @@ const ExperimentPage = () => {
   /**
    * 条件に応じてコンポーネントをフィルタリング
    *
-   * Test1: massColorGrid のみ表示、baseColor 非表示
-   * Test2: colorRecommendation, toneRecommendation のみ表示、baseColor 非表示
+   * UI1: massColorGrid のみ表示、baseColor 非表示
+   * UI2: colorRecommendation, toneRecommendation のみ表示、baseColor 非表示
    *
    * 実験中は常に除外:
    * - skinColor (肌色推薦)
@@ -144,17 +144,17 @@ const ExperimentPage = () => {
         return false;
       }
 
-      // Test1・Test2ではベース色選択を非表示
-      if (componentKey === 'baseColor' && (condition === 'Test1' || condition === 'Test2')) {
+      // UI1・UI2ではベース色選択を非表示
+      if (componentKey === 'baseColor' && (condition === 'UI1' || condition === 'UI2')) {
         return false;
       }
 
-      // 大量色グリッドはTest1のみ表示
+      // 大量色グリッドはUI1のみ表示
       if (componentKey === 'massColorGrid' && !featureFlags.MASS_COLOR_GRID_ON) {
         return false;
       }
 
-      // 色相環＋トーンスライダーはTest2のみ表示
+      // 色相環＋トーンスライダーはUI2のみ表示
       if (componentKey === 'hueWheelToneSlider' && !featureFlags.HUE_WHEEL_SLIDER_ON) {
         return false;
       }

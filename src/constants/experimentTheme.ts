@@ -83,7 +83,7 @@ export const EXPERIMENT_INPUT_STYLES = {
 // バッジスタイル設定
 // ========================================
 export const EXPERIMENT_BADGE_STYLES = {
-  // 条件バッジ（Test1, Test2, Test3）
+  // 条件バッジ（UI1, UI2）
   condition: {
     base: 'font-mono text-base px-3 py-1',
     variant: 'outline' as const,
@@ -103,9 +103,8 @@ export const EXPERIMENT_BADGE_STYLES = {
 
   // 条件色分けバッジ（導入ページ）
   conditionColor: {
-    Test1: 'bg-slate-500 text-white',
-    Test2: 'bg-blue-500 text-white',
-    Test3: 'bg-purple-500 text-white',
+    UI1: 'bg-slate-500 text-white',
+    UI2: 'bg-blue-500 text-white',
   },
 } as const;
 
@@ -113,20 +112,15 @@ export const EXPERIMENT_BADGE_STYLES = {
 // 条件カードの色設定（導入ページ用）
 // ========================================
 export const EXPERIMENT_CONDITION_COLORS = {
-  Test1: {
+  UI1: {
     bg: 'bg-slate-100 dark:bg-slate-800',
     border: 'border-slate-300 dark:border-slate-600',
     badge: 'bg-slate-500',
   },
-  Test2: {
+  UI2: {
     bg: 'bg-blue-50 dark:bg-blue-950',
     border: 'border-blue-300 dark:border-blue-700',
     badge: 'bg-blue-500',
-  },
-  Test3: {
-    bg: 'bg-purple-50 dark:bg-purple-950',
-    border: 'border-purple-300 dark:border-purple-700',
-    badge: 'bg-purple-500',
   },
 } as const;
 
@@ -238,6 +232,6 @@ export const getBadgeProps = (type: 'condition' | 'participant' | 'progress') =>
 /**
  * 条件カードの色設定を取得
  */
-export const getConditionCardColors = (condition: 'Test1' | 'Test2' | 'Test3') => {
+export const getConditionCardColors = (condition: 'UI1' | 'UI2') => {
   return EXPERIMENT_CONDITION_COLORS[condition];
 };

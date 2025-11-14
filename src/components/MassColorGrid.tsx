@@ -4,7 +4,7 @@ import { useColorStore } from '@/store/colorStore';
 import { memo } from 'react';
 
 /**
- * Test1用: 全色相×複数トーンのグリッド表示コンポーネント
+ * UI1用: 全色相×複数トーンのグリッド表示コンポーネント
  *
  * 既存のカラーパレット方式の問題を体験させる目的で、
  * 大量の色を一度に表示して選択の困難さを再現
@@ -91,7 +91,7 @@ const MassColorGridContent = memo(() => {
 MassColorGridContent.displayName = 'MassColorGridContent';
 
 /**
- * Test1: 既存カラーパレット方式
+ * UI1: 既存カラーパレット方式
  * 全色相×複数トーンの大量の色を一度に表示
  */
 export const MassColorGrid = () => {

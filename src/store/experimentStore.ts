@@ -2,7 +2,16 @@ import { create } from 'zustand';
 import JSZip from 'jszip';
 
 // 実験条件の型定義
-export type ExperimentCondition = 'Test1' | 'Test2';
+export type ExperimentCondition = 'UI1' | 'UI2';
+
+// 塗る対象（Material）の型定義
+export type MaterialType = 'taskA' | 'taskB';
+
+// 実験パターン（UI方法 + Material）の型定義
+export type ExperimentPattern = 'U1A' | 'U1B' | 'U2A' | 'U2B';
+
+// カウンターバランスパターン（1〜4）
+export type OrderPattern = 1 | 2 | 3 | 4;
 
 // イベントログの型定義
 export interface ExperimentEvent {
@@ -35,6 +44,8 @@ export interface ParticipantInfo {
 // 条件ごとのログ
 export interface ConditionLog {
   condition: ExperimentCondition;
+  material: MaterialType; // 塗る対象（TaskA/TaskB）
+  pattern: ExperimentPattern; // 実験パターン（U1A, U1B, U2A, U2B）
   start_time: string;
   end_time: string | null;
   task_duration_sec: number | null;
@@ -47,7 +58,7 @@ export interface SurveyResponse {
   usability: number[];      // SUS簡易版(5問) - 1〜5段階評価
   effectiveness: number[];  // TAM(3問) - 1〜5段階評価
   creativity: number[];     // Mini-CSI(3問) - 1〜5段階評価
-  favoriteUI: string[];     // 最も使いやすかったUI (Test1/Test2 複数選択可)
+  favoriteUI: string[];     // 最も使いやすかったUI (UI1/UI2 複数選択可)
   reason: string;           // 理由（自由記述）
   improvement: string;      // 改善点（自由記述）
 }
@@ -70,6 +81,7 @@ export interface ExperimentState {
   participantId: string;
   participantInfo: ParticipantInfo;  // 参加者情報（手動入力）
   condition: ExperimentCondition;
+  material: MaterialType; // 現在の塗る対象
   isExperimentRunning: boolean;
   startTime: number | null;
   endTime: number | null;
@@ -80,8 +92,10 @@ export interface ExperimentState {
   experimentStartTime: number | null; // 全体の実験開始時刻
   experimentEndTime: number | null;   // 全体の実験終了時刻
   conditionLogs: ConditionLog[];      // 各条件のログ
-  currentConditionIndex: number;      // 現在の条件インデックス (0=Test1, 1=Test2)
-  conditionOrder: ExperimentCondition[]; // 実験順序
+  currentConditionIndex: number;      // 現在の条件インデックス
+  conditionOrder: ExperimentCondition[]; // 実験順序（旧互換性のため保持）
+  orderPattern: OrderPattern; // カウンターバランスパターン（1〜4）
+  experimentPatterns: ExperimentPattern[]; // 実験パターンの順序（T1A, T1B, T2A, T2B）
 
   // アンケート
   surveyResponse: SurveyResponse | null; // アンケート回答
@@ -90,6 +104,7 @@ export interface ExperimentState {
   setParticipantId: (id: string) => void;
   setParticipantInfo: (info: ParticipantInfo) => void;  // 参加者情報を設定
   setCondition: (condition: ExperimentCondition) => void;
+  setOrderPattern: (pattern: OrderPattern) => void; // カウンターバランスパターンを設定
   startExperiment: () => void;
   endExperiment: () => void;
   recordEvent: (type: string, value: string, target?: string) => void;
@@ -110,10 +125,10 @@ export interface ExperimentState {
 
   // 条件による機能フラグ
   getFeatureFlags: () => {
-    MASS_COLOR_GRID_ON: boolean;    // Test1: 全色相×複数トーンのグリッド表示
+    MASS_COLOR_GRID_ON: boolean;    // UI1: 全色相×複数トーンのグリッド表示
     HUE_WHEEL_SLIDER_ON: boolean;   // (未使用)
-    HUE_RECO_ON: boolean;           // Test2: 色相推薦
-    TONE_RECO_ON: boolean;          // Test2: トーン推薦
+    HUE_RECO_ON: boolean;           // UI2: 色相推薦
+    TONE_RECO_ON: boolean;          // UI2: トーン推薦
   };
 }
 
@@ -161,6 +176,28 @@ const collectDeviceInfo = (): DeviceInfo => {
 // 初期デバイス情報
 const initialDeviceInfo = collectDeviceInfo();
 
+// カウンターバランスパターンの定義
+export const getExperimentOrder = (pattern: OrderPattern): ExperimentPattern[] => {
+  const orders: Record<OrderPattern, ExperimentPattern[]> = {
+    1: ['U1A', 'U1B', 'U2A', 'U2B'], // UI1 → UI2, TaskA → TaskB
+    2: ['U1B', 'U1A', 'U2B', 'U2A'], // UI1 → UI2, TaskB → TaskA
+    3: ['U2A', 'U2B', 'U1A', 'U1B'], // UI2 → UI1, TaskA → TaskB
+    4: ['U2B', 'U2A', 'U1B', 'U1A'], // UI2 → UI1, TaskB → TaskA
+  };
+  return orders[pattern];
+};
+
+// パターンからUI方法とMaterialを抽出
+export const parsePattern = (pattern: ExperimentPattern): { condition: ExperimentCondition; material: MaterialType } => {
+  const map: Record<ExperimentPattern, { condition: ExperimentCondition; material: MaterialType }> = {
+    'U1A': { condition: 'UI1', material: 'taskA' },
+    'U1B': { condition: 'UI1', material: 'taskB' },
+    'U2A': { condition: 'UI2', material: 'taskA' },
+    'U2B': { condition: 'UI2', material: 'taskB' },
+  };
+  return map[pattern];
+};
+
 export const useExperimentStore = create<ExperimentState>((set, get) => ({
   // 初期状態
   participantId: '',
@@ -169,7 +206,8 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
     illustrationExperience: '',
     ageRange: '',
   },
-  condition: 'Test1',
+  condition: 'UI1',
+  material: 'taskA',
   isExperimentRunning: false,
   startTime: null,
   endTime: null,
@@ -181,7 +219,9 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
   experimentEndTime: null,
   conditionLogs: [],
   currentConditionIndex: 0,
-  conditionOrder: ['Test1', 'Test2'],
+  conditionOrder: ['UI1', 'UI2'], // 旧互換性のため保持
+  orderPattern: 1, // デフォルトはパターン1
+  experimentPatterns: ['U1A', 'U1B', 'U2A', 'U2B'], // デフォルト順序
 
   // アンケート
   surveyResponse: null,
@@ -199,6 +239,16 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
   // 実験条件を設定
   setCondition: (condition: ExperimentCondition) => {
     set({ condition });
+  },
+
+  // カウンターバランスパターンを設定
+  setOrderPattern: (pattern: OrderPattern) => {
+    const patterns = getExperimentOrder(pattern);
+    set({
+      orderPattern: pattern,
+      experimentPatterns: patterns,
+    });
+    console.log(`Order pattern set to ${pattern}:`, patterns);
   },
 
   // 実験開始
@@ -310,6 +360,10 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
 
   // 実験をリセット
   resetExperiment: () => {
+    const state = get();
+    const firstPattern = state.experimentPatterns[0];
+    const { condition, material } = parsePattern(firstPattern);
+
     set({
       isExperimentRunning: false,
       startTime: null,
@@ -320,21 +374,27 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
       experimentEndTime: null,
       conditionLogs: [],
       currentConditionIndex: 0,
-      condition: 'Test1',
+      condition,
+      material,
       surveyResponse: null, // アンケート回答をリセット
     });
     console.log('Experiment reset');
   },
 
-  // 全体実験開始（Test1から）
+  // 全体実験開始（パターンに応じた最初の条件から）
   startFullExperiment: () => {
+    const state = get();
     const now = Date.now();
+    const firstPattern = state.experimentPatterns[0];
+    const { condition, material } = parsePattern(firstPattern);
+
     set({
       experimentStartTime: now,
       experimentEndTime: null,
       conditionLogs: [],
       currentConditionIndex: 0,
-      condition: 'Test1',
+      condition,
+      material,
       isExperimentRunning: true,
       startTime: now,
       endTime: null,
@@ -342,26 +402,28 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
       deviceInfo: collectDeviceInfo(),
       surveyResponse: null, // アンケート回答をリセット
     });
-    console.log('Full experiment started at:', new Date(now).toISOString());
+    console.log(`Full experiment started with pattern ${firstPattern} (${condition}, ${material}) at:`, new Date(now).toISOString());
   },
 
   // 現在の条件を取得
   getCurrentCondition: () => {
     const state = get();
-    return state.conditionOrder[state.currentConditionIndex];
+    return state.condition;
   },
 
   // 次の条件があるか
   hasNextCondition: () => {
     const state = get();
-    return state.currentConditionIndex < state.conditionOrder.length - 1;
+    return state.currentConditionIndex < state.experimentPatterns.length - 1;
   },
 
   // 次の条件を取得
   getNextCondition: () => {
     const state = get();
-    if (state.currentConditionIndex < state.conditionOrder.length - 1) {
-      return state.conditionOrder[state.currentConditionIndex + 1];
+    if (state.currentConditionIndex < state.experimentPatterns.length - 1) {
+      const nextPattern = state.experimentPatterns[state.currentConditionIndex + 1];
+      const { condition } = parsePattern(nextPattern);
+      return condition;
     }
     return null;
   },
@@ -370,10 +432,13 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
   completeCurrentCondition: (canvasImage?: string) => {
     const state = get();
     const now = Date.now();
+    const currentPattern = state.experimentPatterns[state.currentConditionIndex];
 
     // 現在の条件のログを保存
     const conditionLog: ConditionLog = {
       condition: state.condition,
+      material: state.material,
+      pattern: currentPattern,
       start_time: state.startTime ? new Date(state.startTime).toISOString() : '',
       end_time: new Date(now).toISOString(),
       task_duration_sec: state.startTime
@@ -389,39 +454,41 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
       endTime: now,
     });
 
-    console.log(`Condition ${state.condition} completed`, conditionLog);
+    console.log(`Pattern ${currentPattern} (${state.condition}, ${state.material}) completed`, conditionLog);
   },
 
   // 次の条件に進む
   nextCondition: () => {
     const state = get();
 
-    if (state.currentConditionIndex >= state.conditionOrder.length - 1) {
+    if (state.currentConditionIndex >= state.experimentPatterns.length - 1) {
       // 全条件完了
       const now = Date.now();
       set({
         experimentEndTime: now,
         isExperimentRunning: false,
       });
-      console.log('All conditions completed');
+      console.log('All patterns completed');
       return false;
     }
 
     // 次の条件に進む
     const nextIndex = state.currentConditionIndex + 1;
-    const nextCondition = state.conditionOrder[nextIndex];
+    const nextPattern = state.experimentPatterns[nextIndex];
+    const { condition, material } = parsePattern(nextPattern);
     const now = Date.now();
 
     set({
       currentConditionIndex: nextIndex,
-      condition: nextCondition,
+      condition,
+      material,
       isExperimentRunning: true,
       startTime: now,
       endTime: null,
       events: [],
     });
 
-    console.log(`Moved to condition ${nextCondition}`);
+    console.log(`Moved to pattern ${nextPattern} (${condition}, ${material})`);
     return true;
   },
 
@@ -435,10 +502,10 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
   getFeatureFlags: () => {
     const { condition } = get();
     return {
-      MASS_COLOR_GRID_ON: condition === 'Test1',   // Test1: 全色相×複数トーンのグリッド表示
+      MASS_COLOR_GRID_ON: condition === 'UI1',   // UI1: 全色相×複数トーンのグリッド表示
       HUE_WHEEL_SLIDER_ON: false,                  // (未使用)
-      HUE_RECO_ON: condition === 'Test2',          // Test2: 色相推薦
-      TONE_RECO_ON: condition === 'Test2',         // Test2: トーン推薦
+      HUE_RECO_ON: condition === 'UI2',          // UI2: 色相推薦
+      TONE_RECO_ON: condition === 'UI2',         // UI2: トーン推薦
     };
   },
 }));

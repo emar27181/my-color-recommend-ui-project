@@ -455,17 +455,30 @@ const gapSearchRadius = 1;       // 隙間検索時の探索半径（px）
 ## 🧪 実験ページUI仕様
 
 ### 基本仕様
-- **ルート**: `/experiment`, `/experiment/task`, `/experiment/complete`
+- **ルート**: `/experiment`, `/experiment/instruction`, `/experiment/task`, `/experiment/complete`
 - **目的**: 色推薦UI評価実験用インターフェース
+
+### 実験デザイン（4パターン）
+- **UI方法**: UI1（大量の色を一度に表示）、UI2（二段階推薦）
+- **塗る対象**: TaskA（イラスト）、TaskB（ロゴ）
+- **実験パターン**: U1A, U1B, U2A, U2Bの4パターン
+- **説明ページ**: UI1, UI2の2回のみ（UI手法のみ説明）
+- **タスクページ**: 4回実施（materialに応じてキャンバス内容を切り替え）
+
+### カウンターバランス設定
+- **URLパラメータ**: `/experiment?order=1〜4` で実験順序を制御
+- **パターン1**: U1A → U1B → U2A → U2B（UI1→UI2, TaskA→TaskB）
+- **パターン2**: U1B → U1A → U2B → U2A（UI1→UI2, TaskB→TaskA）
+- **パターン3**: U2A → U2B → U1A → U1B（UI2→UI1, TaskA→TaskB）
+- **パターン4**: U2B → U2A → U1B → U1A（UI2→UI1, TaskB→TaskA）
 
 ### デザイン原則
 - **ミニマルデザイン**: 明確な情報階層、十分なホワイトスペース
 - **視覚的理解促進**: アイコン・色分けで直感的に情報伝達
-- **条件色分け**: C0（灰）、C1（青）、C2（紫）、C3（緑）
 
 ### 実験タスクページの表示制御
 - **非表示**: skinColor（α）、hueToneExtraction（β）を常に非表示
-- **自動展開**: C1〜C3では該当する推薦セクションを自動展開
+- **自動展開**: UI1では大量色グリッド、UI2では色相推薦・トーン推薦を自動展開
 - **目的**: 認知負荷軽減、タスク集中促進
 
 ### デバッグモード重要注意事項
@@ -484,16 +497,16 @@ const gapSearchRadius = 1;       // 隙間検索時の探索半径（px）
 
 ### 実験説明ページ（ExperimentInstructionPage）UI仕様
 - **レイアウト**: 動画とUIプレビュー画像を横並びで配置（7:3比率）
-- **Test1 & Test2共通仕様**:
+- **UI1 & UI2共通仕様**:
   - グリッドレイアウト: `grid-cols-10`、動画 `col-span-7`、画像 `col-span-3`
   - 動画: 16:9アスペクト比を維持
   - 画像: 親コンテナ幅の80%表示（`w-4/5 h-auto`）、余白 `p-4`
 - **動画URL**:
-  - Test1: `https://www.youtube.com/embed/PLACEHOLDER_T1`（動画準備中・枠のみ表示）
-  - Test2: `https://www.youtube.com/embed/Sr1CyI3407c`
+  - UI1: `https://www.youtube.com/embed/PLACEHOLDER_U1`（動画準備中・枠のみ表示）
+  - UI2: `https://www.youtube.com/embed/Sr1CyI3407c`
 - **画像パス**:
-  - Test1: `/images/UI_test/image_T1.png`
-  - Test2: `/images/UI_test/image_T3.png`（二段階推薦の画像）
+  - UI1: `/images/UI_test/image_U1.png`
+  - UI2: `/images/UI_test/image_U2.png`（二段階推薦の画像）
 
 ---
 

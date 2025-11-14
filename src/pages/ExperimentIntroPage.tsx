@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useExperimentStore } from '@/store/experimentStore';
+import { useExperimentStore, type OrderPattern } from '@/store/experimentStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,11 +28,23 @@ const ExperimentIntroPage = () => {
   const [searchParams] = useSearchParams();
   const isDebugMode = searchParams.get('debug') === 'true';
 
-  const { setParticipantId, setParticipantInfo, startFullExperiment } = useExperimentStore();
+  const { setParticipantId, setParticipantInfo, setOrderPattern, startFullExperiment } = useExperimentStore();
   const [inputId, setInputId] = useState(isDebugMode ? 'DEBUG001' : '');
   const [deviceType, setDeviceType] = useState<'PC' | 'tablet' | 'smartphone' | ''>(isDebugMode ? 'PC' : '');
   const [illustrationExperience, setIllustrationExperience] = useState<'beginner' | 'some' | 'hobby' | 'professional' | ''>(isDebugMode ? 'hobby' : '');
   const [ageRange, setAgeRange] = useState<'10s' | '20s' | '30s' | '40s' | '50s' | '60s+' | ''>(isDebugMode ? '20s' : '');
+
+  // URLパラメータからorderを取得してカウンターバランスパターンを設定
+  useEffect(() => {
+    const orderParam = searchParams.get('order');
+    if (orderParam) {
+      const orderNumber = parseInt(orderParam, 10);
+      if (orderNumber >= 1 && orderNumber <= 4) {
+        setOrderPattern(orderNumber as OrderPattern);
+        console.log(`Order pattern set to ${orderNumber} from URL parameter`);
+      }
+    }
+  }, [searchParams, setOrderPattern]);
 
   // 実験開始ハンドラ
   const handleStart = () => {
@@ -61,9 +73,9 @@ const ExperimentIntroPage = () => {
 
     startFullExperiment();
 
-    // Test1説明ページに遷移（デバッグモードを引き継ぐ）
+    // UI1説明ページに遷移（デバッグモードを引き継ぐ）
     const debugParam = isDebugMode ? '&debug=true' : '';
-    navigate(`/experiment/instruction?cond=Test1${debugParam}`);
+    navigate(`/experiment/instruction?cond=UI1${debugParam}`);
   };
 
 
@@ -243,12 +255,12 @@ const ExperimentIntroPage = () => {
               className={`w-full text-xl h-16 ${getButtonClassName('action')}`}
             >
               <Play className={EXPERIMENT_ICON_STYLES.large} />
-              実験開始（Test1から）
+              実験開始（UI1から）
             </Button>
 
             <Alert className="border-primary/30 bg-primary/5 p-6">
               <AlertDescription className="text-sm leading-relaxed">
-                Test1 → Test2 の順で体験します。各テスト終了後、次に進む確認が表示されます。
+                UI1 → UI2 の順で体験します。各テスト終了後、次に進む確認が表示されます。
               </AlertDescription>
             </Alert>
           </CardContent>

@@ -31,7 +31,7 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
   const [creativity, setCreativity] = useState<number[]>(isDebugMode ? [4, 4, 4] : [0, 0, 0]);
 
   // 選択UI・理由・改善点 - デバッグモード時は自動入力（複数選択可能）
-  const [favoriteUI, setFavoriteUI] = useState<string[]>(isDebugMode ? ['Test2'] : []);
+  const [favoriteUI, setFavoriteUI] = useState<string[]>(isDebugMode ? ['UI2'] : []);
   const [reason, setReason] = useState<string>(isDebugMode ? 'デバッグモードでの自動入力テスト' : '');
   const [improvement, setImprovement] = useState<string>(isDebugMode ? '特になし（デバッグ）' : '');
 
@@ -219,7 +219,7 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
           <div className="space-y-4">
             <Label className="text-base">最も使いやすかったUIを選択してください（複数選択可）</Label>
             <div className="flex gap-4">
-              {['Test1', 'Test2'].map((cond) => (
+              {['UI1', 'UI2'].map((cond) => (
                 <label key={cond} className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"

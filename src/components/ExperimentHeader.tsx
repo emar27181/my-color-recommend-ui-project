@@ -39,7 +39,7 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
 
       // 確認ダイアログを表示
       const confirmed = window.confirm(
-        `${condition} の実験が完了しました。\n\n前のページには戻れません。次のページに進んで良いですか？\n\n次の条件：${nextCond}`
+        `${condition} の実験が完了しました。\n\n前のページには戻れません。次のページに進んで良いですか？\n\n次のUI：${nextCond}`
       );
 
       if (!confirmed) {
@@ -63,7 +63,7 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
     } else {
       // 全条件完了 - アンケートページに遷移
       const confirmed = window.confirm(
-        `すべてのテスト（Test1, Test2）が完了しました！\n\n前のページには戻れません。アンケートページに進んで良いですか？`
+        `すべてのテスト（UI1, UI2）が完了しました！\n\n前のページには戻れません。アンケートページに進んで良いですか？`
       );
 
       if (!confirmed) {
