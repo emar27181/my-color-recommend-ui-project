@@ -55,12 +55,18 @@ export interface ConditionLog {
 
 // アンケート回答の型定義
 export interface SurveyResponse {
-  usability: number[];      // SUS簡易版(5問) - 1〜5段階評価
-  effectiveness: number[];  // TAM(3問) - 1〜5段階評価
-  creativity: number[];     // Mini-CSI(3問) - 1〜5段階評価
-  favoriteUI: string[];     // 最も使いやすかったUI (UI1/UI2 複数選択可)
-  reason: string;           // 理由（自由記述）
-  improvement: string;      // 改善点（自由記述）
+  // UI1用の評価（9問：1〜5段階）
+  ui1_core: number[];        // コアの4問
+  ui1_additional: number[];  // 追加の4問
+  ui1_seq: number;           // SEQ（タスク難易度）1問
+
+  // UI2用の評価（9問：1〜5段階）
+  ui2_core: number[];        // コアの4問
+  ui2_additional: number[];  // 追加の4問
+  ui2_seq: number;           // SEQ（タスク難易度）1問
+
+  // 全体質問
+  favoriteUI: string;        // 最も使いやすかったUI (UI1 or UI2 単一選択)
 }
 
 // 実験ログ全体の型定義

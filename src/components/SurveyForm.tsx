@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Bug } from 'lucide-react';
 import type { SurveyResponse } from '@/store/experimentStore';
 
@@ -14,262 +13,295 @@ interface SurveyFormProps {
 /**
  * アンケートフォームコンポーネント
  *
- * - SUS簡易版（5問）
- * - TAM（3問）
- * - Mini-CSI（3問）
- * - 最も使いやすかったUI + 理由 + 改善点
+ * - UI1用評価（コア4問 + 追加4問 + SEQ1問）
+ * - UI2用評価（コア4問 + 追加4問 + SEQ1問）
+ * - 全体質問（どちらのUIが使いやすかったか）
  * - デバッグモード対応（自動入力）
  */
 export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) => {
-  // SUS簡易版（5問）- デバッグモード時は全て4に設定
-  const [usability, setUsability] = useState<number[]>(isDebugMode ? [4, 4, 4, 4, 4] : [0, 0, 0, 0, 0]);
+  // UI1用の評価
+  const [ui1Core, setUi1Core] = useState<number[]>(isDebugMode ? [4, 4, 4, 4] : [0, 0, 0, 0]);
+  const [ui1Additional, setUi1Additional] = useState<number[]>(isDebugMode ? [4, 4, 4, 4] : [0, 0, 0, 0]);
+  const [ui1Seq, setUi1Seq] = useState<number>(isDebugMode ? 4 : 0);
 
-  // TAM（3問）- デバッグモード時は全て4に設定
-  const [effectiveness, setEffectiveness] = useState<number[]>(isDebugMode ? [4, 4, 4] : [0, 0, 0]);
+  // UI2用の評価
+  const [ui2Core, setUi2Core] = useState<number[]>(isDebugMode ? [4, 4, 4, 4] : [0, 0, 0, 0]);
+  const [ui2Additional, setUi2Additional] = useState<number[]>(isDebugMode ? [4, 4, 4, 4] : [0, 0, 0, 0]);
+  const [ui2Seq, setUi2Seq] = useState<number>(isDebugMode ? 4 : 0);
 
-  // Mini-CSI（3問）- デバッグモード時は全て4に設定
-  const [creativity, setCreativity] = useState<number[]>(isDebugMode ? [4, 4, 4] : [0, 0, 0]);
+  // 全体質問
+  const [favoriteUI, setFavoriteUI] = useState<string>(isDebugMode ? 'UI2' : '');
 
-  // 選択UI・理由・改善点 - デバッグモード時は自動入力（複数選択可能）
-  const [favoriteUI, setFavoriteUI] = useState<string[]>(isDebugMode ? ['UI2'] : []);
-  const [reason, setReason] = useState<string>(isDebugMode ? 'デバッグモードでの自動入力テスト' : '');
-  const [improvement, setImprovement] = useState<string>(isDebugMode ? '特になし（デバッグ）' : '');
-
-  // SUS質問文
-  const susQuestions = [
-    'このシステムを頻繁に使いたい',
-    'このシステムは使いやすい',
-    'このシステムの機能はよく統合されている',
-    'このシステムの使い方をすぐに学べた',
-    '自信を持ってこのシステムを使えた',
+  // 質問文の定義
+  const coreQuestions = [
+    '必要な色の見通しを立てやすかった',
+    '色選びで迷うことが少なかった',
+    '候補の色同士の違いを理解しやすかった',
+    '最終的に選んだ配色に納得できた',
   ];
 
-  // TAM質問文
-  const tamQuestions = [
-    'このシステムは配色タスクに役立つ',
-    'このシステムを使うと作業が速くなる',
-    '今後もこのシステムを使いたい',
+  const additionalQuestions = [
+    '色の候補が多すぎると感じた（逆転項目）',
+    '必要な色に自然と辿り着けた',
+    'イメージに合う色が選びやすかった',
+    '他の色も試したくなるUIだった',
   ];
 
-  // Mini-CSI質問文
-  const csiQuestions = [
-    '新しい配色の発想が得られた',
-    '自分の配色に自信が持てた',
-    '配色作業が楽しかった',
-  ];
+  const seqQuestion = 'このタスクは簡単だった';
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     // バリデーション
-    if (favoriteUI.length === 0) {
-      alert('最も使いやすかったUIを少なくとも1つ選択してください');
+    if (!favoriteUI) {
+      alert('どちらのUIの方が使いやすかったか選択してください');
       return;
     }
 
-    if (usability.some(v => v === 0) || effectiveness.some(v => v === 0) || creativity.some(v => v === 0)) {
+    if (
+      ui1Core.some(v => v === 0) ||
+      ui1Additional.some(v => v === 0) ||
+      ui1Seq === 0 ||
+      ui2Core.some(v => v === 0) ||
+      ui2Additional.some(v => v === 0) ||
+      ui2Seq === 0
+    ) {
       alert('すべての質問に回答してください');
       return;
     }
 
     const response: SurveyResponse = {
-      usability,
-      effectiveness,
-      creativity,
-      favoriteUI,
-      reason: reason.trim(),
-      improvement: improvement.trim(),
+      ui1_core: ui1Core,
+      ui1_additional: ui1Additional,
+      ui1_seq: ui1Seq,
+      ui2_core: ui2Core,
+      ui2_additional: ui2Additional,
+      ui2_seq: ui2Seq,
+      favoriteUI: favoriteUI,
     };
 
     onSubmit(response);
   };
 
-  const updateRating = (category: 'usability' | 'effectiveness' | 'creativity', index: number, value: number) => {
-    if (category === 'usability') {
-      const newUsability = [...usability];
-      newUsability[index] = value;
-      setUsability(newUsability);
-    } else if (category === 'effectiveness') {
-      const newEffectiveness = [...effectiveness];
-      newEffectiveness[index] = value;
-      setEffectiveness(newEffectiveness);
-    } else if (category === 'creativity') {
-      const newCreativity = [...creativity];
-      newCreativity[index] = value;
-      setCreativity(newCreativity);
+  const updateRating = (
+    ui: 'ui1' | 'ui2',
+    category: 'core' | 'additional',
+    index: number,
+    value: number
+  ) => {
+    if (ui === 'ui1') {
+      if (category === 'core') {
+        const newCore = [...ui1Core];
+        newCore[index] = value;
+        setUi1Core(newCore);
+      } else {
+        const newAdditional = [...ui1Additional];
+        newAdditional[index] = value;
+        setUi1Additional(newAdditional);
+      }
+    } else {
+      if (category === 'core') {
+        const newCore = [...ui2Core];
+        newCore[index] = value;
+        setUi2Core(newCore);
+      } else {
+        const newAdditional = [...ui2Additional];
+        newAdditional[index] = value;
+        setUi2Additional(newAdditional);
+      }
     }
   };
 
+  const RatingScale = ({
+    value,
+    onChange,
+  }: {
+    value: number;
+    onChange: (value: number) => void;
+  }) => (
+    <div className="flex gap-2 justify-center">
+      {[1, 2, 3, 4, 5].map((rating) => (
+        <button
+          key={rating}
+          type="button"
+          onClick={() => onChange(rating)}
+          className={`w-12 h-12 rounded-lg border-2 transition-all ${
+            value === rating
+              ? 'bg-primary text-primary-foreground border-primary scale-110'
+              : 'bg-background border-border hover:border-primary/50'
+          }`}
+        >
+          {rating}
+        </button>
+      ))}
+    </div>
+  );
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-10 py-8">
+    <form onSubmit={handleSubmit} className="space-y-6">
       {/* デバッグモードインジケーター */}
       {isDebugMode && (
         <div className="p-3 bg-orange-100 dark:bg-orange-900 border-2 border-orange-500 rounded-lg">
           <div className="flex items-center gap-2 justify-center">
             <Bug className="w-5 h-5 text-orange-700 dark:text-orange-300" />
             <span className="font-semibold text-orange-700 dark:text-orange-300">
-              デバッグモード有効（アンケート自動入力済み）
+              デバッグモード（全項目自動入力済み）
             </span>
           </div>
         </div>
       )}
 
-      {/* SUS簡易版 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>1. システムの使いやすさ（SUS）</CardTitle>
-          <CardDescription>
-            1（全くそう思わない）〜 5（非常にそう思う）で評価してください
-          </CardDescription>
+      {/* UI1の評価 */}
+      <Card className="border-2">
+        <CardHeader className="bg-slate-50 dark:bg-slate-900">
+          <CardTitle>UI1 の評価</CardTitle>
+          <CardDescription>UI1（大量の色を一度に表示）について評価してください</CardDescription>
         </CardHeader>
         <CardContent className="space-y-8 py-6">
-          {susQuestions.map((question, index) => (
-            <div key={index} className="space-y-4">
-              <Label className="text-base">{question}</Label>
-              <div className="flex gap-4 items-center pt-2">
-                {[1, 2, 3, 4, 5].map((value) => (
-                  <label key={value} className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name={`sus-${index}`}
-                      value={value}
-                      checked={usability[index] === value}
-                      onChange={() => updateRating('usability', index, value)}
-                      className="w-4 h-4"
-                    />
-                    <span className="text-sm">{value}</span>
-                  </label>
-                ))}
+          {/* UI1 コアの4問 */}
+          <div className="space-y-6">
+            <h3 className="font-semibold text-lg">基本評価</h3>
+            {coreQuestions.map((question, index) => (
+              <div key={index} className="space-y-3">
+                <Label className="text-base">
+                  {index + 1}. {question}
+                </Label>
+                <div className="flex items-center gap-4">
+                  <span className="text-sm text-muted-foreground w-24 text-right">全くそう思わない</span>
+                  <RatingScale
+                    value={ui1Core[index]}
+                    onChange={(value) => updateRating('ui1', 'core', index, value)}
+                  />
+                  <span className="text-sm text-muted-foreground w-24">非常にそう思う</span>
+                </div>
               </div>
+            ))}
+          </div>
+
+          {/* UI1 追加の4問 */}
+          <div className="space-y-6 pt-4 border-t">
+            <h3 className="font-semibold text-lg">詳細評価</h3>
+            {additionalQuestions.map((question, index) => (
+              <div key={index} className="space-y-3">
+                <Label className="text-base">
+                  {index + 5}. {question}
+                </Label>
+                <div className="flex items-center gap-4">
+                  <span className="text-sm text-muted-foreground w-24 text-right">全くそう思わない</span>
+                  <RatingScale
+                    value={ui1Additional[index]}
+                    onChange={(value) => updateRating('ui1', 'additional', index, value)}
+                  />
+                  <span className="text-sm text-muted-foreground w-24">非常にそう思う</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* UI1 SEQ */}
+          <div className="space-y-3 pt-4 border-t">
+            <h3 className="font-semibold text-lg">タスク難易度</h3>
+            <Label className="text-base">9. {seqQuestion}</Label>
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-muted-foreground w-24 text-right">全くそう思わない</span>
+              <RatingScale value={ui1Seq} onChange={setUi1Seq} />
+              <span className="text-sm text-muted-foreground w-24">非常にそう思う</span>
             </div>
-          ))}
+          </div>
         </CardContent>
       </Card>
 
-      {/* TAM */}
-      <Card>
-        <CardHeader>
-          <CardTitle>2. システムの有用性（TAM）</CardTitle>
-          <CardDescription>
-            1（全くそう思わない）〜 5（非常にそう思う）で評価してください
-          </CardDescription>
+      {/* UI2の評価 */}
+      <Card className="border-2">
+        <CardHeader className="bg-blue-50 dark:bg-blue-950">
+          <CardTitle>UI2 の評価</CardTitle>
+          <CardDescription>UI2（二段階推薦）について評価してください</CardDescription>
         </CardHeader>
         <CardContent className="space-y-8 py-6">
-          {tamQuestions.map((question, index) => (
-            <div key={index} className="space-y-4">
-              <Label className="text-base">{question}</Label>
-              <div className="flex gap-4 items-center pt-2">
-                {[1, 2, 3, 4, 5].map((value) => (
-                  <label key={value} className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name={`tam-${index}`}
-                      value={value}
-                      checked={effectiveness[index] === value}
-                      onChange={() => updateRating('effectiveness', index, value)}
-                      className="w-4 h-4"
-                    />
-                    <span className="text-sm">{value}</span>
-                  </label>
-                ))}
+          {/* UI2 コアの4問 */}
+          <div className="space-y-6">
+            <h3 className="font-semibold text-lg">基本評価</h3>
+            {coreQuestions.map((question, index) => (
+              <div key={index} className="space-y-3">
+                <Label className="text-base">
+                  {index + 1}. {question}
+                </Label>
+                <div className="flex items-center gap-4">
+                  <span className="text-sm text-muted-foreground w-24 text-right">全くそう思わない</span>
+                  <RatingScale
+                    value={ui2Core[index]}
+                    onChange={(value) => updateRating('ui2', 'core', index, value)}
+                  />
+                  <span className="text-sm text-muted-foreground w-24">非常にそう思う</span>
+                </div>
               </div>
+            ))}
+          </div>
+
+          {/* UI2 追加の4問 */}
+          <div className="space-y-6 pt-4 border-t">
+            <h3 className="font-semibold text-lg">詳細評価</h3>
+            {additionalQuestions.map((question, index) => (
+              <div key={index} className="space-y-3">
+                <Label className="text-base">
+                  {index + 5}. {question}
+                </Label>
+                <div className="flex items-center gap-4">
+                  <span className="text-sm text-muted-foreground w-24 text-right">全くそう思わない</span>
+                  <RatingScale
+                    value={ui2Additional[index]}
+                    onChange={(value) => updateRating('ui2', 'additional', index, value)}
+                  />
+                  <span className="text-sm text-muted-foreground w-24">非常にそう思う</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* UI2 SEQ */}
+          <div className="space-y-3 pt-4 border-t">
+            <h3 className="font-semibold text-lg">タスク難易度</h3>
+            <Label className="text-base">9. {seqQuestion}</Label>
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-muted-foreground w-24 text-right">全くそう思わない</span>
+              <RatingScale value={ui2Seq} onChange={setUi2Seq} />
+              <span className="text-sm text-muted-foreground w-24">非常にそう思う</span>
             </div>
-          ))}
+          </div>
         </CardContent>
       </Card>
 
-      {/* Mini-CSI */}
-      <Card>
+      {/* 全体質問 */}
+      <Card className="border-2 border-primary/30">
         <CardHeader>
-          <CardTitle>3. 創造性支援（Mini-CSI）</CardTitle>
-          <CardDescription>
-            1（全くそう思わない）〜 5（非常にそう思う）で評価してください
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-8 py-6">
-          {csiQuestions.map((question, index) => (
-            <div key={index} className="space-y-4">
-              <Label className="text-base">{question}</Label>
-              <div className="flex gap-4 items-center pt-2">
-                {[1, 2, 3, 4, 5].map((value) => (
-                  <label key={value} className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name={`csi-${index}`}
-                      value={value}
-                      checked={creativity[index] === value}
-                      onChange={() => updateRating('creativity', index, value)}
-                      className="w-4 h-4"
-                    />
-                    <span className="text-sm">{value}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-
-      {/* 最も使いやすかったUI */}
-      <Card>
-        <CardHeader>
-          <CardTitle>4. 最も使いやすかったUI</CardTitle>
+          <CardTitle>全体評価</CardTitle>
         </CardHeader>
         <CardContent className="space-y-8 py-6">
           <div className="space-y-4">
-            <Label className="text-base">最も使いやすかったUIを選択してください（複数選択可）</Label>
-            <div className="flex gap-4">
-              {['UI1', 'UI2'].map((cond) => (
-                <label key={cond} className="flex items-center gap-2 cursor-pointer">
+            <Label className="text-base font-semibold">どちらのUIの方が使いやすかったですか？</Label>
+            <div className="flex gap-6 justify-center">
+              {['UI1', 'UI2'].map((ui) => (
+                <label key={ui} className="flex items-center gap-3 cursor-pointer">
                   <input
-                    type="checkbox"
-                    id={`fav-${cond}`}
-                    checked={favoriteUI.includes(cond)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setFavoriteUI([...favoriteUI, cond]);
-                      } else {
-                        setFavoriteUI(favoriteUI.filter((ui) => ui !== cond));
-                      }
-                    }}
-                    className="w-4 h-4"
+                    type="radio"
+                    name="favoriteUI"
+                    value={ui}
+                    checked={favoriteUI === ui}
+                    onChange={(e) => setFavoriteUI(e.target.value)}
+                    className="w-5 h-5"
                   />
-                  <span className="text-sm">{cond}</span>
+                  <span className="text-lg font-semibold">{ui}</span>
                 </label>
               ))}
             </div>
-          </div>
-
-          <div className="space-y-4">
-            <Label htmlFor="reason" className="text-base">そう思った理由を教えてください</Label>
-            <Textarea
-              id="reason"
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              placeholder="例：色の選択が直感的で、推薦機能が役立った"
-              rows={4}
-              className="resize-none bg-muted text-foreground border-2"
-            />
-          </div>
-
-          <div className="space-y-4">
-            <Label htmlFor="improvement" className="text-base">改善してほしい点があれば教えてください</Label>
-            <Textarea
-              id="improvement"
-              value={improvement}
-              onChange={(e) => setImprovement(e.target.value)}
-              placeholder="例：推薦色の数を増やしてほしい"
-              rows={4}
-              className="resize-none bg-muted text-foreground border-2"
-            />
           </div>
         </CardContent>
       </Card>
 
       {/* 送信ボタン */}
-      <div className="flex justify-center pt-8 pb-4">
-        <Button type="submit" size="lg" className="w-full md:w-auto px-12">
-          実験結果をダウンロード
+      <div className="flex justify-center pt-4">
+        <Button type="submit" size="lg" className="w-full max-w-md">
+          アンケートを送信
         </Button>
       </div>
     </form>
