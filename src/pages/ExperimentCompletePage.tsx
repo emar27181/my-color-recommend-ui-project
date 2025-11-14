@@ -37,9 +37,9 @@ const ExperimentCompletePage = () => {
       return;
     }
 
-    // 2つの条件すべて完了していない場合
-    if (conditionLogs.length < 2) {
-      console.warn('Not all conditions completed, redirecting to experiment intro');
+    // 4つのパターンすべて完了していない場合
+    if (conditionLogs.length < 4) {
+      console.warn('Not all patterns completed, redirecting to experiment intro');
       navigate('/experiment');
       return;
     }
@@ -82,7 +82,7 @@ const ExperimentCompletePage = () => {
           </div>
           <h1 className={`${EXPERIMENT_TEXT_STYLES.pageTitle} mb-3`}>実験完了！</h1>
           <p className="text-muted-foreground text-lg">
-            すべてのテスト（UI1, UI2）の評価が完了しました
+            すべてのパターン（U1A, U1B, U2A, U2B）の評価が完了しました
           </p>
         </div>
 
@@ -95,15 +95,14 @@ const ExperimentCompletePage = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* 各テストの結果 */}
-            <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
-              {['UI1', 'UI2'].map((cond, index) => {
-                const duration = getConditionDuration(index);
+            {/* 各パターンの結果 */}
+            <div className="grid grid-cols-2 gap-4 max-w-2xl mx-auto">
+              {conditionLogs.map((log, index) => {
                 return (
-                  <div key={cond} className="p-4 border rounded-lg text-center">
-                    <Badge variant="outline" className="font-mono mb-2">{cond}</Badge>
+                  <div key={log.pattern} className="p-4 border rounded-lg text-center">
+                    <Badge variant="outline" className="font-mono mb-2">{log.pattern}</Badge>
                     <div className="text-2xl font-bold">
-                      {duration !== null ? `${duration.toFixed(1)}s` : '-'}
+                      {log.task_duration_sec !== null ? `${log.task_duration_sec.toFixed(1)}s` : '-'}
                     </div>
                     <div className="text-xs text-muted-foreground">所要時間</div>
                   </div>

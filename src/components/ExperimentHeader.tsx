@@ -30,6 +30,9 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
     experimentPatterns,
   } = useExperimentStore();
 
+  // 現在のパターン名を取得（例: U1A, U2B）
+  const currentPattern = experimentPatterns[currentConditionIndex];
+
   // 条件完了ハンドラ
   const handleComplete = () => {
     // キャンバス画像を取得
@@ -39,9 +42,13 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
     if (hasNextCondition()) {
       const nextCond = getNextCondition();
 
+      // 次のパターン名を取得
+      const nextPatternIndex = currentConditionIndex + 1;
+      const nextPattern = experimentPatterns[nextPatternIndex];
+
       // 確認ダイアログを表示
       const confirmed = window.confirm(
-        `${condition} の実験が完了しました。\n\n前のページには戻れません。次のページに進んで良いですか？\n\n次のUI：${nextCond}`
+        `${currentPattern} の実験が完了しました。\n\n前のページには戻れません。次のページに進んで良いですか？\n\n次のパターン：${nextPattern}`
       );
 
       if (!confirmed) {
@@ -61,8 +68,6 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
       nextCondition();
 
       // 次のパターンのmaterialを取得
-      const nextPatternIndex = currentConditionIndex + 1;
-      const nextPattern = experimentPatterns[nextPatternIndex];
       const { material: nextMaterial } = parsePattern(nextPattern);
 
       const debugParam = isDebugMode ? '&debug=true' : '';
@@ -76,7 +81,7 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
     } else {
       // 全条件完了 - アンケートページに遷移
       const confirmed = window.confirm(
-        `すべてのテスト（UI1, UI2）が完了しました！\n\n前のページには戻れません。アンケートページに進んで良いですか？`
+        `${currentPattern} の実験が完了しました。\n\nすべてのパターン（U1A, U1B, U2A, U2B）が完了しました！\n\n前のページには戻れません。アンケートページに進んで良いですか？`
       );
 
       if (!confirmed) {
@@ -99,7 +104,7 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
           {/* 左側: 条件情報 */}
           <div className="flex items-center gap-2">
             <Badge {...getBadgeProps('condition')}>
-              {condition}
+              {currentPattern}
             </Badge>
           </div>
 
@@ -115,7 +120,7 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
               {hasNextCondition() && (
                 <>
                   <ArrowRight className={EXPERIMENT_ICON_STYLES.small} />
-                  {getNextCondition()}へ
+                  {experimentPatterns[currentConditionIndex + 1]}へ
                 </>
               )}
             </Button>

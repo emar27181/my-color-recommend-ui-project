@@ -21,8 +21,11 @@ import { useEffect } from 'react';
 const ExperimentInstructionPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { condition, participantId } = useExperimentStore();
+  const { condition, participantId, currentConditionIndex, experimentPatterns } = useExperimentStore();
   const isDebugMode = searchParams.get('debug') === 'true';
+
+  // 現在のパターン名を取得（例: U1A, U2B）
+  const currentPattern = experimentPatterns[currentConditionIndex];
 
   // 参加者IDが未設定の場合は導入ページにリダイレクト
   useEffect(() => {
@@ -75,7 +78,7 @@ const ExperimentInstructionPage = () => {
         {/* タイトル */}
         <div className="text-center mb-8">
           <h1 className={`${EXPERIMENT_TEXT_STYLES.pageTitle} mb-3`}>
-            {condition}
+            {currentPattern}
           </h1>
         </div>
 
