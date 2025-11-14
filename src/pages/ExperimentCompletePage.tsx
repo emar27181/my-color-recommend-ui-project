@@ -112,17 +112,9 @@ const ExperimentCompletePage = () => {
 
             {/* 全体の統計 */}
             <div className="p-4 border rounded-lg bg-muted/50">
-              <div className="grid grid-cols-2 gap-4 text-center">
-                <div>
-                  <div className="text-3xl font-bold">{totalDuration.toFixed(1)}s</div>
-                  <div className="text-sm text-muted-foreground">合計時間</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold">
-                    {conditionLogs.reduce((sum, log) => sum + log.events.length, 0)}
-                  </div>
-                  <div className="text-sm text-muted-foreground">総操作数</div>
-                </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold">{totalDuration.toFixed(1)}s</div>
+                <div className="text-sm text-muted-foreground">合計時間</div>
               </div>
             </div>
           </CardContent>
