@@ -8,7 +8,7 @@ export type ExperimentCondition = 'UI1' | 'UI2';
 export type MaterialType = 'taskA' | 'taskB';
 
 // 実験パターン（UI方法 + Material）の型定義
-export type ExperimentPattern = 'U1A' | 'U1B' | 'U2A' | 'U2B';
+export type ExperimentPattern = 'UI1-TaskA' | 'UI1-TaskB' | 'UI2-TaskA' | 'UI2-TaskB';
 
 // カウンターバランスパターン（1〜4）
 export type OrderPattern = 1 | 2 | 3 | 4;
@@ -185,10 +185,10 @@ const initialDeviceInfo = collectDeviceInfo();
 // カウンターバランスパターンの定義
 export const getExperimentOrder = (pattern: OrderPattern): ExperimentPattern[] => {
   const orders: Record<OrderPattern, ExperimentPattern[]> = {
-    1: ['U1A', 'U1B', 'U2A', 'U2B'], // UI1 → UI2, TaskA → TaskB
-    2: ['U1B', 'U1A', 'U2B', 'U2A'], // UI1 → UI2, TaskB → TaskA
-    3: ['U2A', 'U2B', 'U1A', 'U1B'], // UI2 → UI1, TaskA → TaskB
-    4: ['U2B', 'U2A', 'U1B', 'U1A'], // UI2 → UI1, TaskB → TaskA
+    1: ['UI1-TaskA', 'UI1-TaskB', 'UI2-TaskA', 'UI2-TaskB'], // UI1 → UI2, TaskA → TaskB
+    2: ['UI1-TaskB', 'UI1-TaskA', 'UI2-TaskB', 'UI2-TaskA'], // UI1 → UI2, TaskB → TaskA
+    3: ['UI2-TaskA', 'UI2-TaskB', 'UI1-TaskA', 'UI1-TaskB'], // UI2 → UI1, TaskA → TaskB
+    4: ['UI2-TaskB', 'UI2-TaskA', 'UI1-TaskB', 'UI1-TaskA'], // UI2 → UI1, TaskB → TaskA
   };
   return orders[pattern];
 };
@@ -196,10 +196,10 @@ export const getExperimentOrder = (pattern: OrderPattern): ExperimentPattern[] =
 // パターンからUI方法とMaterialを抽出
 export const parsePattern = (pattern: ExperimentPattern): { condition: ExperimentCondition; material: MaterialType } => {
   const map: Record<ExperimentPattern, { condition: ExperimentCondition; material: MaterialType }> = {
-    'U1A': { condition: 'UI1', material: 'taskA' },
-    'U1B': { condition: 'UI1', material: 'taskB' },
-    'U2A': { condition: 'UI2', material: 'taskA' },
-    'U2B': { condition: 'UI2', material: 'taskB' },
+    'UI1-TaskA': { condition: 'UI1', material: 'taskA' },
+    'UI1-TaskB': { condition: 'UI1', material: 'taskB' },
+    'UI2-TaskA': { condition: 'UI2', material: 'taskA' },
+    'UI2-TaskB': { condition: 'UI2', material: 'taskB' },
   };
   return map[pattern];
 };
@@ -227,7 +227,7 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
   currentConditionIndex: 0,
   conditionOrder: ['UI1', 'UI2'], // 旧互換性のため保持
   orderPattern: 1, // デフォルトはパターン1
-  experimentPatterns: ['U1A', 'U1B', 'U2A', 'U2B'], // デフォルト順序
+  experimentPatterns: ['UI1-TaskA', 'UI1-TaskB', 'UI2-TaskA', 'UI2-TaskB'], // デフォルト順序
 
   // アンケート
   surveyResponse: null,

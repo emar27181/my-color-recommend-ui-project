@@ -461,16 +461,16 @@ const gapSearchRadius = 1;       // 隙間検索時の探索半径（px）
 ### 実験デザイン（4パターン）
 - **UI方法**: UI1（大量の色を一度に表示）、UI2（二段階推薦）
 - **塗る対象**: TaskA（イラスト）、TaskB（ロゴ）
-- **実験パターン**: U1A, U1B, U2A, U2Bの4パターン
+- **実験パターン**: UI1-TaskA, UI1-TaskB, UI2-TaskA, UI2-TaskBの4パターン
 - **説明ページ**: UI1, UI2の2回のみ（UI手法のみ説明）
 - **タスクページ**: 4回実施（materialに応じてキャンバス内容を切り替え）
 
 ### カウンターバランス設定
 - **URLパラメータ**: `/experiment?order=1〜4` で実験順序を制御
-- **パターン1**: U1A → U1B → U2A → U2B（UI1→UI2, TaskA→TaskB）
-- **パターン2**: U1B → U1A → U2B → U2A（UI1→UI2, TaskB→TaskA）
-- **パターン3**: U2A → U2B → U1A → U1B（UI2→UI1, TaskA→TaskB）
-- **パターン4**: U2B → U2A → U1B → U1A（UI2→UI1, TaskB→TaskA）
+- **パターン1**: UI1-TaskA → UI1-TaskB → UI2-TaskA → UI2-TaskB（UI1→UI2, TaskA→TaskB）
+- **パターン2**: UI1-TaskB → UI1-TaskA → UI2-TaskB → UI2-TaskA（UI1→UI2, TaskB→TaskA）
+- **パターン3**: UI2-TaskA → UI2-TaskB → UI1-TaskA → UI1-TaskB（UI2→UI1, TaskA→TaskB）
+- **パターン4**: UI2-TaskB → UI2-TaskA → UI1-TaskB → UI1-TaskA（UI2→UI1, TaskB→TaskA）
 
 ### デザイン原則
 - **ミニマルデザイン**: 明確な情報階層、十分なホワイトスペース

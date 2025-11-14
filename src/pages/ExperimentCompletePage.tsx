@@ -82,7 +82,7 @@ const ExperimentCompletePage = () => {
           </div>
           <h1 className={`${EXPERIMENT_TEXT_STYLES.pageTitle} mb-3`}>実験完了！</h1>
           <p className="text-muted-foreground text-lg">
-            すべてのパターン（U1A, U1B, U2A, U2B）の評価が完了しました
+            すべてのパターン（UI1-TaskA, UI1-TaskB, UI2-TaskA, UI2-TaskB）の評価が完了しました
           </p>
         </div>
 

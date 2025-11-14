@@ -81,7 +81,7 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
     } else {
       // 全条件完了 - アンケートページに遷移
       const confirmed = window.confirm(
-        `${currentPattern} の実験が完了しました。\n\nすべてのパターン（U1A, U1B, U2A, U2B）が完了しました！\n\n前のページには戻れません。アンケートページに進んで良いですか？`
+        `${currentPattern} の実験が完了しました。\n\nすべてのパターン（UI1-TaskA, UI1-TaskB, UI2-TaskA, UI2-TaskB）が完了しました！\n\n前のページには戻れません。アンケートページに進んで良いですか？`
       );
 
       if (!confirmed) {
