@@ -110,13 +110,6 @@ const ExperimentCompletePage = () => {
               })}
             </div>
 
-            {/* 全体の統計 */}
-            <div className="p-4 border rounded-lg bg-muted/50">
-              <div className="text-center">
-                <div className="text-3xl font-bold">{totalDuration.toFixed(1)}s</div>
-                <div className="text-sm text-muted-foreground">合計時間</div>
-              </div>
-            </div>
           </CardContent>
         </Card>
 

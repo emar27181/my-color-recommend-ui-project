@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Bug } from 'lucide-react';
 import type { SurveyResponse } from '@/store/experimentStore';
 
@@ -31,6 +32,7 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
 
   // 全体質問
   const [favoriteUI, setFavoriteUI] = useState<string>(isDebugMode ? 'UI2' : '');
+  const [reason, setReason] = useState<string>(isDebugMode ? 'デバッグモード：UI2の方が使いやすかったため' : '');
 
   // 質問文の定義
   const coreQuestions = [
@@ -78,6 +80,7 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
       ui2_additional: ui2Additional,
       ui2_seq: ui2Seq,
       favoriteUI: favoriteUI,
+      reason: reason.trim(),
     };
 
     onSubmit(response);
@@ -128,7 +131,7 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
           className={`w-12 h-12 rounded-lg border-2 transition-all ${
             value === rating
               ? 'bg-primary text-primary-foreground border-primary scale-110'
-              : 'bg-background border-border hover:border-primary/50'
+              : 'bg-background text-foreground border-border hover:border-primary/50'
           }`}
         >
           {rating}
@@ -152,9 +155,19 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
       )}
 
       {/* UI1の評価 */}
+      <div className="space-y-4">
+        <h2 className="text-3xl font-bold">UI1 の評価</h2>
+        <div className="flex justify-center mb-4">
+          <img
+            src="/images/UI_test/image_T1.png"
+            alt="UI1: 大量の色を一度に表示"
+            className="w-full max-w-[256px] h-auto object-contain rounded-lg shadow-lg border border-border"
+          />
+        </div>
+      </div>
+
       <Card className="border-2">
         <CardHeader className="bg-slate-50 dark:bg-slate-900">
-          <CardTitle>UI1 の評価</CardTitle>
           <CardDescription>UI1（大量の色を一度に表示）について評価してください</CardDescription>
         </CardHeader>
         <CardContent className="space-y-8 py-6">
@@ -212,9 +225,19 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
       </Card>
 
       {/* UI2の評価 */}
+      <div className="space-y-4">
+        <h2 className="text-3xl font-bold">UI2 の評価</h2>
+        <div className="flex justify-center mb-4">
+          <img
+            src="/images/UI_test/image_T3.png"
+            alt="UI2: 二段階推薦"
+            className="w-full max-w-[256px] h-auto object-contain rounded-lg shadow-lg border border-border"
+          />
+        </div>
+      </div>
+
       <Card className="border-2">
         <CardHeader className="bg-blue-50 dark:bg-blue-950">
-          <CardTitle>UI2 の評価</CardTitle>
           <CardDescription>UI2（二段階推薦）について評価してください</CardDescription>
         </CardHeader>
         <CardContent className="space-y-8 py-6">
@@ -279,7 +302,7 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
         <CardContent className="space-y-8 py-6">
           <div className="space-y-4">
             <Label className="text-base font-semibold">どちらのUIの方が使いやすかったですか？</Label>
-            <div className="flex gap-6 justify-center">
+            <div className="flex gap-6">
               {['UI1', 'UI2'].map((ui) => (
                 <label key={ui} className="flex items-center gap-3 cursor-pointer">
                   <input
@@ -294,6 +317,17 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
                 </label>
               ))}
             </div>
+          </div>
+
+          <div className="space-y-4">
+            <Label htmlFor="reason" className="text-base font-semibold">そう思った理由を教えてください</Label>
+            <Textarea
+              id="reason"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="例：UI2の方が色を選びやすく、迷わずに必要な色を見つけられたため"
+              className="min-h-[120px] resize-y"
+            />
           </div>
         </CardContent>
       </Card>
