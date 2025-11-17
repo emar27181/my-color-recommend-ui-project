@@ -333,12 +333,12 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
           </div>
 
           <div className="space-y-4">
-            <Label htmlFor="suggestions" className="text-base font-semibold">こういう機能があったらもっといいと感じたことなどあれば教えてください（任意）</Label>
+            <Label htmlFor="suggestions" className="text-base font-semibold">感想記述欄（UI2に関して改善点や感想があれば教えてください・任意）</Label>
             <Textarea
               id="suggestions"
               value={suggestions}
               onChange={(e) => setSuggestions(e.target.value)}
-              placeholder="例：もっと細かい色調整ができると良い、AIによる配色提案が欲しい、など"
+              placeholder="例：二段階推薦の方が色を絞りやすかった、もっと色の候補を増やしてほしい、など"
               className="min-h-[100px] resize-y text-foreground"
             />
           </div>
