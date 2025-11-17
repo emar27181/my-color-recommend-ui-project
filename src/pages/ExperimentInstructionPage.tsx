@@ -8,7 +8,7 @@ import {
   EXPERIMENT_ICON_STYLES,
   getButtonClassName,
 } from '@/constants/experimentTheme';
-import { useEffect } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 /**
  * 実験説明ページ
@@ -24,6 +24,10 @@ const ExperimentInstructionPage = () => {
   const { condition, participantId, currentConditionIndex, experimentPatterns } = useExperimentStore();
   const isDebugMode = searchParams.get('debug') === 'true';
 
+  const [screenSize, setScreenSize] = useState({ width: 0, height: 0 });
+  const [scale, setScale] = useState(1);
+  const mainRef = useRef<HTMLDivElement>(null);
+
   // 現在のパターン名を取得（例: U1A, U2B）
   const currentPattern = experimentPatterns[currentConditionIndex];
 
@@ -33,6 +37,42 @@ const ExperimentInstructionPage = () => {
       navigate('/experiment');
     }
   }, [participantId, navigate]);
+
+  // 画面サイズを取得・更新
+  useEffect(() => {
+    const updateScreenSize = () => {
+      setScreenSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+
+    updateScreenSize();
+    window.addEventListener('resize', updateScreenSize);
+
+    return () => {
+      window.removeEventListener('resize', updateScreenSize);
+    };
+  }, []);
+
+  // スケールを計算（画面サイズに応じて最大化）
+  useEffect(() => {
+    if (!mainRef.current || screenSize.width === 0 || screenSize.height === 0) return;
+
+    const contentWidth = mainRef.current.scrollWidth;
+    const contentHeight = mainRef.current.scrollHeight;
+
+    if (contentWidth === 0 || contentHeight === 0) return;
+
+    // 画面サイズに対する比率を計算（余白を考慮して95%まで）
+    const widthRatio = (screenSize.width * 0.95) / contentWidth;
+    const heightRatio = (screenSize.height * 0.95) / contentHeight;
+
+    // 小さい方の比率を採用（縦横どちらかが幅いっぱいになる）
+    const newScale = Math.min(widthRatio, heightRatio, 1.2); // 最大120%まで
+
+    setScale(newScale);
+  }, [screenSize]);
 
   // 条件ごとの説明内容
   const instructions = {
@@ -73,7 +113,11 @@ const ExperimentInstructionPage = () => {
   };
 
   return (
-    <main className="flex-1 pb-8 min-h-screen flex flex-col bg-background">
+    <main
+      ref={mainRef}
+      className="flex-1 pb-8 min-h-screen flex flex-col bg-background origin-top"
+      style={{ transform: `scale(${scale})` }}
+    >
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* タイトル */}
         <div className="text-center mb-8">
