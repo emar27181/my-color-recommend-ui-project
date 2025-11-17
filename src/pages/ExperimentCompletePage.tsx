@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useExperimentStore, type SurveyResponse } from '@/store/experimentStore';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Download, Home, ClipboardCheck } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { SurveyForm } from '@/components/SurveyForm';
@@ -10,7 +9,6 @@ import {
   EXPERIMENT_LAYOUT,
   EXPERIMENT_ICON_STYLES,
   EXPERIMENT_TEXT_STYLES,
-  getBadgeProps,
   getButtonClassName,
 } from '@/constants/experimentTheme';
 
@@ -45,19 +43,6 @@ const ExperimentCompletePage = () => {
     }
   }, [participantId, conditionLogs, navigate]);
 
-  // 各条件の所要時間を計算
-  const getConditionDuration = (condIndex: number) => {
-    if (condIndex < conditionLogs.length) {
-      return conditionLogs[condIndex].task_duration_sec;
-    }
-    return null;
-  };
-
-  // 全体の所要時間を計算
-  const totalDuration = conditionLogs.reduce((sum, log) => {
-    return sum + (log.task_duration_sec || 0);
-  }, 0);
-
   // アンケート送信ハンドラー
   const handleSurveySubmit = (response: SurveyResponse) => {
     setSurveyResponse(response);
@@ -85,33 +70,6 @@ const ExperimentCompletePage = () => {
             すべてのパターン（UI1-TaskA, UI1-TaskB, UI2-TaskA, UI2-TaskB）の評価が完了しました
           </p>
         </div>
-
-        {/* 実験結果サマリー */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>実験結果サマリー</CardTitle>
-            <CardDescription>
-              参加者ID: <Badge {...getBadgeProps('participant')}>{participantId}</Badge>
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* 各パターンの結果 */}
-            <div className="grid grid-cols-2 gap-4 max-w-2xl mx-auto">
-              {conditionLogs.map((log, index) => {
-                return (
-                  <div key={log.pattern} className="p-4 border rounded-lg text-center">
-                    <Badge variant="outline" className="font-mono mb-2">{log.pattern}</Badge>
-                    <div className="text-2xl font-bold">
-                      {log.task_duration_sec !== null ? `${log.task_duration_sec.toFixed(1)}s` : '-'}
-                    </div>
-                    <div className="text-xs text-muted-foreground">所要時間</div>
-                  </div>
-                );
-              })}
-            </div>
-
-          </CardContent>
-        </Card>
 
         {/* アンケートセクション */}
         {showSurvey ? (
