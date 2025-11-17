@@ -53,7 +53,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
   const [containerWidth, setContainerWidth] = useState(800); // コンテナ幅管理
 
   // レイヤーシステム
-  const [currentLayer, setCurrentLayer] = useState<1 | 2>(1);
+  const [currentLayer, setCurrentLayer] = useState<1 | 2>(2);
   const layer1CanvasRef = useRef<HTMLCanvasElement>(null);
   const layer2CanvasRef = useRef<HTMLCanvasElement>(null);
   const [layer1Context, setLayer1Context] = useState<CanvasRenderingContext2D | null>(null);
@@ -683,8 +683,8 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
         currentLayer2Context.fillStyle = '#ffffff';
         currentLayer2Context.fillRect(0, 0, canvasWidth, canvasHeight);
 
-        // 描画レイヤーをレイヤー1に設定（画像に直接描画）
-        setCurrentLayer(1);
+        // 描画レイヤーをレイヤー2に設定（画像の上に描画できるように）
+        setCurrentLayer(2);
 
         // 表示用キャンバスに合成結果を描画
         updateCompositeCanvas();
@@ -747,8 +747,8 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
         currentLayer2Context.fillStyle = '#ffffff';
         currentLayer2Context.fillRect(0, 0, canvasWidth, canvasHeight);
 
-        // 描画レイヤーをレイヤー1に設定（画像に直接描画）
-        setCurrentLayer(1);
+        // 描画レイヤーをレイヤー2に設定（画像の上に描画できるように）
+        setCurrentLayer(2);
 
         // 表示用キャンバスに合成結果を描画
         updateCompositeCanvas();
