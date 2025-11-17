@@ -20,7 +20,6 @@ interface ExperimentHeaderProps {
 export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentHeaderProps) => {
   const navigate = useNavigate();
   const {
-    condition,
     isExperimentRunning,
     hasNextCondition,
     getNextCondition,
