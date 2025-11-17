@@ -33,6 +33,7 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
   // 全体質問
   const [favoriteUI, setFavoriteUI] = useState<string>(isDebugMode ? 'UI2' : '');
   const [reason, setReason] = useState<string>(isDebugMode ? 'デバッグモード：UI2の方が使いやすかったため' : '');
+  const [suggestions, setSuggestions] = useState<string>(isDebugMode ? 'デバッグモード：特になし' : '');
 
   // 質問文の定義
   const coreQuestions = [
@@ -81,6 +82,7 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
       ui2_seq: ui2Seq,
       favoriteUI: favoriteUI,
       reason: reason.trim(),
+      suggestions: suggestions.trim() || undefined, // 空の場合はundefined
     };
 
     onSubmit(response);
@@ -327,6 +329,17 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
               onChange={(e) => setReason(e.target.value)}
               placeholder="例：UI2の方が色を選びやすく、迷わずに必要な色を見つけられたため"
               className="min-h-[120px] resize-y text-foreground"
+            />
+          </div>
+
+          <div className="space-y-4">
+            <Label htmlFor="suggestions" className="text-base font-semibold">こういう機能があったらもっといいと感じたことなどあれば教えてください（任意）</Label>
+            <Textarea
+              id="suggestions"
+              value={suggestions}
+              onChange={(e) => setSuggestions(e.target.value)}
+              placeholder="例：もっと細かい色調整ができると良い、AIによる配色提案が欲しい、など"
+              className="min-h-[100px] resize-y text-foreground"
             />
           </div>
         </CardContent>

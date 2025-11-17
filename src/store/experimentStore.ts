@@ -68,6 +68,7 @@ export interface SurveyResponse {
   // 全体質問
   favoriteUI: string;        // 最も使いやすかったUI (UI1 or UI2 単一選択)
   reason: string;            // 理由（自由記述）
+  suggestions?: string;      // 機能改善提案（任意・自由記述）
 }
 
 // 実験ログ全体の型定義
