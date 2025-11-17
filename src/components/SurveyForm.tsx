@@ -170,7 +170,7 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
 
       <Card className="border-2">
         <CardHeader className="bg-slate-50 dark:bg-slate-900">
-          <CardDescription>UI1（大量の色を一度に表示）について評価してください</CardDescription>
+          <CardDescription>UI1について評価してください</CardDescription>
         </CardHeader>
         <CardContent className="space-y-8 py-6">
           {/* UI1 コアの4問 */}
@@ -240,7 +240,7 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
 
       <Card className="border-2">
         <CardHeader className="bg-blue-50 dark:bg-blue-950">
-          <CardDescription>UI2（二段階推薦）について評価してください</CardDescription>
+          <CardDescription>UI2について評価してください</CardDescription>
         </CardHeader>
         <CardContent className="space-y-8 py-6">
           {/* UI2 コアの4問 */}
