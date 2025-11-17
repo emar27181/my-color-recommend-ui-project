@@ -315,6 +315,9 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
   // 実験ログを取得
   getExperimentLog: (): ExperimentLog => {
     const state = get();
+    // canvas_imageを除外したconditionLogsを作成
+    const conditionsWithoutImages = state.conditionLogs.map(({ canvas_image, ...rest }) => rest);
+
     return {
       participant_id: state.participantId,
       participant_info: state.participantInfo,  // 参加者情報（手動入力）
@@ -324,7 +327,7 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
       total_duration_sec: state.experimentStartTime && state.experimentEndTime
         ? parseFloat(((state.experimentEndTime - state.experimentStartTime) / 1000).toFixed(2))
         : null,
-      conditions: state.conditionLogs,
+      conditions: conditionsWithoutImages as any, // canvas_imageを除外（型キャスト）
       survey: state.surveyResponse || undefined, // アンケート回答を含める
     };
   },
@@ -340,12 +343,13 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
     // JSONログを追加
     zip.file(`log_${state.participantId || 'anonymous'}.json`, JSON.stringify(log, null, 2));
 
-    // 各条件のキャンバス画像を追加
+    // 各条件のキャンバス画像を追加（4パターン: UI1-TaskA, UI1-TaskB, UI2-TaskA, UI2-TaskB）
     state.conditionLogs.forEach((condLog) => {
       if (condLog.canvas_image) {
         // base64データURLから画像データを抽出
         const base64Data = condLog.canvas_image.replace(/^data:image\/\w+;base64,/, '');
-        zip.file(`${condLog.condition}_canvas.png`, base64Data, { base64: true });
+        // patternを使ってファイル名を生成（例: UI1-TaskA_canvas.png）
+        zip.file(`${condLog.pattern}_canvas.png`, base64Data, { base64: true });
       }
     });
 
