@@ -102,7 +102,7 @@ const ExperimentCompletePage = () => {
             <CardContent className="space-y-4">
               <Button onClick={exportLog} size="lg" className={`w-full ${getButtonClassName('primary')}`}>
                 <Download className={EXPERIMENT_ICON_STYLES.default} />
-                実験データをダウンロード（ZIP）
+                実験データを再ダウンロード
               </Button>
 
               <div className="text-sm text-muted-foreground space-y-2">
