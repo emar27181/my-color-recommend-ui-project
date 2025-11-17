@@ -35,12 +35,12 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
   const [penSize, setPenSize] = useState(20);
   const [isEraserMode, setIsEraserMode] = useState(false);
-  const [isFillMode, setIsFillMode] = useState(false);
+  const [isFillMode, setIsFillMode] = useState(true); // デフォルトツールを塗りつぶしに
   const [isEyedropperMode, setIsEyedropperMode] = useState(false);
   const [previousTool, setPreviousTool] = useState<{
     isFillMode: boolean;
     isEraserMode: boolean;
-  }>({ isFillMode: false, isEraserMode: false });
+  }>({ isFillMode: true, isEraserMode: false }); // デフォルトを塗りつぶしに
   const [isEditingPenSize, setIsEditingPenSize] = useState(false);
   const [tempPenSize, setTempPenSize] = useState('');
   const [isExtractingColors, setIsExtractingColors] = useState(false);
@@ -683,8 +683,8 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
         currentLayer2Context.fillStyle = '#ffffff';
         currentLayer2Context.fillRect(0, 0, canvasWidth, canvasHeight);
 
-        // 描画レイヤーをレイヤー2に設定（画像の上に描画できるように）
-        setCurrentLayer(2);
+        // 描画レイヤーをレイヤー1に設定（画像に直接描画）
+        setCurrentLayer(1);
 
         // 表示用キャンバスに合成結果を描画
         updateCompositeCanvas();
@@ -747,8 +747,8 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
         currentLayer2Context.fillStyle = '#ffffff';
         currentLayer2Context.fillRect(0, 0, canvasWidth, canvasHeight);
 
-        // 描画レイヤーをレイヤー2に設定（画像の上に描画できるように）
-        setCurrentLayer(2);
+        // 描画レイヤーをレイヤー1に設定（画像に直接描画）
+        setCurrentLayer(1);
 
         // 表示用キャンバスに合成結果を描画
         updateCompositeCanvas();
