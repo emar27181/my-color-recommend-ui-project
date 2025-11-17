@@ -326,7 +326,7 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="例：UI2の方が色を選びやすく、迷わずに必要な色を見つけられたため"
-              className="min-h-[120px] resize-y"
+              className="min-h-[120px] resize-y text-foreground"
             />
           </div>
         </CardContent>
