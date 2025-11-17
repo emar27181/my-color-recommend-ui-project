@@ -172,50 +172,43 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
         <CardHeader className="bg-slate-50 dark:bg-slate-900">
           <CardDescription>UI1について評価してください</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-8 py-6">
+        <CardContent className="space-y-6 py-6">
           {/* UI1 コアの4問 */}
-          <div className="space-y-6">
-            <h3 className="font-semibold text-lg">基本評価</h3>
-            {coreQuestions.map((question, index) => (
-              <div key={index} className="space-y-3">
-                <Label className="text-base">
-                  {index + 1}. {question}
-                </Label>
-                <div className="flex items-center gap-4">
-                  <span className="text-sm text-muted-foreground w-24 text-right">全くそう思わない</span>
-                  <RatingScale
-                    value={ui1Core[index]}
-                    onChange={(value) => updateRating('ui1', 'core', index, value)}
-                  />
-                  <span className="text-sm text-muted-foreground w-24">非常にそう思う</span>
-                </div>
+          {coreQuestions.map((question, index) => (
+            <div key={index} className="space-y-3">
+              <Label className="text-base">
+                {index + 1}. {question}
+              </Label>
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-muted-foreground w-24 text-right">全くそう思わない</span>
+                <RatingScale
+                  value={ui1Core[index]}
+                  onChange={(value) => updateRating('ui1', 'core', index, value)}
+                />
+                <span className="text-sm text-muted-foreground w-24">非常にそう思う</span>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
 
           {/* UI1 追加の4問 */}
-          <div className="space-y-6 pt-4 border-t">
-            <h3 className="font-semibold text-lg">詳細評価</h3>
-            {additionalQuestions.map((question, index) => (
-              <div key={index} className="space-y-3">
-                <Label className="text-base">
-                  {index + 5}. {question}
-                </Label>
-                <div className="flex items-center gap-4">
-                  <span className="text-sm text-muted-foreground w-24 text-right">全くそう思わない</span>
-                  <RatingScale
-                    value={ui1Additional[index]}
-                    onChange={(value) => updateRating('ui1', 'additional', index, value)}
-                  />
-                  <span className="text-sm text-muted-foreground w-24">非常にそう思う</span>
-                </div>
+          {additionalQuestions.map((question, index) => (
+            <div key={index} className="space-y-3">
+              <Label className="text-base">
+                {index + 5}. {question}
+              </Label>
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-muted-foreground w-24 text-right">全くそう思わない</span>
+                <RatingScale
+                  value={ui1Additional[index]}
+                  onChange={(value) => updateRating('ui1', 'additional', index, value)}
+                />
+                <span className="text-sm text-muted-foreground w-24">非常にそう思う</span>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
 
           {/* UI1 SEQ */}
-          <div className="space-y-3 pt-4 border-t">
-            <h3 className="font-semibold text-lg">タスク難易度</h3>
+          <div className="space-y-3">
             <Label className="text-base">9. {seqQuestion}</Label>
             <div className="flex items-center gap-4">
               <span className="text-sm text-muted-foreground w-24 text-right">全くそう思わない</span>
@@ -242,50 +235,43 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
         <CardHeader className="bg-blue-50 dark:bg-blue-950">
           <CardDescription>UI2について評価してください</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-8 py-6">
+        <CardContent className="space-y-6 py-6">
           {/* UI2 コアの4問 */}
-          <div className="space-y-6">
-            <h3 className="font-semibold text-lg">基本評価</h3>
-            {coreQuestions.map((question, index) => (
-              <div key={index} className="space-y-3">
-                <Label className="text-base">
-                  {index + 1}. {question}
-                </Label>
-                <div className="flex items-center gap-4">
-                  <span className="text-sm text-muted-foreground w-24 text-right">全くそう思わない</span>
-                  <RatingScale
-                    value={ui2Core[index]}
-                    onChange={(value) => updateRating('ui2', 'core', index, value)}
-                  />
-                  <span className="text-sm text-muted-foreground w-24">非常にそう思う</span>
-                </div>
+          {coreQuestions.map((question, index) => (
+            <div key={index} className="space-y-3">
+              <Label className="text-base">
+                {index + 1}. {question}
+              </Label>
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-muted-foreground w-24 text-right">全くそう思わない</span>
+                <RatingScale
+                  value={ui2Core[index]}
+                  onChange={(value) => updateRating('ui2', 'core', index, value)}
+                />
+                <span className="text-sm text-muted-foreground w-24">非常にそう思う</span>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
 
           {/* UI2 追加の4問 */}
-          <div className="space-y-6 pt-4 border-t">
-            <h3 className="font-semibold text-lg">詳細評価</h3>
-            {additionalQuestions.map((question, index) => (
-              <div key={index} className="space-y-3">
-                <Label className="text-base">
-                  {index + 5}. {question}
-                </Label>
-                <div className="flex items-center gap-4">
-                  <span className="text-sm text-muted-foreground w-24 text-right">全くそう思わない</span>
-                  <RatingScale
-                    value={ui2Additional[index]}
-                    onChange={(value) => updateRating('ui2', 'additional', index, value)}
-                  />
-                  <span className="text-sm text-muted-foreground w-24">非常にそう思う</span>
-                </div>
+          {additionalQuestions.map((question, index) => (
+            <div key={index} className="space-y-3">
+              <Label className="text-base">
+                {index + 5}. {question}
+              </Label>
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-muted-foreground w-24 text-right">全くそう思わない</span>
+                <RatingScale
+                  value={ui2Additional[index]}
+                  onChange={(value) => updateRating('ui2', 'additional', index, value)}
+                />
+                <span className="text-sm text-muted-foreground w-24">非常にそう思う</span>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
 
           {/* UI2 SEQ */}
-          <div className="space-y-3 pt-4 border-t">
-            <h3 className="font-semibold text-lg">タスク難易度</h3>
+          <div className="space-y-3">
             <Label className="text-base">9. {seqQuestion}</Label>
             <div className="flex items-center gap-4">
               <span className="text-sm text-muted-foreground w-24 text-right">全くそう思わない</span>
