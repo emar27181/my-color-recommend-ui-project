@@ -167,7 +167,7 @@ const ExperimentPage = () => {
    * 条件に応じてコンポーネントをフィルタリング
    *
    * UI1: massColorGrid のみ表示、baseColor 非表示
-   * UI2: colorRecommendation, toneRecommendation のみ表示、baseColor 非表示
+   * UI2: baseColor, colorRecommendation, toneRecommendation を表示
    *
    * 実験中は常に除外:
    * - skinColor (肌色推薦)
@@ -185,8 +185,8 @@ const ExperimentPage = () => {
         return false;
       }
 
-      // UI1・UI2ではベース色選択を非表示
-      if (componentKey === 'baseColor' && (condition === 'UI1' || condition === 'UI2')) {
+      // UI1のみベース色選択を非表示
+      if (componentKey === 'baseColor' && condition === 'UI1') {
         return false;
       }
 
