@@ -41,8 +41,8 @@ const ExperimentPage = () => {
 
     // materialに応じて画像URLを決定
     const imageUrl = material === 'taskA'
-      ? '/images/illust_bear.jpg'  // TaskA: イラスト
-      : '/images/logo_techloop.jpg'; // TaskB: ロゴ
+      ? '/images/illust_bear.png'  // TaskA: イラスト
+      : '/images/logo_techloop.png'; // TaskB: ロゴ
 
     // 少し待ってからキャンバスに画像を読み込み（初期化完了を待つ）
     const timer = setTimeout(() => {
