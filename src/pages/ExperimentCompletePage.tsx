@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useExperimentStore, type SurveyResponse } from '@/store/experimentStore';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, Download, Home, ClipboardCheck } from 'lucide-react';
+import { CheckCircle, Download, ClipboardCheck } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { SurveyForm } from '@/components/SurveyForm';
 import {
@@ -121,14 +121,6 @@ const ExperimentCompletePage = () => {
             </CardContent>
           </Card>
         )}
-
-        {/* ホームに戻るボタン */}
-        <div className="text-center">
-          <Button onClick={() => navigate('/')} variant="outline" className={getButtonClassName('outline')}>
-            <Home className={EXPERIMENT_ICON_STYLES.small} />
-            ホームに戻る
-          </Button>
-        </div>
       </div>
     </main>
   );
