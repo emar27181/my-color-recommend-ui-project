@@ -25,7 +25,7 @@ const ExperimentPage = () => {
   // URLから条件を読み取る
   useExperimentQuery();
 
-  const { condition, participantId, getFeatureFlags } = useExperimentStore();
+  const { condition, participantId, material, getFeatureFlags } = useExperimentStore();
   const featureFlags = getFeatureFlags();
 
   // 参加者IDが未設定の場合は導入ページにリダイレクト
@@ -34,6 +34,24 @@ const ExperimentPage = () => {
       navigate('/experiment');
     }
   }, [participantId, navigate]);
+
+  // タスクに応じて画像を自動読み込み
+  useEffect(() => {
+    if (!canvasColorRecommendationsRef.current || !material) return;
+
+    // materialに応じて画像URLを決定
+    const imageUrl = material === 'taskA'
+      ? '/images/illust_bear.jpg'  // TaskA: イラスト
+      : '/images/logo_techloop.jpg'; // TaskB: ロゴ
+
+    // 少し待ってからキャンバスに画像を読み込み（初期化完了を待つ）
+    const timer = setTimeout(() => {
+      canvasColorRecommendationsRef.current?.loadImageFromUrl(imageUrl);
+      console.log(`Auto-loaded image for ${material}: ${imageUrl}`);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [material]);
 
   const [screenSize, setScreenSize] = useState({ width: 0, height: 0 });
 

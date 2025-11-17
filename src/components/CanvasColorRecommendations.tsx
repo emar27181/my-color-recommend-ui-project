@@ -17,6 +17,7 @@ interface CanvasColorRecommendationsProps {
 
 export interface CanvasColorRecommendationsRef {
   drawImageToCanvas: (imageFile: File) => void;
+  loadImageFromUrl: (imageUrl: string) => void; // URLから画像を読み込み
   extractColorsFromCanvas: () => Promise<void>;
   clearAllLayers: () => void;
   undo: () => void;
@@ -708,6 +709,63 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     reader.readAsDataURL(imageFile);
   }, [context, saveToHistory, resizeCanvas, updateCompositeCanvas]);
 
+  // URLから画像を読み込んでキャンバスに描画する関数
+  const loadImageFromUrl = useCallback((imageUrl: string) => {
+    if (!context || !canvasRef.current) return;
+
+    const img: HTMLImageElement = document.createElement('img');
+
+    img.onload = () => {
+      // 履歴保存
+      saveToHistory();
+
+      // 画像サイズに合わせてキャンバスをリサイズ
+      resizeCanvas(img.width, img.height);
+
+      // リサイズ後、少し待ってから描画（コンテキスト更新を待つ）
+      setTimeout(() => {
+        const currentContext = canvasRef.current?.getContext('2d');
+        const currentLayer2Context = layer2CanvasRef.current?.getContext('2d');
+
+        if (!currentContext || !currentLayer2Context || !canvasRef.current || !layer2CanvasRef.current) {
+          console.error('Context lost after resize');
+          return;
+        }
+
+        // リサイズ後のキャンバスサイズを取得
+        const canvasWidth = canvasRef.current.width;
+        const canvasHeight = canvasRef.current.height;
+
+        // レイヤー1の前の画像を削除してから新しい画像を描画
+        const currentLayer1Context = layer1CanvasRef.current?.getContext('2d');
+        if (currentLayer1Context && layer1CanvasRef.current) {
+          currentLayer1Context.clearRect(0, 0, canvasWidth, canvasHeight);
+          currentLayer1Context.drawImage(img, 0, 0, canvasWidth, canvasHeight);
+        }
+
+        // レイヤー2（背景）を白で初期化
+        currentLayer2Context.fillStyle = '#ffffff';
+        currentLayer2Context.fillRect(0, 0, canvasWidth, canvasHeight);
+
+        // 描画レイヤーをレイヤー2に設定（画像の上に描画できるように）
+        setCurrentLayer(2);
+
+        // 表示用キャンバスに合成結果を描画
+        updateCompositeCanvas();
+
+        console.log('Image loaded from URL to layer 1:', imageUrl);
+      }, 100); // リサイズ処理完了を待つ
+    };
+
+    img.onerror = () => {
+      console.error('Failed to load image from URL:', imageUrl);
+      showToast('画像の読み込みに失敗しました', 'error');
+    };
+
+    // URLを直接設定
+    img.src = imageUrl;
+  }, [context, saveToHistory, resizeCanvas, updateCompositeCanvas, showToast]);
+
   // すべてのレイヤーをクリアする関数
   const clearAllLayers = useCallback(() => {
     if (!layer1Context || !layer2Context || !layer1CanvasRef.current || !layer2CanvasRef.current) {
@@ -906,6 +964,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
   // 外部からアクセス可能な関数を公開
   useImperativeHandle(ref, () => ({
     drawImageToCanvas,
+    loadImageFromUrl,
     extractColorsFromCanvas,
     clearAllLayers,
     undo,
@@ -913,7 +972,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     canUndo: () => historyIndex > 0,
     canRedo: () => historyIndex < history.length - 1,
     getCanvasImage
-  }), [drawImageToCanvas, extractColorsFromCanvas, clearAllLayers, undo, redo, historyIndex, history.length, getCanvasImage]);
+  }), [drawImageToCanvas, loadImageFromUrl, extractColorsFromCanvas, clearAllLayers, undo, redo, historyIndex, history.length, getCanvasImage]);
 
   // キャンバスから色を取得する関数（合成表示から）
   const pickColorFromCanvas = useCallback((x: number, y: number) => {
