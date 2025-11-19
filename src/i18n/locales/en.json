@@ -20,7 +20,8 @@
     "clickToSelect": "Click to select color",
     "selectedColor": "Selected color",
     "clickToChange": "Click to change",
-    "tapToChange": "Tap to change"
+    "tapToChange": "Tap to change",
+    "hue": "Hue"
   },
   "imageUpload": {
     "invalidFile": "Invalid file",

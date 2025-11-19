@@ -1,35 +1,37 @@
 import { useColorStore } from '@/store/colorStore';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { CopyColorButton } from '@/components/common/CopyColorButton';
-import { TYPOGRAPHY, BORDER_PRESETS } from '@/constants/ui';
+import { ColorBlock } from '@/components/common/ColorBlock';
+import { TYPOGRAPHY } from '@/constants/ui';
 import { useTutorial } from '@/contexts/TutorialContext';
-import { Palette } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import chroma from 'chroma-js';
+import { useMemo, useState } from 'react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 export const ColorPicker = () => {
   const { baseColor, setColorFromBase } = useColorStore();
   const { onUserAction } = useTutorial();
   const { t } = useTranslation();
+  const [isPaletteVisible, setIsPaletteVisible] = useState(false);
 
-  const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const color = e.target.value;
+  // 24色の色相パレット（15度区切り、明度50、彩度100）を生成
+  const hueColors = useMemo(() => {
+    return Array.from({ length: 24 }, (_, i) => {
+      const hue = i * 15; // 0, 15, 30, ..., 345
+      return chroma.hsl(hue, 1, 0.5).hex();
+    });
+  }, []);
+
+  const handleColorClick = (color: string) => {
     // ベース色選択：ベースカラー、selectedColor、描画色をすべて更新
     setColorFromBase(color);
     // チュートリアルの自動進行をトリガー
     onUserAction('click', '[data-tutorial="color-picker"]');
   };
 
-  // ベースカラーとのコントラスト比を考慮したアイコン色を取得
-  const getIconColor = () => {
-    try {
-      const color = chroma(baseColor);
-      const lightness = color.get('hsl.l');
-      // 明るい色には暗いアイコン、暗い色には明るいアイコン
-      return lightness > 0.5 ? '#374151' : '#f9fafb'; // gray-700 or gray-50
-    } catch {
-      return '#6b7280'; // デフォルト: gray-500
-    }
+  const togglePalette = () => {
+    setIsPaletteVisible(!isPaletteVisible);
   };
 
   return (
@@ -39,33 +41,14 @@ export const ColorPicker = () => {
       <CardContent className="pt-0 flex-1 overflow-auto pb-0">
         {/* Desktop/Tablet Layout */}
         <div className="hidden md:block h-full">
-          <div className="p-1 transition-all duration-200 h-full flex items-center">
-            <div className="flex items-center gap-3 w-full">
-              <div className="flex items-center gap-3" data-tutorial="color-picker">
-                <div className="relative cursor-pointer hover:scale-110 transition-all duration-200">
-                  <input
-                    type="color"
-                    value={baseColor}
-                    onChange={handleColorChange}
-                    className="absolute inset-0 opacity-0 w-full h-full cursor-pointer z-10"
-                    title={t('colorPicker.clickToSelect')}
-                  />
-                  <div 
-                    className={`${BORDER_PRESETS.colorBlock} flex items-center justify-center pointer-events-none`}
-                    style={{
-                      backgroundColor: baseColor,
-                      width: '46px',
-                      height: '46px'
-                    }}
-                    title={`${t('colorPicker.selectedColor')}: ${baseColor} - ${t('colorPicker.clickToChange')}`}
-                  >
-                    <Palette 
-                      className="w-5 h-5" 
-                      style={{ color: getIconColor() }}
-                    />
-                  </div>
-                </div>
-              </div>
+          <div className="p-1 transition-all duration-200">
+            {/* 選択中のベースカラー表示 */}
+            <div className="flex items-center gap-3" data-tutorial="color-picker">
+              <ColorBlock
+                color={baseColor}
+                isHighlighted={true}
+                onClick={togglePalette}
+              />
               <div className="flex-1 min-w-0">
                 <p className={`${TYPOGRAPHY.colorCode} truncate`}>{baseColor}</p>
               </div>
@@ -74,46 +57,82 @@ export const ColorPicker = () => {
                 variant="minimal"
                 className="opacity-100"
               />
+              <button
+                onClick={togglePalette}
+                className="p-1 hover:bg-muted rounded transition-colors"
+                title={isPaletteVisible ? "パレットを閉じる" : "パレットを開く"}
+              >
+                {isPaletteVisible ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+              </button>
             </div>
+
+            {/* 24色パレットグリッド（6列×4行） - 表示/非表示切り替え */}
+            {isPaletteVisible && (
+              <div className="grid grid-cols-6 gap-3 mt-3 animate-in fade-in duration-200">
+                {hueColors.map((color, index) => (
+                  <ColorBlock
+                    key={index}
+                    color={color}
+                    onClick={() => handleColorClick(color)}
+                    title={`${t('colorPicker.hue')}: ${index * 15}°`}
+                    showClickIcon={false}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
         {/* Mobile Layout */}
         <div className="block md:hidden h-full">
-          <div className="p-1 flex items-center gap-1 h-full">
+          <div className="p-1">
+            {/* 選択中のベースカラー表示 */}
             <div className="flex items-center gap-2">
-              <div className="relative cursor-pointer hover:scale-110 transition-all duration-200">
-                <input
-                  type="color"
-                  value={baseColor}
-                  onChange={handleColorChange}
-                  className="absolute inset-0 opacity-0 w-full h-full cursor-pointer z-10"
-                  title={t('colorPicker.clickToSelect')}
-                />
-                <div 
-                  className={`${BORDER_PRESETS.colorBlock} flex items-center justify-center pointer-events-none`}
-                  style={{
-                    backgroundColor: baseColor,
-                    width: '24px',
-                    height: '24px'
-                  }}
-                  title={`${t('colorPicker.selectedColor')}: ${baseColor} - ${t('colorPicker.tapToChange')}`}
-                >
-                  <Palette 
-                    className="w-3 h-3" 
-                    style={{ color: getIconColor() }}
-                  />
-                </div>
+              <div
+                className="border-2 border-foreground rounded-md cursor-pointer"
+                style={{
+                  backgroundColor: baseColor,
+                  width: '24px',
+                  height: '24px'
+                }}
+                onClick={togglePalette}
+              />
+              <CopyColorButton
+                color={baseColor}
+                variant="minimal"
+                className="opacity-100 flex-shrink-0"
+              />
+              <div className="flex-1 min-w-0">
+                <span className="text-xs font-mono text-muted-foreground truncate block">{baseColor}</span>
               </div>
+              <button
+                onClick={togglePalette}
+                className="p-1 hover:bg-muted rounded transition-colors"
+                title={isPaletteVisible ? "パレットを閉じる" : "パレットを開く"}
+              >
+                {isPaletteVisible ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </button>
             </div>
-            <CopyColorButton
-              color={baseColor}
-              variant="minimal"
-              className="opacity-100 flex-shrink-0"
-            />
-            <div className="flex-1 min-w-0">
-              <span className="text-xs font-mono text-muted-foreground truncate block">{baseColor}</span>
-            </div>
+
+            {/* 24色パレットグリッド（6列×4行） - 表示/非表示切り替え */}
+            {isPaletteVisible && (
+              <div className="grid grid-cols-6 gap-1 mt-2 animate-in fade-in duration-200">
+                {hueColors.map((color, index) => (
+                  <div
+                    key={index}
+                    className="cursor-pointer hover:scale-110 transition-all duration-200 rounded-md"
+                    style={{
+                      backgroundColor: color,
+                      width: '100%',
+                      aspectRatio: '1',
+                      minHeight: '24px'
+                    }}
+                    onClick={() => handleColorClick(color)}
+                    title={`${t('colorPicker.hue')}: ${index * 15}°`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </CardContent>

@@ -20,7 +20,8 @@
     "clickToSelect": "クリックで色を選択",
     "selectedColor": "選択中の色",
     "clickToChange": "クリックで変更",
-    "tapToChange": "タップで変更"
+    "tapToChange": "タップで変更",
+    "hue": "色相"
   },
   "imageUpload": {
     "invalidFile": "無効なファイルです",
