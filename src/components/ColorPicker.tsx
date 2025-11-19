@@ -66,18 +66,20 @@ export const ColorPicker = () => {
               </button>
             </div>
 
-            {/* 24色パレットグリッド（6列×4行） - 表示/非表示切り替え */}
+            {/* 24色パレット（横一列） - 表示/非表示切り替え */}
             {isPaletteVisible && (
-              <div className="grid grid-cols-6 gap-3 mt-3 animate-in fade-in duration-200">
-                {hueColors.map((color, index) => (
-                  <ColorBlock
-                    key={index}
-                    color={color}
-                    onClick={() => handleColorClick(color)}
-                    title={`${t('colorPicker.hue')}: ${index * 15}°`}
-                    showClickIcon={false}
-                  />
-                ))}
+              <div className="mt-3 animate-in fade-in duration-200">
+                <div className="flex gap-3 overflow-x-auto pb-2">
+                  {hueColors.map((color, index) => (
+                    <ColorBlock
+                      key={index}
+                      color={color}
+                      onClick={() => handleColorClick(color)}
+                      title={`${t('colorPicker.hue')}: ${index * 15}°`}
+                      showClickIcon={false}
+                    />
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -114,23 +116,24 @@ export const ColorPicker = () => {
               </button>
             </div>
 
-            {/* 24色パレットグリッド（6列×4行） - 表示/非表示切り替え */}
+            {/* 24色パレット（横一列） - 表示/非表示切り替え */}
             {isPaletteVisible && (
-              <div className="grid grid-cols-6 gap-1 mt-2 animate-in fade-in duration-200">
-                {hueColors.map((color, index) => (
-                  <div
-                    key={index}
-                    className="cursor-pointer hover:scale-110 transition-all duration-200 rounded-md"
-                    style={{
-                      backgroundColor: color,
-                      width: '100%',
-                      aspectRatio: '1',
-                      minHeight: '24px'
-                    }}
-                    onClick={() => handleColorClick(color)}
-                    title={`${t('colorPicker.hue')}: ${index * 15}°`}
-                  />
-                ))}
+              <div className="mt-2 animate-in fade-in duration-200">
+                <div className="flex gap-1 overflow-x-auto pb-2">
+                  {hueColors.map((color, index) => (
+                    <div
+                      key={index}
+                      className="cursor-pointer hover:scale-110 transition-all duration-200 rounded-md flex-shrink-0"
+                      style={{
+                        backgroundColor: color,
+                        width: '32px',
+                        height: '32px'
+                      }}
+                      onClick={() => handleColorClick(color)}
+                      title={`${t('colorPicker.hue')}: ${index * 15}°`}
+                    />
+                  ))}
+                </div>
               </div>
             )}
           </div>
