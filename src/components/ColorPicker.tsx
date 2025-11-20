@@ -28,6 +28,20 @@ export const ColorPicker = () => {
     onUserAction('click', '[data-tutorial="color-picker"]');
   };
 
+  // 選択中のベースカラーの色相に最も近いパレット色のインデックスを取得
+  const getHighlightedIndex = () => {
+    try {
+      const baseHue = chroma(baseColor).get('hsl.h');
+      // 最も近い15度区切りの色相を見つける
+      const closestIndex = Math.round(baseHue / 15) % 24;
+      return closestIndex;
+    } catch {
+      return -1; // エラー時はハイライトなし
+    }
+  };
+
+  const highlightedIndex = getHighlightedIndex();
+
   return (
     <Card className="w-full h-full flex flex-col">
       <CardHeader className="pb-1 pt-2 flex-shrink-0">
@@ -62,6 +76,7 @@ export const ColorPicker = () => {
                     onClick={() => handleColorClick(color)}
                     title={`${t('colorPicker.hue')}: ${index * 15}°`}
                     showClickIcon={false}
+                    isHighlighted={index === highlightedIndex}
                   />
                 ))}
               </div>
@@ -98,7 +113,9 @@ export const ColorPicker = () => {
                 {hueColors.map((color, index) => (
                   <div
                     key={index}
-                    className="cursor-pointer hover:scale-110 transition-all duration-200 rounded-md flex-shrink-0"
+                    className={`cursor-pointer hover:scale-110 transition-all duration-200 rounded-md flex-shrink-0 ${
+                      index === highlightedIndex ? 'border-2 border-foreground' : ''
+                    }`}
                     style={{
                       backgroundColor: color,
                       width: '32px',
