@@ -13,7 +13,7 @@ export const ColorPicker = () => {
   const { baseColor, setColorFromBase } = useColorStore();
   const { onUserAction } = useTutorial();
   const { t } = useTranslation();
-  const [isPaletteVisible, setIsPaletteVisible] = useState(false);
+  const [isPaletteVisible, setIsPaletteVisible] = useState(true);
 
   // 24色の色相パレット（15度区切り、明度50、彩度100）を生成
   const hueColors = useMemo(() => {

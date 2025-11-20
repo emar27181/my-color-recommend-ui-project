@@ -69,11 +69,11 @@ export const COMPONENT_CONFIG = {
     hasUpdateButton: false
   },
   baseColor: {
-    key: 'baseColor', 
+    key: 'baseColor',
     step: '1',
     titleKey: 'app.steps.baseColorSelectionShort',
     collapseState: 'isBaseColorCollapsed',
-    hasUpdateButton: true
+    hasUpdateButton: false
   },
   colorRecommendation: {
     key: 'colorRecommendation',
