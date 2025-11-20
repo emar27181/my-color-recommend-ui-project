@@ -66,9 +66,9 @@ export const ColorPicker = () => {
               />
             </div>
 
-            {/* 24色パレット（横一列） - 常時表示 */}
+            {/* 24色パレット（2列表示） - 常時表示 */}
             <div className="mt-3">
-              <div className="flex gap-3 overflow-x-auto pb-2">
+              <div className="grid grid-cols-12 gap-3">
                 {hueColors.map((color, index) => (
                   <ColorBlock
                     key={index}
@@ -107,13 +107,13 @@ export const ColorPicker = () => {
               </div>
             </div>
 
-            {/* 24色パレット（横一列） - 常時表示 */}
+            {/* 24色パレット（2列表示） - 常時表示 */}
             <div className="mt-2">
-              <div className="flex gap-1 overflow-x-auto pb-2">
+              <div className="grid grid-cols-12 gap-1">
                 {hueColors.map((color, index) => (
                   <div
                     key={index}
-                    className={`cursor-pointer hover:scale-110 transition-all duration-200 rounded-md flex-shrink-0 ${
+                    className={`cursor-pointer hover:scale-110 transition-all duration-200 rounded-md ${
                       index === highlightedIndex ? 'border-2 border-foreground' : ''
                     }`}
                     style={{
