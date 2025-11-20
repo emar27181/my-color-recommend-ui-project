@@ -6,14 +6,12 @@ import { TYPOGRAPHY } from '@/constants/ui';
 import { useTutorial } from '@/contexts/TutorialContext';
 import { useTranslation } from 'react-i18next';
 import chroma from 'chroma-js';
-import { useMemo, useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useMemo } from 'react';
 
 export const ColorPicker = () => {
   const { baseColor, setColorFromBase } = useColorStore();
   const { onUserAction } = useTutorial();
   const { t } = useTranslation();
-  const [isPaletteVisible, setIsPaletteVisible] = useState(true);
 
   // 24色の色相パレット（15度区切り、明度50、彩度100）を生成
   const hueColors = useMemo(() => {
@@ -30,10 +28,6 @@ export const ColorPicker = () => {
     onUserAction('click', '[data-tutorial="color-picker"]');
   };
 
-  const togglePalette = () => {
-    setIsPaletteVisible(!isPaletteVisible);
-  };
-
   return (
     <Card className="w-full h-full flex flex-col">
       <CardHeader className="pb-1 pt-2 flex-shrink-0">
@@ -47,7 +41,6 @@ export const ColorPicker = () => {
               <ColorBlock
                 color={baseColor}
                 isHighlighted={true}
-                onClick={togglePalette}
               />
               <div className="flex-1 min-w-0">
                 <p className={`${TYPOGRAPHY.colorCode} truncate`}>{baseColor}</p>
@@ -57,31 +50,22 @@ export const ColorPicker = () => {
                 variant="minimal"
                 className="opacity-100"
               />
-              <button
-                onClick={togglePalette}
-                className="p-1 hover:bg-muted rounded transition-colors"
-                title={isPaletteVisible ? "パレットを閉じる" : "パレットを開く"}
-              >
-                {isPaletteVisible ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-              </button>
             </div>
 
-            {/* 24色パレット（横一列） - 表示/非表示切り替え */}
-            {isPaletteVisible && (
-              <div className="mt-3 animate-in fade-in duration-200">
-                <div className="flex gap-3 overflow-x-auto pb-2">
-                  {hueColors.map((color, index) => (
-                    <ColorBlock
-                      key={index}
-                      color={color}
-                      onClick={() => handleColorClick(color)}
-                      title={`${t('colorPicker.hue')}: ${index * 15}°`}
-                      showClickIcon={false}
-                    />
-                  ))}
-                </div>
+            {/* 24色パレット（横一列） - 常時表示 */}
+            <div className="mt-3">
+              <div className="flex gap-3 overflow-x-auto pb-2">
+                {hueColors.map((color, index) => (
+                  <ColorBlock
+                    key={index}
+                    color={color}
+                    onClick={() => handleColorClick(color)}
+                    title={`${t('colorPicker.hue')}: ${index * 15}°`}
+                    showClickIcon={false}
+                  />
+                ))}
               </div>
-            )}
+            </div>
           </div>
         </div>
 
@@ -91,13 +75,12 @@ export const ColorPicker = () => {
             {/* 選択中のベースカラー表示 */}
             <div className="flex items-center gap-2">
               <div
-                className="border-2 border-foreground rounded-md cursor-pointer"
+                className="border-2 border-foreground rounded-md"
                 style={{
                   backgroundColor: baseColor,
                   width: '24px',
                   height: '24px'
                 }}
-                onClick={togglePalette}
               />
               <CopyColorButton
                 color={baseColor}
@@ -107,35 +90,26 @@ export const ColorPicker = () => {
               <div className="flex-1 min-w-0">
                 <span className="text-xs font-mono text-muted-foreground truncate block">{baseColor}</span>
               </div>
-              <button
-                onClick={togglePalette}
-                className="p-1 hover:bg-muted rounded transition-colors"
-                title={isPaletteVisible ? "パレットを閉じる" : "パレットを開く"}
-              >
-                {isPaletteVisible ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-              </button>
             </div>
 
-            {/* 24色パレット（横一列） - 表示/非表示切り替え */}
-            {isPaletteVisible && (
-              <div className="mt-2 animate-in fade-in duration-200">
-                <div className="flex gap-1 overflow-x-auto pb-2">
-                  {hueColors.map((color, index) => (
-                    <div
-                      key={index}
-                      className="cursor-pointer hover:scale-110 transition-all duration-200 rounded-md flex-shrink-0"
-                      style={{
-                        backgroundColor: color,
-                        width: '32px',
-                        height: '32px'
-                      }}
-                      onClick={() => handleColorClick(color)}
-                      title={`${t('colorPicker.hue')}: ${index * 15}°`}
-                    />
-                  ))}
-                </div>
+            {/* 24色パレット（横一列） - 常時表示 */}
+            <div className="mt-2">
+              <div className="flex gap-1 overflow-x-auto pb-2">
+                {hueColors.map((color, index) => (
+                  <div
+                    key={index}
+                    className="cursor-pointer hover:scale-110 transition-all duration-200 rounded-md flex-shrink-0"
+                    style={{
+                      backgroundColor: color,
+                      width: '32px',
+                      height: '32px'
+                    }}
+                    onClick={() => handleColorClick(color)}
+                    title={`${t('colorPicker.hue')}: ${index * 15}°`}
+                  />
+                ))}
               </div>
-            )}
+            </div>
           </div>
         </div>
       </CardContent>
