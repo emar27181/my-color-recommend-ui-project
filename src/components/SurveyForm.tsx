@@ -14,20 +14,20 @@ interface SurveyFormProps {
 /**
  * アンケートフォームコンポーネント
  *
- * - UI1用評価（コア4問 + 追加4問 + SEQ1問）
- * - UI2用評価（コア4問 + 追加4問 + SEQ1問）
+ * - UI1用評価（8問 + SEQ1問）
+ * - UI2用評価（8問 + SEQ1問）
  * - 全体質問（どちらのUIが使いやすかったか）
  * - デバッグモード対応（自動入力）
  */
 export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) => {
-  // UI1用の評価
-  const [ui1Core, setUi1Core] = useState<number[]>(isDebugMode ? [4, 4, 4, 4] : [0, 0, 0, 0]);
-  const [ui1Additional, setUi1Additional] = useState<number[]>(isDebugMode ? [4, 4, 4, 4] : [0, 0, 0, 0]);
+  // UI1用の評価（8問に統合）
+  const [ui1Core, setUi1Core] = useState<number[]>(isDebugMode ? [4, 4, 4, 4, 4, 4, 4, 4] : [0, 0, 0, 0, 0, 0, 0, 0]);
+  const [ui1Additional, setUi1Additional] = useState<number[]>([]);  // 未使用（後方互換性のため残す）
   const [ui1Seq, setUi1Seq] = useState<number>(isDebugMode ? 4 : 0);
 
-  // UI2用の評価
-  const [ui2Core, setUi2Core] = useState<number[]>(isDebugMode ? [4, 4, 4, 4] : [0, 0, 0, 0]);
-  const [ui2Additional, setUi2Additional] = useState<number[]>(isDebugMode ? [4, 4, 4, 4] : [0, 0, 0, 0]);
+  // UI2用の評価（8問に統合）
+  const [ui2Core, setUi2Core] = useState<number[]>(isDebugMode ? [4, 4, 4, 4, 4, 4, 4, 4] : [0, 0, 0, 0, 0, 0, 0, 0]);
+  const [ui2Additional, setUi2Additional] = useState<number[]>([]);  // 未使用（後方互換性のため残す）
   const [ui2Seq, setUi2Seq] = useState<number>(isDebugMode ? 4 : 0);
 
   // 全体質問
@@ -35,22 +35,21 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
   const [reason, setReason] = useState<string>(isDebugMode ? 'デバッグモード：UI2の方が使いやすかったため' : '');
   const [suggestions, setSuggestions] = useState<string>(isDebugMode ? 'デバッグモード：特になし' : '');
 
-  // 質問文の定義
+  // 質問文の定義（8問に統合）
   const coreQuestions = [
-    '必要な色の見通しを立てやすかった',
+    '必要な色の方向性がつかみやすく、目的の色に到達しやすかった',
     '色選びで迷うことが少なかった',
-    '候補の色同士の違いを理解しやすかった',
-    '最終的に選んだ配色に納得できた',
-  ];
-
-  const additionalQuestions = [
+    '候補の色同士の違いがわかりやすかった',
+    'イメージ（テーマ）に合う色が選びやすかった',
+    '最終的に選んだ色に納得できた',
     '色の候補が多すぎると感じた（逆転項目）',
-    '必要な色に自然と辿り着けた',
-    'イメージに合う色が選びやすかった',
-    '他の色も試したくなるUIだった',
+    'UIの色の提示方法（表示方法や手順）は色選びの役に立った',
+    '選んだ色に自信を持つことができた',
   ];
 
-  const seqQuestion = 'このタスクは簡単だった';
+  const additionalQuestions: string[] = [];  // 未使用（後方互換性のため残す）
+
+  const seqQuestion = 'このUIは使いやすかった';
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,10 +62,8 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
 
     if (
       ui1Core.some(v => v === 0) ||
-      ui1Additional.some(v => v === 0) ||
       ui1Seq === 0 ||
       ui2Core.some(v => v === 0) ||
-      ui2Additional.some(v => v === 0) ||
       ui2Seq === 0
     ) {
       alert('すべての質問に回答してください');
@@ -130,11 +127,10 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
           key={rating}
           type="button"
           onClick={() => onChange(rating)}
-          className={`w-12 h-12 rounded-lg border-2 transition-all ${
-            value === rating
+          className={`w-12 h-12 rounded-lg border-2 transition-all ${value === rating
               ? 'bg-primary text-primary-foreground border-primary scale-110'
               : 'bg-background text-foreground border-border hover:border-primary/50'
-          }`}
+            }`}
         >
           {rating}
         </button>
