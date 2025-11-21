@@ -1,13 +1,13 @@
 import { type CanvasColorRecommendationsRef } from '@/components/CanvasColorRecommendations';
 import { LayoutRenderer } from '@/components/layout/LayoutRenderer';
 import { LAYOUT_CONFIG } from '@/constants/layout';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 
 const App = () => {
-  
+
   const [isDebugMode, setIsDebugMode] = useState(false);
   const [screenSize, setScreenSize] = useState({ width: 0, height: 0 });
-  
+
   // デバイス判定（閾値800px）
   const isMobile = screenSize.width < 800;
 
@@ -21,7 +21,7 @@ const App = () => {
   };
 
   // キャンバスから色を抽出する処理
-  const handleExtractColorsFromCanvas = async () => {
+  const handleExtractColorsFromCanvas = useCallback(async () => {
     try {
       console.log('Attempting to extract colors from canvas...');
 
@@ -35,7 +35,7 @@ const App = () => {
     } catch (error) {
       console.error('Canvas color extraction failed:', error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     // 初期表示時にページの最上端を表示
@@ -90,7 +90,7 @@ const App = () => {
 
     // 即座に実行
     setScrollPosition();
-    
+
     // requestAnimationFrame で次のフレームで実行
     const rafId = requestAnimationFrame(() => {
       setScrollPosition();

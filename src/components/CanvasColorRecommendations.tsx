@@ -68,6 +68,9 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
   const [historyIndex, setHistoryIndex] = useState(-1);
   const maxHistorySize = 50; // 最大履歴保存数
 
+  // 自動色抽出フラグ
+  const [hasAutoExtracted, setHasAutoExtracted] = useState(false);
+
   // ベースカラーとのコントラスト比を考慮したアイコン色を取得
   const getIconColor = () => {
     try {
@@ -645,6 +648,24 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     }
   }, [setExtractedColors]);
 
+  // 初期化完了後に自動的に色を抽出
+  useEffect(() => {
+    if (layer1Context && layer2Context && !hasAutoExtracted) {
+      const timer = setTimeout(async () => {
+        console.log('Auto-extracting colors on initialization');
+        setHasAutoExtracted(true);
+        // まず使用色をクリア
+        setExtractedColors([], { hex: '#808080', usage: 0, rgb: [128, 128, 128] });
+        // 少し待ってから色抽出
+        await new Promise(resolve => setTimeout(resolve, 100));
+        // 色抽出実行
+        await extractColorsFromCanvas();
+      }, 800); // 800ms待機
+
+      return () => clearTimeout(timer);
+    }
+  }, [layer1Context, layer2Context, hasAutoExtracted, setExtractedColors, extractColorsFromCanvas]);
+
   // キャンバスに画像を描画する関数（完全実装版）
   const drawImageToCanvas = useCallback((imageFile: File) => {
     if (!context || !canvasRef.current) return;
@@ -691,6 +712,17 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
 
         console.log('Image drawn to layer 1:', imageFile.name);
 
+        // 画像ロード完了後、色抽出を自動実行
+        setTimeout(async () => {
+          console.log('Auto-extracting colors after image upload');
+          // まず使用色をクリア
+          setExtractedColors([], { hex: '#808080', usage: 0, rgb: [128, 128, 128] });
+          // 少し待ってから色抽出
+          await new Promise(resolve => setTimeout(resolve, 100));
+          // 色抽出実行
+          await extractColorsFromCanvas();
+        }, 200);
+
         // テンプレート表示状態を更新
       }, 100); // リサイズ処理完了を待つ
     };
@@ -707,7 +739,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
       }
     };
     reader.readAsDataURL(imageFile);
-  }, [context, saveToHistory, resizeCanvas, updateCompositeCanvas]);
+  }, [context, saveToHistory, resizeCanvas, updateCompositeCanvas, setExtractedColors, extractColorsFromCanvas]);
 
   // URLから画像を読み込んでキャンバスに描画する関数
   const loadImageFromUrl = useCallback((imageUrl: string) => {
@@ -754,6 +786,17 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
         updateCompositeCanvas();
 
         console.log('Image loaded from URL to layer 1:', imageUrl);
+
+        // 画像ロード完了後、色抽出を自動実行
+        setTimeout(async () => {
+          console.log('Auto-extracting colors after image load from URL');
+          // まず使用色をクリア
+          setExtractedColors([], { hex: '#808080', usage: 0, rgb: [128, 128, 128] });
+          // 少し待ってから色抽出
+          await new Promise(resolve => setTimeout(resolve, 100));
+          // 色抽出実行
+          await extractColorsFromCanvas();
+        }, 200);
       }, 100); // リサイズ処理完了を待つ
     };
 
@@ -764,7 +807,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
 
     // URLを直接設定
     img.src = imageUrl;
-  }, [context, saveToHistory, resizeCanvas, updateCompositeCanvas, showToast]);
+  }, [context, saveToHistory, resizeCanvas, updateCompositeCanvas, showToast, setExtractedColors, extractColorsFromCanvas]);
 
   // すべてのレイヤーをクリアする関数
   const clearAllLayers = useCallback(() => {
