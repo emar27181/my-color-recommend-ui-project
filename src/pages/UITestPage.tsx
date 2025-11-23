@@ -245,13 +245,13 @@ const UITestPage = () => {
               </div>
               <button
                 onClick={() => setIsControlPanelCollapsed(!isControlPanelCollapsed)}
-                className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                className="p-2 rounded-lg bg-secondary hover:bg-secondary/80 transition-colors"
                 aria-label={isControlPanelCollapsed ? '展開' : '折りたたむ'}
               >
                 {isControlPanelCollapsed ? (
-                  <ChevronDown className="w-5 h-5" />
+                  <ChevronDown className="w-5 h-5 text-foreground" />
                 ) : (
-                  <ChevronUp className="w-5 h-5" />
+                  <ChevronUp className="w-5 h-5 text-foreground" />
                 )}
               </button>
             </div>
