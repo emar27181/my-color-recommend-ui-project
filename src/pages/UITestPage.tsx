@@ -250,9 +250,9 @@ const UITestPage = () => {
                 aria-label={isControlPanelCollapsed ? '展開' : '折りたたむ'}
               >
                 {isControlPanelCollapsed ? (
-                  <ChevronDown className="w-5 h-5 text-foreground" />
+                  <ChevronDown className="w-5 h-5 text-muted-foreground" />
                 ) : (
-                  <ChevronUp className="w-5 h-5 text-foreground" />
+                  <ChevronUp className="w-5 h-5 text-muted-foreground" />
                 )}
               </button>
             </div>
