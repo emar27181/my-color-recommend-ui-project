@@ -5,7 +5,7 @@ import { useEffect, useState, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { TestTube2 } from 'lucide-react';
+import { TestTube2, ChevronUp, ChevronDown } from 'lucide-react';
 
 type UICondition = 'UI1' | 'UI2';
 type TaskType = 'taskA' | 'taskB' | 'taskC';
@@ -19,6 +19,7 @@ type TaskType = 'taskA' | 'taskB' | 'taskC';
 const UITestPage = () => {
   const [uiCondition, setUICondition] = useState<UICondition>('UI1');
   const [task, setTask] = useState<TaskType>('taskA');
+  const [isControlPanelCollapsed, setIsControlPanelCollapsed] = useState(false);
   const [screenSize, setScreenSize] = useState({ width: 0, height: 0 });
   const [scale, setScale] = useState(1);
   const mainRef = useRef<HTMLDivElement>(null);
@@ -238,15 +239,30 @@ const UITestPage = () => {
       <div className="px-4 pt-4 pb-2">
         <Card className="border-2 border-primary/30">
           <CardHeader className="pb-3">
-            <div className="flex items-center gap-2">
-              <TestTube2 className="w-5 h-5 text-primary" />
-              <CardTitle className="text-xl">UI テストページ</CardTitle>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <TestTube2 className="w-5 h-5 text-primary" />
+                <CardTitle className="text-xl">UI テストページ</CardTitle>
+              </div>
+              <button
+                onClick={() => setIsControlPanelCollapsed(!isControlPanelCollapsed)}
+                className="p-2 rounded-lg hover:bg-muted transition-colors"
+                aria-label={isControlPanelCollapsed ? '展開' : '折りたたむ'}
+              >
+                {isControlPanelCollapsed ? (
+                  <ChevronDown className="w-5 h-5 text-foreground" />
+                ) : (
+                  <ChevronUp className="w-5 h-5 text-foreground" />
+                )}
+              </button>
             </div>
-            <CardDescription>
-              テスト用画像を使って UI1 と UI2 を自由に試すことができます
-            </CardDescription>
+            {!isControlPanelCollapsed && (
+              <CardDescription>
+                テスト用画像を使って UI1 と UI2 を自由に試すことができます
+              </CardDescription>
+            )}
           </CardHeader>
-          <CardContent>
+          {!isControlPanelCollapsed && <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* UI選択 */}
               <div className="space-y-3">
@@ -293,7 +309,7 @@ const UITestPage = () => {
                 }
               </div>
             </div>
-          </CardContent>
+          </CardContent>}
         </Card>
       </div>
 
