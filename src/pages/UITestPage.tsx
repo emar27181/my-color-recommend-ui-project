@@ -4,7 +4,6 @@ import { EXPERIMENT_LAYOUT_CONFIG } from '@/constants/layout';
 import { useEffect, useState, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { TestTube2, ChevronUp, ChevronDown } from 'lucide-react';
 
 type UICondition = 'UI1' | 'UI2';
