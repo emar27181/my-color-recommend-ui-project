@@ -4,6 +4,34 @@
 
 ## 2025-11-21
 
+### UIテストページの追加とTaskC（花イラスト）対応
+
+**変更内容:**
+- テスト画像（illust_bear.png、logo_techloop.png、illust_flower.png）を使ってUI1とUI2を試せる新しいページを作成
+- UI条件（UI1/UI2）とタスク（TaskA/TaskB/TaskC）をラジオボタンで選択可能
+- 選択内容に応じてレイアウトとコンポーネントを動的に切り替え
+- ナビゲーションバーに TestTube2 アイコンでリンクを追加
+
+**ページ機能:**
+- UI1: 大量の色を一度に表示（massColorGrid）
+- UI2: 二段階推薦（baseColor + colorRecommendation + toneRecommendation）
+- TaskA: イラスト（くま - illust_bear.png）
+- TaskB: ロゴ（TechLoop - logo_techloop.png）
+- TaskC: イラスト（花 - illust_flower.png）
+
+**新規ファイル:**
+- `src/pages/UITestPage.tsx`
+
+**変更ファイル:**
+- `src/main.tsx` - /ui-test ルート追加
+- `src/components/NavigationMenu.tsx` - TestTube2 アイコンで UIテストリンク追加
+
+**アクセス:**
+- URL: `/ui-test`
+- ナビゲーション: ヘッダー右側の TestTube2 アイコン
+
+---
+
 ### アンケート質問を8問構成に変更
 
 **変更内容:**

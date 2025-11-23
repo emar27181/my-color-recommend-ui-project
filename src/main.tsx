@@ -8,6 +8,7 @@ import { HelpPage } from './pages/HelpPage.tsx'
 import { InfoPage } from './pages/InfoPage.tsx'
 import SwipeRecommender from './pages/SwipeRecommender.tsx'
 import SnsAnalysisPage from './pages/SnsAnalysisPage.tsx'
+import UITestPage from './pages/UITestPage.tsx'
 import ExperimentIntroPage from './pages/ExperimentIntroPage.tsx'
 import ExperimentInstructionPage from './pages/ExperimentInstructionPage.tsx'
 import ExperimentPage from './pages/ExperimentPage.tsx'
@@ -27,6 +28,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/info" element={<Layout><InfoPage /></Layout>} />
             <Route path="/swipe" element={<Layout><SwipeRecommender /></Layout>} />
             <Route path="/sns-analysis" element={<Layout><SnsAnalysisPage /></Layout>} />
+            <Route path="/ui-test" element={<Layout><UITestPage /></Layout>} />
             <Route path="/experiment" element={<Layout><ExperimentIntroPage /></Layout>} />
             <Route path="/experiment/instruction" element={<Layout><ExperimentInstructionPage /></Layout>} />
             <Route path="/experiment/task" element={<Layout><ExperimentPage /></Layout>} />
