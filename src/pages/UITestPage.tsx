@@ -18,7 +18,7 @@ type TaskType = 'taskA' | 'taskB' | 'taskC';
  */
 const UITestPage = () => {
   const [uiCondition, setUICondition] = useState<UICondition>('UI1');
-  const [task, setTask] = useState<TaskType>('taskA');
+  const [task, setTask] = useState<TaskType>('taskC');
   const [isControlPanelCollapsed, setIsControlPanelCollapsed] = useState(false);
   const [screenSize, setScreenSize] = useState({ width: 0, height: 0 });
   const [scale, setScale] = useState(1);
@@ -246,13 +246,13 @@ const UITestPage = () => {
               </div>
               <button
                 onClick={() => setIsControlPanelCollapsed(!isControlPanelCollapsed)}
-                className="p-2 rounded-lg hover:bg-muted transition-colors"
+                className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
                 aria-label={isControlPanelCollapsed ? '展開' : '折りたたむ'}
               >
                 {isControlPanelCollapsed ? (
-                  <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                  <ChevronDown className="w-5 h-5" />
                 ) : (
-                  <ChevronUp className="w-5 h-5 text-muted-foreground" />
+                  <ChevronUp className="w-5 h-5" />
                 )}
               </button>
             </div>
@@ -263,44 +263,56 @@ const UITestPage = () => {
             )}
           </CardHeader>
           {!isControlPanelCollapsed && <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-6">
               {/* UI選択 */}
-              <div className="space-y-3">
-                <Label className="text-base font-semibold">UI 方式</Label>
-                <RadioGroup value={uiCondition} onValueChange={(value) => setUICondition(value as UICondition)}>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="UI1" id="ui1" />
-                    <Label htmlFor="ui1" className="cursor-pointer">UI1: 大量の色を一度に表示</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="UI2" id="ui2" />
-                    <Label htmlFor="ui2" className="cursor-pointer">UI2: 二段階推薦</Label>
-                  </div>
-                </RadioGroup>
+              <div className="space-y-4">
+                <Label className="text-base font-semibold">どちらのUIを試しますか？</Label>
+                <div className="flex gap-6">
+                  {['UI1', 'UI2'].map((ui) => (
+                    <label key={ui} className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="uiCondition"
+                        value={ui}
+                        checked={uiCondition === ui}
+                        onChange={(e) => setUICondition(e.target.value as UICondition)}
+                        className="w-5 h-5"
+                      />
+                      <span className="text-lg font-semibold">
+                        {ui === 'UI1' ? 'UI1: 大量の色を一度に表示' : 'UI2: 二段階推薦'}
+                      </span>
+                    </label>
+                  ))}
+                </div>
               </div>
 
               {/* タスク選択 */}
-              <div className="space-y-3">
-                <Label className="text-base font-semibold">塗る対象</Label>
-                <RadioGroup value={task} onValueChange={(value) => setTask(value as TaskType)}>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="taskA" id="taskA" />
-                    <Label htmlFor="taskA" className="cursor-pointer">TaskA: イラスト（くま）</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="taskB" id="taskB" />
-                    <Label htmlFor="taskB" className="cursor-pointer">TaskB: ロゴ（TechLoop）</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="taskC" id="taskC" />
-                    <Label htmlFor="taskC" className="cursor-pointer">TaskC: イラスト（花）</Label>
-                  </div>
-                </RadioGroup>
+              <div className="space-y-4">
+                <Label className="text-base font-semibold">どの画像を塗りますか？</Label>
+                <div className="flex flex-col gap-3">
+                  {[
+                    { value: 'taskA', label: 'TaskA: イラスト（くま）' },
+                    { value: 'taskB', label: 'TaskB: ロゴ（TechLoop）' },
+                    { value: 'taskC', label: 'TaskC: イラスト（花）' }
+                  ].map((option) => (
+                    <label key={option.value} className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="task"
+                        value={option.value}
+                        checked={task === option.value}
+                        onChange={(e) => setTask(e.target.value as TaskType)}
+                        className="w-5 h-5"
+                      />
+                      <span className="text-lg font-semibold">{option.label}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
             </div>
 
             {/* 現在の設定表示 */}
-            <div className="mt-4 p-3 bg-muted rounded-lg">
+            <div className="mt-6 p-3 bg-muted rounded-lg">
               <div className="text-sm font-mono">
                 <span className="font-semibold">現在の設定:</span> {uiCondition} × {
                   task === 'taskA' ? 'イラスト（くま）' :
