@@ -60,7 +60,7 @@ const UITestPage = () => {
     const imageUrl =
       task === 'taskA' ? '/images/illust_bear.png' :  // TaskA: イラスト（くま）
       task === 'taskB' ? '/images/logo_techloop.png' : // TaskB: ロゴ
-      '/images/illust_flower.png'; // TaskC: イラスト（花）
+      '/images/illust_leaf.png'; // TaskC: イラスト（葉）
 
     // 少し待ってからキャンバスに画像を読み込み（初期化完了を待つ）
     const timer = setTimeout(() => {
@@ -292,7 +292,7 @@ const UITestPage = () => {
                   {[
                     { value: 'taskA', label: 'TaskA: イラスト（くま）' },
                     { value: 'taskB', label: 'TaskB: ロゴ（TechLoop）' },
-                    { value: 'taskC', label: 'TaskC: イラスト（花）' }
+                    { value: 'taskC', label: 'TaskC: イラスト（葉）' }
                   ].map((option) => (
                     <label key={option.value} className="flex items-center gap-3 cursor-pointer">
                       <input
@@ -316,7 +316,7 @@ const UITestPage = () => {
                 <span className="font-semibold">現在の設定:</span> {uiCondition} × {
                   task === 'taskA' ? 'イラスト（くま）' :
                   task === 'taskB' ? 'ロゴ' :
-                  'イラスト（花）'
+                  'イラスト（葉）'
                 }
               </div>
             </div>
