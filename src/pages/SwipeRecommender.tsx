@@ -4,6 +4,7 @@ import { useSwipeable } from 'react-swipeable';
 import { Heart, X, RotateCcw, ArrowLeft, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import palettesData from '@/data/palettes.json';
+import { PALETTE_STRIP_SPEC } from '@/constants/ui';
 
 // コントラスト比を計算して適切なテキスト色を決定
 const getContrastColor = (hexColor: string): string => {
@@ -34,7 +35,21 @@ const SwipeRecommender = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [dragX, setDragX] = useState(0);
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const navigate = useNavigate();
+
+  // デバイスサイズに応じたカラーボックスサイズを決定
+  const boxSize = isMobile ? PALETTE_STRIP_SPEC.mobile : PALETTE_STRIP_SPEC.desktop;
+
+  // 画面リサイズ検知
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // スワイプ画面でのスクロール禁止（モバイル対応）
   useEffect(() => {
@@ -276,13 +291,20 @@ const SwipeRecommender = () => {
               </div>
 
               {/* Color Palette Strip */}
-              <div className="mb-8 mx-auto w-[90%]">
-                <div className="flex rounded-[1.5rem] overflow-hidden shadow-xl h-20">
+              <div className="mb-8 mx-auto flex justify-center">
+                <div
+                  className="flex overflow-hidden shadow-xl"
+                  style={{ borderRadius: PALETTE_STRIP_SPEC.borderRadius, height: `${boxSize.boxHeight}px` }}
+                >
                   {currentPalette.colors.map((color, index) => (
                     <div
                       key={index}
-                      className="flex-1 relative group transition-all duration-300 hover:scale-105"
-                      style={{ backgroundColor: color }}
+                      className="relative group transition-all duration-300 hover:scale-105"
+                      style={{
+                        backgroundColor: color,
+                        width: `${boxSize.boxWidth}px`,
+                        height: `${boxSize.boxHeight}px`
+                      }}
                     >
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
                         <span 

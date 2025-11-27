@@ -2,6 +2,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import chroma from 'chroma-js';
 import { useColorStore } from '@/store/colorStore';
 import { memo } from 'react';
+import { COLOR_BLOCK_SPEC } from '@/constants/ui';
 
 /**
  * UI1用: 全色相×複数トーンのグリッド表示コンポーネント
@@ -71,15 +72,19 @@ const MassColorGridContent = memo(() => {
       <div
         className="grid gap-1 p-2"
         style={{
-          gridTemplateColumns: `repeat(${HUE_STEPS}, minmax(0, 1fr))`,
+          gridTemplateColumns: `repeat(${HUE_STEPS}, ${COLOR_BLOCK_SPEC.width}px)`,
         }}
       >
         {colors.map((color, index) => (
           <button
             key={index}
             onClick={() => handleColorClick(color)}
-            className="w-12 h-12 aspect-square rounded-sm border-2 border-gray-300 hover:scale-110 transition-transform cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary"
-            style={{ backgroundColor: color.hex }}
+            className="aspect-square rounded-sm border-2 border-gray-300 hover:scale-110 transition-transform cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary"
+            style={{
+              backgroundColor: color.hex,
+              width: `${COLOR_BLOCK_SPEC.width}px`,
+              height: `${COLOR_BLOCK_SPEC.height}px`
+            }}
             title={`${color.hex} (H:${color.hue.toFixed(0)}° S:${color.saturation}% L:${color.lightness}%)`}
           />
         ))}

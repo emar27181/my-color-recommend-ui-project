@@ -69,17 +69,35 @@ export const COLOR_BLOCK_SPEC = {
   // サイズ（コンポーネント全体）
   width: 48,
   height: 48,
-  
+
   // 色表示エリアのサイズ（95%）
   colorWidth: 46,
   colorHeight: 46,
-  
+
   // CSSクラス（統一ボーダー仕様を使用）
   className: `${BORDER_PRESETS.colorBlock} cursor-pointer hover:scale-110 transition-all duration-200`,
-  
+
   // アニメーション
   hoverScale: 1.1,
   transitionDuration: '0.2s'
+} as const;
+
+/**
+ * スワイプページのカラーパレットストリップ仕様
+ */
+export const PALETTE_STRIP_SPEC = {
+  // カラーボックスの固定サイズ（モバイル）
+  mobile: {
+    boxWidth: 56,   // 56px固定幅
+    boxHeight: 56,  // 56px固定高さ
+  },
+  // カラーボックスの固定サイズ（PC）
+  desktop: {
+    boxWidth: 72,   // 72px固定幅
+    boxHeight: 72,  // 72px固定高さ
+  },
+  // ストリップ全体の角丸
+  borderRadius: '1.5rem'
 } as const;
 
 /**
