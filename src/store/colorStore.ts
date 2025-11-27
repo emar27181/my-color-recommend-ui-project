@@ -32,23 +32,25 @@ const getSchemeRecommendationOrder = (currentScheme: string): string[] => {
     'analogous_2': ['analogous_2', 'analogous_1', 'intermediate_2', 'dominant_2', 'intermediate_1', 'complementary'],
     
     // 補色配色優先グループ
-    'complementary': ['complementary', 'split_complementary', 'tetradic', 'triadic', 'analogous_1', 'dominant_1'],
-    'opponent': ['opponent', 'complementary', 'split_complementary', 'tetradic', 'triadic', 'analogous_1'],
-    
+    'complementary': ['complementary', 'split_complementary_1', 'split_complementary_2', 'split_complementary_3', 'tetradic', 'triadic', 'analogous_1', 'dominant_1'],
+    'opponent': ['opponent', 'complementary', 'split_complementary_1', 'split_complementary_2', 'split_complementary_3', 'tetradic', 'triadic', 'analogous_1'],
+
     // 三角・四角配色優先グループ
-    'triadic': ['triadic', 'split_complementary', 'tetradic', 'complementary', 'analogous_1', 'dominant_1'],
-    'tetradic': ['tetradic', 'triadic', 'complementary', 'split_complementary', 'analogous_2', 'dominant_2'],
-    
+    'triadic': ['triadic', 'split_complementary_1', 'split_complementary_2', 'split_complementary_3', 'tetradic', 'complementary', 'analogous_1', 'dominant_1'],
+    'tetradic': ['tetradic', 'triadic', 'complementary', 'split_complementary_1', 'split_complementary_2', 'split_complementary_3', 'analogous_2', 'dominant_2'],
+
     // その他の配色技法
     'intermediate_1': ['intermediate_1', 'analogous_1', 'analogous_2', 'dominant_1', 'complementary', 'triadic'],
     'intermediate_2': ['intermediate_2', 'analogous_2', 'analogous_1', 'dominant_2', 'complementary', 'triadic'],
-    'split_complementary': ['split_complementary', 'complementary', 'triadic', 'tetradic', 'analogous_1', 'dominant_1'],
-    'pentad': ['pentad', 'triadic', 'tetradic', 'hexad', 'split_complementary', 'complementary'],
-    'hexad': ['hexad', 'pentad', 'tetradic', 'triadic', 'split_complementary', 'complementary']
+    'split_complementary_1': ['split_complementary_1', 'split_complementary_2', 'split_complementary_3', 'complementary', 'triadic', 'tetradic', 'analogous_1', 'dominant_1'],
+    'split_complementary_2': ['split_complementary_2', 'split_complementary_1', 'split_complementary_3', 'complementary', 'triadic', 'tetradic', 'analogous_1', 'dominant_1'],
+    'split_complementary_3': ['split_complementary_3', 'split_complementary_1', 'split_complementary_2', 'complementary', 'triadic', 'tetradic', 'analogous_1', 'dominant_1'],
+    'pentad': ['pentad', 'triadic', 'tetradic', 'hexad', 'split_complementary_1', 'split_complementary_2', 'split_complementary_3', 'complementary'],
+    'hexad': ['hexad', 'pentad', 'tetradic', 'triadic', 'split_complementary_1', 'split_complementary_2', 'split_complementary_3', 'complementary']
   };
   
-  return schemes[currentScheme as keyof typeof schemes] || 
-         ['complementary', 'analogous_1', 'dominant_1', 'triadic', 'tetradic', 'split_complementary'];
+  return schemes[currentScheme as keyof typeof schemes] ||
+         ['complementary', 'analogous_1', 'dominant_1', 'triadic', 'tetradic', 'split_complementary_1', 'split_complementary_2', 'split_complementary_3'];
 };
 */
 
@@ -115,10 +117,22 @@ export const COLOR_SCHEMES: ColorScheme[] = [
     angles: [0, 120, 240],
   },
   {
-    id: 'split_complementary',
-    name: 'スプリットコンプリメンタリー配色\n反対色の隣接色',
+    id: 'split_complementary_1',
+    name: 'スプリットコンプリメンタリー配色\n反対色の隣接色（パターン1）',
     description: '反対色の隣の2色を使った配色',
     angles: [0, 150, 210],
+  },
+  {
+    id: 'split_complementary_2',
+    name: 'スプリットコンプリメンタリー配色\n反対色の隣接色（パターン2）',
+    description: '反対色の隣の2色を使った配色',
+    angles: [0, 60, 210],
+  },
+  {
+    id: 'split_complementary_3',
+    name: 'スプリットコンプリメンタリー配色\n反対色の隣接色（パターン3）',
+    description: '反対色の隣の2色を使った配色',
+    angles: [0, 150, 300],
   },
   {
     id: 'tetradic',
@@ -455,7 +469,7 @@ const detectColorScheme = (colors: ExtractedColor[], baseColor: string): string 
     const splitComp2 = sortedAngles.filter(angle => angle >= 200 && angle <= 220);
     if (splitComp1.length >= 1 && splitComp2.length >= 1) {
       console.log('Detected: Split complementary color scheme');
-      return 'split_complementary';
+      return 'split_complementary_1';
     }
     
     // 5. 補色配色（170-190度）

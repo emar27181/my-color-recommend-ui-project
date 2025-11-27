@@ -60,7 +60,9 @@
     "dominant_2": "ドミナント配色(3色)",
     "dominant_3": "ドミナント配色(3色)",
     "triadic": "トライアド配色(3色)",
-    "split_complementary": "スプリットコンプリメンタリー配色(3色)",
+    "split_complementary_1": "スプリットコンプリメンタリー配色(3色) パターン1",
+    "split_complementary_2": "スプリットコンプリメンタリー配色(3色) パターン2",
+    "split_complementary_3": "スプリットコンプリメンタリー配色(3色) パターン3",
     "tetradic": "テトラード配色(4色)",
     "pentad": "ペンタード配色(5色)",
     "hexad": "ヘクサード配色(6色)"

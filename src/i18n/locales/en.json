@@ -60,7 +60,9 @@
     "dominant_2": "Dominant (3 colors)",
     "dominant_3": "Dominant (3 colors)",
     "triadic": "Triad (3 colors)",
-    "split_complementary": "Split-Complementary (3 colors)",
+    "split_complementary_1": "Split-Complementary (3 colors) Pattern 1",
+    "split_complementary_2": "Split-Complementary (3 colors) Pattern 2",
+    "split_complementary_3": "Split-Complementary (3 colors) Pattern 3",
     "tetradic": "Tetrad (4 colors)",
     "pentad": "Pentad (5 colors)",
     "hexad": "Hexad (6 colors)"
