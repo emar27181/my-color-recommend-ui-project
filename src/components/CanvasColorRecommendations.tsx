@@ -1745,6 +1745,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
               variant={!isEraserMode && !isFillMode && !isEyedropperMode ? "default" : "outline"}
               size="sm"
               className="h-6 px-1 sm:h-8 sm:px-2"
+              title="ペンツール - 自由に描画"
             >
               <Pen className="w-4 h-4 text-foreground" />
             </Button>
@@ -1757,6 +1758,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
               variant={isEraserMode ? "default" : "outline"}
               size="sm"
               className="h-6 px-1 sm:h-8 sm:px-2"
+              title="消しゴムツール - 描画を消去"
             >
               <Eraser className="w-4 h-4 text-foreground" />
             </Button>
