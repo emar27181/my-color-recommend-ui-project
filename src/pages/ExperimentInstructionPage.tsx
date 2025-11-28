@@ -149,57 +149,32 @@ const ExperimentInstructionPage = () => {
               </CardContent>
             </Card>
 
-            {/* デモ動画・UIプレビュー */}
-            {currentInstruction.videoUrl ? (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Play className={EXPERIMENT_ICON_STYLES.default} />
-                    デモ動画
-                  </CardTitle>
-                  <CardDescription>操作方法を動画で確認できます</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-10 gap-6">
-                    {/* 左側：動画（7割） */}
-                    <div className="col-span-7 flex flex-col">
-                      <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                        <iframe
-                          className="absolute top-0 left-0 w-full h-full rounded-lg border border-border"
-                          src={currentInstruction.videoUrl}
-                          title={`${condition} デモ動画`}
-                          frameBorder="0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        ></iframe>
-                      </div>
-                    </div>
-                    {/* 右側：UIプレビュー（3割） */}
-                    <div className="col-span-3 flex flex-col">
-                      <div className="flex items-center justify-center p-4">
-                        <img
-                          src={currentInstruction.imageUrl}
-                          alt={`${condition} UI画像`}
-                          className="w-4/5 h-auto object-contain rounded-lg shadow-md border border-border"
-                        />
-                      </div>
+            {/* デモ動画 */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Play className={EXPERIMENT_ICON_STYLES.default} />
+                  デモ動画
+                </CardTitle>
+                <CardDescription>操作方法を動画で確認できます</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex justify-center">
+                  <div className="w-full max-w-4xl">
+                    <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                      <iframe
+                        className="absolute top-0 left-0 w-full h-full rounded-lg border border-border"
+                        src={currentInstruction.videoUrl}
+                        title={`${condition} デモ動画`}
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      ></iframe>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            ) : (
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-center py-8">
-                    <img
-                      src={currentInstruction.imageUrl}
-                      alt={`${condition} UI画像`}
-                      className="w-4/5 h-auto max-w-[256px] object-contain rounded-lg shadow-lg border border-border"
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
 
