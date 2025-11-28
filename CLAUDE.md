@@ -502,8 +502,8 @@ const gapSearchRadius = 1;       // 隙間検索時の探索半径（px）
   - 動画: 16:9アスペクト比を維持
   - 画像: 親コンテナ幅の80%表示（`w-4/5 h-auto`）、余白 `p-4`
 - **動画URL**:
-  - UI1: `https://www.youtube.com/embed/PLACEHOLDER_U1`（動画準備中・枠のみ表示）
-  - UI2: `https://www.youtube.com/embed/Sr1CyI3407c`
+  - UI1: `https://www.youtube.com/embed/hSvk-xlZ6IQ`
+  - UI2: `https://www.youtube.com/embed/RBTNjDDmxmw`
 - **画像パス**:
   - UI1: `/images/UI_test/image_T1.png`
   - UI2: `/images/UI_test/image_T3.png`（二段階推薦の画像）
