@@ -7,6 +7,7 @@ import { CheckCircle, ArrowRight } from 'lucide-react';
 import type { CanvasColorRecommendationsRef } from '@/components/CanvasColorRecommendations';
 import {
   EXPERIMENT_ICON_STYLES,
+  TASK_CONCEPTS,
   getBadgeProps,
   getButtonClassName,
   getCardClassName,
@@ -31,6 +32,10 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
 
   // 現在のパターン名を取得（例: U1A, U2B）
   const currentPattern = experimentPatterns[currentConditionIndex];
+
+  // パターンからmaterialを取得してコンセプトを決定
+  const { material } = parsePattern(currentPattern);
+  const concept = TASK_CONCEPTS[material];
 
   // 条件完了ハンドラ
   const handleComplete = () => {
@@ -100,11 +105,14 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
     <Card className={`mb-0 ${getCardClassName('emphasized')}`}>
       <CardContent className="py-1 px-4">
         <div className="flex items-center justify-between gap-3">
-          {/* 左側: 条件情報 */}
-          <div className="flex items-center gap-2">
+          {/* 左側: 条件情報とコンセプト */}
+          <div className="flex items-center gap-3">
             <Badge {...getBadgeProps('condition')}>
               {currentPattern}
             </Badge>
+            <span className="text-sm text-muted-foreground">
+              コンセプト: <span className="font-semibold text-foreground">「{concept}」</span>
+            </span>
           </div>
 
           {/* 右側: 条件完了ボタン */}
