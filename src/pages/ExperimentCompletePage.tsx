@@ -78,8 +78,8 @@ const ExperimentCompletePage = () => {
               <div className="flex items-center gap-3">
                 <ClipboardCheck className={`${EXPERIMENT_ICON_STYLES.large} text-primary`} />
                 <div>
-                  <h2 className="text-lg font-semibold">アンケートにご協力ください</h2>
-                  <p className="text-sm text-muted-foreground">
+                  <h2 className={EXPERIMENT_TEXT_STYLES.cardTitle}>アンケートにご協力ください</h2>
+                  <p className={EXPERIMENT_TEXT_STYLES.description}>
                     実験ログをダウンロードする前に、アンケートに回答してください
                   </p>
                 </div>
@@ -91,11 +91,11 @@ const ExperimentCompletePage = () => {
           /* 次のステップ */
           <Card className="mb-6 border-2 border-primary/20">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className={`${EXPERIMENT_TEXT_STYLES.cardTitle} flex items-center gap-2`}>
                 <CheckCircle className={`${EXPERIMENT_ICON_STYLES.default} text-green-600`} />
                 アンケート回答完了
               </CardTitle>
-              <CardDescription>
+              <CardDescription className={EXPERIMENT_TEXT_STYLES.description}>
                 実験ログをダウンロードしてください
               </CardDescription>
             </CardHeader>

@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Play, User, Palette, Bug } from 'lucide-react';
 import {
   EXPERIMENT_ICON_STYLES,
+  EXPERIMENT_TEXT_STYLES,
   getButtonClassName,
   getInputClassName,
 } from '@/constants/experimentTheme';
@@ -113,7 +114,7 @@ const ExperimentIntroPage = () => {
             <CardContent className="pt-6">
               <div className="flex items-center gap-3 mb-2">
                 <div>
-                  <p className="font-semibold">所要時間</p>
+                  <p className="text-base font-semibold">所要時間</p>
                   <p className="text-sm text-muted-foreground">約 15〜20 分</p>
                 </div>
               </div>
@@ -124,7 +125,7 @@ const ExperimentIntroPage = () => {
             <CardContent className="pt-6">
               <div className="flex items-center gap-3 mb-2">
                 <div>
-                  <p className="font-semibold">実験形式</p>
+                  <p className="text-base font-semibold">実験形式</p>
                   <p className="text-sm text-muted-foreground">3つのテストを順番に体験</p>
                 </div>
               </div>
@@ -176,11 +177,11 @@ const ExperimentIntroPage = () => {
         {/* 参加者ID入力と開始 */}
         <Card className="border-2 border-primary/30 shadow-lg">
           <CardHeader className="bg-primary/5 pt-10 pb-10 px-8">
-            <CardTitle className="flex items-center gap-2 text-xl mb-4">
+            <CardTitle className={`${EXPERIMENT_TEXT_STYLES.cardTitle} flex items-center gap-2 mb-4`}>
               <User className="w-6 h-6" />
               実験を開始
             </CardTitle>
-            <CardDescription className="text-base">
+            <CardDescription className={EXPERIMENT_TEXT_STYLES.description}>
               参加者IDを入力して実験を開始してください
             </CardDescription>
           </CardHeader>

@@ -132,8 +132,8 @@ const ExperimentInstructionPage = () => {
             {/* 使い方説明 */}
             <Card>
               <CardHeader>
-                <CardTitle>使い方</CardTitle>
-                <CardDescription>以下の手順で操作してください</CardDescription>
+                <CardTitle className={EXPERIMENT_TEXT_STYLES.cardTitle}>使い方</CardTitle>
+                <CardDescription className={EXPERIMENT_TEXT_STYLES.description}>以下の手順で操作してください</CardDescription>
               </CardHeader>
               <CardContent>
                 <ol className="space-y-3">
@@ -142,7 +142,7 @@ const ExperimentInstructionPage = () => {
                       <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold">
                         {index + 1}
                       </span>
-                      <span className="flex-1 pt-0.5">{step}</span>
+                      <span className="flex-1 pt-0.5 text-base">{step}</span>
                     </li>
                   ))}
                 </ol>
@@ -152,11 +152,11 @@ const ExperimentInstructionPage = () => {
             {/* デモ動画 */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className={`${EXPERIMENT_TEXT_STYLES.cardTitle} flex items-center gap-2`}>
                   <Play className={EXPERIMENT_ICON_STYLES.default} />
                   デモ動画
                 </CardTitle>
-                <CardDescription>操作方法を動画で確認できます</CardDescription>
+                <CardDescription className={EXPERIMENT_TEXT_STYLES.description}>操作方法を動画で確認できます</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex justify-center">
