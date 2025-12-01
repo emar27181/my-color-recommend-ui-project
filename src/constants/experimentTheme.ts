@@ -191,8 +191,8 @@ export const EXPERIMENT_TEXT_STYLES = {
 // タスクコンセプト設定
 // ========================================
 export const TASK_CONCEPTS = {
-  taskA: '冬の丘に立つクマ',
-  taskB: '近未来の幾何学ロゴ',
+  taskA: '冬の丘に立つクマのイラスト',
+  taskB: '循環や継続を表現した企業のロゴ',
 } as const;
 
 // ========================================
