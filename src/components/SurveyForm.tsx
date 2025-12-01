@@ -20,6 +20,9 @@ interface SurveyFormProps {
  * - デバッグモード対応（自動入力）
  */
 export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) => {
+  // 入力デバイス
+  const [inputDevice, setInputDevice] = useState<string>(isDebugMode ? 'マウス' : '');
+
   // UI1用の評価（8問に統合）
   const [ui1Core, setUi1Core] = useState<number[]>(isDebugMode ? [4, 4, 4, 4, 4, 4, 4, 4] : [0, 0, 0, 0, 0, 0, 0, 0]);
   const [ui1Additional, setUi1Additional] = useState<number[]>([]);  // 未使用（後方互換性のため残す）
@@ -55,6 +58,11 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
     e.preventDefault();
 
     // バリデーション
+    if (!inputDevice) {
+      alert('入力デバイスを選択してください');
+      return;
+    }
+
     if (!favoriteUI) {
       alert('どちらのUIの方が使いやすかったか選択してください');
       return;
@@ -71,6 +79,7 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
     }
 
     const response: SurveyResponse = {
+      inputDevice: inputDevice,
       ui1_core: ui1Core,
       ui1_additional: ui1Additional,
       ui1_seq: ui1Seq,
@@ -151,6 +160,36 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
           </div>
         </div>
       )}
+
+      {/* 入力デバイス選択 */}
+      <Card className="border-2 border-primary/30">
+        <CardHeader>
+          <CardTitle>入力デバイス</CardTitle>
+          <CardDescription>実験で使用した入力デバイスを選択してください</CardDescription>
+        </CardHeader>
+        <CardContent className="py-6">
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {['マウス', 'タブレットペン', 'ペンタブ', '液タブ'].map((device) => (
+                <label key={device} className="flex items-center gap-3 cursor-pointer p-4 border-2 rounded-lg transition-all hover:border-primary/50" style={{
+                  borderColor: inputDevice === device ? 'var(--primary)' : 'var(--border)',
+                  backgroundColor: inputDevice === device ? 'var(--primary)/10' : 'transparent'
+                }}>
+                  <input
+                    type="radio"
+                    name="inputDevice"
+                    value={device}
+                    checked={inputDevice === device}
+                    onChange={(e) => setInputDevice(e.target.value)}
+                    className="w-5 h-5"
+                  />
+                  <span className="text-base font-semibold">{device}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* UI1の評価 */}
       <div className="space-y-4">

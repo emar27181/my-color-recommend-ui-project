@@ -55,6 +55,9 @@ export interface ConditionLog {
 
 // アンケート回答の型定義
 export interface SurveyResponse {
+  // 入力デバイス
+  inputDevice: string;       // 使用した入力デバイス（マウス/タブレットペン/ペンタブ/液タブ）
+
   // UI1用の評価（9問：1〜5段階）
   ui1_core: number[];        // コアの4問
   ui1_additional: number[];  // 追加の4問
