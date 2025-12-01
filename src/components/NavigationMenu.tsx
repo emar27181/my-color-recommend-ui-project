@@ -52,7 +52,7 @@ export const NavigationMenu = ({ className = '' }: NavigationMenuProps) => {
         <TestTube2 className="w-5 h-5" />
       </Link>
       <Link
-        to="/experiment?debug=true"
+        to="/experiment"
         className="p-2 rounded-lg bg-background/50 border-none hover:bg-muted/50 transition-colors backdrop-blur-sm text-foreground"
         title="実験ページ"
       >

@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useExperimentStore, type OrderPattern } from '@/store/experimentStore';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Label } from '@/components/ui/label';
@@ -30,7 +29,6 @@ const ExperimentIntroPage = () => {
   const isDebugMode = searchParams.get('debug') === 'true';
 
   const { setParticipantId, setParticipantInfo, setOrderPattern, startFullExperiment } = useExperimentStore();
-  const [inputId, setInputId] = useState(isDebugMode ? 'DEBUG001' : '');
   const [deviceType, setDeviceType] = useState<'PC' | 'tablet' | 'smartphone' | ''>(isDebugMode ? 'PC' : '');
   const [illustrationExperience, setIllustrationExperience] = useState<'beginner' | 'some' | 'hobby' | 'professional' | ''>(isDebugMode ? 'hobby' : '');
   const [ageRange, setAgeRange] = useState<'10s' | '20s' | '30s' | '40s' | '50s' | '60s+' | ''>(isDebugMode ? '20s' : '');
@@ -49,11 +47,6 @@ const ExperimentIntroPage = () => {
 
   // 実験開始ハンドラ
   const handleStart = () => {
-    if (!inputId.trim()) {
-      alert('参加者IDを入力してください');
-      return;
-    }
-
     if (!deviceType) {
       alert('使用デバイスを選択してください');
       return;
@@ -64,8 +57,8 @@ const ExperimentIntroPage = () => {
       return;
     }
 
-    // 参加者情報を保存
-    setParticipantId(inputId.trim());
+    // 参加者情報を保存（IDは常に"noname"）
+    setParticipantId('noname');
     setParticipantInfo({
       deviceType,
       illustrationExperience,
@@ -182,25 +175,10 @@ const ExperimentIntroPage = () => {
               実験を開始
             </CardTitle>
             <CardDescription className={EXPERIMENT_TEXT_STYLES.description}>
-              参加者IDを入力して実験を開始してください
+              以下の情報を選択して実験を開始してください
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-16 pb-16 px-8 space-y-10">
-            <div>
-              <Input
-                type="text"
-                placeholder="例: U001"
-                value={inputId}
-                onChange={(e) => setInputId(e.target.value)}
-                className={getInputClassName('large')}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    handleStart();
-                  }
-                }}
-              />
-            </div>
-
             {/* 使用デバイス選択 */}
             <div className="space-y-3">
               <Label className="text-base font-semibold text-foreground">使用デバイス *</Label>
