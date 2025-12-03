@@ -466,11 +466,13 @@ const gapSearchRadius = 1;       // 隙間検索時の探索半径（px）
 - **タスクページ**: 4回実施（materialに応じてキャンバス内容を切り替え）
 
 ### カウンターバランス設定
-- **URLパラメータ**: `/experiment?order=1〜4` で実験順序を制御
-- **パターン1**: UI1-TaskA → UI1-TaskB → UI2-TaskA → UI2-TaskB（UI1→UI2, TaskA→TaskB）
-- **パターン2**: UI1-TaskB → UI1-TaskA → UI2-TaskB → UI2-TaskA（UI1→UI2, TaskB→TaskA）
-- **パターン3**: UI2-TaskA → UI2-TaskB → UI1-TaskA → UI1-TaskB（UI2→UI1, TaskA→TaskB）
-- **パターン4**: UI2-TaskB → UI2-TaskA → UI1-TaskB → UI1-TaskA（UI2→UI1, TaskB→TaskA）
+- **URLパラメータ**:
+  - `/experiment?uiOrder=UI1` - UI1から開始（TaskA→B固定）
+  - `/experiment?uiOrder=UI2` - UI2から開始（TaskA→B固定）
+  - `/experiment?order=1` または `?order=2` で直接パターン指定も可能
+- **パターン1**: UI1-TaskA → UI1-TaskB → UI2-TaskA → UI2-TaskB（UI1先行, TaskA→B固定）
+- **パターン2**: UI2-TaskA → UI2-TaskB → UI1-TaskA → UI1-TaskB（UI2先行, TaskA→B固定）
+- **タスク順序**: TaskA → TaskB に固定（UIの順序のみカウンターバランス）
 
 ### デザイン原則
 - **ミニマルデザイン**: 明確な情報階層、十分なホワイトスペース

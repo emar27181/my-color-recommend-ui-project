@@ -28,20 +28,34 @@ const ExperimentIntroPage = () => {
   const [searchParams] = useSearchParams();
   const isDebugMode = searchParams.get('debug') === 'true';
 
-  const { setParticipantId, setParticipantInfo, setOrderPattern, startFullExperiment } = useExperimentStore();
+  const { setParticipantId, setParticipantInfo, setOrderPattern, startFullExperiment, orderPattern } = useExperimentStore();
   const [deviceType, setDeviceType] = useState<'PC' | 'tablet' | 'smartphone' | ''>(isDebugMode ? 'PC' : '');
   const [illustrationExperience, setIllustrationExperience] = useState<'beginner' | 'some' | 'hobby' | 'professional' | ''>(isDebugMode ? 'hobby' : '');
   const [inputDevice, setInputDevice] = useState<'マウス' | 'タブレットペン' | 'ペンタブ' | '液タブ' | ''>(isDebugMode ? 'マウス' : '');
 
-  // URLパラメータからorderを取得してカウンターバランスパターンを設定
+  // 最初に実験するUIを判定（パターン1はUI1、パターン2はUI2）
+  const firstUI = orderPattern === 1 ? 'UI1' : 'UI2';
+
+  // URLパラメータからorder/uiOrderを取得してカウンターバランスパターンを設定
   useEffect(() => {
+    // orderパラメータが指定されている場合はそれを優先
     const orderParam = searchParams.get('order');
     if (orderParam) {
       const orderNumber = parseInt(orderParam, 10);
-      if (orderNumber >= 1 && orderNumber <= 4) {
+      if (orderNumber >= 1 && orderNumber <= 2) {
         setOrderPattern(orderNumber as OrderPattern);
-        console.log(`Order pattern set to ${orderNumber} from URL parameter`);
+        console.log(`Order pattern set to ${orderNumber} from URL parameter 'order'`);
+        return;
       }
+    }
+
+    // uiOrderパラメータが指定されている場合、それに基づいてパターンを選択
+    const uiOrderParam = searchParams.get('uiOrder');
+    if (uiOrderParam === 'UI1' || uiOrderParam === 'UI2') {
+      // UI1先行: パターン1、UI2先行: パターン2（TaskA→B固定）
+      const pattern = uiOrderParam === 'UI1' ? 1 : 2;
+      setOrderPattern(pattern as OrderPattern);
+      console.log(`Order pattern set to ${pattern} from URL parameter 'uiOrder=${uiOrderParam}'`);
     }
   }, [searchParams, setOrderPattern]);
 
@@ -72,9 +86,9 @@ const ExperimentIntroPage = () => {
 
     startFullExperiment();
 
-    // UI1説明ページに遷移（デバッグモードを引き継ぐ）
+    // 最初のUI説明ページに遷移（デバッグモードを引き継ぐ）
     const debugParam = isDebugMode ? '&debug=true' : '';
-    navigate(`/experiment/instruction?cond=UI1${debugParam}`);
+    navigate(`/experiment/instruction?cond=${firstUI}${debugParam}`);
   };
 
 
@@ -237,12 +251,12 @@ const ExperimentIntroPage = () => {
               className={`w-full text-xl h-16 ${getButtonClassName('action')}`}
             >
               <Play className={EXPERIMENT_ICON_STYLES.large} />
-              実験開始（UI1から）
+              実験開始（{firstUI}から）
             </Button>
 
             <Alert className="border-primary/30 bg-primary/5 p-6">
               <AlertDescription className="text-sm leading-relaxed">
-                UI1 → UI2 の順で体験します。各テスト終了後、次に進む確認が表示されます。
+                {firstUI === 'UI1' ? 'UI1 → UI2' : 'UI2 → UI1'} の順で体験します。各テスト終了後、次に進む確認が表示されます。
               </AlertDescription>
             </Alert>
           </CardContent>

@@ -10,8 +10,9 @@ export type MaterialType = 'taskA' | 'taskB';
 // 実験パターン（UI方法 + Material）の型定義
 export type ExperimentPattern = 'UI1-TaskA' | 'UI1-TaskB' | 'UI2-TaskA' | 'UI2-TaskB';
 
-// カウンターバランスパターン（1〜4）
-export type OrderPattern = 1 | 2 | 3 | 4;
+// カウンターバランスパターン（1〜2）
+// 1: UI1先行（TaskA→B固定）, 2: UI2先行（TaskA→B固定）
+export type OrderPattern = 1 | 2;
 
 // イベントログの型定義
 export interface ExperimentEvent {
@@ -72,6 +73,8 @@ export interface ExperimentLog {
   participant_id: string;
   participant_info: ParticipantInfo;  // 参加者情報（手動入力）
   device: DeviceInfo;                 // デバイス情報（自動検出）
+  first_ui: 'UI1' | 'UI2';            // 最初にテストしたUI
+  order_pattern: OrderPattern;        // カウンターバランスパターン（1〜4）
   experiment_start_time: string;
   experiment_end_time: string | null;
   total_duration_sec: number | null;
@@ -100,6 +103,7 @@ export interface ExperimentState {
   conditionOrder: ExperimentCondition[]; // 実験順序（旧互換性のため保持）
   orderPattern: OrderPattern; // カウンターバランスパターン（1〜4）
   experimentPatterns: ExperimentPattern[]; // 実験パターンの順序（T1A, T1B, T2A, T2B）
+  firstUI: 'UI1' | 'UI2'; // 最初にテストしたUI
 
   // アンケート
   surveyResponse: SurveyResponse | null; // アンケート回答
@@ -180,13 +184,11 @@ const collectDeviceInfo = (): DeviceInfo => {
 // 初期デバイス情報
 const initialDeviceInfo = collectDeviceInfo();
 
-// カウンターバランスパターンの定義
+// カウンターバランスパターンの定義（タスク順序はA→B固定）
 export const getExperimentOrder = (pattern: OrderPattern): ExperimentPattern[] => {
   const orders: Record<OrderPattern, ExperimentPattern[]> = {
-    1: ['UI1-TaskA', 'UI1-TaskB', 'UI2-TaskA', 'UI2-TaskB'], // UI1 → UI2, TaskA → TaskB
-    2: ['UI1-TaskB', 'UI1-TaskA', 'UI2-TaskB', 'UI2-TaskA'], // UI1 → UI2, TaskB → TaskA
-    3: ['UI2-TaskA', 'UI2-TaskB', 'UI1-TaskA', 'UI1-TaskB'], // UI2 → UI1, TaskA → TaskB
-    4: ['UI2-TaskB', 'UI2-TaskA', 'UI1-TaskB', 'UI1-TaskA'], // UI2 → UI1, TaskB → TaskA
+    1: ['UI1-TaskA', 'UI1-TaskB', 'UI2-TaskA', 'UI2-TaskB'], // UI1先行, TaskA → TaskB固定
+    2: ['UI2-TaskA', 'UI2-TaskB', 'UI1-TaskA', 'UI1-TaskB'], // UI2先行, TaskA → TaskB固定
   };
   return orders[pattern];
 };
@@ -226,6 +228,7 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
   conditionOrder: ['UI1', 'UI2'], // 旧互換性のため保持
   orderPattern: 1, // デフォルトはパターン1
   experimentPatterns: ['UI1-TaskA', 'UI1-TaskB', 'UI2-TaskA', 'UI2-TaskB'], // デフォルト順序
+  firstUI: 'UI1', // デフォルトはUI1から
 
   // アンケート
   surveyResponse: null,
@@ -248,11 +251,14 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
   // カウンターバランスパターンを設定
   setOrderPattern: (pattern: OrderPattern) => {
     const patterns = getExperimentOrder(pattern);
+    // パターンから最初のUIを判定（パターン1はUI1先行、パターン2はUI2先行）
+    const firstUI = pattern === 1 ? 'UI1' : 'UI2';
     set({
       orderPattern: pattern,
       experimentPatterns: patterns,
+      firstUI,
     });
-    console.log(`Order pattern set to ${pattern}:`, patterns);
+    console.log(`Order pattern set to ${pattern}:`, patterns, `(first UI: ${firstUI})`);
   },
 
   // 実験開始
@@ -319,6 +325,8 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
       participant_id: state.participantId,
       participant_info: state.participantInfo,  // 参加者情報（手動入力）
       device: state.deviceInfo,
+      first_ui: state.firstUI, // 最初にテストしたUI
+      order_pattern: state.orderPattern, // カウンターバランスパターン
       experiment_start_time: state.experimentStartTime ? new Date(state.experimentStartTime).toISOString() : '',
       experiment_end_time: state.experimentEndTime ? new Date(state.experimentEndTime).toISOString() : null,
       total_duration_sec: state.experimentStartTime && state.experimentEndTime
