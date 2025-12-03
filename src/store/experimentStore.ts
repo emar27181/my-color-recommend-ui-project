@@ -38,7 +38,7 @@ export interface DeviceInfo {
 export interface ParticipantInfo {
   deviceType: 'PC' | 'tablet' | 'smartphone' | '';  // 使用デバイス（ユーザー選択）
   illustrationExperience: 'beginner' | 'some' | 'hobby' | 'professional' | '';  // イラスト経験
-  ageRange?: '10s' | '20s' | '30s' | '40s' | '50s' | '60s+' | '';  // 年齢層（オプション）
+  inputDevice: 'マウス' | 'タブレットペン' | 'ペンタブ' | '液タブ' | '';  // 入力デバイス
 }
 
 // 条件ごとのログ
@@ -55,18 +55,11 @@ export interface ConditionLog {
 
 // アンケート回答の型定義
 export interface SurveyResponse {
-  // 入力デバイス
-  inputDevice: string;       // 使用した入力デバイス（マウス/タブレットペン/ペンタブ/液タブ）
+  // UI1用の評価（7問：1〜5段階）
+  ui1_responses: number[];   // 7つの質問への回答
 
-  // UI1用の評価（9問：1〜5段階）
-  ui1_core: number[];        // コアの4問
-  ui1_additional: number[];  // 追加の4問
-  ui1_seq: number;           // SEQ（タスク難易度）1問
-
-  // UI2用の評価（9問：1〜5段階）
-  ui2_core: number[];        // コアの4問
-  ui2_additional: number[];  // 追加の4問
-  ui2_seq: number;           // SEQ（タスク難易度）1問
+  // UI2用の評価（7問：1〜5段階）
+  ui2_responses: number[];   // 7つの質問への回答
 
   // 全体質問
   favoriteUI: string;        // 最も使いやすかったUI (UI1 or UI2 単一選択)
@@ -215,7 +208,7 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
   participantInfo: {
     deviceType: '',
     illustrationExperience: '',
-    ageRange: '',
+    inputDevice: '',
   },
   condition: 'UI1',
   material: 'taskA',

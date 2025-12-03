@@ -31,7 +31,7 @@ const ExperimentIntroPage = () => {
   const { setParticipantId, setParticipantInfo, setOrderPattern, startFullExperiment } = useExperimentStore();
   const [deviceType, setDeviceType] = useState<'PC' | 'tablet' | 'smartphone' | ''>(isDebugMode ? 'PC' : '');
   const [illustrationExperience, setIllustrationExperience] = useState<'beginner' | 'some' | 'hobby' | 'professional' | ''>(isDebugMode ? 'hobby' : '');
-  const [ageRange, setAgeRange] = useState<'10s' | '20s' | '30s' | '40s' | '50s' | '60s+' | ''>(isDebugMode ? '20s' : '');
+  const [inputDevice, setInputDevice] = useState<'マウス' | 'タブレットペン' | 'ペンタブ' | '液タブ' | ''>(isDebugMode ? 'マウス' : '');
 
   // URLパラメータからorderを取得してカウンターバランスパターンを設定
   useEffect(() => {
@@ -57,12 +57,17 @@ const ExperimentIntroPage = () => {
       return;
     }
 
+    if (!inputDevice) {
+      alert('入力デバイスを選択してください');
+      return;
+    }
+
     // 参加者情報を保存（IDは常に"noname"）
     setParticipantId('noname');
     setParticipantInfo({
       deviceType,
       illustrationExperience,
-      ageRange,
+      inputDevice,
     });
 
     startFullExperiment();
@@ -194,6 +199,22 @@ const ExperimentIntroPage = () => {
               </Select>
             </div>
 
+            {/* 入力デバイス選択 */}
+            <div className="space-y-3">
+              <Label className="text-base font-semibold text-foreground">入力デバイス *</Label>
+              <Select value={inputDevice} onValueChange={(value: string) => setInputDevice(value as 'マウス' | 'タブレットペン' | 'ペンタブ' | '液タブ' | '')}>
+                <SelectTrigger className={getInputClassName('default')}>
+                  <SelectValue placeholder="入力デバイスを選択してください" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="マウス">マウス</SelectItem>
+                  <SelectItem value="タブレットペン">タブレットペン</SelectItem>
+                  <SelectItem value="ペンタブ">ペンタブ</SelectItem>
+                  <SelectItem value="液タブ">液タブ</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             {/* イラスト経験選択 */}
             <div className="space-y-3">
               <Label className="text-base font-semibold text-foreground">イラスト経験 *</Label>
@@ -206,24 +227,6 @@ const ExperimentIntroPage = () => {
                   <SelectItem value="some">少し経験あり（たまに描く）</SelectItem>
                   <SelectItem value="hobby">趣味レベル（よく描く）</SelectItem>
                   <SelectItem value="professional">プロ・セミプロレベル</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* 年齢層選択（オプション） */}
-            <div className="space-y-3">
-              <Label className="text-base font-semibold text-foreground">年齢層（任意）</Label>
-              <Select value={ageRange} onValueChange={(value: string) => setAgeRange(value as '10s' | '20s' | '30s' | '40s' | '50s' | '60s+' | '')}>
-                <SelectTrigger className={getInputClassName('default')}>
-                  <SelectValue placeholder="年齢層を選択（任意）" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="10s">10代</SelectItem>
-                  <SelectItem value="20s">20代</SelectItem>
-                  <SelectItem value="30s">30代</SelectItem>
-                  <SelectItem value="40s">40代</SelectItem>
-                  <SelectItem value="50s">50代</SelectItem>
-                  <SelectItem value="60s+">60代以上</SelectItem>
                 </SelectContent>
               </Select>
             </div>
