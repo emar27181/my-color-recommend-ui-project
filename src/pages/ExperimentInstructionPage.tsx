@@ -129,26 +129,6 @@ const ExperimentInstructionPage = () => {
         {/* 説明とデモ動画 */}
         <div className="mb-6">
           <div className="space-y-6">
-            {/* 使い方説明 */}
-            <Card>
-              <CardHeader>
-                <CardTitle className={EXPERIMENT_TEXT_STYLES.cardTitle}>使い方</CardTitle>
-                <CardDescription className={EXPERIMENT_TEXT_STYLES.description}>以下の手順で操作してください</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ol className="space-y-3">
-                  {currentInstruction.steps.map((step, index) => (
-                    <li key={index} className="flex gap-3">
-                      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold">
-                        {index + 1}
-                      </span>
-                      <span className="flex-1 pt-0.5 text-base">{step}</span>
-                    </li>
-                  ))}
-                </ol>
-              </CardContent>
-            </Card>
-
             {/* デモ動画 */}
             <Card>
               <CardHeader>
@@ -160,7 +140,7 @@ const ExperimentInstructionPage = () => {
               </CardHeader>
               <CardContent>
                 <div className="flex justify-center">
-                  <div className="w-full max-w-4xl">
+                  <div className="w-full max-w-7xl">
                     <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                       <iframe
                         className="absolute top-0 left-0 w-full h-full rounded-lg border border-border"
