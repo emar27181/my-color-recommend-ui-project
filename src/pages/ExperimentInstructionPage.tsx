@@ -138,19 +138,17 @@ const ExperimentInstructionPage = () => {
                 </CardTitle>
                 <CardDescription className={EXPERIMENT_TEXT_STYLES.description}>操作方法を動画で確認できます</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="flex justify-center">
-                  <div className="w-full max-w-7xl">
-                    <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                      <iframe
-                        className="absolute top-0 left-0 w-full h-full rounded-lg border border-border"
-                        src={currentInstruction.videoUrl}
-                        title={`${condition} デモ動画`}
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      ></iframe>
-                    </div>
+              <CardContent className="px-2 sm:px-4">
+                <div className="w-full">
+                  <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                    <iframe
+                      className="absolute top-0 left-0 w-full h-full rounded-lg border border-border"
+                      src={currentInstruction.videoUrl}
+                      title={`${condition} デモ動画`}
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
                   </div>
                 </div>
               </CardContent>
