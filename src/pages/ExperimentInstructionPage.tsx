@@ -1,7 +1,7 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useExperimentStore } from '@/store/experimentStore';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, Play } from 'lucide-react';
 import {
   EXPERIMENT_TEXT_STYLES,
@@ -79,7 +79,7 @@ const ExperimentInstructionPage = () => {
     UI1: {
       title: 'UI1: 大量の色を一度に表示',
       description: '色相とトーンの組み合わせで大量の色を一覧表示します。',
-      videoUrl: 'https://www.youtube.com/embed/hSvk-xlZ6IQ',
+      videoUrl: 'https://www.youtube.com/embed/eKne5u4Cx-M',
       imageUrl: '/images/UI_test/image_T1.png',
       steps: [
         '画面に表示されている色グリッドから、好きな色をクリックして選択します',
@@ -90,7 +90,7 @@ const ExperimentInstructionPage = () => {
     UI2: {
       title: 'UI2: 色相→トーンの二段階で選択',
       description: 'ベース色を選択すると、配色技法に基づいた推薦色が表示されます。',
-      videoUrl: 'https://www.youtube.com/embed/RBTNjDDmxmw',
+      videoUrl: 'https://www.youtube.com/embed/0mkxgfSK7rg',
       imageUrl: '/images/UI_test/image_T3.png',
       steps: [
         'ベース色を選択します（カラーピッカーまたは画像アップロード）',
@@ -118,42 +118,38 @@ const ExperimentInstructionPage = () => {
       className="flex-1 pb-8 min-h-screen flex flex-col bg-background origin-top"
       style={{ transform: `scale(${scale})` }}
     >
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="container mx-auto px-2 sm:px-4 py-6 max-w-[95vw]">
         {/* タイトル */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <h1 className={`${EXPERIMENT_TEXT_STYLES.pageTitle} mb-3`}>
             {currentPattern}
           </h1>
         </div>
 
-        {/* 説明とデモ動画 */}
+        {/* デモ動画 */}
         <div className="mb-6">
-          <div className="space-y-6">
-            {/* デモ動画 */}
-            <Card>
-              <CardHeader>
-                <CardTitle className={`${EXPERIMENT_TEXT_STYLES.cardTitle} flex items-center gap-2`}>
-                  <Play className={EXPERIMENT_ICON_STYLES.default} />
-                  デモ動画
-                </CardTitle>
-                <CardDescription className={EXPERIMENT_TEXT_STYLES.description}>操作方法を動画で確認できます</CardDescription>
-              </CardHeader>
-              <CardContent className="px-2 sm:px-4">
-                <div className="w-full">
-                  <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                    <iframe
-                      className="absolute top-0 left-0 w-full h-full rounded-lg border border-border"
-                      src={currentInstruction.videoUrl}
-                      title={`${condition} デモ動画`}
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    ></iframe>
-                  </div>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className={`${EXPERIMENT_TEXT_STYLES.cardTitle} flex items-center gap-2`}>
+                <Play className={EXPERIMENT_ICON_STYLES.default} />
+                デモ動画
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="px-2 sm:px-3 pb-3">
+              <div className="w-full">
+                <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                  <iframe
+                    className="absolute top-0 left-0 w-full h-full rounded-lg border border-border"
+                    src={currentInstruction.videoUrl}
+                    title={`${condition} デモ動画`}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* 次へボタン */}
