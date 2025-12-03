@@ -227,7 +227,7 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
               id="reason"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="例：UI●の方が色を選びやすく、迷わずに必要な色を見つけられたため"
+              placeholder="例：UIXの方が色を選びやすく、迷わずに必要な色を見つけられたため"
               className="min-h-[120px] resize-y text-foreground"
             />
           </div>
@@ -238,7 +238,7 @@ export const SurveyForm = ({ onSubmit, isDebugMode = false }: SurveyFormProps) =
               id="suggestions"
               value={suggestions}
               onChange={(e) => setSuggestions(e.target.value)}
-              placeholder="例：UI●の方が色を絞りやすかった、もっと色の候補を増やしてほしい、など"
+              placeholder="例：UIXの方が色を絞りやすかった、もっと色の候補を増やしてほしい、など"
               className="min-h-[100px] resize-y text-foreground"
             />
           </div>
