@@ -159,8 +159,8 @@ export const ExperimentInstructionsModal = ({
         </Button>
       </DialogTrigger>
       <DialogContent className="w-[70vw] max-w-none max-h-[80vh] overflow-y-auto">
-        <DialogHeader className="pr-12">
-          <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+        <DialogHeader className="pr-16">
+          <DialogTitle className="text-2xl font-bold flex items-center gap-2 max-w-[calc(100%-3rem)]">
             <FileText className="w-6 h-6" />
             実験指示書（参加者向け）
           </DialogTitle>
