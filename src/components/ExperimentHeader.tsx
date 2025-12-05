@@ -12,6 +12,7 @@ import {
   getButtonClassName,
   getCardClassName,
 } from '@/constants/experimentTheme';
+import { ExperimentInstructionsModal } from '@/components/ExperimentInstructionsModal';
 
 interface ExperimentHeaderProps {
   canvasRef?: React.RefObject<CanvasColorRecommendationsRef | null>;
@@ -113,6 +114,7 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
             <span className="text-sm text-muted-foreground">
               コンセプト: <span className="font-semibold text-foreground">「{concept}」</span>
             </span>
+            <ExperimentInstructionsModal variant="ghost" size="sm" />
           </div>
 
           {/* 右側: 条件完了ボタン */}
