@@ -6,13 +6,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Play, User, Palette, Bug } from 'lucide-react';
+import { Play, User, Palette, Bug, CheckCircle } from 'lucide-react';
 import {
   EXPERIMENT_ICON_STYLES,
   EXPERIMENT_TEXT_STYLES,
   getButtonClassName,
   getInputClassName,
 } from '@/constants/experimentTheme';
+import { ExperimentInstructionsModal } from '@/components/ExperimentInstructionsModal';
 
 /**
  * 実験導入ページ（改良版）
@@ -32,6 +33,7 @@ const ExperimentIntroPage = () => {
   const [deviceType, setDeviceType] = useState<'PC' | 'tablet' | 'smartphone' | ''>(isDebugMode ? 'PC' : '');
   const [illustrationExperience, setIllustrationExperience] = useState<'beginner' | 'some' | 'hobby' | 'professional' | ''>(isDebugMode ? 'hobby' : '');
   const [inputDevice, setInputDevice] = useState<'マウス' | 'タブレットペン' | 'ペンタブ' | '液タブ' | ''>(isDebugMode ? 'マウス' : '');
+  const [instructionsChecked, setInstructionsChecked] = useState(isDebugMode ? true : false);
 
   // 最初に実験するUIを判定（パターン1はUI1、パターン2はUI2）
   const firstUI = orderPattern === 1 ? 'UI1' : 'UI2';
@@ -73,6 +75,11 @@ const ExperimentIntroPage = () => {
 
     if (!inputDevice) {
       alert('入力デバイスを選択してください');
+      return;
+    }
+
+    if (!instructionsChecked) {
+      alert('指示書を確認してチェックを入れてください');
       return;
     }
 
@@ -243,6 +250,32 @@ const ExperimentIntroPage = () => {
                   <SelectItem value="professional">プロ・セミプロレベル</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* 指示書確認 */}
+            <div className="space-y-3">
+              <div className="flex flex-col gap-3 p-4 border-2 border-primary/30 rounded-lg bg-primary/5">
+                <div className="flex items-center gap-2">
+                  {instructionsChecked ? (
+                    <CheckCircle className="w-5 h-5 text-green-600" />
+                  ) : (
+                    <div className="w-5 h-5 rounded-full border-2 border-muted-foreground" />
+                  )}
+                  <Label className="text-base font-semibold text-foreground">
+                    指示書を確認する *
+                  </Label>
+                </div>
+                <ExperimentInstructionsModal
+                  variant="outline"
+                  size="sm"
+                  onOpen={() => setInstructionsChecked(true)}
+                />
+                {!instructionsChecked && (
+                  <p className="text-sm text-muted-foreground">
+                    指示書を開いて確認してください
+                  </p>
+                )}
+              </div>
             </div>
 
             <Button
