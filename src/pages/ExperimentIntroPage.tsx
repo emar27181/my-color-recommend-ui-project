@@ -257,7 +257,7 @@ const ExperimentIntroPage = () => {
               <div className="flex flex-col gap-3 p-4 border-2 border-primary/30 rounded-lg bg-primary/5">
                 <div className="flex items-center gap-2">
                   {instructionsChecked ? (
-                    <CheckCircle className="w-5 h-5 text-green-600" />
+                    <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 fill-green-600 dark:fill-green-400" />
                   ) : (
                     <div className="w-5 h-5 rounded-full border-2 border-muted-foreground" />
                   )}
