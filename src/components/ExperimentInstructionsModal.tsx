@@ -153,8 +153,8 @@ export const ExperimentInstructionsModal = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={variant} size={size} className="rounded-lg text-foreground">
-          <FileText className="w-4 h-4 mr-2" />
+        <Button variant={variant} size={size} className="rounded-lg text-gray-900 dark:text-gray-900">
+          <FileText className="w-4 h-4 mr-2 text-gray-900 dark:text-gray-900" />
           指示書を表示
         </Button>
       </DialogTrigger>
