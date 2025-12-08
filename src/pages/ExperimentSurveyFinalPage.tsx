@@ -140,6 +140,26 @@ const ExperimentSurveyFinalPage = () => {
           </p>
         </div>
 
+        {/* UI1とUI2の画像を並べて表示 */}
+        <div className="grid grid-cols-2 gap-6 mb-8">
+          <div className="flex flex-col items-center">
+            <img
+              src="/images/UI_test/image_T1.png"
+              alt="UI1"
+              className="w-full max-w-[256px] h-auto object-contain rounded-lg shadow-lg border border-border mb-2"
+            />
+            <p className="text-sm font-semibold text-foreground">UI1</p>
+          </div>
+          <div className="flex flex-col items-center">
+            <img
+              src="/images/UI_test/image_T3.png"
+              alt="UI2"
+              className="w-full max-w-[256px] h-auto object-contain rounded-lg shadow-lg border border-border mb-2"
+            />
+            <p className="text-sm font-semibold text-foreground">UI2</p>
+          </div>
+        </div>
+
         <Card className="border-2 border-primary/30">
           <CardHeader>
             <CardTitle>全体評価</CardTitle>
