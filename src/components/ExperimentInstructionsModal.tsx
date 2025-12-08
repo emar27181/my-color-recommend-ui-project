@@ -32,6 +32,10 @@ interface ExperimentInstructionsModalProps {
    * ボタンのテキスト（デフォルト: '指示書を表示'）
    */
   buttonText?: string;
+  /**
+   * カスタムclassName（実験テーマのボタンスタイルなど）
+   */
+  customClassName?: string;
 }
 
 /**
@@ -47,6 +51,7 @@ export const ExperimentInstructionsModal = ({
   size = 'default',
   onOpen,
   buttonText = '指示書を表示',
+  customClassName,
 }: ExperimentInstructionsModalProps) => {
   const [open, setOpen] = useState(false);
 
@@ -158,8 +163,12 @@ export const ExperimentInstructionsModal = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={variant} size={size} className="rounded-lg text-gray-900 dark:text-gray-900">
-          <FileText className="w-4 h-4 mr-2 text-gray-900 dark:text-gray-900" />
+        <Button
+          variant={customClassName ? undefined : variant}
+          size={size}
+          className={customClassName || "rounded-lg"}
+        >
+          <FileText className="w-4 h-4 mr-2" />
           {buttonText}
         </Button>
       </DialogTrigger>

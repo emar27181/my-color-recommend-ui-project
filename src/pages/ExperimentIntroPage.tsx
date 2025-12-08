@@ -268,9 +268,9 @@ const ExperimentIntroPage = () => {
                   </Label>
                 </div>
                 <ExperimentInstructionsModal
-                  variant="outline"
                   size="sm"
                   buttonText={instructionsButtonText}
+                  customClassName={getButtonClassName('action')}
                   onOpen={() => {
                     setInstructionsChecked(true);
                     setInstructionsButtonText('指示書を再表示');
