@@ -1,0 +1,4 @@
+# Netlify SPA redirect rules
+# すべてのルートをindex.htmlにリダイレクト（SPAのクライアントサイドルーティング用）
+
+/*    /index.html   200
