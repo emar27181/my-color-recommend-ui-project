@@ -238,13 +238,13 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
   experimentEndTime: null,
   conditionLogs: [],
   currentConditionIndex: 0,
-  conditionOrder: ['UI1', 'UI2'], // 旧互換性のため保持
-  orderPattern: 1, // デフォルトはパターン1
-  experimentPatterns: ['UI1-TaskA', 'UI1-TaskB', 'UI2-TaskA', 'UI2-TaskB'], // デフォルト順序
-  firstUI: 'UI1', // デフォルトはUI1から
+  conditionOrder: ['UI2', 'UI1'], // 旧互換性のため保持（UI2先行）
+  orderPattern: 2, // デフォルトはパターン2（UI2先行）
+  experimentPatterns: ['UI2-TaskA', 'UI2-TaskB', 'UI1-TaskA', 'UI1-TaskB'], // デフォルト順序（UI2先行）
+  firstUI: 'UI2', // デフォルトはUI2から
 
   // アンケート
-  surveyMode: 'batch', // デフォルトはbatchモード
+  surveyMode: 'incremental', // デフォルトはincrementalモード
   surveyResponse: null,
   ui1SurveyResponse: null,
   ui2SurveyResponse: null,
@@ -338,6 +338,25 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
     // canvas_imageを除外したconditionLogsを作成
     const conditionsWithoutImages = state.conditionLogs.map(({ canvas_image, ...rest }) => rest);
 
+    // アンケート回答を取得（batchモードまたはincrementalモード）
+    let surveyData: SurveyResponse | undefined;
+
+    if (state.surveyMode === 'incremental') {
+      // incrementalモードの場合、個別アンケートと全体アンケートをマージ
+      if (state.ui1SurveyResponse && state.ui2SurveyResponse && state.finalSurveyResponse) {
+        surveyData = {
+          ui1_responses: state.ui1SurveyResponse.ui_responses,
+          ui2_responses: state.ui2SurveyResponse.ui_responses,
+          favoriteUI: state.finalSurveyResponse.favoriteUI,
+          reason: state.finalSurveyResponse.reason,
+          suggestions: state.finalSurveyResponse.suggestions,
+        };
+      }
+    } else {
+      // batchモードの場合、既存のsurveyResponseを使用
+      surveyData = state.surveyResponse || undefined;
+    }
+
     return {
       participant_id: state.participantId,
       participant_info: state.participantInfo,  // 参加者情報（手動入力）
@@ -350,7 +369,7 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
         ? parseFloat(((state.experimentEndTime - state.experimentStartTime) / 1000).toFixed(2))
         : null,
       conditions: conditionsWithoutImages as any, // canvas_imageを除外（型キャスト）
-      survey: state.surveyResponse || undefined, // アンケート回答を含める
+      survey: surveyData, // アンケート回答を含める（batchまたはincremental）
     };
   },
 
@@ -409,7 +428,10 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
       currentConditionIndex: 0,
       condition,
       material,
-      surveyResponse: null, // アンケート回答をリセット
+      surveyResponse: null, // アンケート回答をリセット（batchモード）
+      ui1SurveyResponse: null, // UI1アンケート回答をリセット（incrementalモード）
+      ui2SurveyResponse: null, // UI2アンケート回答をリセット（incrementalモード）
+      finalSurveyResponse: null, // 全体アンケート回答をリセット（incrementalモード）
     });
     console.log('Experiment reset');
   },
@@ -433,7 +455,10 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
       endTime: null,
       events: [],
       deviceInfo: collectDeviceInfo(),
-      surveyResponse: null, // アンケート回答をリセット
+      surveyResponse: null, // アンケート回答をリセット（batchモード）
+      ui1SurveyResponse: null, // UI1アンケート回答をリセット（incrementalモード）
+      ui2SurveyResponse: null, // UI2アンケート回答をリセット（incrementalモード）
+      finalSurveyResponse: null, // 全体アンケート回答をリセット（incrementalモード）
     });
     console.log(`Full experiment started with pattern ${firstPattern} (${condition}, ${material}) at:`, new Date(now).toISOString());
   },
@@ -493,6 +518,7 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
   // 次の条件に進む
   nextCondition: () => {
     const state = get();
+    console.log('nextCondition called - current index:', state.currentConditionIndex, 'participantId:', state.participantId);
 
     if (state.currentConditionIndex >= state.experimentPatterns.length - 1) {
       // 全条件完了
@@ -521,7 +547,7 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
       events: [],
     });
 
-    console.log(`Moved to pattern ${nextPattern} (${condition}, ${material})`);
+    console.log(`nextCondition completed - new index: ${nextIndex}, pattern: ${nextPattern} (${condition}, ${material}), participantId:`, get().participantId);
     return true;
   },
 

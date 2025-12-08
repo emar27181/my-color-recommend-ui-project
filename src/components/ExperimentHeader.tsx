@@ -41,8 +41,56 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
 
   // 条件完了ハンドラ
   const handleComplete = () => {
+    console.log('ExperimentHeader handleComplete called');
+    console.log('現在の状態:', {
+      currentConditionIndex,
+      currentPattern,
+      experimentPatterns,
+      surveyMode
+    });
+
     // キャンバス画像を取得
     const canvasImage = canvasRef?.current?.getCanvasImage() || undefined;
+
+    // 確認ダイアログを表示（共通）
+    const confirmed = window.confirm(
+      `${currentPattern} の実験が完了しました。\n\n前のページには戻れません。次のページに進んで良いですか？`
+    );
+
+    if (!confirmed) {
+      return; // キャンセル時は何もしない
+    }
+
+    // 確認後に条件を完了（キャンバス画像を保存）
+    completeCurrentCondition(canvasImage);
+
+    // incrementalモードの場合、UI完了時（TaskB完了時）にアンケートページへ遷移
+    if (surveyMode === 'incremental') {
+      const { condition, material } = parsePattern(currentPattern);
+      console.log('ExperimentHeader: incrementalモード - condition:', condition, 'material:', material, 'currentPattern:', currentPattern);
+
+      // TaskB完了（UI完了）の場合
+      if (material === 'taskB') {
+        const debugParam = isDebugMode ? '?debug=true' : '';
+
+        // UI1完了 → UI1アンケート
+        if (condition === 'UI1') {
+          console.log('ExperimentHeader: UI1-TaskB完了。UI1アンケートページへ遷移');
+          const { participantId } = useExperimentStore.getState();
+          console.log('ExperimentHeader: 遷移前のparticipantId:', participantId);
+          navigate(`/experiment/survey/ui1${debugParam}`);
+          return;
+        }
+        // UI2完了 → UI2アンケート
+        if (condition === 'UI2') {
+          console.log('ExperimentHeader: UI2-TaskB完了。UI2アンケートページへ遷移');
+          const { participantId } = useExperimentStore.getState();
+          console.log('ExperimentHeader: 遷移前のparticipantId:', participantId);
+          navigate(`/experiment/survey/ui2${debugParam}`);
+          return;
+        }
+      }
+    }
 
     // 次の条件があるかチェック
     if (hasNextCondition()) {
@@ -51,39 +99,6 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
       // 次のパターン名を取得
       const nextPatternIndex = currentConditionIndex + 1;
       const nextPattern = experimentPatterns[nextPatternIndex];
-
-      // 確認ダイアログを表示
-      const confirmed = window.confirm(
-        `${currentPattern} の実験が完了しました。\n\n前のページには戻れません。次のページに進んで良いですか？\n\n次のパターン：${nextPattern}`
-      );
-
-      if (!confirmed) {
-        return; // キャンセル時は何もしない
-      }
-
-      // 確認後に条件を完了（キャンバス画像を保存）
-      completeCurrentCondition(canvasImage);
-
-      // incrementalモードの場合、UI完了時にアンケートページへ遷移
-      if (surveyMode === 'incremental') {
-        const { condition, material } = parsePattern(currentPattern);
-
-        // TaskB完了（UI完了）の場合
-        if (material === 'taskB') {
-          const debugParam = isDebugMode ? '?debug=true' : '';
-
-          // UI1完了 → UI1アンケート
-          if (condition === 'UI1') {
-            navigate(`/experiment/survey/ui1${debugParam}`);
-            return;
-          }
-          // UI2完了 → UI2アンケート
-          if (condition === 'UI2') {
-            navigate(`/experiment/survey/ui2${debugParam}`);
-            return;
-          }
-        }
-      }
 
       // キャンバスをリセット
       if (canvasRef?.current) {
@@ -106,28 +121,11 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
         navigate(`/experiment/task?cond=${nextCond}${debugParam}`);
       }
     } else {
-      // 全条件完了 - アンケートページに遷移
-      const confirmed = window.confirm(
-        `${currentPattern} の実験が完了しました。\n\nすべてのパターン（UI1-TaskA, UI1-TaskB, UI2-TaskA, UI2-TaskB）が完了しました！\n\n前のページには戻れません。アンケートページに進んで良いですか？`
-      );
-
-      if (!confirmed) {
-        return; // キャンセル時は何もしない
-      }
-
-      // 確認後に条件を完了（キャンバス画像を保存）
-      completeCurrentCondition(canvasImage);
-
-      // 完了ページ（アンケート）に遷移（デバッグモードを引き継ぐ）
-      const debugParam = isDebugMode ? '?debug=true' : '';
-
-      // incrementalモードの場合は全体アンケートページへ
-      if (surveyMode === 'incremental') {
-        navigate(`/experiment/survey/final${debugParam}`);
-      } else {
-        // batchモードの場合は既存の完了ページへ
-        navigate(`/experiment/complete${debugParam}`);
-      }
+      // 全条件完了（次の条件がない）
+      // TaskAの場合は次のTaskBに進むが、これは既にincrementalモードでアンケートに遷移している
+      // ここに到達するのは、TaskAの場合のみ（TaskBはアンケートに遷移済み）
+      console.log('ExperimentHeader: 全条件完了 - 次の条件なし');
+      console.warn('想定外の状態: incrementalモードではTaskB完了時にアンケートに遷移するはず');
     }
   };
 
@@ -140,8 +138,8 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
             <Badge {...getBadgeProps('condition')}>
               {currentPattern}
             </Badge>
-            <span className="text-sm text-muted-foreground">
-              コンセプト: <span className="font-semibold text-foreground">「{concept}」</span>
+            <span className="text-sm text-foreground">
+              <span className="font-semibold underline">「{concept}」</span>というコンセプトを守るようにバランスよく塗ってください。
             </span>
             <ExperimentInstructionsModal variant="ghost" size="sm" buttonText="指示書を再表示" />
           </div>

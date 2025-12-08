@@ -1,5 +1,6 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useExperimentStore } from '@/store/experimentStore';
+import { useExperimentQuery } from '@/hooks/useQueryParams';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, Play } from 'lucide-react';
@@ -21,6 +22,10 @@ import { useEffect, useState, useRef } from 'react';
 const ExperimentInstructionPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+
+  // URLから条件を読み取り、ストアを更新
+  useExperimentQuery();
+
   const { condition, participantId, currentConditionIndex, experimentPatterns } = useExperimentStore();
   const isDebugMode = searchParams.get('debug') === 'true';
 
@@ -31,9 +36,13 @@ const ExperimentInstructionPage = () => {
   // 現在のパターン名を取得（例: U1A, U2B）
   const currentPattern = experimentPatterns[currentConditionIndex];
 
+  console.log('ExperimentInstructionPage - condition from store:', condition, 'currentPattern:', currentPattern);
+
   // 参加者IDが未設定の場合は導入ページにリダイレクト
   useEffect(() => {
+    console.log('ExperimentInstructionPage useEffect - participantId:', participantId);
     if (!participantId) {
+      console.warn('ExperimentInstructionPage: participantId is missing, redirecting to /experiment');
       navigate('/experiment');
     }
   }, [participantId, navigate]);

@@ -28,9 +28,22 @@ const ExperimentSurveyFinalPage = () => {
 
   // 参加者IDまたはUI1/UI2アンケートが未設定の場合は導入ページにリダイレクト
   useEffect(() => {
-    if (!participantId || !ui1SurveyResponse || !ui2SurveyResponse) {
+    if (!participantId) {
+      console.warn('ExperimentSurveyFinalPage: participantId is missing, redirecting to /experiment');
       navigate('/experiment');
+      return;
     }
+    if (!ui1SurveyResponse) {
+      console.warn('ExperimentSurveyFinalPage: ui1SurveyResponse is missing, redirecting to /experiment');
+      navigate('/experiment');
+      return;
+    }
+    if (!ui2SurveyResponse) {
+      console.warn('ExperimentSurveyFinalPage: ui2SurveyResponse is missing, redirecting to /experiment');
+      navigate('/experiment');
+      return;
+    }
+    console.log('ExperimentSurveyFinalPage: All conditions met, displaying final survey');
   }, [participantId, ui1SurveyResponse, ui2SurveyResponse, navigate]);
 
   // 送信ハンドラ

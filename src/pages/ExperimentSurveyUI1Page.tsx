@@ -19,7 +19,7 @@ import {
 const ExperimentSurveyUI1Page = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { setUI1SurveyResponse, participantId } = useExperimentStore();
+  const { setUI1SurveyResponse, participantId, firstUI, nextCondition } = useExperimentStore();
   const isDebugMode = searchParams.get('debug') === 'true';
 
   // 7つの質問への回答（1〜5段階）
@@ -27,7 +27,9 @@ const ExperimentSurveyUI1Page = () => {
 
   // 参加者IDが未設定の場合は導入ページにリダイレクト
   useEffect(() => {
+    console.log('ExperimentSurveyUI1Page mounted - participantId:', participantId, 'firstUI:', firstUI);
     if (!participantId) {
+      console.warn('ExperimentSurveyUI1Page: participantId is missing, redirecting to /experiment');
       navigate('/experiment');
     }
   }, [participantId, navigate]);
@@ -86,10 +88,22 @@ const ExperimentSurveyUI1Page = () => {
 
     // UI1アンケート回答を保存
     setUI1SurveyResponse({ ui_responses: responses });
+    console.log('UI1アンケート回答を保存しました:', responses);
 
-    // 次のタスク（UI2-TaskA）の説明ページへ遷移
     const debugParam = isDebugMode ? '&debug=true' : '';
-    navigate(`/experiment/instruction?cond=UI2${debugParam}`);
+
+    // UI1が最初のUIの場合は次にUI2へ、UI1が最後のUIの場合は全体アンケートへ
+    if (firstUI === 'UI1') {
+      // UI1 → UI2 の順番なので、次はUI2-TaskAの説明ページへ
+      // 次の条件に進む（UI1-TaskB → UI2-TaskA）
+      nextCondition();
+      console.log('UI1アンケート完了。次はUI2-TaskAの説明ページへ遷移');
+      navigate(`/experiment/instruction?cond=UI2${debugParam}`);
+    } else {
+      // UI2 → UI1 の順番なので、UI1が最後。全体アンケートへ
+      console.log('UI1アンケート完了。全体アンケートへ遷移');
+      navigate(`/experiment/survey/final${debugParam}`);
+    }
   };
 
   return (

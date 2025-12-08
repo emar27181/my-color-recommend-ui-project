@@ -19,7 +19,7 @@ import {
 const ExperimentSurveyUI2Page = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { setUI2SurveyResponse, participantId } = useExperimentStore();
+  const { setUI2SurveyResponse, participantId, firstUI, nextCondition } = useExperimentStore();
   const isDebugMode = searchParams.get('debug') === 'true';
 
   // 7つの質問への回答（1〜5段階）
@@ -86,10 +86,22 @@ const ExperimentSurveyUI2Page = () => {
 
     // UI2アンケート回答を保存
     setUI2SurveyResponse({ ui_responses: responses });
+    console.log('UI2アンケート回答を保存しました:', responses);
 
-    // 全体アンケートページへ遷移
-    const debugParam = isDebugMode ? '?debug=true' : '';
-    navigate(`/experiment/survey/final${debugParam}`);
+    const debugParam = isDebugMode ? '&debug=true' : '';
+
+    // UI2が最初のUIの場合は次にUI1へ、UI2が最後のUIの場合は全体アンケートへ
+    if (firstUI === 'UI2') {
+      // UI2 → UI1 の順番なので、次はUI1-TaskAの説明ページへ
+      // 次の条件に進む（UI2-TaskB → UI1-TaskA）
+      nextCondition();
+      console.log('UI2アンケート完了。次はUI1-TaskAの説明ページへ遷移');
+      navigate(`/experiment/instruction?cond=UI1${debugParam}`);
+    } else {
+      // UI1 → UI2 の順番なので、UI2が最後。全体アンケートへ
+      console.log('UI2アンケート完了。全体アンケートへ遷移');
+      navigate(`/experiment/survey/final${debugParam}`);
+    }
   };
 
   return (

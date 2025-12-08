@@ -33,7 +33,7 @@ export const useExperimentQuery = () => {
 
 // 有効な実験条件かチェックする関数
 const isValidCondition = (cond: string): cond is ExperimentCondition => {
-  return ['C0', 'C1', 'C2', 'C3'].includes(cond);
+  return ['C0', 'C1', 'C2', 'C3', 'UI1', 'UI2'].includes(cond);
 };
 
 /**
