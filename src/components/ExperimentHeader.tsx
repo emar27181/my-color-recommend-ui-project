@@ -114,7 +114,7 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
             <span className="text-sm text-muted-foreground">
               コンセプト: <span className="font-semibold text-foreground">「{concept}」</span>
             </span>
-            <ExperimentInstructionsModal variant="ghost" size="sm" />
+            <ExperimentInstructionsModal variant="ghost" size="sm" buttonText="指示書を再表示" />
           </div>
 
           {/* 右側: 条件完了ボタン */}

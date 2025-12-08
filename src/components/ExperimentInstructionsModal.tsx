@@ -28,6 +28,10 @@ interface ExperimentInstructionsModalProps {
    * モーダルが開かれたときのコールバック
    */
   onOpen?: () => void;
+  /**
+   * ボタンのテキスト（デフォルト: '指示書を表示'）
+   */
+  buttonText?: string;
 }
 
 /**
@@ -42,6 +46,7 @@ export const ExperimentInstructionsModal = ({
   variant = 'outline',
   size = 'default',
   onOpen,
+  buttonText = '指示書を表示',
 }: ExperimentInstructionsModalProps) => {
   const [open, setOpen] = useState(false);
 
@@ -155,7 +160,7 @@ export const ExperimentInstructionsModal = ({
       <DialogTrigger asChild>
         <Button variant={variant} size={size} className="rounded-lg text-gray-900 dark:text-gray-900">
           <FileText className="w-4 h-4 mr-2 text-gray-900 dark:text-gray-900" />
-          指示書を表示
+          {buttonText}
         </Button>
       </DialogTrigger>
       <DialogContent className="w-[70vw] max-w-none max-h-[80vh] overflow-y-auto">

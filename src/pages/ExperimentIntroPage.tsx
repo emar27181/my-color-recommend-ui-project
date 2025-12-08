@@ -34,6 +34,7 @@ const ExperimentIntroPage = () => {
   const [illustrationExperience, setIllustrationExperience] = useState<'beginner' | 'some' | 'hobby' | 'professional' | ''>(isDebugMode ? 'hobby' : '');
   const [inputDevice, setInputDevice] = useState<'マウス' | 'タッチパッド' | 'タブレットペン' | 'ペンタブ' | '液タブ' | ''>(isDebugMode ? 'マウス' : '');
   const [instructionsChecked, setInstructionsChecked] = useState(isDebugMode ? true : false);
+  const [instructionsButtonText, setInstructionsButtonText] = useState('指示書を表示');
 
   // 最初に実験するUIを判定（パターン1はUI1、パターン2はUI2）
   const firstUI = orderPattern === 1 ? 'UI1' : 'UI2';
@@ -269,7 +270,11 @@ const ExperimentIntroPage = () => {
                 <ExperimentInstructionsModal
                   variant="outline"
                   size="sm"
-                  onOpen={() => setInstructionsChecked(true)}
+                  buttonText={instructionsButtonText}
+                  onOpen={() => {
+                    setInstructionsChecked(true);
+                    setInstructionsButtonText('指示書を再表示');
+                  }}
                 />
                 {!instructionsChecked && (
                   <p className="text-sm text-muted-foreground">
