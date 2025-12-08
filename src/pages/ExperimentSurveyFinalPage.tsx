@@ -4,7 +4,6 @@ import { useExperimentStore } from '@/store/experimentStore';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
 import { Download, CheckCircle } from 'lucide-react';
 import {
@@ -54,12 +53,18 @@ const ExperimentSurveyFinalPage = () => {
     });
 
     setIsCompleted(true);
+
+    // アンケート回答後、自動でログをダウンロード
+    setTimeout(() => {
+      exportLog();
+      alert('アンケートありがとうございました！\n実験データ（ログ・アンケート・イラスト画像）をZIPファイルでダウンロードしました。');
+    }, 100);
   };
 
   // ダウンロードハンドラ
   const handleDownload = () => {
     exportLog();
-    alert('実験ログをダウンロードしました。ご協力ありがとうございました！');
+    alert('実験ログを再ダウンロードしました。');
   };
 
   if (isCompleted) {
@@ -79,16 +84,30 @@ const ExperimentSurveyFinalPage = () => {
           <Card>
             <CardContent className="pt-6 space-y-4">
               <p className="text-foreground">
-                実験ログをダウンロードして、研究者に送付してください。
+                実験ログは自動的にダウンロードされました。<br />
+                必要に応じて再ダウンロードしてください。
               </p>
               <Button
                 onClick={handleDownload}
                 size="lg"
-                className={`w-full ${getButtonClassName('action')}`}
+                className={`w-full ${getButtonClassName('primary')}`}
               >
                 <Download className={EXPERIMENT_ICON_STYLES.default} />
-                実験ログをダウンロード
+                実験データを再ダウンロード
               </Button>
+              <div className="text-sm text-muted-foreground space-y-2 text-left">
+                <p>
+                  <strong>1.</strong> ダウンロードした実験データ（ZIPファイル）を確認
+                </p>
+                <p className="ml-6 text-xs">
+                  • 実験ログ（JSON）<br />
+                  • アンケート結果<br />
+                  • 完成イラスト画像（各テスト）
+                </p>
+                <p>
+                  <strong>2.</strong> ZIPファイルを研究者に提出してください
+                </p>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -101,66 +120,56 @@ const ExperimentSurveyFinalPage = () => {
       <div className="container mx-auto px-4 py-8 max-w-3xl">
         <div className="text-center mb-8">
           <h1 className={`${EXPERIMENT_TEXT_STYLES.pageTitle} mb-3`}>
-            全体アンケート
+            全体評価
           </h1>
           <p className="text-muted-foreground">
             UI1・UI2を比較して、以下の質問にお答えください。
           </p>
         </div>
 
-        <Card>
+        <Card className="border-2 border-primary/30">
           <CardHeader>
-            <CardTitle className={EXPERIMENT_TEXT_STYLES.cardTitle}>
-              UI比較アンケート
-            </CardTitle>
+            <CardTitle>全体評価</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-8">
-            {/* 最も使いやすかったUI */}
-            <div className="space-y-3">
-              <Label className="text-base font-semibold">
-                最も使いやすかったUIはどちらですか？ *
-              </Label>
-              <RadioGroup value={favoriteUI} onValueChange={setFavoriteUI}>
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="UI1" id="ui1" />
-                    <Label htmlFor="ui1" className="cursor-pointer">
-                      UI1（大量の色を一度に表示）
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="UI2" id="ui2" />
-                    <Label htmlFor="ui2" className="cursor-pointer">
-                      UI2（色相→トーンの二段階選択）
-                    </Label>
-                  </div>
-                </div>
-              </RadioGroup>
+          <CardContent className="space-y-8 py-6">
+            <div className="space-y-4">
+              <Label className="text-base font-semibold">どちらのUIの方が使いやすかったですか？</Label>
+              <div className="flex gap-6">
+                {['UI1', 'UI2'].map((ui) => (
+                  <label key={ui} className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="favoriteUI"
+                      value={ui}
+                      checked={favoriteUI === ui}
+                      onChange={(e) => setFavoriteUI(e.target.value)}
+                      className="w-5 h-5"
+                    />
+                    <span className="text-lg font-semibold">{ui}</span>
+                  </label>
+                ))}
+              </div>
             </div>
 
-            {/* 理由 */}
-            <div className="space-y-3">
-              <Label className="text-base font-semibold">
-                その理由を教えてください。 *
-              </Label>
+            <div className="space-y-4">
+              <Label htmlFor="reason" className="text-base font-semibold">そう思った理由を教えてください</Label>
               <Textarea
+                id="reason"
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                placeholder="使いやすかった理由を具体的にお書きください..."
-                className="min-h-[120px]"
+                placeholder="例：UIXの方が色を選びやすく、迷わずに必要な色を見つけられたため"
+                className="min-h-[120px] resize-y text-foreground"
               />
             </div>
 
-            {/* 機能改善提案 */}
-            <div className="space-y-3">
-              <Label className="text-base font-semibold">
-                機能改善のご提案（任意）
-              </Label>
+            <div className="space-y-4">
+              <Label htmlFor="suggestions" className="text-base font-semibold">感想記述欄（UI2に関して改善点や感想があれば教えてください・任意）</Label>
               <Textarea
+                id="suggestions"
                 value={suggestions}
                 onChange={(e) => setSuggestions(e.target.value)}
-                placeholder="こんな機能があればもっと使いやすいと思う点があればお書きください..."
-                className="min-h-[120px]"
+                placeholder="例：UIXの方が色を絞りやすかった、もっと色の候補を増やしてほしい、など"
+                className="min-h-[100px] resize-y text-foreground"
               />
             </div>
 
@@ -171,7 +180,7 @@ const ExperimentSurveyFinalPage = () => {
                 className={`w-full ${getButtonClassName('action')}`}
               >
                 <CheckCircle className={EXPERIMENT_ICON_STYLES.default} />
-                アンケートを送信
+                結果をダウンロード
               </Button>
             </div>
           </CardContent>

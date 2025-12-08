@@ -2,9 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useExperimentStore } from '@/store/experimentStore';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { ArrowRight } from 'lucide-react';
 import {
   EXPERIMENT_TEXT_STYLES,
@@ -33,21 +32,47 @@ const ExperimentSurveyUI2Page = () => {
     }
   }, [participantId, navigate]);
 
-  // UI2の質問
+  // 質問文の定義（7問）
   const questions = [
-    '1. 色を選ぶ操作は簡単でしたか？',
-    '2. 目的の色を見つけやすかったですか？',
-    '3. 色の選択肢の量は適切でしたか？',
-    '4. 配色を考えるのに役立ちましたか？',
-    '5. 色選びにかかった時間は適切でしたか？',
-    '6. UIの見た目は分かりやすかったですか？',
-    '7. 全体的な使いやすさはどうでしたか？',
+    '色が多すぎると感じた',
+    '色が少なすぎると感じた',
+    '塗りたいと思った色が見つかった',
+    '指示された「バランスよく塗る」が実践しやすかった',
+    '塗りたい色にたどり着くまでがスムーズだった',
+    '完成した絵の出来に満足できた',
+    '使用したUI（カラーパレット）に満足できた',
   ];
 
+  // 評価スケールコンポーネント
+  const RatingScale = ({
+    value,
+    onChange,
+  }: {
+    value: number;
+    onChange: (value: number) => void;
+  }) => (
+    <div className="flex gap-2 justify-center">
+      {[1, 2, 3, 4, 5].map((rating) => (
+        <button
+          key={rating}
+          type="button"
+          onClick={() => onChange(rating)}
+          className={`w-12 h-12 rounded-lg border-2 transition-all ${
+            value === rating
+              ? 'bg-primary text-primary-foreground border-primary scale-110'
+              : 'bg-background text-foreground border-border hover:border-primary/50'
+          }`}
+        >
+          {rating}
+        </button>
+      ))}
+    </div>
+  );
+
   // 回答を更新
-  const handleResponseChange = (questionIndex: number, value: string) => {
+  const updateRating = (index: number, value: number) => {
     const newResponses = [...responses];
-    newResponses[questionIndex] = parseInt(value, 10);
+    newResponses[index] = value;
     setResponses(newResponses);
   };
 
@@ -72,45 +97,39 @@ const ExperimentSurveyUI2Page = () => {
       <div className="container mx-auto px-4 py-8 max-w-3xl">
         <div className="text-center mb-8">
           <h1 className={`${EXPERIMENT_TEXT_STYLES.pageTitle} mb-3`}>
-            UI2アンケート
+            UI2 の評価
           </h1>
-          <p className="text-muted-foreground">
-            UI2を使ったタスクについて、以下の質問にお答えください。
-          </p>
+          <div className="flex justify-center mb-4">
+            <img
+              src="/images/UI_test/image_T3.png"
+              alt="UI2: 二段階推薦"
+              className="w-full max-w-[256px] h-auto object-contain rounded-lg shadow-lg border border-border"
+            />
+          </div>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className={EXPERIMENT_TEXT_STYLES.cardTitle}>
-              UI2（色相→トーンの二段階選択）について
-            </CardTitle>
+        <Card className="border-2">
+          <CardHeader className="bg-blue-50 dark:bg-blue-950">
+            <CardDescription>UI2について評価してください</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-8">
+          <CardContent className="space-y-6 py-6">
             {questions.map((question, index) => (
               <div key={index} className="space-y-3">
-                <Label className="text-base font-semibold">{question}</Label>
-                <RadioGroup
-                  value={responses[index].toString()}
-                  onValueChange={(value) => handleResponseChange(index, value)}
-                >
-                  <div className="flex justify-between gap-2">
-                    {[1, 2, 3, 4, 5].map((rating) => (
-                      <div key={rating} className="flex flex-col items-center gap-2">
-                        <RadioGroupItem value={rating.toString()} id={`q${index}-${rating}`} />
-                        <Label
-                          htmlFor={`q${index}-${rating}`}
-                          className="text-sm cursor-pointer"
-                        >
-                          {rating === 1 && 'とても悪い'}
-                          {rating === 2 && 'やや悪い'}
-                          {rating === 3 && 'どちらでもない'}
-                          {rating === 4 && 'やや良い'}
-                          {rating === 5 && 'とても良い'}
-                        </Label>
-                      </div>
-                    ))}
-                  </div>
-                </RadioGroup>
+                <Label className="text-base">
+                  {index + 1}. {question}
+                </Label>
+                <div className="flex items-center gap-4">
+                  <span className="text-sm text-muted-foreground w-24 text-right">
+                    全くそう思わない
+                  </span>
+                  <RatingScale
+                    value={responses[index]}
+                    onChange={(value) => updateRating(index, value)}
+                  />
+                  <span className="text-sm text-muted-foreground w-24">
+                    非常にそう思う
+                  </span>
+                </div>
               </div>
             ))}
 
