@@ -3,7 +3,7 @@ import { useExperimentStore, parsePattern } from '@/store/experimentStore';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { CheckCircle, ArrowRight } from 'lucide-react';
+import { CheckCircle, ArrowRight, Play } from 'lucide-react';
 import type { CanvasColorRecommendationsRef } from '@/components/CanvasColorRecommendations';
 import {
   EXPERIMENT_ICON_STYLES,
@@ -30,6 +30,7 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
     currentConditionIndex,
     experimentPatterns,
     surveyMode,
+    condition, // ストアから直接取得
   } = useExperimentStore();
 
   // 現在のパターン名を取得（例: U1A, U2B）
@@ -38,6 +39,20 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
   // パターンからmaterialを取得してコンセプトを決定
   const { material } = parsePattern(currentPattern);
   const concept = TASK_CONCEPTS[material];
+
+  // 条件ごとの説明動画URL
+  const videoUrls = {
+    UI1: 'https://www.youtube.com/watch?v=eKne5u4Cx-M',
+    UI2: 'https://www.youtube.com/watch?v=0mkxgfSK7rg',
+  };
+
+  // 説明動画を別タブで開く
+  const handleOpenVideo = () => {
+    console.log('handleOpenVideo - currentPattern:', currentPattern, 'condition:', condition);
+    const videoUrl = videoUrls[condition];
+    console.log('Opening video URL:', videoUrl);
+    window.open(videoUrl, '_blank', 'noopener,noreferrer');
+  };
 
   // 条件完了ハンドラ
   const handleComplete = () => {
@@ -141,26 +156,37 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
             <span className="text-sm text-foreground">
               <span className="font-semibold underline">「{concept}」</span>というコンセプトを守るようにバランスよく塗ってください。
             </span>
-            <ExperimentInstructionsModal variant="ghost" size="sm" buttonText="指示書を再表示" />
           </div>
 
-          {/* 右側: 条件完了ボタン */}
-          {isExperimentRunning && (
+          {/* 右側: ボタン群 */}
+          <div className="flex items-center gap-2">
+            <ExperimentInstructionsModal variant="ghost" size="sm" buttonText="指示書を再表示" />
             <Button
-              onClick={handleComplete}
+              variant="ghost"
               size="sm"
-              className={getButtonClassName('action')}
+              onClick={handleOpenVideo}
+              className="text-xs"
             >
-              <CheckCircle className={EXPERIMENT_ICON_STYLES.small} />
-              条件を完了
-              {hasNextCondition() && (
-                <>
-                  <ArrowRight className={EXPERIMENT_ICON_STYLES.small} />
-                  {experimentPatterns[currentConditionIndex + 1]}へ
-                </>
-              )}
+              <Play className={EXPERIMENT_ICON_STYLES.small} />
+              説明動画を再表示
             </Button>
-          )}
+            {isExperimentRunning && (
+              <Button
+                onClick={handleComplete}
+                size="sm"
+                className={getButtonClassName('action')}
+              >
+                <CheckCircle className={EXPERIMENT_ICON_STYLES.small} />
+                条件を完了
+                {hasNextCondition() && (
+                  <>
+                    <ArrowRight className={EXPERIMENT_ICON_STYLES.small} />
+                    {experimentPatterns[currentConditionIndex + 1]}へ
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>
