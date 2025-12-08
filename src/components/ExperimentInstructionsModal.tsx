@@ -141,7 +141,7 @@ export const ExperimentInstructionsModal = ({
             <p key={index} className="mb-2 text-foreground leading-relaxed">
               {parts.map((part, i) =>
                 i % 2 === 1 ? (
-                  <strong key={i} className="font-bold text-primary">
+                  <strong key={i} className="font-bold text-primary underline">
                     {part}
                   </strong>
                 ) : (
