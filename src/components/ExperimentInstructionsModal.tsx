@@ -134,20 +134,23 @@ export const ExperimentInstructionsModal = ({
           return <div key={index} className="h-2" />;
         }
         // 太字・強調 (**text**)
-        const boldPattern = /\*\*(.*?)\*\*/g;
-        if (boldPattern.test(line)) {
-          const parts = line.split(boldPattern);
+        if (line.includes('**')) {
+          const parts = line.split(/(\*\*.*?\*\*)/g).filter(part => part !== '');
           return (
             <p key={index} className="mb-2 text-foreground leading-relaxed">
-              {parts.map((part, i) =>
-                i % 2 === 1 ? (
-                  <strong key={i} className="font-bold text-primary underline">
-                    {part}
-                  </strong>
-                ) : (
-                  part
-                )
-              )}
+              {parts.map((part, i) => {
+                if (part.startsWith('**') && part.endsWith('**')) {
+                  // **を削除してボールド+アンダーラインで表示
+                  const text = part.slice(2, -2);
+                  return (
+                    <strong key={i} className="font-bold text-primary underline">
+                      {text}
+                    </strong>
+                  );
+                }
+                // 通常のテキスト部分
+                return <span key={i}>{part}</span>;
+              })}
             </p>
           );
         }
