@@ -159,7 +159,7 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
           </div>
 
           {/* 右側: ボタン群 */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             <ExperimentInstructionsModal variant="ghost" size="sm" buttonText="指示書を再表示" />
             <Button
               variant="ghost"
@@ -174,7 +174,7 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
               <Button
                 onClick={handleComplete}
                 size="sm"
-                className={getButtonClassName('action')}
+                className={`${getButtonClassName('action')} !bg-gradient-to-r !from-green-600 !to-green-700 hover:!from-green-700 hover:!to-green-800`}
               >
                 <CheckCircle className={EXPERIMENT_ICON_STYLES.small} />
                 条件を完了
