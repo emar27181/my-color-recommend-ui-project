@@ -13,6 +13,9 @@ import ExperimentIntroPage from './pages/ExperimentIntroPage.tsx'
 import ExperimentInstructionPage from './pages/ExperimentInstructionPage.tsx'
 import ExperimentPage from './pages/ExperimentPage.tsx'
 import ExperimentCompletePage from './pages/ExperimentCompletePage.tsx'
+import ExperimentSurveyUI1Page from './pages/ExperimentSurveyUI1Page.tsx'
+import ExperimentSurveyUI2Page from './pages/ExperimentSurveyUI2Page.tsx'
+import ExperimentSurveyFinalPage from './pages/ExperimentSurveyFinalPage.tsx'
 import { ToastProvider } from './contexts/ToastContext'
 import { TutorialProvider } from './contexts/TutorialContext'
 import { Layout } from './components/Layout.tsx'
@@ -33,6 +36,9 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/experiment/instruction" element={<Layout><ExperimentInstructionPage /></Layout>} />
             <Route path="/experiment/task" element={<Layout><ExperimentPage /></Layout>} />
             <Route path="/experiment/complete" element={<Layout><ExperimentCompletePage /></Layout>} />
+            <Route path="/experiment/survey/ui1" element={<Layout><ExperimentSurveyUI1Page /></Layout>} />
+            <Route path="/experiment/survey/ui2" element={<Layout><ExperimentSurveyUI2Page /></Layout>} />
+            <Route path="/experiment/survey/final" element={<Layout><ExperimentSurveyFinalPage /></Layout>} />
           </Routes>
         </Router>
       </TutorialProvider>

@@ -29,6 +29,7 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
     nextCondition,
     currentConditionIndex,
     experimentPatterns,
+    surveyMode,
   } = useExperimentStore();
 
   // 現在のパターン名を取得（例: U1A, U2B）
@@ -62,6 +63,27 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
 
       // 確認後に条件を完了（キャンバス画像を保存）
       completeCurrentCondition(canvasImage);
+
+      // incrementalモードの場合、UI完了時にアンケートページへ遷移
+      if (surveyMode === 'incremental') {
+        const { condition, material } = parsePattern(currentPattern);
+
+        // TaskB完了（UI完了）の場合
+        if (material === 'taskB') {
+          const debugParam = isDebugMode ? '?debug=true' : '';
+
+          // UI1完了 → UI1アンケート
+          if (condition === 'UI1') {
+            navigate(`/experiment/survey/ui1${debugParam}`);
+            return;
+          }
+          // UI2完了 → UI2アンケート
+          if (condition === 'UI2') {
+            navigate(`/experiment/survey/ui2${debugParam}`);
+            return;
+          }
+        }
+      }
 
       // キャンバスをリセット
       if (canvasRef?.current) {
@@ -98,7 +120,14 @@ export const ExperimentHeader = ({ canvasRef, isDebugMode = false }: ExperimentH
 
       // 完了ページ（アンケート）に遷移（デバッグモードを引き継ぐ）
       const debugParam = isDebugMode ? '?debug=true' : '';
-      navigate(`/experiment/complete${debugParam}`);
+
+      // incrementalモードの場合は全体アンケートページへ
+      if (surveyMode === 'incremental') {
+        navigate(`/experiment/survey/final${debugParam}`);
+      } else {
+        // batchモードの場合は既存の完了ページへ
+        navigate(`/experiment/complete${debugParam}`);
+      }
     }
   };
 

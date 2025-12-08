@@ -68,6 +68,11 @@ export interface SurveyResponse {
   suggestions?: string;      // 機能改善提案（任意・自由記述）
 }
 
+// UI個別アンケート回答の型定義（incrementalモード用）
+export interface UISurveyResponse {
+  ui_responses: number[];    // 7つの質問への回答
+}
+
 // 実験ログ全体の型定義
 export interface ExperimentLog {
   participant_id: string;
@@ -106,7 +111,11 @@ export interface ExperimentState {
   firstUI: 'UI1' | 'UI2'; // 最初にテストしたUI
 
   // アンケート
-  surveyResponse: SurveyResponse | null; // アンケート回答
+  surveyMode: 'batch' | 'incremental'; // アンケートモード（batch=一括、incremental=逐次）
+  surveyResponse: SurveyResponse | null; // アンケート回答（batchモード用）
+  ui1SurveyResponse: UISurveyResponse | null; // UI1個別アンケート回答（incrementalモード用）
+  ui2SurveyResponse: UISurveyResponse | null; // UI2個別アンケート回答（incrementalモード用）
+  finalSurveyResponse: { favoriteUI: string; reason: string; suggestions?: string } | null; // 全体アンケート回答（incrementalモード用）
 
   // アクション
   setParticipantId: (id: string) => void;
@@ -129,7 +138,11 @@ export interface ExperimentState {
   completeCurrentCondition: (canvasImage?: string) => void;      // 現在の条件を完了
 
   // アンケートアクション
-  setSurveyResponse: (survey: SurveyResponse) => void; // アンケート回答を保存
+  setSurveyMode: (mode: 'batch' | 'incremental') => void; // アンケートモードを設定
+  setSurveyResponse: (survey: SurveyResponse) => void; // アンケート回答を保存（batchモード）
+  setUI1SurveyResponse: (response: UISurveyResponse) => void; // UI1個別アンケート回答を保存
+  setUI2SurveyResponse: (response: UISurveyResponse) => void; // UI2個別アンケート回答を保存
+  setFinalSurveyResponse: (response: { favoriteUI: string; reason: string; suggestions?: string }) => void; // 全体アンケート回答を保存
 
   // 条件による機能フラグ
   getFeatureFlags: () => {
@@ -231,7 +244,11 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
   firstUI: 'UI1', // デフォルトはUI1から
 
   // アンケート
+  surveyMode: 'batch', // デフォルトはbatchモード
   surveyResponse: null,
+  ui1SurveyResponse: null,
+  ui2SurveyResponse: null,
+  finalSurveyResponse: null,
 
   // 参加者IDを設定
   setParticipantId: (id: string) => {
@@ -508,10 +525,34 @@ export const useExperimentStore = create<ExperimentState>((set, get) => ({
     return true;
   },
 
-  // アンケート回答を保存
+  // アンケートモードを設定
+  setSurveyMode: (mode: 'batch' | 'incremental') => {
+    set({ surveyMode: mode });
+    console.log('Survey mode set to:', mode);
+  },
+
+  // アンケート回答を保存（batchモード）
   setSurveyResponse: (survey: SurveyResponse) => {
     set({ surveyResponse: survey });
     console.log('Survey response saved:', survey);
+  },
+
+  // UI1個別アンケート回答を保存
+  setUI1SurveyResponse: (response: UISurveyResponse) => {
+    set({ ui1SurveyResponse: response });
+    console.log('UI1 survey response saved:', response);
+  },
+
+  // UI2個別アンケート回答を保存
+  setUI2SurveyResponse: (response: UISurveyResponse) => {
+    set({ ui2SurveyResponse: response });
+    console.log('UI2 survey response saved:', response);
+  },
+
+  // 全体アンケート回答を保存
+  setFinalSurveyResponse: (response: { favoriteUI: string; reason: string; suggestions?: string }) => {
+    set({ finalSurveyResponse: response });
+    console.log('Final survey response saved:', response);
   },
 
   // 条件による機能フラグを取得

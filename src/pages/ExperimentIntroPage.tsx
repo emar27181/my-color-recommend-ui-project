@@ -29,7 +29,7 @@ const ExperimentIntroPage = () => {
   const [searchParams] = useSearchParams();
   const isDebugMode = searchParams.get('debug') === 'true';
 
-  const { setParticipantId, setParticipantInfo, setOrderPattern, startFullExperiment, orderPattern } = useExperimentStore();
+  const { setParticipantId, setParticipantInfo, setOrderPattern, setSurveyMode, startFullExperiment, orderPattern } = useExperimentStore();
   const [deviceType, setDeviceType] = useState<'PC' | 'tablet' | 'smartphone' | ''>(isDebugMode ? 'PC' : '');
   const [illustrationExperience, setIllustrationExperience] = useState<'beginner' | 'some' | 'hobby' | 'professional' | ''>(isDebugMode ? 'hobby' : '');
   const [inputDevice, setInputDevice] = useState<'マウス' | 'タッチパッド' | 'タブレットペン' | 'ペンタブ' | '液タブ' | ''>(isDebugMode ? 'マウス' : '');
@@ -39,8 +39,15 @@ const ExperimentIntroPage = () => {
   // 最初に実験するUIを判定（パターン1はUI1、パターン2はUI2）
   const firstUI = orderPattern === 1 ? 'UI1' : 'UI2';
 
-  // URLパラメータからorder/uiOrderを取得してカウンターバランスパターンを設定
+  // URLパラメータからorder/uiOrder/surveyModeを取得して設定
   useEffect(() => {
+    // surveyModeパラメータを取得
+    const surveyModeParam = searchParams.get('surveyMode');
+    if (surveyModeParam === 'incremental' || surveyModeParam === 'batch') {
+      setSurveyMode(surveyModeParam);
+      console.log(`Survey mode set to ${surveyModeParam} from URL parameter 'surveyMode'`);
+    }
+
     // orderパラメータが指定されている場合はそれを優先
     const orderParam = searchParams.get('order');
     if (orderParam) {
@@ -60,7 +67,7 @@ const ExperimentIntroPage = () => {
       setOrderPattern(pattern as OrderPattern);
       console.log(`Order pattern set to ${pattern} from URL parameter 'uiOrder=${uiOrderParam}'`);
     }
-  }, [searchParams, setOrderPattern]);
+  }, [searchParams, setOrderPattern, setSurveyMode]);
 
   // 実験開始ハンドラ
   const handleStart = () => {
