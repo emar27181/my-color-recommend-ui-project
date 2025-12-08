@@ -32,7 +32,7 @@ const ExperimentIntroPage = () => {
   const { setParticipantId, setParticipantInfo, setOrderPattern, startFullExperiment, orderPattern } = useExperimentStore();
   const [deviceType, setDeviceType] = useState<'PC' | 'tablet' | 'smartphone' | ''>(isDebugMode ? 'PC' : '');
   const [illustrationExperience, setIllustrationExperience] = useState<'beginner' | 'some' | 'hobby' | 'professional' | ''>(isDebugMode ? 'hobby' : '');
-  const [inputDevice, setInputDevice] = useState<'マウス' | 'タブレットペン' | 'ペンタブ' | '液タブ' | ''>(isDebugMode ? 'マウス' : '');
+  const [inputDevice, setInputDevice] = useState<'マウス' | 'タッチパッド' | 'タブレットペン' | 'ペンタブ' | '液タブ' | ''>(isDebugMode ? 'マウス' : '');
   const [instructionsChecked, setInstructionsChecked] = useState(isDebugMode ? true : false);
 
   // 最初に実験するUIを判定（パターン1はUI1、パターン2はUI2）
@@ -223,12 +223,13 @@ const ExperimentIntroPage = () => {
             {/* 入力デバイス選択 */}
             <div className="space-y-3">
               <Label className="text-base font-semibold text-foreground">入力デバイス *</Label>
-              <Select value={inputDevice} onValueChange={(value: string) => setInputDevice(value as 'マウス' | 'タブレットペン' | 'ペンタブ' | '液タブ' | '')}>
+              <Select value={inputDevice} onValueChange={(value: string) => setInputDevice(value as 'マウス' | 'タッチパッド' | 'タブレットペン' | 'ペンタブ' | '液タブ' | '')}>
                 <SelectTrigger className={getInputClassName('default')}>
                   <SelectValue placeholder="入力デバイスを選択してください" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="マウス">マウス</SelectItem>
+                  <SelectItem value="タッチパッド">タッチパッド</SelectItem>
                   <SelectItem value="タブレットペン">タブレットペン</SelectItem>
                   <SelectItem value="ペンタブ">ペンタブ</SelectItem>
                   <SelectItem value="液タブ">液タブ</SelectItem>

@@ -39,7 +39,7 @@ export interface DeviceInfo {
 export interface ParticipantInfo {
   deviceType: 'PC' | 'tablet' | 'smartphone' | '';  // 使用デバイス（ユーザー選択）
   illustrationExperience: 'beginner' | 'some' | 'hobby' | 'professional' | '';  // イラスト経験
-  inputDevice: 'マウス' | 'タブレットペン' | 'ペンタブ' | '液タブ' | '';  // 入力デバイス
+  inputDevice: 'マウス' | 'タッチパッド' | 'タブレットペン' | 'ペンタブ' | '液タブ' | '';  // 入力デバイス
 }
 
 // 条件ごとのログ
