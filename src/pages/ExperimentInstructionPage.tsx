@@ -139,9 +139,9 @@ const ExperimentInstructionPage = () => {
         <div className="mb-6">
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className={`${EXPERIMENT_TEXT_STYLES.cardTitle} flex items-center gap-2`}>
+              <CardTitle className="text-3xl font-bold flex items-center gap-2">
                 <Play className={EXPERIMENT_ICON_STYLES.default} />
-                デモ動画
+                デモ動画(音声付き)
               </CardTitle>
             </CardHeader>
             <CardContent className="px-2 sm:px-3 pb-3">
