@@ -6,14 +6,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Play, User, Palette, Bug, CheckCircle } from 'lucide-react';
+import { Play, User, Palette, Bug } from 'lucide-react';
 import {
   EXPERIMENT_ICON_STYLES,
   EXPERIMENT_TEXT_STYLES,
   getButtonClassName,
   getInputClassName,
 } from '@/constants/experimentTheme';
-import { ExperimentInstructionsModal } from '@/components/ExperimentInstructionsModal';
 
 /**
  * 実験導入ページ（改良版）
@@ -33,8 +32,6 @@ const ExperimentIntroPage = () => {
   const [deviceType, setDeviceType] = useState<'PC' | 'tablet' | 'smartphone' | ''>(isDebugMode ? 'PC' : '');
   const [illustrationExperience, setIllustrationExperience] = useState<'beginner' | 'some' | 'hobby' | 'professional' | ''>(isDebugMode ? 'hobby' : '');
   const [inputDevice, setInputDevice] = useState<'マウス' | 'タッチパッド' | 'タブレットペン' | 'ペンタブ' | '液タブ' | ''>(isDebugMode ? 'マウス' : '');
-  const [instructionsChecked, setInstructionsChecked] = useState(isDebugMode ? true : false);
-  const [instructionsButtonText, setInstructionsButtonText] = useState('指示書を表示');
 
   // 最初に実験するUIを判定（パターン1はUI1、パターン2はUI2）
   const firstUI = orderPattern === 1 ? 'UI1' : 'UI2';
@@ -83,11 +80,6 @@ const ExperimentIntroPage = () => {
 
     if (!inputDevice) {
       alert('入力デバイスを選択してください');
-      return;
-    }
-
-    if (!instructionsChecked) {
-      alert('指示書を確認してチェックを入れてください');
       return;
     }
 
@@ -261,8 +253,8 @@ const ExperimentIntroPage = () => {
               </Select>
             </div>
 
-            {/* 指示書確認 */}
-            <div className="space-y-3">
+            {/* 指示書確認 - 非表示 */}
+            {/* <div className="space-y-3">
               <div className="flex flex-col gap-3 p-4 border-2 border-primary/30 rounded-lg bg-primary/5">
                 <div className="flex items-center gap-2">
                   {instructionsChecked ? (
@@ -289,7 +281,7 @@ const ExperimentIntroPage = () => {
                   </p>
                 )}
               </div>
-            </div>
+            </div> */}
 
             <Button
               onClick={handleStart}
