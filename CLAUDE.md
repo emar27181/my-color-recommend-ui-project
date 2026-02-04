@@ -51,7 +51,7 @@
 - 現在のレイアウト構成（`src/constants/layout.ts`）を維持すること
 - 表示されるコンポーネント:
   - 0. キャンバス（canvasColorRecommendation）
-  - 1. ベース色選択（baseColor）
+  - 1. ベースカラー選択（baseColor）
   - 2. 色相推薦（colorRecommendation）
   - 3. トーン推薦（toneRecommendation）
   - α. 肌色推薦（skinColor）
@@ -283,7 +283,7 @@ const gapSearchRadius = 1;       // 隙間検索時の探索半径（px）
 - **ボタン**: `px-2 py-1 text-xs`
 
 ### 肌色推薦
-- **固定色**: 10色（色白系→やや褐色系）、ベース色+頬色ペア×5段階
+- **固定色**: 10色（色白系→やや褐色系）、ベースカラー+頬色ペア×5段階
 - **コンポーネント**: `SkinColorRecommendations.tsx`
 
 ---

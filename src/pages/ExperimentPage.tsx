@@ -185,7 +185,7 @@ const ExperimentPage = () => {
         return false;
       }
 
-      // UI1のみベース色選択を非表示
+      // UI1のみベースカラー選択を非表示
       if (componentKey === 'baseColor' && condition === 'UI1') {
         return false;
       }

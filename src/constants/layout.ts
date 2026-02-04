@@ -11,7 +11,7 @@ export const LAYOUT_CONFIG = {
       },
       {
         id: 'main-tools',
-        width: 'w-1/3' as const, // 1/3幅（約33.3%）- ベース色選択列を拡大
+        width: 'w-1/3' as const, // 1/3幅（約33.3%）- ベースカラー選択列を拡大
         components: ['baseColor', 'colorRecommendation', 'toneRecommendation', 'skinColor']
       },
       {

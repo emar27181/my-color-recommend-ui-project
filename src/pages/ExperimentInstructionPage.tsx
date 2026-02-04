@@ -98,11 +98,11 @@ const ExperimentInstructionPage = () => {
     },
     UI2: {
       title: 'UI2: 色相→トーンの二段階で選択',
-      description: 'ベース色を選択すると、配色技法に基づいた推薦色が表示されます。',
+      description: 'ベースカラーを選択すると、配色技法に基づいた推薦色が表示されます。',
       videoUrl: 'https://www.youtube.com/embed/0mkxgfSK7rg',
       imageUrl: '/images/UI_test/image_T3.png',
       steps: [
-        'ベース色を選択します（カラーピッカーまたは画像アップロード）',
+        'ベースカラーを選択します（カラーピッカーまたは画像アップロード）',
         '色相推薦から配色技法を選択します',
         '表示された推薦色やトーン推薦から好きな色を選んでください',
       ],

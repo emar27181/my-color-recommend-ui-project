@@ -4,7 +4,7 @@
     "steps": {
       "canvas": "キャンバス",
       "baseColorSelection": "ベースカラー(推薦元)選択",
-      "baseColorSelectionShort": "ベース色選択",
+      "baseColorSelectionShort": "ベースカラー選択",
       "massColorGrid": "カラーパレット",
       "hueWheelToneSlider": "色相環＋トーンスライダー",
       "colorRecommendation": "色相(配色技法)推薦",
@@ -46,7 +46,7 @@
   "toneRecommendations": {
     "title": "トーン推薦",
     "noTones": "トーン推薦がありません",
-    "selectBaseColor": "ベース色を選択してください"
+    "selectBaseColor": "ベースカラーを選択してください"
   },
   "colorSchemes": {
     "identity": "アイデンティティ配色(1色)",

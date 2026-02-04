@@ -230,7 +230,7 @@ export interface ColorState {
   setSelectedScheme: (schemeId: string) => void;
   setExtractedColors: (colors: ExtractedColor[], dominantColor: ExtractedColor) => void;
   setColorFromRecommendation: (color: string) => void; // 推薦色から選択時（描画色のみ変更）
-  setColorFromBase: (color: string) => void; // ベース色選択時（ベースカラー+描画色変更）
+  setColorFromBase: (color: string) => void; // ベースカラー選択時（ベースカラー+描画色変更）
   generateRecommendedColors: () => void;
   generateRecommendedTones: (baseColor: string) => void;
   toggleQuantization: () => void;
@@ -573,16 +573,16 @@ export const useColorStore = create<ColorState>((set, get) => {
       set({ paintColor: color });
     },
 
-    // ベース色選択時: ベースカラー、selectedColor、描画色をすべて更新
+    // ベースカラー選択時: ベースカラー、selectedColor、描画色をすべて更新
     setColorFromBase: (color: string) => {
       set({ 
         baseColor: color,
         selectedColor: color,
         paintColor: color 
       });
-      // トーン推薦も新しいベース色で更新
+      // トーン推薦も新しいベースカラーで更新
       get().generateRecommendedTones(color);
-      // 色相推薦も新しいベース色で更新
+      // 色相推薦も新しいベースカラーで更新
       get().generateRecommendedColors();
     },
 
