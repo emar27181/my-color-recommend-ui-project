@@ -58,97 +58,109 @@ const getSchemeRecommendationOrder = (currentScheme: string): string[] => {
 export const COLOR_SCHEMES: ColorScheme[] = [
   {
     id: 'identity',
-    name: 'アイデンティティ配色\n単色のみ',
+    name: '1.アイデンティティ配色\n単色のみ',
     description: '一つの色だけを使った配色',
     angles: [0],
   },
   {
     id: 'analogous_1',
-    name: 'アナロジー配色\n近い色同士',
+    name: '2.アナロジー配色\n近い色同士',
     description: '色相環で隣り合う近い色同士の組み合わせ',
     angles: [0, 30],
   },
   {
     id: 'analogous_2',
-    name: 'アナロジー配色\n近い色同士',
+    name: '2.アナロジー配色\n近い色同士',
     description: '色相環で隣り合う近い色同士の組み合わせ',
     angles: [0, -30],
   },
   {
     id: 'intermediate_1',
-    name: 'インターミディエート配色\n中間色の組み合わせ',
+    name: '3.インターミディエート配色\n中間色の組み合わせ',
     description: '隣接色と反対色の中間にある色の組み合わせ',
-    angles: [0, 60],
+    angles: [0, 90],
   },
   {
     id: 'intermediate_2',
-    name: 'インターミディエート配色\n中間色の組み合わせ',
+    name: '3.インターミディエート配色\n中間色の組み合わせ',
     description: '隣接色と反対色の中間にある色の組み合わせ',
-    angles: [0, -60],
+    angles: [0, -90],
+  },
+  {
+    id: 'opponent_1',
+    name: '4.オポーネント配色\n中差色の組み合わせ',
+    description: '補色に近いコントラストと調和を両立させた色の組み合わせ',
+    angles: [0, 135],
+  },
+  {
+    id: 'opponent_2',
+    name: '4.オポーネント配色\n中差色の組み合わせ',
+    description: '補色に近いコントラストと調和を両立させた色の組み合わせ',
+    angles: [0, -135],
   },
   {
     id: 'complementary',
-    name: 'ダイアード配色\n正反対の色同士',
+    name: '5.ダイアード配色\n正反対の色同士',
     description: '色相環で正反対にある色同士の組み合わせ',
     angles: [0, 180],
   },
   {
     id: 'dominant_1',
-    name: 'ドミナント配色\n統一感のある色合い',
+    name: '6.ドミナント配色\n統一感のある色合い',
     description: '似た色相でまとめた統一感のある組み合わせ',
     angles: [0, 30, -30],
   },
   {
     id: 'dominant_2',
-    name: 'ドミナント配色\n統一感のある色合い',
+    name: '6.ドミナント配色\n統一感のある色合い',
     description: '似た色相でまとめた統一感のある組み合わせ',
     angles: [0, 30, 60],
   },
   {
     id: 'dominant_3',
-    name: 'ドミナント配色\n統一感のある色合い',
+    name: '6.ドミナント配色\n統一感のある色合い',
     description: '似た色相でまとめた統一感のある組み合わせ',
     angles: [0, -30, -60],
   },
   {
     id: 'triadic',
-    name: 'トライアド配色\n三等分の色合い',
+    name: '7.トライアド配色\n三等分の色合い',
     description: '色相環を3つに分けた均等な色の組み合わせ',
     angles: [0, 120, 240],
   },
   {
     id: 'split_complementary_1',
-    name: 'スプリットコンプリメンタリー配色\n反対色の隣接色（パターン1）',
+    name: '8.スプリットコンプリメンタリー配色\n反対色の隣接色（パターン1）',
     description: '反対色の隣の2色を使った配色',
     angles: [0, 150, 210],
   },
   {
     id: 'split_complementary_2',
-    name: 'スプリットコンプリメンタリー配色\n反対色の隣接色（パターン2）',
+    name: '8.スプリットコンプリメンタリー配色\n反対色の隣接色（パターン2）',
     description: '反対色の隣の2色を使った配色',
     angles: [0, 60, 210],
   },
   {
     id: 'split_complementary_3',
-    name: 'スプリットコンプリメンタリー配色\n反対色の隣接色（パターン3）',
+    name: '8.スプリットコンプリメンタリー配色\n反対色の隣接色（パターン3）',
     description: '反対色の隣の2色を使った配色',
     angles: [0, 150, 300],
   },
   {
     id: 'tetradic',
-    name: 'テトラード配色\n四等分の色合い',
+    name: '9.テトラード配色\n四等分の色合い',
     description: '色相環を4つに分けた均等な色の組み合わせ',
     angles: [0, 90, 180, 270],
   },
   {
     id: 'pentad',
-    name: 'ペンタード配色\n五等分の色合い',
+    name: '10.ペンタード配色\n五等分の色合い',
     description: '色相環を5つに分けた均等な色の組み合わせ',
     angles: [0, 72, 144, 216, 288],
   },
   {
     id: 'hexad',
-    name: 'ヘクサード配色\n六等分の色合い',
+    name: '11.ヘクサード配色\n六等分の色合い',
     description: '色相環を6つに分けた均等な色の組み合わせ',
     angles: [0, 60, 120, 180, 240, 300],
   },
@@ -247,14 +259,14 @@ export type SortMethod = 'lightness_desc' | 'lightness_asc' | 'hue' | 'hue_dista
 export const COLOR_SORT_CONFIG = {
   // 推薦色の並び替え手法 (変更可能)
   method: 'hue_distance' as SortMethod,
-  
+
   // 利用可能な手法一覧とその説明
   availableMethods: {
     'lightness_desc': '明るい→暗い順 (従来の方法)',
     'lightness_asc': '暗い→明るい順',
     'hue': '色相順 (赤→橙→黄→緑→青→紫)',
     'hue_distance': '色相距離順 (ベースカラーに近い順)',
-    'saturation_desc': '鮮やか→くすんだ順', 
+    'saturation_desc': '鮮やか→くすんだ順',
     'saturation_asc': 'くすんだ→鮮やか順',
     'original': '元の順序を維持 (配色技法の角度順)',
     'random': 'ランダムシャッフル'
@@ -265,7 +277,7 @@ export const COLOR_SORT_CONFIG = {
 export const SCHEME_SORT_CONFIG = {
   // 配色技法の並び替え手法 (変更可能)
   method: 'color_count' as 'compatibility' | 'hue_distance' | 'original' | 'color_count',
-  
+
   // 利用可能な手法一覧とその説明
   availableMethods: {
     'compatibility': '抽出色との適合度順 (従来の方法)',
@@ -309,7 +321,7 @@ const sortColorsByMethod = (colors: string[], method: SortMethod = CURRENT_SORT_
   if (method === 'original') {
     return [...colors]; // 元の順序を維持
   }
-  
+
   if (method === 'random') {
     const shuffled = [...colors];
     for (let i = shuffled.length - 1; i > 0; i--) {
@@ -575,10 +587,10 @@ export const useColorStore = create<ColorState>((set, get) => {
 
     // ベースカラー選択時: ベースカラー、selectedColor、描画色をすべて更新
     setColorFromBase: (color: string) => {
-      set({ 
+      set({
         baseColor: color,
         selectedColor: color,
-        paintColor: color 
+        paintColor: color
       });
       // トーン推薦も新しいベースカラーで更新
       get().generateRecommendedTones(color);
@@ -588,9 +600,9 @@ export const useColorStore = create<ColorState>((set, get) => {
 
     // 推薦色から選択時: selectedColorと描画色のみ更新、ベースカラーは維持
     setColorFromRecommendation: (color: string) => {
-      set({ 
+      set({
         selectedColor: color,
-        paintColor: color 
+        paintColor: color
       });
       // トーン推薦は新しい選択色で更新
       get().generateRecommendedTones(color);
@@ -694,7 +706,7 @@ export const useColorStore = create<ColorState>((set, get) => {
 // 抽出された色の色相を分析する関数
 export const analyzeExtractedHues = (extractedColors: ExtractedColor[]): number[] => {
   const hues: number[] = [];
-  
+
   extractedColors.forEach(color => {
     try {
       const hue = chroma(color.hex).get('hsl.h');
@@ -705,37 +717,37 @@ export const analyzeExtractedHues = (extractedColors: ExtractedColor[]): number[
       console.error('Error analyzing hue for color:', color.hex, error);
     }
   });
-  
+
   return hues;
 };
 
 // 配色技法の適合度を計算する関数
 export const calculateSchemeCompatibility = (
-  extractedColors: ExtractedColor[], 
-  selectedColor: string, 
+  extractedColors: ExtractedColor[],
+  selectedColor: string,
   scheme: ColorScheme
 ): number => {
   if (extractedColors.length === 0) return 0;
-  
+
   try {
     const baseHue = chroma(selectedColor).get('hsl.h') || 0;
     const extractedHues = analyzeExtractedHues(extractedColors);
-    
+
     if (extractedHues.length === 0) return 0;
-    
+
     // 配色技法の期待色相を計算
     const expectedHues = scheme.angles.map(angle => (baseHue + angle) % 360);
-    
+
     let compatibilityScore = 0;
     let totalWeight = 0;
-    
+
     // 抽出された色相と期待色相の適合度を計算
     extractedColors.forEach((extractedColor, index) => {
       if (index >= extractedHues.length) return;
-      
+
       const extractedHue = extractedHues[index];
       const weight = extractedColor.usage; // 使用率を重みとして使用
-      
+
       // 最も近い期待色相との距離を計算
       let minDistance = Infinity;
       expectedHues.forEach(expectedHue => {
@@ -745,13 +757,13 @@ export const calculateSchemeCompatibility = (
         );
         minDistance = Math.min(minDistance, distance);
       });
-      
+
       // 距離が小さいほど適合度が高い（最大30度の許容範囲）
       const similarity = Math.max(0, 1 - minDistance / 30);
       compatibilityScore += similarity * weight;
       totalWeight += weight;
     });
-    
+
     return totalWeight > 0 ? compatibilityScore / totalWeight : 0;
   } catch (error) {
     console.error('Error calculating scheme compatibility:', error);
@@ -763,13 +775,13 @@ export const calculateSchemeCompatibility = (
 const calculateSchemeHueDistance = (scheme: ColorScheme, baseColor: string): number => {
   try {
     const baseHue = chroma(baseColor).get('hsl.h') || 0;
-    
+
     // 各配色角度との距離を計算し、平均距離を求める
     const distances = scheme.angles.map(angle => {
       const targetHue = (baseHue + angle) % 360;
       return getHueDistance(baseHue, targetHue);
     });
-    
+
     // 平均距離を返す（近い色相順でソートするため）
     return distances.reduce((sum, dist) => sum + dist, 0) / distances.length;
   } catch (error) {
@@ -788,15 +800,15 @@ export const sortSchemesByHueDistance = (
     scheme,
     hueDistance: calculateSchemeHueDistance(scheme, baseColor)
   }));
-  
+
   // 色相距離順にソート（近い順）
   schemesWithDistances.sort((a, b) => a.hueDistance - b.hueDistance);
-  
+
   console.log('Scheme hue distances:', schemesWithDistances.map(s => ({
     name: s.scheme.name.split(':')[0],
     distance: s.hueDistance.toFixed(1)
   })));
-  
+
   return schemesWithDistances.map(s => s.scheme);
 };
 
@@ -827,21 +839,21 @@ export const sortSchemesByCompatibility = (
     // 抽出色がない場合はデフォルト順序
     return [...schemes];
   }
-  
+
   // 各配色技法の適合度を計算
   const schemesWithScores = schemes.map(scheme => ({
     scheme,
     compatibility: calculateSchemeCompatibility(extractedColors, selectedColor, scheme)
   }));
-  
+
   // 適合度順にソート（降順）
   schemesWithScores.sort((a, b) => b.compatibility - a.compatibility);
-  
+
   console.log('Scheme compatibility scores:', schemesWithScores.map(s => ({
     name: s.scheme.name.split(':')[0],
     score: s.compatibility.toFixed(3)
   })));
-  
+
   return schemesWithScores.map(s => s.scheme);
 };
 
