@@ -61,7 +61,7 @@ export const ColorGrid = ({
   } else {
     // デスクトップ: グリッドタイプに応じて列数を決定
     if (gridType === 'baseColors') {
-      gridClasses = RESPONSIVE_GRID.baseColors; // ベース色選択: 2列
+      gridClasses = RESPONSIVE_GRID.baseColors; // ベースカラー選択: 2列
     } else if (gridType === 'tones') {
       gridClasses = RESPONSIVE_GRID.tones; // トーン推薦: 4列
     } else {

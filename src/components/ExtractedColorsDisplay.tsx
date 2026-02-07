@@ -14,7 +14,7 @@ export const ExtractedColorsDisplay = ({ isMobile = false }: ExtractedColorsDisp
   }
 
   const handleColorSelect = (color: string) => {
-    // 抽出色からの選択はベース色選択として扱う
+    // 抽出色からの選択はベースカラー選択として扱う
     setColorFromBase(color);
   };
 
@@ -32,7 +32,7 @@ export const ExtractedColorsDisplay = ({ isMobile = false }: ExtractedColorsDisp
             }))}
             onColorClick={handleColorSelect}
             isMobile={isMobile}
-            gridType="baseColors" // ベース色選択専用: モバイル2列、PC4列
+            gridType="baseColors" // ベースカラー選択専用: モバイル2列、PC4列
             emptyMessage="画像から色が抽出されていません"
           />
         </CardContent>

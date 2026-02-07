@@ -25,7 +25,7 @@ const ExperimentPage = () => {
   // URLから条件を読み取る
   useExperimentQuery();
 
-  const { condition, participantId, getFeatureFlags } = useExperimentStore();
+  const { condition, participantId, material, getFeatureFlags } = useExperimentStore();
   const featureFlags = getFeatureFlags();
 
   // 参加者IDが未設定の場合は導入ページにリダイレクト
@@ -35,7 +35,27 @@ const ExperimentPage = () => {
     }
   }, [participantId, navigate]);
 
+  // タスクに応じて画像を自動読み込み
+  useEffect(() => {
+    if (!canvasColorRecommendationsRef.current || !material) return;
+
+    // materialに応じて画像URLを決定
+    const imageUrl = material === 'taskA'
+      ? '/images/illust_bear.png'  // TaskA: イラスト
+      : '/images/logo_techloop.png'; // TaskB: ロゴ
+
+    // 少し待ってからキャンバスに画像を読み込み（初期化完了を待つ）
+    const timer = setTimeout(() => {
+      canvasColorRecommendationsRef.current?.loadImageFromUrl(imageUrl);
+      console.log(`Auto-loaded image for ${material}: ${imageUrl}`);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [material]);
+
   const [screenSize, setScreenSize] = useState({ width: 0, height: 0 });
+  const [scale, setScale] = useState(1);
+  const mainRef = useRef<HTMLDivElement>(null);
 
   // デバイス判定（閾値800px）
   const isMobile = screenSize.width < 800;
@@ -98,6 +118,27 @@ const ExperimentPage = () => {
     };
   }, []);
 
+  // スケールを計算（画面サイズに応じて最大化）
+  useEffect(() => {
+    if (!mainRef.current || screenSize.width === 0 || screenSize.height === 0) return;
+
+    // コンテンツの自然なサイズを測定（scale-90を削除したベースサイズ）
+    const contentWidth = mainRef.current.scrollWidth;
+    const contentHeight = mainRef.current.scrollHeight;
+
+    if (contentWidth === 0 || contentHeight === 0) return;
+
+    // 画面サイズに対する比率を計算（余白を考慮して95%まで）
+    const widthRatio = (screenSize.width * 0.95) / contentWidth;
+    const heightRatio = (screenSize.height * 0.95) / contentHeight;
+
+    // 小さい方の比率を採用（縦横どちらかが幅いっぱいになる）
+    const newScale = Math.min(widthRatio, heightRatio, 1.2); // 最大120%まで
+
+    setScale(newScale);
+    console.log(`Scale calculated: ${newScale.toFixed(2)} (width: ${widthRatio.toFixed(2)}, height: ${heightRatio.toFixed(2)})`);
+  }, [screenSize]);
+
   // 初期スクロール位置を最上端に設定
   useEffect(() => {
     const setScrollPosition = () => {
@@ -125,9 +166,8 @@ const ExperimentPage = () => {
   /**
    * 条件に応じてコンポーネントをフィルタリング
    *
-   * Test1: massColorGrid のみ表示、baseColor 非表示
-   * Test2: hueWheelToneSlider のみ表示、baseColor 非表示
-   * Test3: colorRecommendation, toneRecommendation, baseColor 表示
+   * UI1: massColorGrid のみ表示、baseColor 非表示
+   * UI2: baseColor, colorRecommendation, toneRecommendation を表示
    *
    * 実験中は常に除外:
    * - skinColor (肌色推薦)
@@ -145,17 +185,17 @@ const ExperimentPage = () => {
         return false;
       }
 
-      // Test1・Test2ではベース色選択を非表示
-      if (componentKey === 'baseColor' && (condition === 'Test1' || condition === 'Test2')) {
+      // UI1のみベースカラー選択を非表示
+      if (componentKey === 'baseColor' && condition === 'UI1') {
         return false;
       }
 
-      // 大量色グリッドはTest1のみ表示
+      // 大量色グリッドはUI1のみ表示
       if (componentKey === 'massColorGrid' && !featureFlags.MASS_COLOR_GRID_ON) {
         return false;
       }
 
-      // 色相環＋トーンスライダーはTest2のみ表示
+      // 色相環＋トーンスライダーはUI2のみ表示
       if (componentKey === 'hueWheelToneSlider' && !featureFlags.HUE_WHEEL_SLIDER_ON) {
         return false;
       }
@@ -209,7 +249,11 @@ const ExperimentPage = () => {
   }
 
   return (
-    <main className="flex-1 pb-1 min-h-0 flex flex-col scale-90 origin-top">
+    <main
+      ref={mainRef}
+      className="flex-1 pb-1 min-h-0 flex flex-col origin-top"
+      style={{ transform: `scale(${scale})` }}
+    >
       {/* 実験ヘッダー */}
       <div className="px-4 pt-0 pb-0">
         <ExperimentHeader canvasRef={canvasColorRecommendationsRef} isDebugMode={isDebugMode} />

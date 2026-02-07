@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useExperimentStore } from '@/store/experimentStore';
+import { useExperimentStore, type OrderPattern } from '@/store/experimentStore';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Label } from '@/components/ui/label';
@@ -10,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Play, User, Palette, Bug } from 'lucide-react';
 import {
   EXPERIMENT_ICON_STYLES,
+  EXPERIMENT_TEXT_STYLES,
   getButtonClassName,
   getInputClassName,
 } from '@/constants/experimentTheme';
@@ -28,19 +28,46 @@ const ExperimentIntroPage = () => {
   const [searchParams] = useSearchParams();
   const isDebugMode = searchParams.get('debug') === 'true';
 
-  const { setParticipantId, setParticipantInfo, startFullExperiment } = useExperimentStore();
-  const [inputId, setInputId] = useState(isDebugMode ? 'DEBUG001' : '');
+  const { setParticipantId, setParticipantInfo, setOrderPattern, setSurveyMode, startFullExperiment, orderPattern } = useExperimentStore();
   const [deviceType, setDeviceType] = useState<'PC' | 'tablet' | 'smartphone' | ''>(isDebugMode ? 'PC' : '');
   const [illustrationExperience, setIllustrationExperience] = useState<'beginner' | 'some' | 'hobby' | 'professional' | ''>(isDebugMode ? 'hobby' : '');
-  const [ageRange, setAgeRange] = useState<'10s' | '20s' | '30s' | '40s' | '50s' | '60s+' | ''>(isDebugMode ? '20s' : '');
+  const [inputDevice, setInputDevice] = useState<'マウス' | 'タッチパッド' | 'タブレットペン' | 'ペンタブ' | '液タブ' | ''>(isDebugMode ? 'マウス' : '');
+
+  // 最初に実験するUIを判定（パターン1はUI1、パターン2はUI2）
+  const firstUI = orderPattern === 1 ? 'UI1' : 'UI2';
+
+  // URLパラメータからorder/uiOrder/surveyModeを取得して設定
+  useEffect(() => {
+    // surveyModeパラメータを取得
+    const surveyModeParam = searchParams.get('surveyMode');
+    if (surveyModeParam === 'incremental' || surveyModeParam === 'batch') {
+      setSurveyMode(surveyModeParam);
+      console.log(`Survey mode set to ${surveyModeParam} from URL parameter 'surveyMode'`);
+    }
+
+    // orderパラメータが指定されている場合はそれを優先
+    const orderParam = searchParams.get('order');
+    if (orderParam) {
+      const orderNumber = parseInt(orderParam, 10);
+      if (orderNumber >= 1 && orderNumber <= 2) {
+        setOrderPattern(orderNumber as OrderPattern);
+        console.log(`Order pattern set to ${orderNumber} from URL parameter 'order'`);
+        return;
+      }
+    }
+
+    // uiOrderパラメータが指定されている場合、それに基づいてパターンを選択
+    const uiOrderParam = searchParams.get('uiOrder');
+    if (uiOrderParam === 'UI1' || uiOrderParam === 'UI2') {
+      // UI1先行: パターン1、UI2先行: パターン2（TaskA→B固定）
+      const pattern = uiOrderParam === 'UI1' ? 1 : 2;
+      setOrderPattern(pattern as OrderPattern);
+      console.log(`Order pattern set to ${pattern} from URL parameter 'uiOrder=${uiOrderParam}'`);
+    }
+  }, [searchParams, setOrderPattern, setSurveyMode]);
 
   // 実験開始ハンドラ
   const handleStart = () => {
-    if (!inputId.trim()) {
-      alert('参加者IDを入力してください');
-      return;
-    }
-
     if (!deviceType) {
       alert('使用デバイスを選択してください');
       return;
@@ -51,19 +78,24 @@ const ExperimentIntroPage = () => {
       return;
     }
 
-    // 参加者情報を保存
-    setParticipantId(inputId.trim());
+    if (!inputDevice) {
+      alert('入力デバイスを選択してください');
+      return;
+    }
+
+    // 参加者情報を保存（IDは常に"noname"）
+    setParticipantId('noname');
     setParticipantInfo({
       deviceType,
       illustrationExperience,
-      ageRange,
+      inputDevice,
     });
 
     startFullExperiment();
 
-    // Test1説明ページに遷移（デバッグモードを引き継ぐ）
+    // 最初のUI説明ページに遷移（デバッグモードを引き継ぐ）
     const debugParam = isDebugMode ? '&debug=true' : '';
-    navigate(`/experiment/instruction?cond=Test1${debugParam}`);
+    navigate(`/experiment/instruction?cond=${firstUI}${debugParam}`);
   };
 
 
@@ -101,7 +133,7 @@ const ExperimentIntroPage = () => {
             <CardContent className="pt-6">
               <div className="flex items-center gap-3 mb-2">
                 <div>
-                  <p className="font-semibold">所要時間</p>
+                  <p className="text-base font-semibold">所要時間</p>
                   <p className="text-sm text-muted-foreground">約 15〜20 分</p>
                 </div>
               </div>
@@ -112,7 +144,7 @@ const ExperimentIntroPage = () => {
             <CardContent className="pt-6">
               <div className="flex items-center gap-3 mb-2">
                 <div>
-                  <p className="font-semibold">実験形式</p>
+                  <p className="text-base font-semibold">実験形式</p>
                   <p className="text-sm text-muted-foreground">3つのテストを順番に体験</p>
                 </div>
               </div>
@@ -164,30 +196,15 @@ const ExperimentIntroPage = () => {
         {/* 参加者ID入力と開始 */}
         <Card className="border-2 border-primary/30 shadow-lg">
           <CardHeader className="bg-primary/5 pt-10 pb-10 px-8">
-            <CardTitle className="flex items-center gap-2 text-xl mb-4">
+            <CardTitle className={`${EXPERIMENT_TEXT_STYLES.cardTitle} flex items-center gap-2 mb-4`}>
               <User className="w-6 h-6" />
               実験を開始
             </CardTitle>
-            <CardDescription className="text-base">
-              参加者IDを入力して実験を開始してください
+            <CardDescription className={EXPERIMENT_TEXT_STYLES.description}>
+              以下の情報を選択して実験を開始してください
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-16 pb-16 px-8 space-y-10">
-            <div>
-              <Input
-                type="text"
-                placeholder="例: U001"
-                value={inputId}
-                onChange={(e) => setInputId(e.target.value)}
-                className={getInputClassName('large')}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    handleStart();
-                  }
-                }}
-              />
-            </div>
-
             {/* 使用デバイス選択 */}
             <div className="space-y-3">
               <Label className="text-base font-semibold text-foreground">使用デバイス *</Label>
@@ -199,6 +216,23 @@ const ExperimentIntroPage = () => {
                   <SelectItem value="PC">PC</SelectItem>
                   <SelectItem value="tablet">タブレット</SelectItem>
                   <SelectItem value="smartphone">スマートフォン</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 入力デバイス選択 */}
+            <div className="space-y-3">
+              <Label className="text-base font-semibold text-foreground">入力デバイス *</Label>
+              <Select value={inputDevice} onValueChange={(value: string) => setInputDevice(value as 'マウス' | 'タッチパッド' | 'タブレットペン' | 'ペンタブ' | '液タブ' | '')}>
+                <SelectTrigger className={getInputClassName('default')}>
+                  <SelectValue placeholder="入力デバイスを選択してください" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="マウス">マウス</SelectItem>
+                  <SelectItem value="タッチパッド">タッチパッド</SelectItem>
+                  <SelectItem value="タブレットペン">タブレットペン</SelectItem>
+                  <SelectItem value="ペンタブ">ペンタブ</SelectItem>
+                  <SelectItem value="液タブ">液タブ</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -219,23 +253,35 @@ const ExperimentIntroPage = () => {
               </Select>
             </div>
 
-            {/* 年齢層選択（オプション） */}
-            <div className="space-y-3">
-              <Label className="text-base font-semibold text-foreground">年齢層（任意）</Label>
-              <Select value={ageRange} onValueChange={(value: string) => setAgeRange(value as '10s' | '20s' | '30s' | '40s' | '50s' | '60s+' | '')}>
-                <SelectTrigger className={getInputClassName('default')}>
-                  <SelectValue placeholder="年齢層を選択（任意）" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="10s">10代</SelectItem>
-                  <SelectItem value="20s">20代</SelectItem>
-                  <SelectItem value="30s">30代</SelectItem>
-                  <SelectItem value="40s">40代</SelectItem>
-                  <SelectItem value="50s">50代</SelectItem>
-                  <SelectItem value="60s+">60代以上</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            {/* 指示書確認 - 非表示 */}
+            {/* <div className="space-y-3">
+              <div className="flex flex-col gap-3 p-4 border-2 border-primary/30 rounded-lg bg-primary/5">
+                <div className="flex items-center gap-2">
+                  {instructionsChecked ? (
+                    <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 fill-green-600 dark:fill-green-400" />
+                  ) : (
+                    <div className="w-5 h-5 rounded-full border-2 border-muted-foreground" />
+                  )}
+                  <Label className="text-base font-semibold text-foreground">
+                    指示書を確認する *
+                  </Label>
+                </div>
+                <ExperimentInstructionsModal
+                  size="sm"
+                  buttonText={instructionsButtonText}
+                  customClassName={getButtonClassName('action')}
+                  onOpen={() => {
+                    setInstructionsChecked(true);
+                    setInstructionsButtonText('指示書を再表示');
+                  }}
+                />
+                {!instructionsChecked && (
+                  <p className="text-sm text-muted-foreground">
+                    指示書を開いて確認してください
+                  </p>
+                )}
+              </div>
+            </div> */}
 
             <Button
               onClick={handleStart}
@@ -243,12 +289,12 @@ const ExperimentIntroPage = () => {
               className={`w-full text-xl h-16 ${getButtonClassName('action')}`}
             >
               <Play className={EXPERIMENT_ICON_STYLES.large} />
-              実験開始（Test1から）
+              実験開始（{firstUI}から）
             </Button>
 
             <Alert className="border-primary/30 bg-primary/5 p-6">
               <AlertDescription className="text-sm leading-relaxed">
-                Test1 → Test2 → Test3 の順で体験します。各テスト終了後、次に進む確認が表示されます。
+                {firstUI === 'UI1' ? 'UI1 → UI2' : 'UI2 → UI1'} の順で体験します。各テスト終了後、次に進む確認が表示されます。
               </AlertDescription>
             </Alert>
           </CardContent>

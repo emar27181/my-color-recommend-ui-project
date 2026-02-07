@@ -290,7 +290,7 @@ const HueWheel = ({ colors, onHueClick, isQuantized, selectedColor, selectedSche
                   opacity="0.5"
                 />
 
-                {/* 角度ラベル（ベース色以外） */}
+                {/* 角度ラベル（ベースカラー以外） */}
                 {!point.isBase && (
                   <text
                     x={point.x + (point.x > center ? 12 : -12)}

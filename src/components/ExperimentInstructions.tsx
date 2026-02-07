@@ -14,17 +14,13 @@ interface ExperimentInstructionsProps {
 
 // 条件別の説明
 const CONDITION_INFO = {
-  Test1: {
-    title: 'Test1: UI方式1',
+  UI1: {
+    title: 'UI1: UI方式1',
     description: '大量の色が一度に表示されます。多くの選択肢から色を選ぶ体験をしてください。',
   },
-  Test2: {
-    title: 'Test2: UI方式2',
+  UI2: {
+    title: 'UI2: UI方式2',
     description: '色相環とスライダーで自由に色を作成できます。色の数に制限はありません。',
-  },
-  Test3: {
-    title: 'Test3: UI方式3',
-    description: 'まず色相から選択し、次にトーンから選択します。',
   },
 };
 

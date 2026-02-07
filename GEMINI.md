@@ -312,7 +312,7 @@ const gapSearchRadius = 1;       // 隙間検索時の探索半径（px）
 
 ### 肌色推薦仕様（2025-07-10追加）
 - **固定色表示**: 10色の肌色パレット（色白系→やや褐色系）
-- **色順序**: ベース色と頬色のペアを5段階で表示
+- **色順序**: ベースカラーと頬色のペアを5段階で表示
 - **コンポーネント**: `SkinColorRecommendations.tsx` で実装
 - **レイアウト**: 既存のColorGridコンポーネントを使用
 - **機能**: 表示のみ（クリック機能なし）
@@ -574,8 +574,8 @@ main (h-full flex flex-col)
 ```typescript
 RESPONSIVE_GRID = {
   colors: 'grid-cols-4', // 色推薦: PC・モバイル共に4列
-  baseColors: 'grid-cols-2', // ベース色選択: PC・モバイル共に2列
-  baseColorsMobile: 'grid-cols-2', // ベース色選択モバイル: 2列
+  baseColors: 'grid-cols-2', // ベースカラー選択: PC・モバイル共に2列
+  baseColorsMobile: 'grid-cols-2', // ベースカラー選択モバイル: 2列
   tones: 'grid-cols-4', // トーン推薦: PC・モバイル共に4列
   schemes: 'grid-cols-2 sm:grid-cols-4 md:grid-cols-6',
   gap: 'gap-3',

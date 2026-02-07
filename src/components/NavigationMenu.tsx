@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, ClipboardList, Info, FlaskConical } from 'lucide-react';
+import { Menu, X, ClipboardList, Info, FlaskConical, TestTube2 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
 interface NavigationMenuProps {
@@ -45,7 +45,14 @@ export const NavigationMenu = ({ className = '' }: NavigationMenuProps) => {
         <FlaskConical className="w-5 h-5" />
       </Link>
       <Link
-        to="/experiment?debug=true"
+        to="/ui-test"
+        className="p-2 rounded-lg bg-background/50 border-none hover:bg-muted/50 transition-colors backdrop-blur-sm text-foreground"
+        title="UIテスト"
+      >
+        <TestTube2 className="w-5 h-5" />
+      </Link>
+      <Link
+        to="/experiment"
         className="p-2 rounded-lg bg-background/50 border-none hover:bg-muted/50 transition-colors backdrop-blur-sm text-foreground"
         title="実験ページ"
       >

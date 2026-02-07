@@ -4,7 +4,7 @@ import chroma from 'chroma-js';
 import { useState, useEffect } from 'react';
 
 /**
- * Test2用: 色相環＋トーンスライダーコンポーネント
+ * UI2用: 色相環＋トーンスライダーコンポーネント
  *
  * 色相環とトーンスライダーで自由に色を作成できる。
  * 問題点：作れる色の数が多すぎて選択に迷う体験を提供。

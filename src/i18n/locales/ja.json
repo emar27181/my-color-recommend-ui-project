@@ -4,7 +4,7 @@
     "steps": {
       "canvas": "キャンバス",
       "baseColorSelection": "ベースカラー(推薦元)選択",
-      "baseColorSelectionShort": "ベース色選択",
+      "baseColorSelectionShort": "ベースカラー選択",
       "massColorGrid": "カラーパレット",
       "hueWheelToneSlider": "色相環＋トーンスライダー",
       "colorRecommendation": "色相(配色技法)推薦",
@@ -20,7 +20,8 @@
     "clickToSelect": "クリックで色を選択",
     "selectedColor": "選択中の色",
     "clickToChange": "クリックで変更",
-    "tapToChange": "タップで変更"
+    "tapToChange": "タップで変更",
+    "hue": "色相"
   },
   "imageUpload": {
     "invalidFile": "無効なファイルです",
@@ -45,7 +46,7 @@
   "toneRecommendations": {
     "title": "トーン推薦",
     "noTones": "トーン推薦がありません",
-    "selectBaseColor": "ベース色を選択してください"
+    "selectBaseColor": "ベースカラーを選択してください"
   },
   "colorSchemes": {
     "identity": "アイデンティティ配色(1色)",
@@ -59,7 +60,9 @@
     "dominant_2": "ドミナント配色(3色)",
     "dominant_3": "ドミナント配色(3色)",
     "triadic": "トライアド配色(3色)",
-    "split_complementary": "スプリットコンプリメンタリー配色(3色)",
+    "split_complementary_1": "スプリットコンプリメンタリー配色(3色) パターン1",
+    "split_complementary_2": "スプリットコンプリメンタリー配色(3色) パターン2",
+    "split_complementary_3": "スプリットコンプリメンタリー配色(3色) パターン3",
     "tetradic": "テトラード配色(4色)",
     "pentad": "ペンタード配色(5色)",
     "hexad": "ヘクサード配色(6色)"

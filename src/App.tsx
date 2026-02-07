@@ -1,18 +1,21 @@
 import { type CanvasColorRecommendationsRef } from '@/components/CanvasColorRecommendations';
 import { LayoutRenderer } from '@/components/layout/LayoutRenderer';
 import { LAYOUT_CONFIG } from '@/constants/layout';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 
 const App = () => {
-  
+
   const [isDebugMode, setIsDebugMode] = useState(false);
   const [screenSize, setScreenSize] = useState({ width: 0, height: 0 });
-  
+  const [hasLoadedDefaultImage, setHasLoadedDefaultImage] = useState(false);
+
   // デバイス判定（閾値800px）
   const isMobile = screenSize.width < 800;
 
   // CanvasColorRecommendationsへの参照
   const canvasColorRecommendationsRef = useRef<CanvasColorRecommendationsRef>(null);
+
+  const DEFAULT_CANVAS_IMAGE = '/images/illust_bear.png';
 
   // 画像アップロード時の処理
   const handleImageUpload = (imageFile: File) => {
@@ -21,7 +24,7 @@ const App = () => {
   };
 
   // キャンバスから色を抽出する処理
-  const handleExtractColorsFromCanvas = async () => {
+  const handleExtractColorsFromCanvas = useCallback(async () => {
     try {
       console.log('Attempting to extract colors from canvas...');
 
@@ -35,7 +38,40 @@ const App = () => {
     } catch (error) {
       console.error('Canvas color extraction failed:', error);
     }
-  };
+  }, []);
+
+  // ホーム画面表示時にレイヤー1へデフォルトのくま線画を読み込み
+  useEffect(() => {
+    if (hasLoadedDefaultImage) {
+      return;
+    }
+
+    let timeoutId: number;
+    let attempts = 0;
+    const maxAttempts = 6;
+
+    const attemptLoad = () => {
+      const canvasRef = canvasColorRecommendationsRef.current;
+      if (canvasRef) {
+        canvasRef.loadImageFromUrl(DEFAULT_CANVAS_IMAGE);
+        setHasLoadedDefaultImage(true);
+        return;
+      }
+
+      if (attempts < maxAttempts) {
+        attempts += 1;
+        timeoutId = window.setTimeout(attemptLoad, 300);
+      }
+    };
+
+    timeoutId = window.setTimeout(attemptLoad, 600);
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [hasLoadedDefaultImage]);
 
   useEffect(() => {
     // 初期表示時にページの最上端を表示
@@ -90,7 +126,7 @@ const App = () => {
 
     // 即座に実行
     setScrollPosition();
-    
+
     // requestAnimationFrame で次のフレームで実行
     const rafId = requestAnimationFrame(() => {
       setScrollPosition();

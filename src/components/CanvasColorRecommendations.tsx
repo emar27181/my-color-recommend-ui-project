@@ -17,12 +17,14 @@ interface CanvasColorRecommendationsProps {
 
 export interface CanvasColorRecommendationsRef {
   drawImageToCanvas: (imageFile: File) => void;
+  loadImageFromUrl: (imageUrl: string) => void; // URLから画像を読み込み
   extractColorsFromCanvas: () => Promise<void>;
   clearAllLayers: () => void;
   undo: () => void;
   redo: () => void;
   canUndo: () => boolean;
   canRedo: () => boolean;
+  getCanvasImage: () => string | null; // キャンバス画像をbase64データURLで取得
 }
 
 const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendationsRef, CanvasColorRecommendationsProps>(({ className = '', isDebugMode = false }, ref) => {
@@ -33,12 +35,12 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
   const [penSize, setPenSize] = useState(20);
   const [isEraserMode, setIsEraserMode] = useState(false);
-  const [isFillMode, setIsFillMode] = useState(false);
+  const [isFillMode, setIsFillMode] = useState(true); // デフォルトツールを塗りつぶしに
   const [isEyedropperMode, setIsEyedropperMode] = useState(false);
   const [previousTool, setPreviousTool] = useState<{
     isFillMode: boolean;
     isEraserMode: boolean;
-  }>({ isFillMode: false, isEraserMode: false });
+  }>({ isFillMode: true, isEraserMode: false }); // デフォルトを塗りつぶしに
   const [isEditingPenSize, setIsEditingPenSize] = useState(false);
   const [tempPenSize, setTempPenSize] = useState('');
   const [isExtractingColors, setIsExtractingColors] = useState(false);
@@ -51,7 +53,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
   const [containerWidth, setContainerWidth] = useState(800); // コンテナ幅管理
 
   // レイヤーシステム
-  const [currentLayer, setCurrentLayer] = useState<1 | 2>(1);
+  const [currentLayer, setCurrentLayer] = useState<1 | 2>(2);
   const layer1CanvasRef = useRef<HTMLCanvasElement>(null);
   const layer2CanvasRef = useRef<HTMLCanvasElement>(null);
   const [layer1Context, setLayer1Context] = useState<CanvasRenderingContext2D | null>(null);
@@ -65,6 +67,9 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
   const [history, setHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const maxHistorySize = 50; // 最大履歴保存数
+
+  // 自動色抽出フラグ
+  const [hasAutoExtracted, setHasAutoExtracted] = useState(false);
 
   // ベースカラーとのコントラスト比を考慮したアイコン色を取得
   const getIconColor = () => {
@@ -643,6 +648,24 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     }
   }, [setExtractedColors]);
 
+  // 初期化完了後に自動的に色を抽出
+  useEffect(() => {
+    if (layer1Context && layer2Context && !hasAutoExtracted) {
+      const timer = setTimeout(async () => {
+        console.log('Auto-extracting colors on initialization');
+        setHasAutoExtracted(true);
+        // まず使用色をクリア
+        setExtractedColors([], { hex: '#808080', usage: 0, rgb: [128, 128, 128] });
+        // 少し待ってから色抽出
+        await new Promise(resolve => setTimeout(resolve, 100));
+        // 色抽出実行
+        await extractColorsFromCanvas();
+      }, 800); // 800ms待機
+
+      return () => clearTimeout(timer);
+    }
+  }, [layer1Context, layer2Context, hasAutoExtracted, setExtractedColors, extractColorsFromCanvas]);
+
   // キャンバスに画像を描画する関数（完全実装版）
   const drawImageToCanvas = useCallback((imageFile: File) => {
     if (!context || !canvasRef.current) return;
@@ -689,6 +712,17 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
 
         console.log('Image drawn to layer 1:', imageFile.name);
 
+        // 画像ロード完了後、色抽出を自動実行
+        setTimeout(async () => {
+          console.log('Auto-extracting colors after image upload');
+          // まず使用色をクリア
+          setExtractedColors([], { hex: '#808080', usage: 0, rgb: [128, 128, 128] });
+          // 少し待ってから色抽出
+          await new Promise(resolve => setTimeout(resolve, 100));
+          // 色抽出実行
+          await extractColorsFromCanvas();
+        }, 200);
+
         // テンプレート表示状態を更新
       }, 100); // リサイズ処理完了を待つ
     };
@@ -705,7 +739,75 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
       }
     };
     reader.readAsDataURL(imageFile);
-  }, [context, saveToHistory, resizeCanvas, updateCompositeCanvas]);
+  }, [context, saveToHistory, resizeCanvas, updateCompositeCanvas, setExtractedColors, extractColorsFromCanvas]);
+
+  // URLから画像を読み込んでキャンバスに描画する関数
+  const loadImageFromUrl = useCallback((imageUrl: string) => {
+    if (!context || !canvasRef.current) return;
+
+    const img: HTMLImageElement = document.createElement('img');
+
+    img.onload = () => {
+      // 履歴保存
+      saveToHistory();
+
+      // 画像サイズに合わせてキャンバスをリサイズ
+      resizeCanvas(img.width, img.height);
+
+      // リサイズ後、少し待ってから描画（コンテキスト更新を待つ）
+      setTimeout(() => {
+        const currentContext = canvasRef.current?.getContext('2d');
+        const currentLayer2Context = layer2CanvasRef.current?.getContext('2d');
+
+        if (!currentContext || !currentLayer2Context || !canvasRef.current || !layer2CanvasRef.current) {
+          console.error('Context lost after resize');
+          return;
+        }
+
+        // リサイズ後のキャンバスサイズを取得
+        const canvasWidth = canvasRef.current.width;
+        const canvasHeight = canvasRef.current.height;
+
+        // レイヤー1の前の画像を削除してから新しい画像を描画
+        const currentLayer1Context = layer1CanvasRef.current?.getContext('2d');
+        if (currentLayer1Context && layer1CanvasRef.current) {
+          currentLayer1Context.clearRect(0, 0, canvasWidth, canvasHeight);
+          currentLayer1Context.drawImage(img, 0, 0, canvasWidth, canvasHeight);
+        }
+
+        // レイヤー2（背景）を白で初期化
+        currentLayer2Context.fillStyle = '#ffffff';
+        currentLayer2Context.fillRect(0, 0, canvasWidth, canvasHeight);
+
+        // 描画レイヤーをレイヤー2に設定（画像の上に描画できるように）
+        setCurrentLayer(2);
+
+        // 表示用キャンバスに合成結果を描画
+        updateCompositeCanvas();
+
+        console.log('Image loaded from URL to layer 1:', imageUrl);
+
+        // 画像ロード完了後、色抽出を自動実行
+        setTimeout(async () => {
+          console.log('Auto-extracting colors after image load from URL');
+          // まず使用色をクリア
+          setExtractedColors([], { hex: '#808080', usage: 0, rgb: [128, 128, 128] });
+          // 少し待ってから色抽出
+          await new Promise(resolve => setTimeout(resolve, 100));
+          // 色抽出実行
+          await extractColorsFromCanvas();
+        }, 200);
+      }, 100); // リサイズ処理完了を待つ
+    };
+
+    img.onerror = () => {
+      console.error('Failed to load image from URL:', imageUrl);
+      showToast('画像の読み込みに失敗しました', 'error');
+    };
+
+    // URLを直接設定
+    img.src = imageUrl;
+  }, [context, saveToHistory, resizeCanvas, updateCompositeCanvas, showToast, setExtractedColors, extractColorsFromCanvas]);
 
   // すべてのレイヤーをクリアする関数
   const clearAllLayers = useCallback(() => {
@@ -890,16 +992,30 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
     }
   }, [historyIndex, history, restoreFromHistory]);
 
+  // キャンバス画像を取得する関数
+  const getCanvasImage = useCallback((): string | null => {
+    if (!canvasRef.current) return null;
+    try {
+      // 合成表示キャンバスからPNG形式のbase64データURLを取得
+      return canvasRef.current.toDataURL('image/png');
+    } catch (error) {
+      console.error('Failed to get canvas image:', error);
+      return null;
+    }
+  }, []);
+
   // 外部からアクセス可能な関数を公開
   useImperativeHandle(ref, () => ({
     drawImageToCanvas,
+    loadImageFromUrl,
     extractColorsFromCanvas,
     clearAllLayers,
     undo,
     redo,
     canUndo: () => historyIndex > 0,
-    canRedo: () => historyIndex < history.length - 1
-  }), [drawImageToCanvas, extractColorsFromCanvas, clearAllLayers, undo, redo, historyIndex, history.length]);
+    canRedo: () => historyIndex < history.length - 1,
+    getCanvasImage
+  }), [drawImageToCanvas, loadImageFromUrl, extractColorsFromCanvas, clearAllLayers, undo, redo, historyIndex, history.length, getCanvasImage]);
 
   // キャンバスから色を取得する関数（合成表示から）
   const pickColorFromCanvas = useCallback((x: number, y: number) => {
@@ -1629,6 +1745,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
               variant={!isEraserMode && !isFillMode && !isEyedropperMode ? "default" : "outline"}
               size="sm"
               className="h-6 px-1 sm:h-8 sm:px-2"
+              title="ペンツール - 自由に描画"
             >
               <Pen className="w-4 h-4 text-foreground" />
             </Button>
@@ -1641,6 +1758,7 @@ const CanvasColorRecommendationsComponent = forwardRef<CanvasColorRecommendation
               variant={isEraserMode ? "default" : "outline"}
               size="sm"
               className="h-6 px-1 sm:h-8 sm:px-2"
+              title="消しゴムツール - 描画を消去"
             >
               <Eraser className="w-4 h-4 text-foreground" />
             </Button>

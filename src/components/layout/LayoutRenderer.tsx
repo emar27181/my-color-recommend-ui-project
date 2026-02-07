@@ -4,7 +4,6 @@ import { RefreshCw } from 'lucide-react';
 import { useColorStore } from '@/store/colorStore';
 import { ColorPicker } from '@/components/ColorPicker';
 import { ColorRecommendations, ToneRecommendations } from '@/components/ColorRecommendations';
-import { ImageUpload } from '@/components/ImageUpload';
 import { ExtractedColorsDisplay } from '@/components/ExtractedColorsDisplay';
 import { SkinColorRecommendations } from '@/components/SkinColorRecommendations';
 import { HueToneExtraction } from '@/components/HueToneExtraction';
@@ -56,12 +55,9 @@ const ComponentMap = {
   canvas: () => (
     <div>Canvas component disabled</div>
   ),
-  baseColor: ({ handleImageUpload, isMobile }: any) => (
+  baseColor: ({ isMobile }: any) => (
     <div className={isMobile ? "space-y-1" : "space-y-4"}>
-      <div className={isMobile ? "flex gap-1" : "grid grid-cols-2 gap-4"}>
-        <ColorPicker />
-        <ImageUpload onImageUpload={handleImageUpload} />
-      </div>
+      <ColorPicker />
       <ColorUsageBar />
       <ExtractedColorsDisplay isMobile={isMobile} />
     </div>

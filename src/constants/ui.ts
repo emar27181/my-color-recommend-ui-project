@@ -69,17 +69,35 @@ export const COLOR_BLOCK_SPEC = {
   // サイズ（コンポーネント全体）
   width: 48,
   height: 48,
-  
+
   // 色表示エリアのサイズ（95%）
   colorWidth: 46,
   colorHeight: 46,
-  
+
   // CSSクラス（統一ボーダー仕様を使用）
   className: `${BORDER_PRESETS.colorBlock} cursor-pointer hover:scale-110 transition-all duration-200`,
-  
+
   // アニメーション
   hoverScale: 1.1,
   transitionDuration: '0.2s'
+} as const;
+
+/**
+ * スワイプページのカラーパレットストリップ仕様
+ */
+export const PALETTE_STRIP_SPEC = {
+  // カラーボックスの固定サイズ（モバイル）
+  mobile: {
+    boxWidth: 56,   // 56px固定幅
+    boxHeight: 56,  // 56px固定高さ
+  },
+  // カラーボックスの固定サイズ（PC）
+  desktop: {
+    boxWidth: 72,   // 72px固定幅
+    boxHeight: 72,  // 72px固定高さ
+  },
+  // ストリップ全体の角丸
+  borderRadius: '1.5rem'
 } as const;
 
 /**
@@ -89,8 +107,8 @@ export const RESPONSIVE_GRID = {
   // カラム数定義
   colors: 'grid-cols-4', // PCでは4列表示に変更
   colorsMobile: 'grid-cols-4', // スマホ専用: 4列表示（2・3セクション用）
-  baseColors: 'grid-cols-2', // PC: ベース色選択専用2列表示
-  baseColorsMobile: 'grid-cols-2', // スマホ: ベース色選択専用2列表示
+  baseColors: 'grid-cols-2', // PC: ベースカラー選択専用2列表示
+  baseColorsMobile: 'grid-cols-2', // スマホ: ベースカラー選択専用2列表示
   tones: 'grid-cols-4', // トーン推薦専用: 4x4の16パターン表示
   tonesMobile: 'grid-cols-4', // スマホ専用トーン: 4列表示
   schemes: 'grid-cols-2 sm:grid-cols-4 md:grid-cols-6',

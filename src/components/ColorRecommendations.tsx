@@ -53,9 +53,28 @@ export const ColorRecommendations = ({ isMobile = false }: ColorRecommendationsP
   }, [baseColor, extractedColors, selectedColor]);
 
   const handleGenerateTones = (color: string) => {
-    // 推薦色から選択：描画色のみ更新、ベースカラーは維持
-    setColorFromRecommendation(color);
-    generateRecommendedTones(color);
+    // 推薦色の色相を取得し、paintColorの明度と彩度を維持
+    try {
+      const selectedHue = chroma(color).get('hsl.h') || 0;
+
+      // paintColorが存在する場合、その明度と彩度を使用
+      if (paintColor) {
+        const currentSaturation = chroma(paintColor).get('hsl.s');
+        const currentLightness = chroma(paintColor).get('hsl.l');
+        const newColor = chroma.hsl(selectedHue, currentSaturation, currentLightness).hex();
+        setColorFromRecommendation(newColor);
+        generateRecommendedTones(newColor);
+      } else {
+        // paintColorがない場合は選択された色をそのまま使用
+        setColorFromRecommendation(color);
+        generateRecommendedTones(color);
+      }
+    } catch (error) {
+      console.error('Error applying hue with current saturation/lightness:', error);
+      // エラー時は選択された色をそのまま使用
+      setColorFromRecommendation(color);
+      generateRecommendedTones(color);
+    }
     // チュートリアルの自動進行をトリガー
     onUserAction('click', '[data-tutorial="recommended-colors"]');
   };
@@ -248,8 +267,25 @@ export const ToneRecommendations = ({ isMobile = false }: ToneRecommendationsPro
   }, [selectedColor, recommendedTones.length, generateRecommendedTones]);
 
   const handleToneClick = (color: string) => {
-    // トーン推薦色から選択：描画色のみ更新、ベースカラーは維持
-    setColorFromRecommendation(color);
+    // トーン推薦色の明度と彩度を取得し、paintColorの色相を維持
+    try {
+      const selectedSaturation = chroma(color).get('hsl.s');
+      const selectedLightness = chroma(color).get('hsl.l');
+
+      // paintColorが存在する場合、その色相を使用
+      if (paintColor) {
+        const currentHue = chroma(paintColor).get('hsl.h') || 0;
+        const newColor = chroma.hsl(currentHue, selectedSaturation, selectedLightness).hex();
+        setColorFromRecommendation(newColor);
+      } else {
+        // paintColorがない場合は選択された色をそのまま使用
+        setColorFromRecommendation(color);
+      }
+    } catch (error) {
+      console.error('Error applying tone with current hue:', error);
+      // エラー時は選択された色をそのまま使用
+      setColorFromRecommendation(color);
+    }
   };
 
   // 色の距離を計算する関数（deltaE 2000使用）

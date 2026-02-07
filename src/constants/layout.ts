@@ -11,7 +11,7 @@ export const LAYOUT_CONFIG = {
       },
       {
         id: 'main-tools',
-        width: 'w-1/3' as const, // 1/3幅（約33.3%）- ベース色選択列を拡大
+        width: 'w-1/3' as const, // 1/3幅（約33.3%）- ベースカラー選択列を拡大
         components: ['baseColor', 'colorRecommendation', 'toneRecommendation', 'skinColor']
       },
       {
@@ -42,7 +42,7 @@ export const EXPERIMENT_LAYOUT_CONFIG = {
       {
         id: 'main-tools',
         width: 'w-1/3' as const,
-        components: ['baseColor', 'massColorGrid', 'hueWheelToneSlider', 'colorRecommendation', 'toneRecommendation']
+        components: ['baseColor', 'massColorGrid', 'colorRecommendation', 'toneRecommendation']
       },
       {
         id: 'analysis',
@@ -55,7 +55,7 @@ export const EXPERIMENT_LAYOUT_CONFIG = {
 
   // モバイルレイアウト設定（縦積み）
   mobile: {
-    order: ['canvasColorRecommendation', 'baseColor', 'massColorGrid', 'hueWheelToneSlider', 'colorRecommendation', 'toneRecommendation', 'hueToneExtraction']
+    order: ['canvasColorRecommendation', 'baseColor', 'massColorGrid', 'colorRecommendation', 'toneRecommendation', 'hueToneExtraction']
   }
 } as const;
 
@@ -69,11 +69,11 @@ export const COMPONENT_CONFIG = {
     hasUpdateButton: false
   },
   baseColor: {
-    key: 'baseColor', 
+    key: 'baseColor',
     step: '1',
     titleKey: 'app.steps.baseColorSelectionShort',
     collapseState: 'isBaseColorCollapsed',
-    hasUpdateButton: true
+    hasUpdateButton: false
   },
   colorRecommendation: {
     key: 'colorRecommendation',

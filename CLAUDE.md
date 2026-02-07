@@ -51,7 +51,7 @@
 - 現在のレイアウト構成（`src/constants/layout.ts`）を維持すること
 - 表示されるコンポーネント:
   - 0. キャンバス（canvasColorRecommendation）
-  - 1. ベース色選択（baseColor）
+  - 1. ベースカラー選択（baseColor）
   - 2. 色相推薦（colorRecommendation）
   - 3. トーン推薦（toneRecommendation）
   - α. 肌色推薦（skinColor）
@@ -283,7 +283,7 @@ const gapSearchRadius = 1;       // 隙間検索時の探索半径（px）
 - **ボタン**: `px-2 py-1 text-xs`
 
 ### 肌色推薦
-- **固定色**: 10色（色白系→やや褐色系）、ベース色+頬色ペア×5段階
+- **固定色**: 10色（色白系→やや褐色系）、ベースカラー+頬色ペア×5段階
 - **コンポーネント**: `SkinColorRecommendations.tsx`
 
 ---
@@ -455,17 +455,32 @@ const gapSearchRadius = 1;       // 隙間検索時の探索半径（px）
 ## 🧪 実験ページUI仕様
 
 ### 基本仕様
-- **ルート**: `/experiment`, `/experiment/task`, `/experiment/complete`
+- **ルート**: `/experiment`, `/experiment/instruction`, `/experiment/task`, `/experiment/complete`
 - **目的**: 色推薦UI評価実験用インターフェース
+
+### 実験デザイン（4パターン）
+- **UI方法**: UI1（大量の色を一度に表示）、UI2（二段階推薦）
+- **塗る対象**: TaskA（イラスト）、TaskB（ロゴ）
+- **実験パターン**: UI1-TaskA, UI1-TaskB, UI2-TaskA, UI2-TaskBの4パターン
+- **説明ページ**: UI1, UI2の2回のみ（UI手法のみ説明）
+- **タスクページ**: 4回実施（materialに応じてキャンバス内容を切り替え）
+
+### カウンターバランス設定
+- **URLパラメータ**:
+  - `/experiment?uiOrder=UI1` - UI1から開始（TaskA→B固定）
+  - `/experiment?uiOrder=UI2` - UI2から開始（TaskA→B固定）
+  - `/experiment?order=1` または `?order=2` で直接パターン指定も可能
+- **パターン1**: UI1-TaskA → UI1-TaskB → UI2-TaskA → UI2-TaskB（UI1先行, TaskA→B固定）
+- **パターン2**: UI2-TaskA → UI2-TaskB → UI1-TaskA → UI1-TaskB（UI2先行, TaskA→B固定）
+- **タスク順序**: TaskA → TaskB に固定（UIの順序のみカウンターバランス）
 
 ### デザイン原則
 - **ミニマルデザイン**: 明確な情報階層、十分なホワイトスペース
 - **視覚的理解促進**: アイコン・色分けで直感的に情報伝達
-- **条件色分け**: C0（灰）、C1（青）、C2（紫）、C3（緑）
 
 ### 実験タスクページの表示制御
 - **非表示**: skinColor（α）、hueToneExtraction（β）を常に非表示
-- **自動展開**: C1〜C3では該当する推薦セクションを自動展開
+- **自動展開**: UI1では大量色グリッド、UI2では色相推薦・トーン推薦を自動展開
 - **目的**: 認知負荷軽減、タスク集中促進
 
 ### デバッグモード重要注意事項
@@ -481,6 +496,16 @@ const gapSearchRadius = 1;       // 隙間検索時の探索半径（px）
 - **ストア永続化の禁止**: `experimentStore` は Zustand の persist 機能を使用しない
   - リロード時に状態がリセットされることで、デバッグデータの混入を防ぐ
 - **開発時の注意**: デバッグモードで実験を実行した後は、必ずリロードして状態をクリア
+
+### 実験説明ページ（ExperimentInstructionPage）UI仕様
+- **レイアウト**: デモ動画を横幅広めに中央配置
+- **UI1 & UI2共通仕様**:
+  - 動画: 16:9アスペクト比を維持
+  - 最大幅: `max-w-4xl`（横幅広め表示）
+  - 中央揃え: `flex justify-center`
+- **動画URL**:
+  - UI1: `https://www.youtube.com/embed/hSvk-xlZ6IQ`
+  - UI2: `https://www.youtube.com/embed/RBTNjDDmxmw`
 
 ---
 
