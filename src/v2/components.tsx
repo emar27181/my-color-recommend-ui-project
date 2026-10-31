@@ -92,8 +92,13 @@ export function TextField(props: Omit<InputHTMLAttributes<HTMLInputElement>, 'cl
   return <input {...props} className="crv2-textfield" />;
 }
 
-export function ColorInput({ label, ...props }: Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'className' | 'aria-label'> & { label: string }) {
-  return <input {...props} type="color" aria-label={label} />;
+/** MD2D atoms/ColorInput: custom picker opener, never native input[type=color]. */
+export function ColorInput({ label, value, onOpen }: { label: string; value: string; onOpen: () => void }) {
+  return (
+    <button type="button" className="crv2-color-input"
+      aria-label={label} title={label} onClick={onOpen}
+      style={{ backgroundColor: value }} />
+  );
 }
 
 export function SelectField({ children, ...props }: Omit<SelectHTMLAttributes<HTMLSelectElement>, 'className'>) {
