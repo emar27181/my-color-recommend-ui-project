@@ -9,7 +9,7 @@
 
 ## MD2D をデザインの基準（Single Source of Truth）にする
 
-参照: `emar27181/MD2D` の `develop`、`docs/DESIGN.md`、`src/design/color-picker.ts`、`src/design/color-system.ts`、`src/domain/color/{index,oklch,tone}.ts`、`src/components/molecules/ColorPicker.tsx`、`src/components/atoms/ColorInput.tsx`、`src/styles/tokens.css`。
+参照: `emar27181/MD2D` の `develop`、`docs/DESIGN.md`、`src/design/color-picker.ts`、`src/design/color-system.ts`、`src/domain/color/{index,oklch,tone,imagePalette}.ts`、`src/components/molecules/ColorPicker.tsx`、`src/components/atoms/ColorInput.tsx`、`src/styles/tokens.css`。
 
 独立リポジトリ（MD2Dはprivate）のため runtime import せず、**MD2Dの計算コードをV2の `src/v2/md2d/` に取り込み**、独自ColorPicker MoleculeをAtom群で組み立てる。派生コード・登録簿はV2内で各1箇所のみ、元のMD2Dを設計上の正本とする。MD2D更新時はこの写しとの関数差分を明示的に比較する（自動同期ではない）。
 
@@ -54,7 +54,7 @@
 - PNG「スポイト用」: 1色につき180×180pxの**正方形**を色数分だけ横連結。余白・枠・文字・影・透過を入れず、色面の各ピクセルは元のRGB値と同一。画像貼り付け後にスポイトで使うため。寸法は `PALETTE_SPEC.exportTileSize` に一元管理。
 - PNG「コード付き」: 色面の下側に白背景＋HEXラベル。色面は変更しない。
 - 画像コピー: `navigator.clipboard.write` / `ClipboardItem('image/png')`。ブラウザや外部アプリによっては非対応なので PNG 保存を必ず残す。
-- 画像抽出は従来の `src/lib/colorExtractor.ts` を共有し、抽出結果の色を基準色として選択可能にする。
+- 画像抽出はMD2Dの `src/domain/color/imagePalette.ts` のOKLab k-means `extractPalette` と同じ計算をV2専用に移植。画素読込は `src/v2/imageExtraction.ts` に分離し、抽出色を基準色として選択できる。従来版のColorThief抽出処理はV1にのみ残す。
 
 ## 品質ゲート
 
