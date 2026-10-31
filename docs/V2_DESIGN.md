@@ -5,13 +5,13 @@
 - 既存のホーム `/` は **従来版**。変更しない。既存の研究 UI1/UI2・実験画面・データはそのまま。
 - 新しいパレット向け UI は `/v2`。両方をヘッダー内の相互リンクで行き来できる。
 - 新UIだけを公開する置き換えではない。差分のレビュー後に PR をマージする。
-- 色相とトーンの推薦ロジックは `src/store/colorStore.ts` を共有し、別アルゴリズムを作らない。
+- **V1の研究ロジック**（`src/store/colorStore.ts`）は変更しない。**V2の色相・トーン計算**はMD2Dの`design/color-system.ts`登録簿と`domain/color/oklch.ts`/`tone.ts`、基準色の調整は`design/color-picker.ts`を採用する。V1/V2でアルゴリズムが異なるため、研究成果の数値とV2の推薦精度を混同しない。
 
 ## MD2D をデザインの基準（Single Source of Truth）にする
 
-参照: `emar27181/MD2D` の `develop`、`docs/DESIGN.md`、`src/design/icons.ts`、`src/components/foundation/Icon.tsx`、`src/components/atoms/Button.tsx`、`SwatchButton.tsx`、`src/styles/tokens.css`。
+参照: `emar27181/MD2D` の `develop`、`docs/DESIGN.md`、`src/design/color-picker.ts`、`src/design/color-system.ts`、`src/domain/color/{index,oklch,tone}.ts`、`src/components/molecules/ColorPicker.tsx`、`src/components/atoms/ColorInput.tsx`、`src/styles/tokens.css`。
 
-独立リポジトリのため MD2D のソースを runtime import せず、**コンポーネントの役割・API・規則**を V2 に適応して移植している。将来の差分を比較可能なように、この参照元を正本とする。
+独立リポジトリ（MD2Dはprivate）のため runtime import せず、**MD2Dの計算コードをV2の `src/v2/md2d/` に取り込み**、独自ColorPicker MoleculeをAtom群で組み立てる。派生コード・登録簿はV2内で各1箇所のみ、元のMD2Dを設計上の正本とする。MD2D更新時はこの写しとの関数差分を明示的に比較する（自動同期ではない）。
 
 1. **Atomic Design:** `src/v2/design/icons.ts` → `src/v2/components.tsx` (Icon / Button / IconButton / SwatchButton / TextField / ColorInput / SelectField / FileInput / CopyColorButton) → `PaletteV2Page.tsx`。V2 ページに生の button / input / select を書かない。
 2. **トークン一元化:** `src/v2/design/tokens.css` が Primitive → Semantic → Component の UI 数値・色の正本。旧UIへの波及を避けるため `crv2-` で名前空間化。レスポンシブ規則は `src/v2/design/breakpoints.css` に集約、閾値は `src/v2/design/breakpoints.ts` の登録簿とテストで同期。
@@ -22,6 +22,14 @@
 7. **画面幅:** MD2D と同じスマホ <= 760px / タブレット <= 1100px。スマホ操作ボタンは最低44pxを基準とする。スクロール可能でキーボード表示時も入力が隠れない。
 8. **アクセシビリティ:** タブ・フォーム・コピー・追加・移動・削除はキーボードで操作でき、状態にはラベル、色見本は `role=radio` / `aria-checked`。選択色の視認性は色のコントラストに依存させない。
 9. **研究保護:** `/experiment` 以下のルートと実験ストア、色推薦計算を改変しない。従来UIの `/` を維持することをテストする。
+
+## MD2D独自ColorPickerをV2にも適用する
+
+- 基準色の色ボタンはブラウザ標準の `input[type=color]` を**一切使わない**。MD2Dと同様に色見本ボタン→専用ダイアログを開き、12色相・6トーン・6無彩色・HEXを設定できる。
+- V2の計算は `src/v2/md2d/design/color-picker.ts`（`COLOR_PICKER` / `hslPickerHex` / `pickerHueOf`）と`src/v2/md2d/domain/color/{oklch,tone}.ts`、`src/v2/md2d/design/color-system.ts`（技法角度・トーンの登録簿）を使う。V2の調停のみ`src/v2/colorRecommendations.ts`に集約。
+- 基準色の色ボタンとHEX入力欄は`--crv2-control`の高さと`--crv2-radius-control`の角丸を共有する。色見本・アイコンボタンも同じcontrol半径（8px）。外枠パネルやカードはcard半径（12px）。チェックの丸い印だけpill。
+- MD2Dのトーン登録簿は9件、V2の色相技法は6件。研究版V1の技法数や元の13色トーンとは別の選択肢とする。
+- ライト/ダーク・320/390/820/1440pxで色選択UIの実描画を検査する。色相を選ぶと基準色・推薦が変わり、閉じるとダイアログが閉じることを確認する。
 
 ## V2 正方形スウォッチ表示の規則
 
@@ -51,7 +59,7 @@
 ## 品質ゲート
 
 - `npm run build` （従来の TypeScript＋Vite ビルド）
-- `npm run test:v2` （Node 22: 色正規化、重複・最大数、順番、PNG色面、旧UIルート、アイコン登録簿、余白トークン）
+- `npm run test:v2` （Node 22: HEX、MD2Dプリセット・色相/OKLCH変換・トーン登録簿・重複/最大数・PNG色面・旧UIルート・アイコン/角丸一元化）
 - V2 と旧UIをそれぞれ PC / スマホで操作確認する。画像を別アプリに貼った後のスポイト色の一致は人手でも検査する。
 - 元の `/` と `/experiment` を置き換えたり、MD2D 側のコードを直接変更したりしない。
 
