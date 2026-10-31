@@ -13,8 +13,8 @@
 
 独立リポジトリのため MD2D のソースを runtime import せず、**コンポーネントの役割・API・規則**を V2 に適応して移植している。将来の差分を比較可能なように、この参照元を正本とする。
 
-1. **Atomic Design:** `src/v2/design/icons.ts` → `src/v2/components.tsx` (Icon / Button / IconButton / SwatchButton) → `PaletteV2Page.tsx`。
-2. **トークン一元化:** `src/v2/design/tokens.css` が Primitive → Semantic → Component の唯一の UI 数値・色・ブレークポイントの定義元。旧UIへの波及を避けるため `crv2-` で名前空間化。
+1. **Atomic Design:** `src/v2/design/icons.ts` → `src/v2/components.tsx` (Icon / Button / IconButton / SwatchButton / TextField / ColorInput / SelectField / FileInput / CopyColorButton) → `PaletteV2Page.tsx`。V2 ページに生の button / input / select を書かない。
+2. **トークン一元化:** `src/v2/design/tokens.css` が Primitive → Semantic → Component の UI 数値・色の正本。旧UIへの波及を避けるため `crv2-` で名前空間化。レスポンシブ規則は `src/v2/design/breakpoints.css` に集約、閾値は `src/v2/design/breakpoints.ts` の登録簿とテストで同期。
 3. **例外:** ユーザーが選んだ HEX を色面の `backgroundColor` に動的に設定することは許容。これをデザイントークンとして誤管理しない。
 4. **見た目:** 枠線より背景面の差、4px余白の7段階、文字・アイコン・操作部品も7段階、角丸は用途で統一。無彩色の操作部＋黄色のアクセント。スウォッチの選択は色だけでなくチェックでも示す。
 5. **アイコン:** `lucide-react` の import は V2 内では `design/icons.ts` に集約。絵文字を UI に使わない。
