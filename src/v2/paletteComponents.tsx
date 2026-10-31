@@ -2,7 +2,7 @@
  * MD2D-style molecules: one swatch presentation for recommendation and saved palettes.
  * Color values are domain data; dimensions, interaction states and spacing come from tokens.
  */
-import { CopyColorButton, IconButton, SwatchButton, SwatchSurface } from './components';
+import { CopyColorButton, IconButton, IconMenu, SwatchButton, SwatchSurface } from './components';
 import type { V2Strings } from './design/copy';
 
 export interface RecommendationColorTileProps {
@@ -43,14 +43,18 @@ export function PaletteColorCard({
   return (
     <div className="crv2-palette-card" data-component="palette-color-card">
       <SwatchSurface color={color} />
-      <CopyColorButton color={color} label={copy.copy} onCopy={onCopy} />
-      <div className="crv2-palette-actions" role="group" aria-label={color}>
-        <IconButton icon="moveUp" label={copy.up} disabled={index === 0}
-          onClick={() => onMove(index, -1)} />
-        <IconButton icon="moveDown" label={copy.down} disabled={index === count - 1}
-          onClick={() => onMove(index, 1)} />
-        <IconButton icon="trash" label={copy.remove + ' ' + color}
-          onClick={() => onRemove(index)} />
+      <div className="crv2-palette-card__footer">
+        <CopyColorButton color={color} label={copy.copy} onCopy={onCopy} />
+        <IconMenu label={copy.moreActions + ' ' + color}>
+          <div className="crv2-palette-actions" role="group" aria-label={color}>
+            <IconButton icon="moveLeft" label={copy.up} disabled={index === 0}
+              onClick={() => onMove(index, -1)} />
+            <IconButton icon="moveRight" label={copy.down} disabled={index === count - 1}
+              onClick={() => onMove(index, 1)} />
+            <IconButton icon="trash" label={copy.remove + ' ' + color}
+              onClick={() => onRemove(index)} />
+          </div>
+        </IconMenu>
       </div>
     </div>
   );
