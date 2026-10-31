@@ -1,11 +1,12 @@
-import { useEffect, useState, type ChangeEvent } from 'react';
+import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { COLOR_SCHEMES, useColorStore } from '@/store/colorStore';
 import { extractColorsFromImage } from '@/lib/colorExtractor';
-import { Button, Icon, IconButton, SwatchSurface, TextField, ColorInput, SelectField, FileInput, ExtractedSwatchButton } from './components';
+import { Button, Icon, IconButton, SwatchSurface, SelectField, FileInput, ExtractedSwatchButton } from './components';
+import { ColorPicker } from './ColorPicker';
 import { RecommendationColorTile, PaletteColorCard } from './paletteComponents';
-import { V2_COPY, type V2Strings } from './design/copy';
+import { V2_COPY, V2_HARMONY_LABELS, V2_TONE_LABELS, type V2Strings } from './design/copy';
+import { V2_DEFAULT_HARMONY, V2_HARMONIES, harmonyCandidates, toneCandidates } from './colorRecommendations';
 import {
   PALETTE_SPEC, normalizeHex, sanitizedPalette, addPaletteColor,
   movePaletteColor, downloadPalette, copyPaletteImage,
@@ -65,14 +66,16 @@ function PaletteActions({
 export default function PaletteV2Page() {
   const { i18n } = useTranslation();
   const copy: V2Strings = V2_COPY[i18n.language.startsWith('en') ? 'en' : 'ja'];
-  const {
-    baseColor, selectedColor, paintColor, selectedScheme, recommendedColors,
-    recommendedTones, setColorFromBase, setSelectedScheme,
-    setColorFromRecommendation, setPaintColor, setExtractedColors,
-  } = useColorStore();
+  const lang = i18n.language.startsWith('en') ? 'en' : 'ja';
+  // V2 uses MD2D's own OKLCH recommendation functions, isolated from the classic research store.
+  const [baseColor, setBaseColor] = useState<string>(PALETTE_SPEC.defaultBaseColor);
+  const [selectedScheme, setSelectedScheme] = useState(V2_DEFAULT_HARMONY);
+  const [selectedColor, setSelectedColor] = useState<string>(PALETTE_SPEC.defaultBaseColor);
+  const [paintColor, setPaintColor] = useState<string>(PALETTE_SPEC.defaultBaseColor);
+  const recommendedColors = useMemo(() => harmonyCandidates(baseColor, selectedScheme), [baseColor, selectedScheme]);
+  const recommendedTones = useMemo(() => toneCandidates(selectedColor), [selectedColor]);
   const [palette, setPalette] = useState<string[]>(loadPalette);
   const [theme, setTheme] = useState<'light' | 'dark'>(loadTheme);
-  const [baseDraft, setBaseDraft] = useState(baseColor.toUpperCase());
   const [exportMode, setExportMode] = useState<ExportMode>('solid');
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
@@ -85,14 +88,23 @@ export default function PaletteV2Page() {
   useEffect(() => {
     try { localStorage.setItem(PALETTE_SPEC.themeKey, theme); } catch { /* storage unavailable */ }
   }, [theme]);
-  useEffect(() => setBaseDraft(baseColor.toUpperCase()), [baseColor]);
 
   const changeBase = (color: string) => {
     const normalized = normalizeHex(color);
-    if (!normalized) { setBaseDraft(baseColor.toUpperCase()); return; }
-    setBaseDraft(normalized);
-    setColorFromBase(normalized);
+    if (!normalized) return;
+    setBaseColor(normalized);
+    setSelectedColor(normalized);
+    setPaintColor(normalized);
     setNotice('');
+  };
+  const changeScheme = (id: string) => {
+    setSelectedScheme(id);
+    setSelectedColor(baseColor);
+    setPaintColor(baseColor);
+  };
+  const selectHue = (color: string) => {
+    setSelectedColor(color);
+    setPaintColor(color);
   };
   const copyHex = async (color: string) => {
     try {
@@ -123,7 +135,6 @@ export default function PaletteV2Page() {
       const result = await extractColorsFromImage(file, 8);
       const colors = sanitizedPalette(result.colors.map(color => color.hex));
       setExtracted(colors);
-      setExtractedColors(result.colors, result.dominantColor);
       changeBase(result.dominantColor.hex);
       setNotice('');
     } catch {
@@ -178,17 +189,8 @@ export default function PaletteV2Page() {
           <div className="crv2-section-title"><h2>{copy.base}</h2><span className="crv2-step">01</span></div>
           <div>
             <label htmlFor="crv2-hex" className="crv2-inputlabel">{copy.input} (HEX)</label>
-            <div className="crv2-picker-row">
-              <ColorInput label={copy.input} value={baseColor} onChange={event => changeBase(event.target.value)} />
-              <TextField
-                id="crv2-hex" value={baseDraft}
-                onChange={event => setBaseDraft(event.target.value)}
-                onBlur={() => changeBase(baseDraft)}
-                onKeyDown={event => { if (event.key === 'Enter') event.currentTarget.blur(); }}
-                spellCheck={false} maxLength={7} inputMode="text"
-              />
-              <IconButton icon="copy" label={copy.copy} onClick={() => void copyHex(baseColor)} />
-            </div>
+            <ColorPicker value={baseColor} onChange={changeBase}
+              onCopy={color => void copyHex(color)} copy={copy} />
           </div>
           <div>
             <label htmlFor="crv2-image" className="crv2-inputlabel">{copy.imageInput}</label>
@@ -215,16 +217,18 @@ export default function PaletteV2Page() {
             <label htmlFor="crv2-scheme" className="crv2-inputlabel">{copy.scheme}</label>
             <SelectField
               id="crv2-scheme" value={selectedScheme}
-              onChange={event => setSelectedScheme(event.target.value)}
+              onChange={event => changeScheme(event.target.value)}
             >
-              {COLOR_SCHEMES.map(scheme => <option key={scheme.id} value={scheme.id}>{scheme.name.replace(/\n/g, ' / ')}</option>)}
+              {V2_HARMONIES.map(scheme => <option key={scheme.id} value={scheme.id}>
+                {V2_HARMONY_LABELS[lang][scheme.id as keyof typeof V2_HARMONY_LABELS.ja] ?? scheme.id}
+              </option>)}
             </SelectField>
           </div>
           <div role="radiogroup" aria-label={copy.hue} className="crv2-hue-grid">
             {recommendedColors.map((color, index) => (
               <RecommendationColorTile key={color + index} color={color.toUpperCase()}
                 caption={copy.hue + ' ' + (index + 1)} active={selectedColor.toUpperCase() === color.toUpperCase()}
-                onPick={() => setColorFromRecommendation(color)}
+                onPick={() => selectHue(color)}
                 onCopy={color => void copyHex(color)} copyLabel={copy.copy}
               />
             ))}
@@ -232,10 +236,11 @@ export default function PaletteV2Page() {
           <div className="crv2-section-title"><h2>{copy.tones}</h2><span className="crv2-step">03</span></div>
           <p className="crv2-muted">{copy.tonesHint}</p>
           <div role="radiogroup" aria-label={copy.tones} className="crv2-color-grid">
-            {recommendedTones.map((color, index) => (
-              <RecommendationColorTile key={color + index} color={color.toUpperCase()}
-                caption={copy.tones + ' ' + (index + 1)} active={paintColor.toUpperCase() === color.toUpperCase()}
-                onPick={() => setPaintColor(color)}
+            {recommendedTones.map(tone => (
+              <RecommendationColorTile key={tone.id} color={tone.hex}
+                caption={V2_TONE_LABELS[lang][tone.id as keyof typeof V2_TONE_LABELS.ja] ?? tone.id}
+                active={paintColor === tone.hex}
+                onPick={() => setPaintColor(tone.hex)}
                 onCopy={color => void copyHex(color)} copyLabel={copy.copy}
               />
             ))}
