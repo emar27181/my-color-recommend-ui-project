@@ -91,3 +91,27 @@ test('recommendation and saved palette share a square swatch atom', () => {
   assert.ok(!css.includes('--crv2-palette-height:'), 'remove stale fixed palette height');
   assert.equal(PALETTE_SPEC.exportTileSize, 180);
 });
+
+test('compact UI uses shared design tokens for grid, icon radii and interaction sizes', () => {
+  const css = readFileSync(new URL('../src/v2/design/tokens.css', import.meta.url), 'utf8');
+  const media = readFileSync(new URL('../src/v2/design/breakpoints.css', import.meta.url), 'utf8');
+  const atoms = readFileSync(new URL('../src/v2/components.tsx', import.meta.url), 'utf8');
+  const molecule = readFileSync(new URL('../src/v2/paletteComponents.tsx', import.meta.url), 'utf8');
+  const icons = readFileSync(new URL('../src/v2/design/icons.ts', import.meta.url), 'utf8');
+  assert.match(css, /--crv2-swatch-columns:\s*4/);
+  assert.match(css, /--crv2-swatch-columns-tiny:\s*3/);
+  assert.match(css, /repeat\(var\(--crv2-swatch-columns\)/);
+  assert.match(media, /--crv2-swatch-columns:\s*var\(--crv2-swatch-columns-tiny\)/);
+  assert.match(css, /--crv2-radius-icon-button:\s*var\(--crv2-radius-control\)/);
+  assert.match(css, /--crv2-radius-swatch:\s*var\(--crv2-radius-control\)/);
+  assert.match(css, /--crv2-radius-palette-card:\s*var\(--crv2-radius-card\)/);
+  assert.match(css, /\.crv2-iconbtn\s*\{[^}]*border-radius:\s*var\(--crv2-radius-icon-button\)/s);
+  assert.match(css, /\.crv2-swatch-surface\s*\{[^}]*border-radius:\s*var\(--crv2-radius-swatch\)/s);
+  for (const line of css.split('\n').filter(line => /\bborder-radius\s*:/.test(line))) {
+    assert.match(line, /border-radius:\s*var\(--crv2-/, 'no literal border radius allowed: ' + line.trim());
+  }
+  assert.match(atoms, /export function IconMenu/);
+  assert.match(molecule, /<IconMenu /);
+  assert.match(icons, /more:\s*Ellipsis/);
+  assert.doesNotMatch(molecule, /icon="moveUp"|icon="moveDown"/, 'semantic left/right icons are required');
+});
