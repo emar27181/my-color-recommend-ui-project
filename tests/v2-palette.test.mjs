@@ -7,6 +7,8 @@ import { COLOR_PICKER, hslPickerHex, pickerHueOf } from '../src/v2/md2d/design/c
 import { HARMONY_TECHNIQUES, TONES } from '../src/v2/md2d/design/color-system.ts';
 import { hexToOklch, oklchToHex } from '../src/v2/md2d/domain/color/oklch.ts';
 import { harmonyCandidates, toneCandidates, V2_HARMONIES } from '../src/v2/colorRecommendations.ts';
+import { extractPalette } from '../src/v2/md2d/domain/color/imagePalette.ts';
+import { IMAGE_PALETTE } from '../src/v2/md2d/design/color-system.ts';
 
 test('HEX normalization supports CSS hex and rejects invalid codes', () => {
   assert.equal(normalizeHex('#abC123'), '#ABC123');
@@ -162,4 +164,20 @@ test('MD2D OKLCH and registry are V2 recommendation single source of truth', () 
   assert.deepEqual(tones.map(t=>t.id), TONES.map(t=>t.id));
   assert.ok(tones.every(t=>/^#[0-9A-F]{6}$/.test(t.hex)));
   assert.equal(toneCandidates('invalid').length, 0);
+});
+
+test('V2 image extraction delegates to MD2D OKLab k-means and ignores transparent pixels', () => {
+  const page = readFileSync(new URL('../src/v2/PaletteV2Page.tsx', import.meta.url), 'utf8');
+  assert.doesNotMatch(page, /@\/lib\/colorExtractor|extractColorsFromImage|useColorStore/);
+  assert.match(page, /extractImageColors\(file\)/);
+  const transparent = new Uint8Array(4 * IMAGE_PALETTE.colors);
+  assert.deepEqual(extractPalette(transparent), []);
+  const red = new Uint8Array(Array(20).fill([255,0,0,255]).flat());
+  const results = extractPalette(red);
+  assert.equal(results.length, 1);
+  assert.equal(results[0].share, 1);
+  assert.ok(/^([A-F0-9]{6})$/.test(results[0].hex));
+  assert.ok(parseInt(results[0].hex.slice(0,2),16) >= 254);
+  assert.ok(parseInt(results[0].hex.slice(2,4),16) <= 1);
+  assert.ok(parseInt(results[0].hex.slice(4,6),16) <= 1);
 });
