@@ -100,6 +100,8 @@ test('compact UI uses shared design tokens for grid, icon radii and interaction 
   const icons = readFileSync(new URL('../src/v2/design/icons.ts', import.meta.url), 'utf8');
   assert.match(css, /--crv2-swatch-columns:\s*4/);
   assert.match(css, /--crv2-swatch-columns-tiny:\s*3/);
+  assert.match(css, /--crv2-palette-mobile-columns:\s*3/);
+  assert.match(media, /repeat\(var\(--crv2-palette-mobile-columns\)/);
   assert.match(css, /repeat\(var\(--crv2-swatch-columns\)/);
   assert.match(media, /--crv2-swatch-columns:\s*var\(--crv2-swatch-columns-tiny\)/);
   assert.match(css, /--crv2-radius-icon-button:\s*var\(--crv2-radius-control\)/);
