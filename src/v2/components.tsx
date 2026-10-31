@@ -43,6 +43,22 @@ export function IconButton({ icon, label, size = 'md', type = 'button', ...rest 
   );
 }
 
+/**
+ * MD2D-like action disclosure: a single icon button reveals secondary
+ * operations without forcing three full-size controls into every color card.
+ * Native details/summary preserves keyboard and touch operation.
+ */
+export function IconMenu({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <details className="crv2-icon-menu">
+      <summary className="crv2-iconbtn crv2-icon-menu__trigger" aria-label={label} title={label}>
+        <Icon name="more" />
+      </summary>
+      <div className="crv2-icon-menu__panel">{children}</div>
+    </details>
+  );
+}
+
 /** A single raw user-color surface; size and selected state are determined by tokens. */
 export function SwatchSurface({ color, checked = false }: { color: string; checked?: boolean }) {
   return (
