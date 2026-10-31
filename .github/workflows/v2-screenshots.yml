@@ -1,0 +1,69 @@
+name: V2 responsive screenshots
+
+on:
+  push:
+    branches:
+      - feature/palette-v2-md2d-ui
+    paths:
+      - 'src/v2/**'
+      - 'src/main.tsx'
+      - 'src/store/colorStore.ts'
+      - '.github/workflows/v2-screenshots.yml'
+      - 'scripts/v2-screenshots.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install app
+        run: npm ci
+      - name: Build V2
+        run: npm run build
+      - name: Install Playwright
+        run: |
+          npm install --no-save --package-lock=false playwright
+          npx playwright install --with-deps chromium
+      - name: Start Vite preview
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/v2-preview.log 2>&1 &
+          for i in $(seq 1 50); do
+            if curl -fsS http://127.0.0.1:4173/v2 >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/v2-preview.log
+          exit 1
+      - name: Capture responsive layouts and check overflow
+        run: node scripts/v2-screenshots.mjs
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: color-recommendation-v2-responsive
+          path: docs/screenshots/v2/
+          if-no-files-found: warn
+      - name: Commit snapshots to PR
+        if: success()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/screenshots/v2
+          if git diff --cached --quiet; then
+            echo "Screenshots unchanged"
+          else
+            git commit -m "docs(v2): capture real responsive screenshots [skip ci]"
+            git push
+          fi
