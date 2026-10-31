@@ -62,15 +62,21 @@ body:has(.cr-v2) { background: var(--crv2-charcoal-950); }
   --crv2-control-2xl: 44px;
   --crv2-control-3xl: 48px;
   --crv2-control: var(--crv2-control-md);
+  /* MD2D semantic radius roles: all icons, swatches and cards resolve here. */
   --crv2-radius-control: 8px;
   --crv2-radius-card: 12px;
   --crv2-radius-pill: 999px;
+  --crv2-radius-icon-button: var(--crv2-radius-control);
+  --crv2-radius-swatch: var(--crv2-radius-control);
+  --crv2-radius-palette-card: var(--crv2-radius-card);
   --crv2-duration-fast: 120ms;
   --crv2-panel-left: 244px;
   --crv2-panel-right: 308px;
   --crv2-header-height: 56px;
   /* Shared square swatch geometry. Both hue and tone grids use the same minimum. */
-  --crv2-swatch-grid-max: 312px; /* 4 columns x 72px + 3 gaps x 8px */
+  --crv2-swatch-grid-max: 312px;
+  --crv2-swatch-columns: 4;
+  --crv2-swatch-columns-tiny: 3;
   --crv2-palette-card-min: 84px;
   --crv2-palette-card-max: 96px;
   --crv2-z-menu: 30;
@@ -130,7 +136,7 @@ body:has(.cr-v2) { background: var(--crv2-charcoal-950); }
 .cr-v2 button, .cr-v2 input, .cr-v2 select { font: inherit; }
 .cr-v2 button { cursor: pointer; }
 .cr-v2 button:disabled { cursor: not-allowed; opacity: var(--crv2-disabled-opacity); }
-.cr-v2 :is(button, input, select, a):focus-visible {
+.cr-v2 :is(button, input, select, a, summary):focus-visible {
   outline: var(--crv2-focus-width) solid var(--crv2-color-focus);
   outline-offset: var(--crv2-focus-offset);
 }
@@ -208,7 +214,7 @@ body:has(.cr-v2) { background: var(--crv2-charcoal-950); }
 .crv2-btn--sm { min-height: var(--crv2-control-sm); font-size: var(--crv2-fs-caption); }
 .crv2-iconbtn {
   background: var(--crv2-color-control);
-  border: 0; border-radius: var(--crv2-radius-control);
+  border: 0; border-radius: var(--crv2-radius-icon-button);
   color: var(--crv2-color-text);
   width: var(--crv2-control); height: var(--crv2-control);
   flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
@@ -222,7 +228,7 @@ body:has(.cr-v2) { background: var(--crv2-charcoal-950); }
  * Column behavior and dimensions are controlled by tokens and breakpoints. */
 .crv2-color-grid, .crv2-hue-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(var(--crv2-swatch-columns), minmax(0, 1fr));
   max-width: var(--crv2-swatch-grid-max);
   gap: var(--crv2-space-2);
 }
@@ -236,7 +242,7 @@ body:has(.cr-v2) { background: var(--crv2-charcoal-950); }
 .crv2-swatch-surface {
   display: flex; align-items: center; justify-content: center;
   width: 100%; aspect-ratio: 1 / 1;
-  border-radius: var(--crv2-radius-control);
+  border-radius: var(--crv2-radius-swatch);
 }
 .crv2-swatch-surface[data-selected="true"] {
   box-shadow: inset 0 0 0 var(--crv2-swatch-selection-width) var(--crv2-color-accent);
@@ -272,7 +278,7 @@ body:has(.cr-v2) { background: var(--crv2-charcoal-950); }
 .crv2-palette-card {
   display: flex; flex-direction: column; align-items: stretch; min-width: 0;
   padding: var(--crv2-space-1); gap: var(--crv2-space-1);
-  background: var(--crv2-color-raised); border-radius: var(--crv2-radius-card);
+  background: var(--crv2-color-raised); border-radius: var(--crv2-radius-palette-card);
 }
 .crv2-palette-card:has(.crv2-icon-menu[open]) { position: relative; z-index: var(--crv2-z-menu); }
 .crv2-palette-card > .crv2-swatch-surface { flex: none; }
@@ -282,7 +288,7 @@ body:has(.cr-v2) { background: var(--crv2-charcoal-950); }
 .crv2-icon-menu__trigger {
   display: flex; align-items: center; justify-content: center;
   list-style: none; width: 100%; min-height: var(--crv2-control);
-  border-radius: var(--crv2-radius-control);
+  border-radius: var(--crv2-radius-icon-button);
 }
 .crv2-icon-menu__trigger::-webkit-details-marker { display: none; }
 .crv2-icon-menu__panel {
