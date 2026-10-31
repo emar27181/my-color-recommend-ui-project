@@ -13,6 +13,11 @@ export const V2_COPY = {
     intro: '色を選んで、使えるパレットに。',
     base: '基準色',
     input: '色を選択',
+    openPicker: '色相・トーン・HEXを調整',
+    close: '閉じる',
+    pickerHue: '色相',
+    pickerTone: 'トーン',
+    pickerNeutral: '無彩色',
     imageInput: '画像から抽出',
     chooseFile: '画像を選択',
     imageHint: '画像内の代表色から選べます',
@@ -48,12 +53,18 @@ export const V2_COPY = {
     reset: 'すべて削除',
     noColor: '色を追加すると書き出せます',
     extracted: '画像から抽出した色',
-    source: '色推薦ロジックは従来版と共通',
+    source: 'MD2Dの色調整・OKLCH推薦を使用（従来版の研究ロジックは保持）',
   },
   en: {
     brand: 'Color Recommendation', mobileBrand: 'Color V2', legacyShort: 'Classic', version: 'V2 / Palette recommender', legacy: 'Open classic UI',
     appearance: 'Toggle appearance', intro: 'Pick a color. Build a usable palette.', base: 'Base color',
-    input: 'Choose color', imageInput: 'Extract from image', chooseFile: 'Choose image',
+    input: 'Choose color',
+    openPicker: 'Edit hue, tone and HEX',
+    close: 'Close',
+    pickerHue: 'Hue',
+    pickerTone: 'Tone',
+    pickerNeutral: 'Neutral colors',
+    imageInput: 'Extract from image', chooseFile: 'Choose image',
     imageHint: 'Pick a dominant color from your image', imageError: 'Could not read image',
     fileError: 'Select an image under 10 MB', hue: 'Hue recommendation',
     hueHint: 'Choose a color harmony and hue', scheme: 'Color harmony',
@@ -75,3 +86,26 @@ export const V2_COPY = {
 } as const;
 
 export type V2Strings = { [K in keyof typeof V2_COPY.ja]: string };
+
+/** Labels are presentation only; MD2D design/color-system owns offsets and tone values. */
+export const V2_HARMONY_LABELS = {
+  ja: {
+    analogous: '類似色', complementary: '補色', triadic: '三色配色',
+    splitComplementary: '分裂補色', monochromatic: '単色', dominant: 'ドミナント',
+  },
+  en: {
+    analogous: 'Analogous', complementary: 'Complementary', triadic: 'Triadic',
+    splitComplementary: 'Split complementary', monochromatic: 'Monochromatic', dominant: 'Dominant',
+  },
+} as const;
+
+export const V2_TONE_LABELS = {
+  ja: {
+    vivid: 'ビビッド', bright: 'ブライト', light: 'ライト', pale: 'ペール',
+    deep: 'ディープ', dark: 'ダーク', soft: 'ソフト', dull: 'ダル', grayish: 'グレイッシュ',
+  },
+  en: {
+    vivid: 'Vivid', bright: 'Bright', light: 'Light', pale: 'Pale',
+    deep: 'Deep', dark: 'Dark', soft: 'Soft', dull: 'Dull', grayish: 'Grayish',
+  },
+} as const;
