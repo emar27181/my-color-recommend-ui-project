@@ -2,7 +2,7 @@
  * MD2D の foundation/Icon、atoms/Button、IconButton、SwatchButton の
  * インターフェースと役割を V2 名前空間に移植。別リポジトリなので依存は独立。
  */
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import type { ButtonHTMLAttributes, InputHTMLAttributes, SelectHTMLAttributes, ChangeEventHandler, ReactNode } from 'react';
 import { ICONS, type IconName, type IconSize } from './design/icons';
 
 export function Icon({ name, size = 'md' }: { name: IconName; size?: IconSize }) {
@@ -62,4 +62,60 @@ export function SwatchButton({ hex, label, checked, onSelect }: SwatchButtonProp
       </span>
     </button>
   );
+}
+
+/** MD2D の raw-controls 規則: 入力UIは atom に集約する。 */
+export function TextField(props: Omit<InputHTMLAttributes<HTMLInputElement>, 'className'>) {
+  return <input {...props} className="crv2-textfield" />;
+}
+
+export function ColorInput({ label, ...props }: Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'className' | 'aria-label'> & { label: string }) {
+  return <input {...props} type="color" aria-label={label} />;
+}
+
+export function SelectField({ children, ...props }: Omit<SelectHTMLAttributes<HTMLSelectElement>, 'className'>) {
+  return <select {...props} className="crv2-select">{children}</select>;
+}
+
+export function FileInput({
+  id, label, disabled, onChange,
+}: {
+  id: string;
+  label: string;
+  disabled?: boolean;
+  onChange: ChangeEventHandler<HTMLInputElement>;
+}) {
+  return (
+    <label className="crv2-picker-file" htmlFor={id}>
+      <Icon name="image" />
+      <span>{label}</span>
+      <input id={id} className="crv2-inputfile" type="file" accept="image/*" onChange={onChange} disabled={disabled} />
+    </label>
+  );
+}
+
+export function CopyColorButton({
+  color, label, onCopy, className = '',
+}: {
+  color: string;
+  label: string;
+  onCopy: (color: string) => void;
+  className?: string;
+}) {
+  return (
+    <button type="button" className={'crv2-copy-code crv2-code ' + className}
+      title={label + ' ' + color} aria-label={label + ' ' + color}
+      onClick={() => onCopy(color)}>
+      <span>{color}</span><Icon name="copy" size="xs" />
+    </button>
+  );
+}
+
+export function ExtractedSwatchButton({ color, label, onSelect }: {
+  color: string;
+  label: string;
+  onSelect: () => void;
+}) {
+  return <button type="button" style={{ backgroundColor: color }}
+    onClick={onSelect} aria-label={label + ' ' + color} title={color} />;
 }
