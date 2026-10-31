@@ -1,6 +1,6 @@
 /** トーン（明るさ・鮮やかさ）の候補（純粋関数）。同じ色相で、トーン登録簿の各段の色を作る。表示できない色は鮮やかさを下げて収める */
-import { TONES, TONE_GRID, type ToneDef } from "../../design/color-system";
-import { hexToOklch, maxChroma, oklchToHex } from "./oklch";
+import { TONES, TONE_GRID, type ToneDef } from "../../design/color-system.ts";
+import { hexToOklch, maxChroma, oklchToHex } from "./oklch.ts";
 
 export interface ToneCell { tone: ToneDef; hex: string }
 
