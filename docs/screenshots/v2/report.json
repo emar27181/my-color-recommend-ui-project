@@ -8,6 +8,10 @@
     "scrollWidth": 1440,
     "paletteHeading": true,
     "swatches": 18,
+    "rootHeight": 1156,
+    "surfaceHeight": 1156,
+    "documentHeight": 1156,
+    "footerVisible": true,
     "errors": []
   },
   {
@@ -19,6 +23,10 @@
     "scrollWidth": 820,
     "paletteHeading": true,
     "swatches": 18,
+    "rootHeight": 1537,
+    "surfaceHeight": 1537,
+    "documentHeight": 1537,
+    "footerVisible": true,
     "errors": []
   },
   {
@@ -30,6 +38,10 @@
     "scrollWidth": 390,
     "paletteHeading": true,
     "swatches": 18,
+    "rootHeight": 2165,
+    "surfaceHeight": 2165,
+    "documentHeight": 2165,
+    "footerVisible": true,
     "errors": []
   }
 ]
