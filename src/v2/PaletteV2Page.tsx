@@ -171,12 +171,15 @@ export default function PaletteV2Page() {
       <header className="crv2-header">
         <div className="crv2-header-brand">
           <Icon name="design" size="lg" />
-          <span>{copy.brand}</span>
+          <span className="crv2-header-brand__full">{copy.brand}</span>
+          <span className="crv2-header-brand__short" aria-label={copy.brand}>{copy.mobileBrand}</span>
           <span className="crv2-subtitle crv2-header-brand__version">{copy.version}</span>
         </div>
         <div className="crv2-header-actions">
           <Link className="crv2-btn crv2-btn--secondary crv2-btn--sm" to="/">
-            <Icon name="back" /><span>{copy.legacy}</span>
+            <Icon name="back" />
+            <span className="crv2-header-action__full">{copy.legacy}</span>
+            <span className="crv2-header-action__short">{copy.legacyShort}</span>
           </Link>
           <IconButton
             icon={theme === 'dark' ? 'appearanceLight' : 'appearanceDark'}
