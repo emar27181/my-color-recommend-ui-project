@@ -20,6 +20,15 @@
   /* No special columns for hue/tone: the shared adaptive grid keeps all tiles square. */
   .crv2-palette-card .crv2-iconbtn { min-width: var(--crv2-control-2xl); min-height: var(--crv2-control-2xl); }
 }
+/* Dense controls still have 44px touch targets on small phones. */
+@media (max-width: 360px) {
+  .cr-v2 { --crv2-palette-card-min: var(--crv2-palette-card-min-tiny); }
+  .crv2-palette-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .crv2-palette-actions .crv2-iconbtn { width: 100%; }
+  .crv2-palette-actions .crv2-iconbtn:last-child {
+    grid-column: 1 / -1; justify-self: center; width: var(--crv2-control-2xl);
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .cr-v2 *, .cr-v2 *::before, .cr-v2 *::after { transition: none !important; }
 }
