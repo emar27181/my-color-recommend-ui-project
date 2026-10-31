@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { COLOR_SCHEMES, useColorStore } from '@/store/colorStore';
 import { extractColorsFromImage } from '@/lib/colorExtractor';
-import { Button, Icon, IconButton, SwatchButton, TextField, ColorInput, SelectField, FileInput, CopyColorButton, ExtractedSwatchButton } from './components';
+import { Button, Icon, IconButton, SwatchSurface, TextField, ColorInput, SelectField, FileInput, ExtractedSwatchButton } from './components';
+import { RecommendationColorTile, PaletteColorCard } from './paletteComponents';
 import { V2_COPY, type V2Strings } from './design/copy';
 import {
   PALETTE_SPEC, normalizeHex, sanitizedPalette, addPaletteColor,
@@ -29,26 +30,6 @@ function loadTheme(): 'light' | 'dark' {
     // Storage can be blocked; prefer dark as MD2D's default.
   }
   return 'dark';
-}
-
-interface ColorTileProps {
-  color: string;
-  active: boolean;
-  caption: string;
-  onPick: () => void;
-  onCopy: (color: string) => void;
-  copyLabel: string;
-}
-
-function ColorTile({ color, active, caption, onPick, onCopy, copyLabel }: ColorTileProps) {
-  return (
-    <div className="crv2-color-tile">
-      <SwatchButton hex={color} label={caption} checked={active} onSelect={onPick} />
-      <div className="crv2-color-code-row">
-        <CopyColorButton color={color} label={copyLabel} onCopy={onCopy} />
-      </div>
-    </div>
-  );
 }
 
 function PaletteActions({
@@ -241,7 +222,7 @@ export default function PaletteV2Page() {
           </div>
           <div role="radiogroup" aria-label={copy.hue} className="crv2-hue-grid">
             {recommendedColors.map((color, index) => (
-              <ColorTile key={color + index} color={color.toUpperCase()}
+              <RecommendationColorTile key={color + index} color={color.toUpperCase()}
                 caption={copy.hue + ' ' + (index + 1)} active={selectedColor.toUpperCase() === color.toUpperCase()}
                 onPick={() => setColorFromRecommendation(color)}
                 onCopy={color => void copyHex(color)} copyLabel={copy.copy}
@@ -252,7 +233,7 @@ export default function PaletteV2Page() {
           <p className="crv2-muted">{copy.tonesHint}</p>
           <div role="radiogroup" aria-label={copy.tones} className="crv2-color-grid">
             {recommendedTones.map((color, index) => (
-              <ColorTile key={color + index} color={color.toUpperCase()}
+              <RecommendationColorTile key={color + index} color={color.toUpperCase()}
                 caption={copy.tones + ' ' + (index + 1)} active={paintColor.toUpperCase() === color.toUpperCase()}
                 onPick={() => setPaintColor(color)}
                 onCopy={color => void copyHex(color)} copyLabel={copy.copy}
@@ -261,7 +242,7 @@ export default function PaletteV2Page() {
           </div>
           <h3>{copy.selected}</h3>
           <div className="crv2-current">
-            <span className="crv2-current-chip" style={{ backgroundColor: paintColor }} aria-hidden="true" />
+            <span className="crv2-current-chip"><SwatchSurface color={paintColor} /></span>
             <div className="crv2-selection">
               <div className="crv2-code">{paintColor.toUpperCase()}</div>
               <span className="crv2-muted">{copy.selected}</span>
@@ -278,24 +259,12 @@ export default function PaletteV2Page() {
           <p className="crv2-muted">{copy.paletteHint}</p>
           {palette.length ? (
             <>
-              <div className="crv2-palette-strip" aria-label={copy.palette} role="img">
-                {palette.map((color, index) => <span key={color + index} style={{ backgroundColor: color }} />)}
-              </div>
-              <div className="crv2-palette-list">
+              <div className="crv2-palette-list" aria-label={copy.palette}>
                 {palette.map((color, index) => (
-                  <div className="crv2-palette-row" key={color}>
-                    <span className="crv2-palette-chip" style={{ backgroundColor: color }} aria-hidden="true" />
-                    <CopyColorButton color={color} label={copy.copy}
-                      className="crv2-palette-row__code" onCopy={color => void copyHex(color)} />
-                    <div className="crv2-palette-actions">
-                      <IconButton icon="moveUp" size="sm" label={copy.up} disabled={index === 0}
-                        onClick={() => setPalette(prev => movePaletteColor(prev, index, -1))} />
-                      <IconButton icon="moveDown" size="sm" label={copy.down} disabled={index === palette.length - 1}
-                        onClick={() => setPalette(prev => movePaletteColor(prev, index, 1))} />
-                      <IconButton icon="trash" size="sm" label={copy.remove}
-                        onClick={() => setPalette(prev => prev.filter((_, i) => i !== index))} />
-                    </div>
-                  </div>
+                  <PaletteColorCard key={color} color={color} index={index} count={palette.length}
+                    copy={copy} onCopy={color => void copyHex(color)}
+                    onMove={(index, offset) => setPalette(prev => movePaletteColor(prev, index, offset))}
+                    onRemove={index => setPalette(prev => prev.filter((_, i) => i !== index))} />
                 ))}
               </div>
               <Button icon="trash" variant="ghost" size="sm" onClick={() => setPalette([])}>{copy.reset}</Button>
