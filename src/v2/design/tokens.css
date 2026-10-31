@@ -80,7 +80,6 @@ body:has(.cr-v2) { background: var(--crv2-charcoal-950); }
   --crv2-palette-mobile-columns: 3;
   --crv2-palette-card-min: 84px;
   --crv2-palette-card-max: 96px;
-  --crv2-z-menu: 30;
   --crv2-tablet-column-min: 220px;
   --crv2-focus-width: 2px;
   --crv2-focus-offset: 2px;
@@ -281,7 +280,6 @@ body:has(.cr-v2) { background: var(--crv2-charcoal-950); }
   padding: var(--crv2-space-1); gap: var(--crv2-space-1);
   background: var(--crv2-color-raised); border-radius: var(--crv2-radius-palette-card);
 }
-.crv2-palette-card:has(.crv2-icon-menu[open]) { position: relative; z-index: var(--crv2-z-menu); }
 .crv2-palette-card > .crv2-swatch-surface { flex: none; }
 .crv2-palette-card__footer { display: flex; flex-direction: column; align-items: stretch; gap: var(--crv2-space-1); min-width: 0; }
 .crv2-palette-card__footer > .crv2-copy-code { align-self: center; }
@@ -293,9 +291,10 @@ body:has(.cr-v2) { background: var(--crv2-charcoal-950); }
 }
 .crv2-icon-menu__trigger::-webkit-details-marker { display: none; }
 .crv2-icon-menu__panel {
-  position: absolute; top: calc(100% + var(--crv2-space-1)); left: 0; right: 0;
+  /* Expand inside the card. Never obscure a neighboring swatch or clipboard control. */
+  position: static; margin-top: var(--crv2-space-1);
   padding: var(--crv2-space-1); border-radius: var(--crv2-radius-card);
-  background: var(--crv2-color-control); z-index: var(--crv2-z-menu);
+  background: var(--crv2-color-control);
 }
 .crv2-palette-actions { display: flex; flex-direction: column; gap: var(--crv2-space-1); }
 .crv2-palette-actions .crv2-iconbtn { width: 100%; min-height: var(--crv2-control); }
