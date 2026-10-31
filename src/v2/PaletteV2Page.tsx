@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { COLOR_SCHEMES, useColorStore } from '@/store/colorStore';
 import { extractColorsFromImage } from '@/lib/colorExtractor';
-import { Button, Icon, IconButton, SwatchButton } from './components';
+import { Button, Icon, IconButton, SwatchButton, TextField, ColorInput, SelectField, FileInput, CopyColorButton, ExtractedSwatchButton } from './components';
 import { V2_COPY, type V2Strings } from './design/copy';
 import {
   PALETTE_SPEC, normalizeHex, sanitizedPalette, addPaletteColor,
@@ -11,6 +11,7 @@ import {
   type ExportMode,
 } from './paletteExport';
 import './design/tokens.css';
+import './design/breakpoints.css';
 
 function loadPalette(): string[] {
   try {
@@ -44,9 +45,7 @@ function ColorTile({ color, active, caption, onPick, onCopy, copyLabel }: ColorT
     <div className="crv2-color-tile">
       <SwatchButton hex={color} label={caption} checked={active} onSelect={onPick} />
       <div className="crv2-color-code-row">
-        <button type="button" className="crv2-copy-code crv2-code" title={copyLabel + ' ' + color} aria-label={copyLabel + ' ' + color} onClick={() => onCopy(color)}>
-          <span>{color}</span><Icon name="copy" size="xs" />
-        </button>
+        <CopyColorButton color={color} label={copyLabel} onCopy={onCopy} />
       </div>
     </div>
   );
@@ -68,10 +67,10 @@ function PaletteActions({
     <>
       <div>
         <label htmlFor="v2-export-mode" className="crv2-inputlabel">{copy.exportMode}</label>
-        <select id="v2-export-mode" className="crv2-select" value={mode} onChange={e => setMode(e.target.value as ExportMode)}>
+        <SelectField id="v2-export-mode" value={mode} onChange={e => setMode(e.target.value as ExportMode)}>
           <option value="solid">{copy.strip}</option>
           <option value="labeled">{copy.labeled}</option>
-        </select>
+        </SelectField>
       </div>
       <div className="crv2-control-row">
         <Button icon="download" variant="primary" disabled={disabled} onClick={onSave}>{copy.export}</Button>
@@ -196,9 +195,9 @@ export default function PaletteV2Page() {
           <div>
             <label htmlFor="crv2-hex" className="crv2-inputlabel">{copy.input} (HEX)</label>
             <div className="crv2-picker-row">
-              <input type="color" aria-label={copy.input} value={baseColor} onChange={event => changeBase(event.target.value)} />
-              <input
-                id="crv2-hex" className="crv2-textfield" value={baseDraft}
+              <ColorInput label={copy.input} value={baseColor} onChange={event => changeBase(event.target.value)} />
+              <TextField
+                id="crv2-hex" value={baseDraft}
                 onChange={event => setBaseDraft(event.target.value)}
                 onBlur={() => changeBase(baseDraft)}
                 onKeyDown={event => { if (event.key === 'Enter') event.currentTarget.blur(); }}
@@ -209,15 +208,8 @@ export default function PaletteV2Page() {
           </div>
           <div>
             <label htmlFor="crv2-image" className="crv2-inputlabel">{copy.imageInput}</label>
-            <label className="crv2-picker-file">
-              <Icon name="image" />
-              <span>{extracting ? copy.imageInput + '...' : copy.chooseFile}</span>
-              <input
-                id="crv2-image" className="crv2-inputfile" type="file"
-                accept="image/*" onChange={event => void handleUpload(event)}
-                disabled={extracting}
-              />
-            </label>
+            <FileInput id="crv2-image" label={extracting ? copy.imageInput + '...' : copy.chooseFile}
+              onChange={event => void handleUpload(event)} disabled={extracting} />
             <p className="crv2-muted">{copy.imageHint}</p>
           </div>
           {extractedColors.length > 0 && (
@@ -225,10 +217,8 @@ export default function PaletteV2Page() {
               <h3>{copy.extracted}</h3>
               <div className="crv2-extracted" role="group" aria-label={copy.extracted}>
                 {extractedColors.map(color => (
-                  <button
-                    type="button" key={color} style={{ backgroundColor: color }}
-                    onClick={() => changeBase(color)} aria-label={copy.input + ' ' + color} title={color}
-                  />
+                  <ExtractedSwatchButton key={color} color={color}
+                    label={copy.input} onSelect={() => changeBase(color)} />
                 ))}
               </div>
             </div>
@@ -239,12 +229,12 @@ export default function PaletteV2Page() {
           <p className="crv2-muted">{copy.hueHint}</p>
           <div>
             <label htmlFor="crv2-scheme" className="crv2-inputlabel">{copy.scheme}</label>
-            <select
-              id="crv2-scheme" className="crv2-select" value={selectedScheme}
+            <SelectField
+              id="crv2-scheme" value={selectedScheme}
               onChange={event => setSelectedScheme(event.target.value)}
             >
               {COLOR_SCHEMES.map(scheme => <option key={scheme.id} value={scheme.id}>{scheme.name.replace(/\n/g, ' / ')}</option>)}
-            </select>
+            </SelectField>
           </div>
           <div role="radiogroup" aria-label={copy.hue} className="crv2-hue-grid">
             {recommendedColors.map((color, index) => (
@@ -292,10 +282,8 @@ export default function PaletteV2Page() {
                 {palette.map((color, index) => (
                   <div className="crv2-palette-row" key={color}>
                     <span className="crv2-palette-chip" style={{ backgroundColor: color }} aria-hidden="true" />
-                    <button type="button" className="crv2-copy-code crv2-code crv2-palette-row__code"
-                      title={copy.copy + ' ' + color} onClick={() => void copyHex(color)}>
-                      {color}<Icon name="copy" size="xs" />
-                    </button>
+                    <CopyColorButton color={color} label={copy.copy}
+                      className="crv2-palette-row__code" onCopy={color => void copyHex(color)} />
                     <div className="crv2-palette-actions">
                       <IconButton icon="moveUp" size="sm" label={copy.up} disabled={index === 0}
                         onClick={() => setPalette(prev => movePaletteColor(prev, index, -1))} />
