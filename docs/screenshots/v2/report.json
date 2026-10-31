@@ -62,13 +62,13 @@
     "scrollWidth": 320,
     "paletteHeading": true,
     "swatches": 18,
-    "rootHeight": 4595,
-    "surfaceHeight": 4595,
-    "documentHeight": 4595,
+    "rootHeight": 3603,
+    "surfaceHeight": 3603,
+    "documentHeight": 3603,
     "footerVisible": true,
     "squareSwatches": 24,
     "paletteCards": 5,
-    "paletteColumns": 1,
+    "paletteColumns": 2,
     "errors": []
   }
 ]
