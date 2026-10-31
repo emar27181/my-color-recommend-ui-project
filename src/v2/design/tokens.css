@@ -77,6 +77,7 @@ body:has(.cr-v2) { background: var(--crv2-charcoal-950); }
   --crv2-swatch-grid-max: 312px;
   --crv2-swatch-columns: 4;
   --crv2-swatch-columns-tiny: 3;
+  --crv2-palette-mobile-columns: 3;
   --crv2-palette-card-min: 84px;
   --crv2-palette-card-max: 96px;
   --crv2-z-menu: 30;
