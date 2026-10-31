@@ -72,6 +72,7 @@ body:has(.cr-v2) { background: var(--crv2-charcoal-950); }
   /* Shared square swatch geometry. Both hue and tone grids use the same minimum. */
   --crv2-swatch-tile-min: 96px;
   --crv2-palette-card-min: 124px;
+  --crv2-palette-card-min-tiny: 116px;
   --crv2-tablet-column-min: 220px;
   --crv2-focus-width: 2px;
   --crv2-focus-offset: 2px;
