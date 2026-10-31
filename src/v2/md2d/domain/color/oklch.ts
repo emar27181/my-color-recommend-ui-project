@@ -1,5 +1,5 @@
 /** OKLCH（知覚的に均一な色空間。Ottosson 2020）と sRGB の変換。トーンの計算に使う。表示できない色は鮮やかさを下げて収める */
-import { hexToRgb, rgbToHex } from "./index";
+import { hexToRgb, rgbToHex } from "./index.ts";
 
 export interface Oklch { l: number; c: number; h: number }
 
