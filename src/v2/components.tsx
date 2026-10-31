@@ -43,6 +43,15 @@ export function IconButton({ icon, label, size = 'md', type = 'button', ...rest 
   );
 }
 
+/** A single raw user-color surface; size and selected state are determined by tokens. */
+export function SwatchSurface({ color, checked = false }: { color: string; checked?: boolean }) {
+  return (
+    <span className="crv2-swatch-surface" style={{ backgroundColor: color }} data-selected={checked ? 'true' : undefined} aria-hidden="true">
+      {checked && <span className="crv2-swatch__check"><Icon name="done" /></span>}
+    </span>
+  );
+}
+
 interface SwatchButtonProps {
   hex: string;
   label: string;
@@ -57,9 +66,7 @@ export function SwatchButton({ hex, label, checked, onSelect }: SwatchButtonProp
       className="crv2-swatch" data-selected={checked ? 'true' : undefined}
       onClick={onSelect}
     >
-      <span className="crv2-swatch__chip" style={{ backgroundColor: hex }}>
-        {checked && <span className="crv2-swatch__check"><Icon name="done" /></span>}
-      </span>
+      <SwatchSurface color={hex} checked={checked} />
     </button>
   );
 }
@@ -116,6 +123,10 @@ export function ExtractedSwatchButton({ color, label, onSelect }: {
   label: string;
   onSelect: () => void;
 }) {
-  return <button type="button" style={{ backgroundColor: color }}
-    onClick={onSelect} aria-label={label + ' ' + color} title={color} />;
+  return (
+    <button type="button" className="crv2-extracted-btn"
+      onClick={onSelect} aria-label={label + ' ' + color} title={color}>
+      <SwatchSurface color={color} />
+    </button>
+  );
 }
