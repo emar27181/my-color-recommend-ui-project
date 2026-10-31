@@ -161,5 +161,5 @@ test('MD2D OKLCH and registry are V2 recommendation single source of truth', () 
   assert.equal(tones.length, TONES.length);
   assert.deepEqual(tones.map(t=>t.id), TONES.map(t=>t.id));
   assert.ok(tones.every(t=>/^#[0-9A-F]{6}$/.test(t.hex)));
-  assert.equal(toneCandidates('bad').length, 0);
+  assert.equal(toneCandidates('invalid').length, 0);
 });
