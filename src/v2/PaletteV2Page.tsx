@@ -188,7 +188,7 @@ export default function PaletteV2Page() {
         <aside className="crv2-panel" aria-label={copy.base}>
           <div className="crv2-section-title"><h2>{copy.base}</h2><span className="crv2-step">01</span></div>
           <div>
-            <label htmlFor="crv2-hex" className="crv2-inputlabel">{copy.input} (HEX)</label>
+            <div className="crv2-inputlabel">{copy.input} (HEX)</div>
             <ColorPicker value={baseColor} onChange={changeBase}
               onCopy={color => void copyHex(color)} copy={copy} />
           </div>
