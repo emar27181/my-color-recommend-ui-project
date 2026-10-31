@@ -2,10 +2,10 @@
  * No legacy chroma.js/Zustand recommendation code; research routes stay isolated.
  * Every hue and tone value comes from MD2D's design/color-system registry.
  */
-import { HARMONY_TECHNIQUES } from './md2d/design/color-system';
-import { hexToOklch } from './md2d/domain/color/oklch';
-import { toneGrid, withHue } from './md2d/domain/color/tone';
-import { normalizeHex } from './paletteExport';
+import { HARMONY_TECHNIQUES } from './md2d/design/color-system.ts';
+import { hexToOklch } from './md2d/domain/color/oklch.ts';
+import { toneGrid, withHue } from './md2d/domain/color/tone.ts';
+import { normalizeHex } from './paletteExport.ts';
 
 export const V2_HARMONIES = HARMONY_TECHNIQUES;
 export const V2_DEFAULT_HARMONY = HARMONY_TECHNIQUES.find(t => t.id === 'complementary')?.id ?? HARMONY_TECHNIQUES[0]!.id;
