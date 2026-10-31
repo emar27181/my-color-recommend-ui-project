@@ -109,6 +109,34 @@ try {
       await page.screenshot({ path: dir + '/mobile-actions.png', fullPage: true, animations: 'disabled' });
     }
     await menu.locator('summary').click();
+    // MD2D custom picker: no browser native color dialog. It opens a consistent
+    // hue/tone/neutral selector and shares the control radius from tokens.
+    if (await page.locator('input[type="color"]').count() !== 0) {
+      throw new Error(view.name + ': native color input must not be rendered');
+    }
+    const pickerButton = page.getByRole('button', { name: '色相・トーン・HEXを調整' });
+    const field = page.locator('.crv2-picker-row .crv2-textfield').first();
+    const oldHex = await field.inputValue();
+    await pickerButton.click();
+    const picker = page.locator('dialog.crv2-color-dialog');
+    if (!await picker.isVisible()) throw new Error(view.name + ': MD2D custom ColorPicker did not open');
+    if (await picker.locator('[role="radio"]').count() !== 24)
+      throw new Error(view.name + ': MD2D hue/tone/neutral preset registry mismatch');
+    const pickerRadius = await picker.evaluate(el => ({
+      dialog: getComputedStyle(el).borderRadius,
+      input: getComputedStyle(document.querySelector('.crv2-color-input')).borderRadius,
+      tile: getComputedStyle(document.querySelector('.crv2-swatch-surface')).borderRadius,
+    }));
+    if (pickerRadius.input !== pickerRadius.tile)
+      throw new Error(view.name + ': native base color and swatches have divergent corner radii');
+    await picker.locator('.crv2-picker-section').first().locator('[role="radio"]').nth(4).click();
+    if (await field.inputValue() === oldHex)
+      throw new Error(view.name + ': MD2D hue selection did not update base hex');
+    if (view.name === 'mobile' || view.name === 'desktop') {
+      await page.screenshot({ path: dir + '/' + view.name + '-picker.png', animations: 'disabled' });
+    }
+    await picker.getByRole('button', { name: '閉じる' }).click();
+    if (await picker.isVisible()) throw new Error(view.name + ': custom picker did not close');
     await page.close();
   }
   // Capture a second mobile screenshot with the light theme enabled.
