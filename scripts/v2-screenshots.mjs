@@ -38,14 +38,13 @@ try {
       rootHeight: Math.round(document.querySelector('#root')?.getBoundingClientRect().height || 0),
       surfaceHeight: Math.round(document.querySelector('.cr-v2')?.getBoundingClientRect().height || 0),
       documentHeight: document.documentElement.scrollHeight,
-      footerVisible,
     }));
-    const result = { ...view, ...state, errors: pageErrors };
+    const result = { ...view, ...state, footerVisible, errors: pageErrors };
     report.push(result);
     if (state.scrollWidth > state.screenWidth + 1) {
       throw new Error(view.name + ': horizontal overflow ' + state.scrollWidth + ' > ' + state.screenWidth);
     }
-    if (!state.footerVisible) {
+    if (!footerVisible) {
       throw new Error(view.name + ': footer clipped or unreachable');
     }
     if (state.surfaceHeight < state.documentHeight - 3) {
