@@ -86,6 +86,12 @@ try {
     await menu.locator('summary').click();
     const actionButtons = menu.locator('.crv2-palette-actions .crv2-iconbtn');
     if (await actionButtons.count() !== 3) throw new Error('palette actions are missing');
+    const menuContained = await menu.evaluate(el => {
+      const card = el.closest('.crv2-palette-card')?.getBoundingClientRect();
+      const panel = el.querySelector('.crv2-icon-menu__panel')?.getBoundingClientRect();
+      return Boolean(card && panel && panel.left >= card.left - 1 && panel.right <= card.right + 1 && panel.bottom <= card.bottom + 1);
+    });
+    if (!menuContained) throw new Error(view.name + ': action menu overlaps other swatches');
     const radius = await page.evaluate(() => ({
       icon: getComputedStyle(document.querySelector('.crv2-iconbtn')).borderRadius,
       trigger: getComputedStyle(document.querySelector('.crv2-icon-menu__trigger')).borderRadius,
