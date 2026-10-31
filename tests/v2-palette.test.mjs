@@ -34,11 +34,11 @@ test('eyedropper PNG is solid unmodified blocks with no margins or labels', () =
   globalThis.document = { createElement: () => ({ width: 0, height: 0, getContext: () => context }) };
   try {
     const canvas = createPaletteCanvas(['#AA1122','#33BB44'], 'solid');
-    assert.equal(canvas.width, PALETTE_SPEC.exportCellWidth * 2);
-    assert.equal(canvas.height, PALETTE_SPEC.exportSwatchHeight);
+    assert.equal(canvas.width, PALETTE_SPEC.exportTileSize * 2);
+    assert.equal(canvas.height, PALETTE_SPEC.exportTileSize);
     assert.deepEqual(fills, [
-      { fill: '#AA1122', x: 0, y: 0, w: PALETTE_SPEC.exportCellWidth, h: PALETTE_SPEC.exportSwatchHeight },
-      { fill: '#33BB44', x: PALETTE_SPEC.exportCellWidth, y: 0, w: PALETTE_SPEC.exportCellWidth, h: PALETTE_SPEC.exportSwatchHeight },
+      { fill: '#AA1122', x: 0, y: 0, w: PALETTE_SPEC.exportTileSize, h: PALETTE_SPEC.exportTileSize },
+      { fill: '#33BB44', x: PALETTE_SPEC.exportTileSize, y: 0, w: PALETTE_SPEC.exportTileSize, h: PALETTE_SPEC.exportTileSize },
     ]);
   } finally {
     globalThis.document = priorDocument;
@@ -71,4 +71,22 @@ test('MD2D controls and breakpoints have one source of truth', () => {
   const media = readFileSync(new URL('../src/v2/design/breakpoints.css', import.meta.url), 'utf8');
   assert.ok(media.includes('(max-width: ' + BREAKPOINTS.phoneMax + 'px)'));
   assert.ok(media.includes('(max-width: ' + BREAKPOINTS.tabletMax + 'px)'));
+});
+
+test('recommendation and saved palette share a square swatch atom', () => {
+  const atoms = readFileSync(new URL('../src/v2/components.tsx', import.meta.url), 'utf8');
+  const molecules = readFileSync(new URL('../src/v2/paletteComponents.tsx', import.meta.url), 'utf8');
+  const page = readFileSync(new URL('../src/v2/PaletteV2Page.tsx', import.meta.url), 'utf8');
+  const css = readFileSync(new URL('../src/v2/design/tokens.css', import.meta.url), 'utf8');
+  assert.match(atoms, /export function SwatchSurface/);
+  assert.match(atoms, /<SwatchSurface color={hex} checked={checked}/);
+  assert.match(molecules, /<SwatchSurface color={color}/);
+  assert.match(molecules, /<SwatchButton hex={color}/);
+  assert.match(page, /<RecommendationColorTile /);
+  assert.match(page, /<PaletteColorCard /);
+  assert.doesNotMatch(page, /crv2-palette-strip/, 'no duplicate non-square strip');
+  assert.match(css, /\.crv2-swatch-surface\s*\{[^}]*aspect-ratio:\s*1\s*\/\s*1/s);
+  assert.match(css, /\.crv2-palette-list\s*\{[^}]*grid-template-columns:/s);
+  assert.ok(!css.includes('--crv2-palette-height:'), 'remove stale fixed palette height');
+  assert.equal(PALETTE_SPEC.exportTileSize, 180);
 });
