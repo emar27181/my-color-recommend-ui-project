@@ -44,3 +44,16 @@ export const TONE_GRID_PRESETS: readonly string[] = ["vivid", "soft", "dull", "d
 
 /** 文字と背景のコントラストの目安（WCAG の AAA 7:1 / AA 4.5:1）。◎ = good / ○ = ok / ▲ = それ未満 */
 
+
+/** MD2D image palette sampling registry (same values as develop). */
+export const IMAGE_PALETTE = {
+  /** 代表色の数、間引いて読む最大の画素数、k-means の反復、最小の面積割合（これ未満の色は代表にしない） */
+  colors: 5,
+  maxSamples: 4000,
+  iterations: 8,
+  minShare: 0.02,
+  /** 透明に近い画素は無視（アルファの下限 0–255） */
+  minAlpha: 128,
+} as const;
+
+/** 画像からの配色の見せ方 */
