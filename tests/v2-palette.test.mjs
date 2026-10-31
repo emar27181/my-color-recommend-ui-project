@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { normalizeHex, sanitizedPalette, addPaletteColor, movePaletteColor, createPaletteCanvas, PALETTE_SPEC } from '../src/v2/paletteExport.ts';
+import { BREAKPOINTS } from '../src/v2/design/breakpoints.ts';
 
 test('HEX normalization supports CSS hex and rejects invalid codes', () => {
   assert.equal(normalizeHex('#abC123'), '#ABC123');
@@ -60,4 +61,14 @@ test('MD2D-inspired V2 icon registry is centralized', () => {
   }
   const tokens = readFileSync(new URL('../src/v2/design/tokens.css', import.meta.url), 'utf8');
   for (let i=1;i<=7;i++) assert.ok(tokens.includes('--crv2-space-' + i), 'missing spacing token ' + i);
+});
+
+test('MD2D controls and breakpoints have one source of truth', () => {
+  const page = readFileSync(new URL('../src/v2/PaletteV2Page.tsx', import.meta.url), 'utf8');
+  assert.doesNotMatch(page, /<(button|input|select)\b/, 'raw inputs belong in atoms');
+  const css = readFileSync(new URL('../src/v2/design/tokens.css', import.meta.url), 'utf8');
+  assert.doesNotMatch(css, /@media/, 'media rules belong in breakpoints.css');
+  const media = readFileSync(new URL('../src/v2/design/breakpoints.css', import.meta.url), 'utf8');
+  assert.ok(media.includes('(max-width: ' + BREAKPOINTS.phoneMax + 'px)'));
+  assert.ok(media.includes('(max-width: ' + BREAKPOINTS.tabletMax + 'px)'));
 });
