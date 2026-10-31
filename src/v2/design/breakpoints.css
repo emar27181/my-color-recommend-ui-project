@@ -14,6 +14,7 @@
   .crv2-workspace { grid-template-columns: minmax(0, 1fr); padding: var(--crv2-space-3); }
   .crv2-palette-panel { grid-column: auto; }
   .crv2-panel { padding: var(--crv2-space-3); }
+  .crv2-palette-list { grid-template-columns: repeat(var(--crv2-palette-mobile-columns), minmax(0, 1fr)); }
   .crv2-iconbtn { min-width: var(--crv2-control-2xl); min-height: var(--crv2-control-2xl); }
   .crv2-iconbtn--sm { min-width: var(--crv2-control-lg); min-height: var(--crv2-control-lg); }
   .crv2-btn--sm { min-height: var(--crv2-control-2xl); }
