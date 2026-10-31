@@ -152,7 +152,7 @@ body:has(.cr-v2) { background: var(--crv2-charcoal-950); }
   display: flex; align-items: center; gap: var(--crv2-space-2);
 }
 .crv2-header-brand { min-width: 0; font-weight: 700; font-size: var(--crv2-fs-input); }
-.crv2-header-brand__short { display: none; }
+.crv2-header-brand__short, .crv2-header-action__short { display: none; }
 .crv2-header-brand span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .crv2-header-actions { flex-shrink: 0; }
 .crv2-subtitle { color: var(--crv2-color-muted); font-size: var(--crv2-fs-caption); }
