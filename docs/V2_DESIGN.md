@@ -28,9 +28,16 @@
 - `src/v2/components.tsx` の `SwatchSurface` が色面の唯一の Atom。色相推薦・トーン推薦・マイパレット・選択色・画像抽出で共用する。
 - `src/v2/paletteComponents.tsx` の `RecommendationColorTile` と `PaletteColorCard` が Molecule。ページ側で色面やカラーコードを重複実装しない。
 - 色面は `aspect-ratio: 1 / 1` の正方形。選択時も寸法を変えず、アクセント色の内側輪郭とチェックアイコンで示す。
-- 色面の大きさ・余白・操作部品・角丸・列数の最小値は `src/v2/design/tokens.css` のトークンを唯一の正本とし、幅に応じた列数は CSS Grid の `auto-fill` で決める。スマホのパレットカード最小幅だけ `breakpoints.css` でトークンを上書きする。
-- V2 の保存済みパレットは正方形カードのグリッド。以前の横長プレビュー帯と編集リストの重複表示はしない。HEXのコピー、左右移動、削除は各カードにまとめる。
-- 320px / 390px / 820px / 1440px を Chromium でキャプチャし、横はみ出し・画面下部欠け・色面の縦横比を検査。320px 以下はカードを2列に維持し、各カードの操作ボタンを2段にして44pxのタップ領域を守る（閾値は `breakpoints.ts` / `breakpoints.css`）。スクリーンショットは `tests/fixtures/v2-palette.json` の5色をV2の保存領域だけに一時セットして撮影し、本番初期値には影響しない。
+- 色面の大きさ・余白・操作部品・角丸は `src/v2/design/tokens.css` のトークンを唯一の正本とする。推薦色/トーンは4列（360px以下は3列）をトークン `--crv2-swatch-columns` で制御し、PCでも無制限に大きくしない。パレットカードの最小幅・最大幅はトークンとCSS Gridの `auto-fill` で決める。
+- V2 の保存済みパレットはコンパクトな正方形カードのグリッド。以前の横長プレビュー帯と編集リストの重複表示はしない。HEXコピーを常時表示し、左移動・右移動・削除は `IconMenu` Atom の「…」から展開する（タッチ目標44px以上）。
+- 320px / 390px / 820px / 1440px を Chromium でキャプチャし、横はみ出し・画面下部欠け・色面の縦横比を検査。320px / 390px はパレットを3列以上に保ち、左移動・右移動・削除を表示するメニュー内で44pxのタップ領域を確保する（閾値は `breakpoints.ts` / `breakpoints.css`）。スクリーンショットは `tests/fixtures/v2-palette.json` の5色をV2の保存領域だけに一時セットして撮影し、本番初期値には影響しない。
+
+## MD2D に合わせたアイコン・角丸の役割
+
+- `src/v2/design/icons.ts` が Lucide アイコン名のSSOT。コピー・削除・左右移動・メニューのアイコンを部品が直接 import しない。
+- アイコンの大きさは `--crv2-icon-*` の7段階、アイコンボタンの外形は `--crv2-radius-icon-button: var(--crv2-radius-control)`、色見本は `--crv2-radius-swatch`、パレットの外側カードは `--crv2-radius-palette-card: var(--crv2-radius-card)`。部品CSSに角丸の固定数値を書かない。
+- 補助操作は折りたたむ。色の比較とコピーが主で、並べ替え・削除は「…」の下へ置く。
+- 旧UIのグローバルCSSやHTMLは変更しない。
 
 ## エクスポート仕様
 
