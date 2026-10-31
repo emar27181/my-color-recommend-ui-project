@@ -6,6 +6,7 @@ export type ExportMode = 'solid' | 'labeled';
 
 export const PALETTE_SPEC = {
   maxColors: 12,
+  defaultBaseColor: '#B51A00',
   maxImageBytes: 10 * 1024 * 1024,
   /** MD2D-inspired shape rule: every export swatch is square and pixel-exact. */
   exportTileSize: 180,
