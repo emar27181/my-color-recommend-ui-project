@@ -66,6 +66,9 @@ try {
     if (state.surfaceHeight < state.documentHeight - 3) {
       throw new Error(view.name + ': V2 background shorter than document (' + state.surfaceHeight + ' < ' + state.documentHeight + ')');
     }
+    if (view.name === 'mobile-small' && paletteColumns !== 2) {
+      throw new Error('320px viewport must show two square palette cards per row');
+    }
     if (paletteCards !== palette.length) {
       throw new Error(view.name + ': saved palette fixture missing');
     }
