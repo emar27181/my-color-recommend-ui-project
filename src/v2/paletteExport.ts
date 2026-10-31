@@ -7,8 +7,8 @@ export type ExportMode = 'solid' | 'labeled';
 export const PALETTE_SPEC = {
   maxColors: 12,
   maxImageBytes: 10 * 1024 * 1024,
-  exportCellWidth: 180,
-  exportSwatchHeight: 360,
+  /** MD2D-inspired shape rule: every export swatch is square and pixel-exact. */
+  exportTileSize: 180,
   exportLabelHeight: 64,
   exportFontSize: 18,
   filePrefix: 'color-recommendation',
@@ -52,8 +52,8 @@ export function movePaletteColor(colors: string[], index: number, offset: number
 export function createPaletteCanvas(colors: string[], mode: ExportMode): HTMLCanvasElement {
   const palette = sanitizedPalette(colors);
   if (!palette.length) throw new Error('No colors to export');
-  const width = PALETTE_SPEC.exportCellWidth;
-  const swatchHeight = PALETTE_SPEC.exportSwatchHeight;
+  const width = PALETTE_SPEC.exportTileSize;
+  const swatchHeight = PALETTE_SPEC.exportTileSize;
   const labelHeight = mode === 'labeled' ? PALETTE_SPEC.exportLabelHeight : 0;
   const canvas = document.createElement('canvas');
   canvas.width = palette.length * width;
@@ -74,7 +74,7 @@ export function createPaletteCanvas(colors: string[], mode: ExportMode): HTMLCan
     ctx.textBaseline = 'middle';
     palette.forEach((hex, index) => ctx.fillText(hex, (index + 0.5) * width, swatchHeight + labelHeight / 2));
   }
-  // 'solid' ではスウォッチに余白・影・文字を重ねない。中央ピクセルが HEX と完全一致する。
+  // 'solid': adjacent square blocks with no margins, text, rounding or alpha. HEX -> pixels stays exact.
   return canvas;
 }
 
