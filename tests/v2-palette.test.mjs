@@ -3,6 +3,10 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { normalizeHex, sanitizedPalette, addPaletteColor, movePaletteColor, createPaletteCanvas, PALETTE_SPEC } from '../src/v2/paletteExport.ts';
 import { BREAKPOINTS } from '../src/v2/design/breakpoints.ts';
+import { COLOR_PICKER, hslPickerHex, pickerHueOf } from '../src/v2/md2d/design/color-picker.ts';
+import { HARMONY_TECHNIQUES, TONES } from '../src/v2/md2d/design/color-system.ts';
+import { hexToOklch, oklchToHex } from '../src/v2/md2d/domain/color/oklch.ts';
+import { harmonyCandidates, toneCandidates, V2_HARMONIES } from '../src/v2/colorRecommendations.ts';
 
 test('HEX normalization supports CSS hex and rejects invalid codes', () => {
   assert.equal(normalizeHex('#abC123'), '#ABC123');
@@ -116,4 +120,46 @@ test('compact UI uses shared design tokens for grid, icon radii and interaction 
   assert.match(molecule, /<IconMenu /);
   assert.match(icons, /more:\s*Ellipsis/);
   assert.doesNotMatch(molecule, /icon="moveUp"|icon="moveDown"/, 'semantic left/right icons are required');
+});
+
+test('V2 uses MD2D native-free ColorPicker, not the legacy UI/store', () => {
+  const page = readFileSync(new URL('../src/v2/PaletteV2Page.tsx', import.meta.url), 'utf8');
+  const molecule = readFileSync(new URL('../src/v2/ColorPicker.tsx', import.meta.url), 'utf8');
+  const atoms = readFileSync(new URL('../src/v2/components.tsx', import.meta.url), 'utf8');
+  const css = readFileSync(new URL('../src/v2/design/tokens.css', import.meta.url), 'utf8');
+  assert.doesNotMatch(page, /useColorStore|COLOR_SCHEMES|recommendedTones.*colorStore/);
+  assert.match(page, /<ColorPicker /);
+  assert.doesNotMatch(atoms + molecule, /type="color"|type='color'/);
+  assert.match(molecule, /COLOR_PICKER, hslPickerHex, pickerHueOf/);
+  assert.match(css, /\.crv2-color-input, \.crv2-picker-preview\s*\{[^}]*border-radius:\s*var\(--crv2-radius-control\)/s);
+  assert.match(css, /\.crv2-color-dialog\s*\{[^}]*border-radius:\s*var\(--crv2-radius-card\)/s);
+});
+test('MD2D picker presets and conversion are used directly', () => {
+  assert.equal(COLOR_PICKER.hues.length, 12);
+  assert.equal(COLOR_PICKER.tones.length, 6);
+  assert.equal(COLOR_PICKER.neutral.length, 6);
+  assert.equal(hslPickerHex(0, 1, 0.5), 'FF0000');
+  assert.equal(pickerHueOf('#FF0000'), 0);
+  assert.equal(pickerHueOf('#00FF00'), 120);
+});
+test('MD2D OKLCH and registry are V2 recommendation single source of truth', () => {
+  assert.equal(V2_HARMONIES, HARMONY_TECHNIQUES);
+  assert.equal(TONES.length, 9);
+  const base = '#B51A00';
+  const chroma = hexToOklch(base);
+  assert.ok(chroma.c > 0);
+  const roundtrip = oklchToHex(chroma);
+  const rgb = (hex) => [1,3,5].map(i => parseInt(hex.replace('#','').slice(i-1,i+1), 16));
+  const a = rgb(base), b = rgb(roundtrip);
+  assert.ok(a.every((v,i)=>Math.abs(v-b[i]) <= 1), 'OKLCH roundtrip differs from source');
+  const complement = HARMONY_TECHNIQUES.find(t=>t.id==='complementary');
+  const hues = harmonyCandidates(base, complement.id);
+  assert.equal(hues.length, complement.offsets.length);
+  assert.equal(hues[0], base);
+  assert.equal(harmonyCandidates(base, 'nonexistent').length, 0);
+  const tones = toneCandidates(base);
+  assert.equal(tones.length, TONES.length);
+  assert.deepEqual(tones.map(t=>t.id), TONES.map(t=>t.id));
+  assert.ok(tones.every(t=>/^#[0-9A-F]{6}$/.test(t.hex)));
+  assert.equal(toneCandidates('bad').length, 0);
 });
