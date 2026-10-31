@@ -1,0 +1,35 @@
+[
+  {
+    "name": "desktop",
+    "width": 1440,
+    "height": 900,
+    "title": "Color Recommendation App",
+    "screenWidth": 1440,
+    "scrollWidth": 1440,
+    "paletteHeading": true,
+    "swatches": 18,
+    "errors": []
+  },
+  {
+    "name": "tablet",
+    "width": 820,
+    "height": 1180,
+    "title": "Color Recommendation App",
+    "screenWidth": 820,
+    "scrollWidth": 820,
+    "paletteHeading": true,
+    "swatches": 18,
+    "errors": []
+  },
+  {
+    "name": "mobile",
+    "width": 390,
+    "height": 844,
+    "title": "Color Recommendation App",
+    "screenWidth": 390,
+    "scrollWidth": 390,
+    "paletteHeading": true,
+    "swatches": 18,
+    "errors": []
+  }
+]
