@@ -5,6 +5,8 @@
 export const V2_COPY = {
   ja: {
     brand: 'Color Recommendation',
+    mobileBrand: 'Color V2',
+    legacyShort: '旧UI',
     version: 'V2 / パレット推薦',
     legacy: '従来版を開く',
     appearance: '外観を切り替える',
@@ -48,7 +50,7 @@ export const V2_COPY = {
     source: '色推薦ロジックは従来版と共通',
   },
   en: {
-    brand: 'Color Recommendation', version: 'V2 / Palette recommender', legacy: 'Open classic UI',
+    brand: 'Color Recommendation', mobileBrand: 'Color V2', legacyShort: 'Classic', version: 'V2 / Palette recommender', legacy: 'Open classic UI',
     appearance: 'Toggle appearance', intro: 'Pick a color. Build a usable palette.', base: 'Base color',
     input: 'Choose color', imageInput: 'Extract from image', chooseFile: 'Choose image',
     imageHint: 'Pick a dominant color from your image', imageError: 'Could not read image',
