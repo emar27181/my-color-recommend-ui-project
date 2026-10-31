@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { extractColorsFromImage } from '@/lib/colorExtractor';
+import { extractImageColors } from './imageExtraction';
 import { Button, Icon, IconButton, SwatchSurface, SelectField, FileInput, ExtractedSwatchButton } from './components';
 import { ColorPicker } from './ColorPicker';
 import { RecommendationColorTile, PaletteColorCard } from './paletteComponents';
@@ -132,10 +132,11 @@ export default function PaletteV2Page() {
     }
     setExtracting(true);
     try {
-      const result = await extractColorsFromImage(file, 8);
-      const colors = sanitizedPalette(result.colors.map(color => color.hex));
+      const swatches = await extractImageColors(file);
+      if (swatches.length === 0) throw new Error('No representative colors');
+      const colors = sanitizedPalette(swatches.map(color => '#' + color.hex));
       setExtracted(colors);
-      changeBase(result.dominantColor.hex);
+      changeBase('#' + swatches[0]!.hex);
       setNotice('');
     } catch {
       setNotice(copy.imageError);
