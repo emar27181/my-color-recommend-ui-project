@@ -21,7 +21,7 @@
 }
 /* A narrower phone uses three comparison columns; controls remain 44px. */
 @media (max-width: 360px) {
-  .crv2-color-grid, .crv2-hue-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .cr-v2 { --crv2-swatch-columns: var(--crv2-swatch-columns-tiny); }
 }
 @media (prefers-reduced-motion: reduce) {
   .cr-v2 *, .cr-v2 *::before, .cr-v2 *::after { transition: none !important; }
