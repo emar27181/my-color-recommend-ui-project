@@ -11,6 +11,11 @@ on:
       - 'tests/fixtures/v2-palette.json'
   workflow_dispatch:
 
+# Only one screenshot publisher per head branch; avoid stale binary snapshots.
+concurrency:
+  group: v2-screenshots-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: write
 
@@ -65,5 +70,16 @@ jobs:
             echo "Screenshots unchanged"
           else
             git commit -m "docs(v2): capture real responsive screenshots [skip ci]"
-            git push
+            BRANCH="${{ github.head_ref || github.ref_name }}"
+            # Another PR update may land while browsers are installing.
+            # Rebase our generated snapshots on the latest remote branch; never force-push.
+            for attempt in 1 2 3; do
+              git fetch origin "$BRANCH"
+              git rebase -X theirs "origin/$BRANCH"
+              if git push origin "HEAD:$BRANCH"; then
+                exit 0
+              fi
+              echo "Retrying screenshot publish ($attempt)"
+            done
+            exit 1
           fi
