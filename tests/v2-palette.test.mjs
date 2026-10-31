@@ -70,6 +70,7 @@ test('MD2D controls and breakpoints have one source of truth', () => {
   assert.doesNotMatch(css, /@media/, 'media rules belong in breakpoints.css');
   const media = readFileSync(new URL('../src/v2/design/breakpoints.css', import.meta.url), 'utf8');
   assert.ok(media.includes('(max-width: ' + BREAKPOINTS.phoneMax + 'px)'));
+  assert.ok(media.includes('(max-width: ' + BREAKPOINTS.tinyPhoneMax + 'px)'));
   assert.ok(media.includes('(max-width: ' + BREAKPOINTS.tabletMax + 'px)'));
 });
 
