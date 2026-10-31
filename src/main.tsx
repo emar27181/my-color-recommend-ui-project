@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import './index.css'
 import './i18n'
 import App from './App.tsx'
+import PaletteV2Page from './v2/PaletteV2Page.tsx'
 import { HelpPage } from './pages/HelpPage.tsx'
 import { InfoPage } from './pages/InfoPage.tsx'
 import SwipeRecommender from './pages/SwipeRecommender.tsx'
@@ -27,6 +28,7 @@ createRoot(document.getElementById('root')!).render(
         <Router>
           <Routes>
             <Route path="/" element={<Layout><App /></Layout>} />
+            <Route path="/v2" element={<PaletteV2Page />} />
             <Route path="/help" element={<Layout><HelpPage /></Layout>} />
             <Route path="/info" element={<Layout><InfoPage /></Layout>} />
             <Route path="/swipe" element={<Layout><SwipeRecommender /></Layout>} />
