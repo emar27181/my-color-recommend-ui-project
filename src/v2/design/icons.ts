@@ -2,7 +2,7 @@
  * MD2D src/design/icons.ts を基準にした V2 専用アイコン登録簿。
  * Lucide の直接 import はこのファイルのみ。旧 UI には適用しない。
  */
-import { Palette, ArrowLeft, Copy, Check, Plus, Trash2, ArrowUp, ArrowDown, ArrowRight, Ellipsis, Upload, ImageDown, Clipboard, Download, Sun, Moon, Info, ImagePlus, ChevronDown, type LucideIcon } from 'lucide-react';
+import { Palette, ArrowLeft, Copy, Check, Plus, Trash2, ArrowUp, ArrowDown, ArrowRight, Ellipsis, X, Upload, ImageDown, Clipboard, Download, Sun, Moon, Info, ImagePlus, ChevronDown, type LucideIcon } from 'lucide-react';
 
 export const ICONS = {
   design: Palette,
@@ -16,6 +16,7 @@ export const ICONS = {
   moveLeft: ArrowLeft,
   moveRight: ArrowRight,
   more: Ellipsis,
+  close: X,
   upload: Upload,
   export: ImageDown,
   imageCopy: Clipboard,
