@@ -7,7 +7,8 @@
   .cr-v2 { --crv2-control: var(--crv2-control-2xl); --crv2-color-height: 56px; }
   .crv2-header { padding: var(--crv2-space-2) var(--crv2-space-3); }
   .crv2-header-brand { font-size: var(--crv2-fs-body); }
-  .crv2-header-brand__version { display: none; }
+  .crv2-header-brand__version, .crv2-header-brand__full, .crv2-header-action__full { display: none; }
+  .crv2-header-brand__short, .crv2-header-action__short { display: inline; }
   .crv2-intro { padding: var(--crv2-space-4) var(--crv2-space-3) 0; }
   .crv2-intro h1 { font-size: var(--crv2-fs-heading); }
   .crv2-workspace { grid-template-columns: minmax(0, 1fr); padding: var(--crv2-space-3); }
