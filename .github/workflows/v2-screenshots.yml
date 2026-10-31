@@ -1,9 +1,7 @@
 name: V2 responsive screenshots
 
 on:
-  push:
-    branches:
-      - feature/palette-v2-md2d-ui
+  pull_request:
     paths:
       - 'src/v2/**'
       - 'src/main.tsx'
@@ -23,6 +21,7 @@ jobs:
       - name: Checkout branch
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.head_ref || github.ref_name }}
           persist-credentials: true
       - name: Node
         uses: actions/setup-node@v4
