@@ -66,8 +66,8 @@ try {
     if (state.surfaceHeight < state.documentHeight - 3) {
       throw new Error(view.name + ': V2 background shorter than document (' + state.surfaceHeight + ' < ' + state.documentHeight + ')');
     }
-    if (view.name === 'mobile-small' && paletteColumns !== 2) {
-      throw new Error('320px viewport must show two square palette cards per row');
+    if (['mobile', 'mobile-small'].includes(view.name) && paletteColumns < 3) {
+      throw new Error(view.name + ': compact palette requires at least three square cards per row');
     }
     if (paletteCards !== palette.length) {
       throw new Error(view.name + ': saved palette fixture missing');
@@ -79,6 +79,30 @@ try {
       throw new Error(view.name + ': recommendation workspace missing');
     }
     if (pageErrors.length) throw new Error(view.name + ': ' + pageErrors.join('; '));
+
+    // Actions are hidden by default and revealed with a single MD2D-style icon menu.
+    const menu = page.locator('.crv2-palette-card .crv2-icon-menu').first();
+    if (await menu.getAttribute('open') !== null) throw new Error('palette menu must start collapsed');
+    await menu.locator('summary').click();
+    const actionButtons = menu.locator('.crv2-palette-actions .crv2-iconbtn');
+    if (await actionButtons.count() !== 3) throw new Error('palette actions are missing');
+    const radius = await page.evaluate(() => ({
+      icon: getComputedStyle(document.querySelector('.crv2-iconbtn')).borderRadius,
+      trigger: getComputedStyle(document.querySelector('.crv2-icon-menu__trigger')).borderRadius,
+      swatch: getComputedStyle(document.querySelector('.crv2-palette-card .crv2-swatch-surface')).borderRadius,
+      card: getComputedStyle(document.querySelector('.crv2-palette-card')).borderRadius,
+    }));
+    if (radius.icon !== radius.trigger || radius.icon !== radius.swatch)
+      throw new Error(view.name + ': icon, menu and swatch radius tokens diverged');
+    if (radius.card === radius.icon) throw new Error('card and control roles must differ');
+    if (view.width <= 760) {
+      const heights = await actionButtons.evaluateAll(nodes => nodes.map(n => n.getBoundingClientRect().height));
+      if (heights.some(h => h < 44)) throw new Error(view.name + ': menu touch targets below 44px');
+    }
+    if (view.name === 'mobile') {
+      await page.screenshot({ path: dir + '/mobile-actions.png', fullPage: true, animations: 'disabled' });
+    }
+    await menu.locator('summary').click();
     await page.close();
   }
   // Capture a second mobile screenshot with the light theme enabled.
