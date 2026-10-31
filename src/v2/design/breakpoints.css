@@ -1,0 +1,26 @@
+/* All V2 @media rules live here per MD2D's design guardrail. */
+@media (max-width: 1100px) {
+  .crv2-workspace { grid-template-columns: minmax(var(--crv2-tablet-column-min), 1fr) minmax(0, 2fr); }
+  .crv2-palette-panel { grid-column: 1 / -1; }
+}
+@media (max-width: 760px) {
+  .cr-v2 { --crv2-control: var(--crv2-control-2xl); --crv2-color-height: 56px; }
+  .crv2-header { padding: var(--crv2-space-2) var(--crv2-space-3); }
+  .crv2-header-brand { font-size: var(--crv2-fs-body); }
+  .crv2-header-brand__version { display: none; }
+  .crv2-intro { padding: var(--crv2-space-4) var(--crv2-space-3) 0; }
+  .crv2-intro h1 { font-size: var(--crv2-fs-heading); }
+  .crv2-workspace { grid-template-columns: minmax(0, 1fr); padding: var(--crv2-space-3); }
+  .crv2-palette-panel { grid-column: auto; }
+  .crv2-panel { padding: var(--crv2-space-3); }
+  .crv2-iconbtn { min-width: var(--crv2-control-2xl); min-height: var(--crv2-control-2xl); }
+  .crv2-iconbtn--sm { min-width: var(--crv2-control-lg); min-height: var(--crv2-control-lg); }
+  .crv2-btn--sm { min-height: var(--crv2-control-2xl); }
+  .crv2-color-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: var(--crv2-space-2); }
+  .crv2-hue-grid { grid-template-columns: repeat(4,minmax(0,1fr)); gap: var(--crv2-space-1); }
+  .crv2-palette-strip { height: var(--crv2-control-3xl); }
+  .crv2-palette-actions { gap: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cr-v2 *, .cr-v2 *::before, .cr-v2 *::after { transition: none !important; }
+}
