@@ -1,0 +1,41 @@
+name: Diagnose published color recommendation URLs
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/diagnose-live-site.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  public-url-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Inspect existing published research host
+        shell: bash
+        run: |
+          set -uo pipefail
+          echo 'Testing the ONLY published URL documented in this repository.'
+          echo 'No V2 Cloudflare Pages URL is configured in this repository.'
+          for path in / /v2 /classic /experiment; do
+            url="https://color-recommend.netlify.app${path}"
+            echo "::group::GET ${url}"
+            code="$(curl --location --silent --show-error --max-time 15 \
+              -w '%{http_code}' -o /tmp/live-body -D /tmp/live-headers "$url")"
+            result=$?
+            echo "curl_exit=${result}; http_status=${code}"
+            echo "Headers:"
+            sed -n '1,16p' /tmp/live-headers || true
+            echo "HTML beginning:"
+            head -c 400 /tmp/live-body || true
+            echo
+            if [ "$result" -eq 0 ] && [ "$code" = "200" ]; then
+              echo "script_assets:"
+              grep -Eo 'src="[^"]+\.js"' /tmp/live-body | head -n 5 || true
+              echo "contains_spa_root=$(grep -c 'id="root"' /tmp/live-body || true)"
+            fi
+            echo "::endgroup::"
+          done
