@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - '.github/workflows/diagnose-live-site.yml'
+      - 'scripts/diagnose-live-site.mjs'
   workflow_dispatch:
 
 permissions:
@@ -39,3 +40,27 @@ jobs:
             fi
             echo "::endgroup::"
           done
+
+  browser-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install browser test tools
+        run: |
+          npm ci --ignore-scripts
+          npm install --no-save --package-lock=false playwright
+          npx playwright install --with-deps chromium
+      - name: Diagnose actual JavaScript errors
+        run: node scripts/diagnose-live-site.mjs
+      - name: Save production screenshots and console errors
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-blank-screen-evidence
+          path: diagnostics/production/
+          if-no-files-found: warn
