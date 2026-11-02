@@ -27,7 +27,7 @@ try {
     // Preview fixture uses V2's canonical storage key; it is not an application default.
     await page.addInitScript(({ key, colors }) => localStorage.setItem(key, JSON.stringify(colors)),
       { key: PALETTE_SPEC.storageKey, colors: palette });
-    await page.goto(host + '/v2', { waitUntil: 'networkidle' });
+    await page.goto(host + '/', { waitUntil: 'networkidle' });
     // Confirm the last panel and footer are actually reachable, not merely present in the DOM.
     await page.locator('.crv2-footer').scrollIntoViewIfNeeded();
     const footerVisible = await page.locator('.crv2-footer').evaluate(element => {
@@ -143,10 +143,25 @@ try {
   const light = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
   await light.addInitScript(({ key, colors }) => localStorage.setItem(key, JSON.stringify(colors)),
     { key: PALETTE_SPEC.storageKey, colors: palette });
-  await light.goto(host + '/v2', { waitUntil: 'networkidle' });
+  await light.goto(host + '/', { waitUntil: 'networkidle' });
   await light.getByRole('button', { name: '外観を切り替える' }).click();
   await light.screenshot({ path: dir + '/mobile-light.png', fullPage: true, animations: 'disabled' });
   await light.close();
+  // The exact old application remains available under /classic on new hosts.
+  // Legacy page has its own asynchronous canvas; only verify route identity here.
+  const classic = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await classic.goto(host + '/classic', { waitUntil: 'domcontentloaded' });
+  if (await classic.locator('.cr-v2').count() !== 0) {
+    throw new Error('/classic must not render the V2 workspace');
+  }
+  await classic.close();
+  // /v2 is also kept as an explicit permalink after the default root moves.
+  const v2 = await browser.newPage();
+  await v2.goto(host + '/v2', { waitUntil: 'domcontentloaded' });
+  if (await v2.locator('.cr-v2').count() !== 1) {
+    throw new Error('/v2 must remain a V2 permalink');
+  }
+  await v2.close();
   await writeFile(dir + '/report.json', JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report, null, 2));
 } finally {
