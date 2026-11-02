@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { normalizeHex, sanitizedPalette, addPaletteColor, movePaletteColor, createPaletteCanvas, PALETTE_SPEC } from '../src/v2/paletteExport.ts';
 import { BREAKPOINTS } from '../src/v2/design/breakpoints.ts';
+import { COLOR_ROUTES, PRESERVED_RESEARCH_HOSTS, landingVersion } from '../src/routing/landing.ts';
 import { COLOR_PICKER, hslPickerHex, pickerHueOf } from '../src/v2/md2d/design/color-picker.ts';
 import { HARMONY_TECHNIQUES, TONES } from '../src/v2/md2d/design/color-system.ts';
 import { hexToOklch, oklchToHex } from '../src/v2/md2d/domain/color/oklch.ts';
@@ -50,14 +51,33 @@ test('eyedropper PNG is solid unmodified blocks with no margins or labels', () =
     globalThis.document = priorDocument;
   }
 });
-test('legacy route is retained and V2 route is independently mounted', () => {
+test('V2 is default / while the original research URL keeps V1', () => {
+  assert.equal(COLOR_ROUTES.home, '/');
+  assert.equal(COLOR_ROUTES.v2, '/v2');
+  assert.equal(COLOR_ROUTES.classic, '/classic');
+  assert.equal(COLOR_ROUTES.v1, '/v1');
+  assert.equal(COLOR_ROUTES.experiment, '/experiment');
+  assert.deepEqual([...PRESERVED_RESEARCH_HOSTS], ['color-recommend.netlify.app']);
+  assert.equal(landingVersion('color-recommend.netlify.app'), 'classic');
+  assert.equal(landingVersion('COLOR-RECOMMEND.NETLIFY.APP.'), 'classic');
+  assert.equal(landingVersion('www.color-recommend.netlify.app'), 'v2');
+  assert.equal(landingVersion('fakecolor-recommend.netlify.app'), 'v2');
+  assert.equal(landingVersion('localhost'), 'v2');
+  assert.equal(landingVersion('preview.pages.dev'), 'v2');
   const main = readFileSync(new URL('../src/main.tsx', import.meta.url), 'utf8');
-  assert.match(main, /path="\/" element={<Layout><App \/><\/Layout>}/);
-  assert.match(main, /path="\/v2" element={<PaletteV2Page \/>/);
+  assert.match(main, /path={COLOR_ROUTES.home}/);
+  assert.match(main, /landingVersion\(window.location.hostname\)/);
+  assert.match(main, /path={COLOR_ROUTES.classic} element={<Layout><App \/><\/Layout>}/);
+  assert.match(main, /path={COLOR_ROUTES.v1} element={<Layout><App \/><\/Layout>}/);
+  assert.match(main, /path={COLOR_ROUTES.v2} element={<PaletteV2Page \/>/);
+  for (const path of ['/experiment', '/experiment/task', '/experiment/survey/ui1', '/experiment/survey/ui2']) {
+    assert.ok(main.includes('path="' + path + '"'), 'historic experiment link missing: ' + path);
+  }
   const nav = readFileSync(new URL('../src/components/NavigationMenu.tsx', import.meta.url), 'utf8');
   assert.match(nav, /to="\/v2"/);
   const v2 = readFileSync(new URL('../src/v2/PaletteV2Page.tsx', import.meta.url), 'utf8');
-  assert.match(v2, /to="\/"/);
+  assert.match(v2, /to={COLOR_ROUTES.classic}/);
+  assert.doesNotMatch(v2, /to="\/"/);
 });
 test('MD2D-inspired V2 icon registry is centralized', () => {
   const files = ['components.tsx', 'PaletteV2Page.tsx'];
