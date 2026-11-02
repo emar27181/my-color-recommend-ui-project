@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { COLOR_ROUTES } from '../routing/landing';
 import { extractImageColors } from './imageExtraction';
 import { Button, Icon, IconButton, SwatchSurface, SelectField, FileInput, ExtractedSwatchButton } from './components';
 import { ColorPicker } from './ColorPicker';
@@ -169,7 +170,7 @@ export default function PaletteV2Page() {
           <span className="crv2-subtitle crv2-header-brand__version">{copy.version}</span>
         </div>
         <div className="crv2-header-actions">
-          <Link className="crv2-btn crv2-btn--secondary crv2-btn--sm" to="/">
+          <Link className="crv2-btn crv2-btn--secondary crv2-btn--sm" to={COLOR_ROUTES.classic}>
             <Icon name="back" />
             <span className="crv2-header-action__full">{copy.legacy}</span>
             <span className="crv2-header-action__short">{copy.legacyShort}</span>
