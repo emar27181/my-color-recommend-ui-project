@@ -4,6 +4,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import './index.css'
 import './i18n'
 import App from './App.tsx'
+import PaletteV2Page from './v2/PaletteV2Page.tsx'
+import { COLOR_ROUTES, landingVersion } from './routing/landing.ts'
 import { HelpPage } from './pages/HelpPage.tsx'
 import { InfoPage } from './pages/InfoPage.tsx'
 import SwipeRecommender from './pages/SwipeRecommender.tsx'
@@ -26,7 +28,15 @@ createRoot(document.getElementById('root')!).render(
       <TutorialProvider>
         <Router>
           <Routes>
-            <Route path="/" element={<Layout><App /></Layout>} />
+            {/* Research-publication URL keeps V1; all other homepages default to V2. */}
+            <Route path={COLOR_ROUTES.home} element={
+              landingVersion(window.location.hostname) === 'classic'
+                ? <Layout><App /></Layout>
+                : <PaletteV2Page />
+            } />
+            <Route path={COLOR_ROUTES.classic} element={<Layout><App /></Layout>} />
+            <Route path={COLOR_ROUTES.v1} element={<Layout><App /></Layout>} />
+            <Route path={COLOR_ROUTES.v2} element={<PaletteV2Page />} />
             <Route path="/help" element={<Layout><HelpPage /></Layout>} />
             <Route path="/info" element={<Layout><InfoPage /></Layout>} />
             <Route path="/swipe" element={<Layout><SwipeRecommender /></Layout>} />

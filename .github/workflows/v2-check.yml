@@ -1,0 +1,35 @@
+name: Color Recommendation V2 checks
+
+on:
+  pull_request:
+    paths:
+      - 'src/v2/**'
+      - 'src/main.tsx'
+      - 'src/components/NavigationMenu.tsx'
+      - 'tests/v2-palette.test.mjs'
+      - 'package.json'
+      - '.github/workflows/v2-check.yml'
+  push:
+    branches:
+      - 'feature/palette-v2-md2d-ui'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Validate V2 palette and legacy route
+        run: npm run test:v2
+      - name: TypeScript and Vite build
+        run: npm run build

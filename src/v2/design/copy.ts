@@ -1,0 +1,111 @@
+/**
+ * UI 文言の正本。既存サービスの i18n 言語設定に追従する（現段階では日英）。
+ * 新しい文言は TSX に直書きせずここへ追加する。
+ */
+export const V2_COPY = {
+  ja: {
+    brand: 'Color Recommendation',
+    mobileBrand: 'Color V2',
+    legacyShort: '旧UI',
+    version: 'V2 / パレット推薦',
+    legacy: '従来版を開く',
+    appearance: '外観を切り替える',
+    intro: '色を選んで、使えるパレットに。',
+    base: '基準色',
+    input: '色を選択',
+    openPicker: '色相・トーン・HEXを調整',
+    close: '閉じる',
+    pickerHue: '色相',
+    pickerTone: 'トーン',
+    pickerNeutral: '無彩色',
+    imageInput: '画像から抽出',
+    chooseFile: '画像を選択',
+    imageHint: '画像内の代表色から選べます',
+    imageError: '画像を読み込めませんでした',
+    fileError: '10MB以下の画像を選択してください',
+    hue: '色相推薦',
+    hueHint: '配色技法と色相を選択',
+    scheme: '配色技法',
+    tones: 'トーン推薦',
+    tonesHint: '明度・彩度を選択',
+    selected: '選択した色',
+    add: 'パレットに追加',
+    palette: 'マイパレット',
+    paletteHint: '最大12色。色面を別のアプリに貼ってスポイトで利用できます',
+    empty: '推薦色を選び「パレットに追加」を押してください',
+    moreActions: 'パレットの操作',
+    remove: '色を削除',
+    up: '左へ移動',
+    down: '右へ移動',
+    copy: 'カラーコードをコピー',
+    copied: 'カラーコードをコピーしました',
+    copyFailed: 'コピーできませんでした',
+    duplicate: '追加済みの色です',
+    limit: 'パレットの上限は12色です',
+    export: 'PNGを保存',
+    copyImage: '画像をコピー',
+    strip: 'スポイト用（色面のみ）',
+    labeled: 'コード付き',
+    exportMode: '出力形式',
+    saveFailed: '画像を保存できませんでした',
+    imageCopied: 'パレット画像をコピーしました',
+    imageCopyFailed: '画像コピー非対応です。PNGを保存して貼り付けてください',
+    reset: 'すべて削除',
+    noColor: '色を追加すると書き出せます',
+    extracted: '画像から抽出した色',
+    source: 'MD2Dの色調整・OKLCH推薦を使用（従来版の研究ロジックは保持）',
+  },
+  en: {
+    brand: 'Color Recommendation', mobileBrand: 'Color V2', legacyShort: 'Classic', version: 'V2 / Palette recommender', legacy: 'Open classic UI',
+    appearance: 'Toggle appearance', intro: 'Pick a color. Build a usable palette.', base: 'Base color',
+    input: 'Choose color',
+    openPicker: 'Edit hue, tone and HEX',
+    close: 'Close',
+    pickerHue: 'Hue',
+    pickerTone: 'Tone',
+    pickerNeutral: 'Neutral colors',
+    imageInput: 'Extract from image', chooseFile: 'Choose image',
+    imageHint: 'Pick a dominant color from your image', imageError: 'Could not read image',
+    fileError: 'Select an image under 10 MB', hue: 'Hue recommendation',
+    hueHint: 'Choose a color harmony and hue', scheme: 'Color harmony',
+    tones: 'Tone recommendation', tonesHint: 'Choose saturation and lightness',
+    selected: 'Selected color', add: 'Add to palette', palette: 'My palette',
+    paletteHint: 'Up to 12 colors. Paste swatches into an art app to sample colors.',
+    empty: 'Select a recommendation and add it to your palette',
+    moreActions: 'Palette actions',
+    remove: 'Remove color', up: 'Move left', down: 'Move right',
+    copy: 'Copy color code', copied: 'Color code copied', copyFailed: 'Could not copy color',
+    duplicate: 'Already in your palette', limit: 'Maximum 12 colors', export: 'Save PNG',
+    copyImage: 'Copy image', strip: 'Eyedropper (solid swatches)', labeled: 'With HEX labels',
+    exportMode: 'Export style', saveFailed: 'Could not save image',
+    imageCopied: 'Palette image copied',
+    imageCopyFailed: 'Image clipboard is unavailable. Save a PNG instead.',
+    reset: 'Clear palette', noColor: 'Add colors to enable export',
+    extracted: 'Extracted from image', source: 'Recommendation logic shared with the classic UI',
+  },
+} as const;
+
+export type V2Strings = { [K in keyof typeof V2_COPY.ja]: string };
+
+/** Labels are presentation only; MD2D design/color-system owns offsets and tone values. */
+export const V2_HARMONY_LABELS = {
+  ja: {
+    analogous: '類似色', complementary: '補色', triadic: '三色配色',
+    splitComplementary: '分裂補色', monochromatic: '単色', dominant: 'ドミナント',
+  },
+  en: {
+    analogous: 'Analogous', complementary: 'Complementary', triadic: 'Triadic',
+    splitComplementary: 'Split complementary', monochromatic: 'Monochromatic', dominant: 'Dominant',
+  },
+} as const;
+
+export const V2_TONE_LABELS = {
+  ja: {
+    vivid: 'ビビッド', bright: 'ブライト', light: 'ライト', pale: 'ペール',
+    deep: 'ディープ', dark: 'ダーク', soft: 'ソフト', dull: 'ダル', grayish: 'グレイッシュ',
+  },
+  en: {
+    vivid: 'Vivid', bright: 'Bright', light: 'Light', pale: 'Pale',
+    deep: 'Deep', dark: 'Dark', soft: 'Soft', dull: 'Dull', grayish: 'Grayish',
+  },
+} as const;

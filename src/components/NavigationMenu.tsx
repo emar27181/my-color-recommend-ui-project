@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, ClipboardList, Info, FlaskConical, TestTube2 } from 'lucide-react';
+import { Menu, X, ClipboardList, Info, FlaskConical, TestTube2, Palette } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
 interface NavigationMenuProps {
@@ -37,6 +37,16 @@ export const NavigationMenu = ({ className = '' }: NavigationMenuProps) => {
         <ScrollText className="w-5 h-5" />
       </Link>
       */}
+      {/* V2 is a separate interface. Preserve the classic / route and research pages. */}
+      <Link
+        to="/v2"
+        className="flex items-center gap-1 px-2 py-1 rounded-lg bg-background/50 hover:bg-muted/50 text-foreground"
+        title="新しいパレット推薦UI（V2）"
+        aria-label="新しいパレット推薦UI（V2）"
+      >
+        <Palette className="w-5 h-5" aria-hidden="true" />
+        <span className="text-xs font-semibold">V2</span>
+      </Link>
       <Link
         to="/sns-analysis"
         className="p-2 rounded-lg bg-background/50 border-none hover:bg-muted/50 transition-colors backdrop-blur-sm text-foreground"
